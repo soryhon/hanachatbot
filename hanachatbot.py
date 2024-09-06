@@ -81,8 +81,16 @@ def generate_response(query_text, vectorstore, callback):
 
 
 def generate_summarize(raw_text, callback):
-
-    return response.content
+        try:
+        # response 객체 생성 과정
+            response = some_api_call(text, handler)  # 예시
+            if response is None:
+                raise ValueError("Response is None")
+            return response.content
+        except Exception as e:
+            print(f"Error in generate_summarize: {e}")
+            return "An error occurred during summarization."
+   # return response.content
 
 
 # page title
