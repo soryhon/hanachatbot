@@ -10,10 +10,10 @@ from langchain.schema import ChatMessage
 
 from dotenv import load_dotenv
 
-#load_dotenv()
+load_dotenv()
 
 import os
-os.environ["OPENAI_API_KEY"] = "sk-iqikeXmsMIaJo73WNYPtQARmKCdhr-IUY4yNJjgWxJT3BlbkFJSjjKw6pNAyeNKntKTicdtpx6Sv4It1Cm_4_yZ6E2oA"
+#os.environ["OPENAI_API_KEY"] = "sk-iqikeXmsMIaJo73WNYPtQARmKCdhr-IUY4yNJjgWxJT3BlbkFJSjjKw6pNAyeNKntKTicdtpx6Sv4It1Cm_4_yZ6E2oA"
     
 
 # handle streaming conversation
