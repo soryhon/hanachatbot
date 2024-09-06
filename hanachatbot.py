@@ -54,24 +54,24 @@ def process_uploaded_file(uploaded_file):
 def generate_response(query_text, vectorstore, callback):
 
     # retriever 
-     docs_list = vectorstore.similarity_search(query_text, k=3)
-    docs = ""
+        docs_list = vectorstore.similarity_search(query_text, k=3)
+        docs = ""
     
-    for i, doc in enumerate(docs_list):
-        docs += f"'문서{i+1}':{doc.page_content}\n"   
+        for i, doc in enumerate(docs_list):
+            docs += f"'문서{i+1}':{doc.page_content}\n"   
     # generator
-    llm = ChatOpenAI(model_name="gpt-4o", temperature=0, streaming=True, callbacks=[callback])
+        llm = ChatOpenAI(model_name="gpt-4o", temperature=0, streaming=True, callbacks=[callback])
     # chaining
-    rag_prompt = [
-        SystemMessage(
-            content="너는 문서에 대해 질의응답을 하는 '문서봇'이야. 주어진 문서를 참고하여 사용자의 질문에 답변을 해줘. 문서에 내용이 정확하게 나와있지 않으면 대답하지 마."
-        ),
-        HumanMessage(
-            content=f"질문:{query_text}\n\n{docs}"
-        ),
-    ]
+        rag_prompt = [
+            SystemMessage(
+                content="너는 문서에 대해 질의응답을 하는 '문서봇'이야. 주어진 문서를 참고하여 사용자의 질문에 답변을 해줘. 문서에 내용이 정확하게 나와있지 않으면 대답하지 마."
+            ),
+            HumanMessage(
+                content=f"질문:{query_text}\n\n{docs}"
+            ),
+        ]
 
-    response = llm(rag_prompt)
+        response = llm(rag_prompt)
     return response.content
 
 
