@@ -10,8 +10,9 @@ from langchain.schema import ChatMessage
 from dotenv import load_dotenv
 import os
 
+load_dotenv()
 # API 키 설정
-os.environ["OPENAI_API_KEY"] = "sk-iqikeXmsMIaJo73WNYPtQARmKCdhr-IUY4yNJjgWxJT3BlbkFJSjjKw6pNAyeNKntKTicdtpx6Sv4It1Cm_4_yZ6E2oA"  # 실제 키로 대체
+#os.environ["OPENAI_API_KEY"] = "sk-iqikeXmsMIaJo73WNYPtQARmKCdhr-IUY4yNJjgWxJT3BlbkFJSjjKw6pNAyeNKntKTicdtpx6Sv4It1Cm_4_yZ6E2oA"  # 실제 키로 대체
 
 # 스트림 핸들러 클래스
 class StreamHandler(BaseCallbackHandler):
