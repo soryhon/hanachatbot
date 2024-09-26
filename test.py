@@ -9,8 +9,8 @@ from io import BytesIO
 import docx
 import xlsxwriter
 
-# OpenAI API 설정
-os.environ["OPENAI_API_KEY"] = "sk-iqikeXmsMIaJo73WNYPtQARmKCdhr-IUY4yNJjgWxJT3BlbkFJSjjKw6pNAyeNKntKTicdtpx6Sv4It1Cm_4_yZ6E2oA"
+# OpenAI API 설정 (올바른 API 키로 설정하세요)
+os.environ["OPENAI_API_KEY"] = "sk-iQH3k8Kwr4aizl_6HEldJsCmVkDMWiMUnNE2eGe6KsT3BlbkFJQ8YYozec2S8tpnzNDWKHb3S8xVbqw63fUTNTh9wAoA"
 llm = OpenAI(model='gpt-4', temperature=0.7)
 
 # 메인 레이아웃
@@ -29,7 +29,7 @@ with col1:
 
     # 파일 선택 함수
     def select_file(row_idx):
-        uploaded_file = st.file_uploader(f"데이터 선택 (행 {row_idx})", type=['csv', 'txt', 'pdf', 'docx', 'pptx'], key=f'file_{row_idx}')
+        uploaded_file = st.file_uploader(f"데이터 선택 (행 {row_idx})", type=['csv', 'txt', 'pdf', 'docx', 'pptx', 'xlsx'], key=f'file_{row_idx}')
         if uploaded_file is not None:
             file_path = os.path.join("/mnt/data", uploaded_file.name)
             with open(file_path, "wb") as f:
@@ -73,13 +73,14 @@ with col1:
 with col2:
     st.header("3. 실행")
     if st.button("실행"):
-        results = []
-        for idx, row in st.session_state['df'].iterrows():
-            prompt = f"제목: {row['제목']}, 요청: {row['요청']}, 데이터: {row['데이터']}"
-            response = llm(prompt)
-            results.append(response)
-        st.session_state['results'] = results
-        st.success("LLM 처리 완료")
+        if 'df' in st.session_state:
+            results = []
+            for idx, row in st.session_state['df'].iterrows():
+                prompt = f"제목: {row['제목']}, 요청: {row['요청']}, 데이터: {row['데이터']}"
+                response = llm(prompt)
+                results.append(response)
+            st.session_state['results'] = results
+            st.success("LLM 처리 완료")
 
 # 4. 결과 보고서 (col3에 위치)
 with col3:
@@ -141,49 +142,3 @@ with col3:
                     txt_output += f"제목: {st.session_state['df'].at[idx, '제목']}\n"
                     txt_output += f"{result}\n\n"
                 st.download_button(label="Download TXT", data=txt_output, file_name="report.txt")
-
-# 5. 참고 템플릿 미리보기 (col1에 위치)
-with col1:
-    st.header("5. 참고 템플릿 미리보기")
-    template_file = st.file_uploader("템플릿 파일 선택", type=['pdf', 'png', 'jpg', 'html'])
-    if template_file:
-        if template_file.type == "application/pdf":
-            reader = PdfReader(template_file)
-            for page in reader.pages:
-                st.write(page.extract_text())
-        elif template_file.type.startswith("image"):
-            image = Image.open(template_file)
-            st.image(image)
-        # HTML 파일은 별도로 처리 필요
-
-# 6. 저장 및 7. 불러오기 (col3에 위치)
-with col3:
-    st.header("6. 저장")
-    save_filename = st.text_input("저장할 파일명 입력")
-    if st.button("저장"):
-        # DataFrame과 템플릿 파일 경로를 저장하는 로직
-        save_data = {
-            'data': st.session_state['df'].to_dict(),
-            'template_file': template_file.name if template_file else ''
-        }
-        with open(f"/mnt/data/{save_filename}.txt", "w") as f:
-            f.write(str(save_data))
-
-    st.header("7. 불러오기")
-    load_file = st.file_uploader("저장된 txt 파일 선택")
-    if load_file:
-        # txt 파일에서 데이터 불러오기
-        loaded_data = eval(load_file.getvalue().decode())
-        st.session_state['df'] = pd.DataFrame.from_dict(loaded_data['data'])
-        st.success("불러오기 완료")
-
-        # 불러온 템플릿 파일 미리보기 (pdf 또는 이미지)
-        if loaded_data['template_file']:
-            st.write(f"템플릿 파일: {loaded_data['template_file']}")
-            if loaded_data['template_file'].endswith('.pdf'):
-                reader = PdfReader(f"/mnt/data/{loaded_data['template_file']}")
-                for page in reader.pages:
-                    st.write(page.extract_text())
-            elif loaded_data['template_file'].endswith(('.png', '.jpg')):
-                image = Image.open(f"/mnt/data/{loaded_data['template_file']}")
-                st.image(image)
