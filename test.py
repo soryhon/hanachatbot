@@ -46,7 +46,9 @@ with col1:
 
     # 행 추가 함수
     def add_row():
-        st.session_state['df'] = st.session_state['df'].append({'제목': '', '요청': '', '데이터': ''}, ignore_index=True)
+        new_row = {'제목': '', '요청': '', '데이터': ''}
+        # DataFrame에 새로운 행 추가
+        st.session_state['df'] = pd.concat([st.session_state['df'], pd.DataFrame([new_row])], ignore_index=True)
 
     # 행 추가 및 삭제 버튼
     st.button("행 추가", on_click=add_row)
@@ -179,9 +181,3 @@ with col3:
         if loaded_data['template_file']:
             st.write(f"템플릿 파일: {loaded_data['template_file']}")
             if loaded_data['template_file'].endswith('.pdf'):
-                reader = PdfReader(f"/mnt/data/{loaded_data['template_file']}")
-                for page in reader.pages:
-                    st.write(page.extract_text())
-            elif loaded_data['template_file'].endswith(('.png', '.jpg')):
-                image = Image.open(f"/mnt/data/{loaded_data['template_file']}")
-                st.image(image)
