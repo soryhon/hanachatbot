@@ -89,4 +89,6 @@ python-docx
 PyPDF2
 Pillow
 matplotlib
+xlsxwriter
+fpdf
 
