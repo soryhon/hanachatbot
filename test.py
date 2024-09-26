@@ -181,3 +181,9 @@ with col3:
         if loaded_data['template_file']:
             st.write(f"템플릿 파일: {loaded_data['template_file']}")
             if loaded_data['template_file'].endswith('.pdf'):
+                reader = PdfReader(f"/mnt/data/{loaded_data['template_file']}")
+                for page in reader.pages:
+                    st.write(page.extract_text())
+            elif loaded_data['template_file'].endswith(('.png', '.jpg')):
+                image = Image.open(f"/mnt/data/{loaded_data['template_file']}")
+                st.image(image)
