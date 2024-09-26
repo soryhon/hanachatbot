@@ -1,5 +1,3 @@
-
-
 import streamlit as st
 import pandas as pd
 import os
@@ -46,11 +44,19 @@ with col1:
         col_request.text_input("요청", key=f'request_{idx}', value=row['요청'] if pd.notna(row['요청']) else "", on_change=lambda: update_df_value(idx, '요청'))
         col_data.button("데이터 선택", on_click=lambda idx=idx: select_file(idx))
 
+    # 행 추가 함수
+    def add_row():
+        st.session_state['df'] = st.session_state['df'].append({'제목': '', '요청': '', '데이터': ''}, ignore_index=True)
+
     # 행 추가 및 삭제 버튼
-    st.button("행 추가", on_click=lambda: st.session_state['df'] = st.session_state['df'].append({'제목': '', '요청': '', '데이터': ''}, ignore_index=True))
+    st.button("행 추가", on_click=add_row)
     selected_rows = st.multiselect("삭제할 행 선택", st.session_state['df'].index)
-    if st.button("행 삭제"):
+
+    # 행 삭제 함수
+    def delete_selected_rows():
         st.session_state['df'] = st.session_state['df'].drop(selected_rows).reset_index(drop=True)
+
+    st.button("행 삭제", on_click=delete_selected_rows)
 
 # 2. 파일 업로드 (col1에 위치)
 with col1:
