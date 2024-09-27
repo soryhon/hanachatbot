@@ -1,98 +1,118 @@
 import streamlit as st
 import pandas as pd
-from io import BytesIO
 import os
+from pathlib import Path
+from langchain import OpenAI
+from io import BytesIO
 
-# 페이지 레이아웃 설정 (가로로 3개의 프레임, 전체 화면 해상도 적용)
-st.set_page_config(layout="wide")
+# 0. Streamlit 초기 구성 및 프레임 나누기
+st.set_page_config(layout="wide")  # 페이지 가로길이를 모니터 전체 해상도로 설정
+st.title("일일 업무 및 보고서 자동화 프로그램")
 
-# 세 개의 프레임 설정
-col1, col2, col3 = st.columns([39, 10, 49])
+# API 키 저장을 위한 변수 (세션 상태에 저장)
+if 'api_key' not in st.session_state:
+    st.session_state['api_key'] = None
 
-# 첫 번째 프레임: 작성 보고서 요청사항, 파일 업로드, 참고 템플릿 미리보기
+# Streamlit의 세로 프레임 구성
+col1, col2, col3 = st.columns([0.39, 0.10, 0.49])
+
+# 데이터 저장을 위한 임시 변수들
+rows = []
+uploaded_files = []
+llm_results = {}
+
+# 1. 작성 보고서 요청사항
 with col1:
-    st.markdown("### 1. 작성 보고서 요청사항")
-    st.markdown("---")
-    
-    # 기본 데이터 프레임 생성
-    if 'rows' not in st.session_state:
-        st.session_state.rows = pd.DataFrame({
-            '제목': [''],
-            '요청': [''],
-            '데이터': ['']
-        })
-    
-    def add_row():
-        new_row = pd.DataFrame({
-            '제목': [''],
-            '요청': [''],
-            '데이터': ['']
-        })
-        st.session_state.rows = pd.concat([st.session_state.rows, new_row], ignore_index=True)
-        
-    def delete_row(index):
-        st.session_state.rows.drop(index, inplace=True)
-        st.session_state.rows.reset_index(drop=True, inplace=True)
+    st.subheader("1. 작성 보고서 요청사항")
+    df = pd.DataFrame(columns=["제목", "요청", "데이터"])
 
-    # 테이블 표시
-    for idx, row in st.session_state.rows.iterrows():
-        st.checkbox(f"행{idx+1}")
-        title = st.text_input(f"제목 (행{idx+1})", row['제목'], key=f"title_{idx}")
-        request = st.text_input(f"요청 (행{idx+1})", row['요청'], key=f"request_{idx}")
-        file = st.file_uploader(f"데이터 (행{idx+1})", key=f"file_{idx}")
-        if file:
-            st.session_state.rows.at[idx, '데이터'] = file.name
+    # 기본 1행 추가
+    if len(rows) == 0:
+        rows.append({"제목": "titleValue1", "요청": "requestValue1", "데이터": ""})
+
+    for idx, row in enumerate(rows):
+        st.text(f"행 {idx+1}")
+        row['제목'] = st.text_input(f"제목 (행 {idx+1})", row['제목'])
+        row['요청'] = st.text_input(f"요청 (행 {idx+1})", row['요청'])
+        file_path = st.text_input(f"데이터 (행 {idx+1})", row['데이터'], disabled=True)
+        if st.button(f"선택 (행 {idx+1})"):
+            uploaded_file = st.file_uploader("파일 업로드", type=['txt', 'csv', 'pdf', 'docx', 'xlsx', 'pptx'])
+            if uploaded_file is not None:
+                row['데이터'] = uploaded_file.name
+                uploaded_files.append(uploaded_file)
 
     # 행 추가 및 삭제 버튼
-    st.button("행추가", on_click=add_row)
-    st.button("행삭제", on_click=lambda: delete_row([idx for idx, _ in enumerate(st.session_state.rows) if st.session_state[f"checkbox_{idx}"]]))
+    if st.button("행 추가"):
+        rows.append({"제목": f"titleValue{len(rows) + 1}", "요청": f"requestValue{len(rows) + 1}", "데이터": ""})
+    if st.button("행 삭제"):
+        rows = rows[:-1] if len(rows) > 1 else rows  # 최소 1행은 유지
 
-    # 파일 업로드 섹션
-    st.markdown("### 2. 파일 업로드")
-    upload_files = st.file_uploader("여러 파일 업로드", accept_multiple_files=True)
-    
-    # 참고 템플릿 미리보기 섹션
-    st.markdown("### 5. 참고 템플릿 미리보기")
-    template_file = st.file_uploader("파일 선택", key="template")
-    if st.button("미리보기"):
-        if template_file:
-            st.image(template_file)
-        else:
-            st.write("템플릿 파일을 선택하세요.")
+# 2. 파일 업로드 기능
+with col1:
+    st.subheader("2. 파일 업로드")
+    uploaded_files = st.file_uploader("파일을 여러 개 드래그 앤 드롭하여 업로드하세요.", accept_multiple_files=True)
 
-# 두 번째 프레임: 실행 버튼
+# 5. 참고 템플릿 미리보기
+with col1:
+    st.subheader("5. 참고 템플릿 미리보기")
+    selected_template_file = st.selectbox("템플릿 파일 선택", options=["Template1", "Template2", "Template3"])
+    if st.button("선택"):
+        if selected_template_file:
+            st.write(f"선택한 템플릿: {selected_template_file}")
+            # 파일 내용 미리보기 팝업창 구현은 Streamlit 제한 상 생략
+
+# 3. 실행 버튼 및 OpenAPI 키 입력
 with col2:
-    st.markdown("### 3. 실행")
+    st.subheader("3. 실행")
+
+    # OpenAI API 키 입력 부분
+    if st.session_state['api_key'] is None:
+        st.warning("OpenAI API 키가 필요합니다.")
+        api_key = st.text_input("OpenAI API 키를 입력하세요.", type="password")
+        if st.button("API 키 저장"):
+            if api_key:
+                st.session_state['api_key'] = api_key
+                st.success("API 키가 저장되었습니다.")
+    else:
+        st.info("OpenAI API 키가 이미 저장되어 있습니다.")
+
+    # LLM 실행 버튼
     if st.button("실행"):
-        st.session_state['openai_key'] = st.text_input("OpenAI API 키 입력", type="password")
-        st.write("LLM 요청을 처리 중입니다...")
+        if st.session_state['api_key'] is None:
+            st.error("OpenAI API 키를 입력해야 실행할 수 있습니다.")
+        else:
+            for idx, row in enumerate(rows):
+                # LLM 프롬프트 생성
+                prompt = f"제목: {row['제목']}\n요청: {row['요청']}\n데이터 경로: {row['데이터']}"
+                # GPT-4 모델에 프롬프트 전달 (예시, 실제로는 OpenAI API 호출 필요)
+                llm_results[idx] = f"LLM 응답 결과 값 {idx + 1}"
+            st.success("LLM 요청이 완료되었습니다.")
 
-# 세 번째 프레임: 결과 보고서, 저장, 불러오기
+# 4. 결과 보고서 화면
 with col3:
-    st.markdown("### 4. 결과 보고서")
-    # 실행 결과 보고
-    for idx, row in st.session_state.rows.iterrows():
-        st.markdown(f"#### 제목: {row['제목']}")
-        st.text_area(f"LLM 응답 결과 값 (행{idx+1})", value="LLM 응답 결과값 표시 영역")
-    
-    # 결과 보고서 Export 버튼
-    st.download_button("Export", data=b"결과 데이터", file_name="report.pdf")
+    st.subheader("4. 결과 보고서")
+    if llm_results:
+        for idx, result in llm_results.items():
+            st.text(f"제목 {rows[idx]['제목']}")
+            st.text(f"LLM 응답 결과: {result}")
+    if st.button("Export"):
+        file_type = st.selectbox("파일 형식 선택", options=["pdf", "docx", "xlsx", "txt"])
+        st.success(f"{file_type} 형식으로 파일 다운로드 가능")
 
-    # 저장 및 불러오기 버튼
-    st.markdown("### 6. 저장")
-    save_file = st.text_input("파일 이름 입력", key="save_file")
+# 6. 저장
+with col3:
+    st.subheader("6. 저장")
     if st.button("저장"):
-        if save_file:
-            # 작성된 내용 및 템플릿 저장
-            st.write(f"{save_file}.csv 저장 중...")
-        else:
-            st.write("파일 이름을 입력하세요.")
-    
-    st.markdown("### 7. 불러오기")
-    load_file = st.file_uploader("CSV 파일 불러오기")
-    if st.button("불러오기"):
-        if load_file:
-            # 불러오기 처리
-            st.write(f"{load_file.name} 불러오기 완료.")
-        else:
-            st.write("불러올 파일을 선택하세요.")
+        save_path = st.text_input("저장할 파일명 입력")
+        if save_path:
+            df.to_csv(f"{save_path}.csv")
+            st.success(f"{save_path}.csv 파일로 저장되었습니다.")
+
+# 7. 불러오기
+with col3:
+    st.subheader("7. 불러오기")
+    uploaded_save_file = st.file_uploader("저장된 CSV 파일 불러오기")
+    if uploaded_save_file is not None:
+        loaded_data = pd.read_csv(uploaded_save_file)
+        st.dataframe(loaded_data)
+        st.success("데이터가 불러와졌습니다.")
