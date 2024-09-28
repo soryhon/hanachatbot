@@ -163,19 +163,20 @@ with col3:
     st.subheader("6. 저장")
     
     # 결과 저장
-    if st.button("저장"):
-        save_path = st.text_input("저장할 파일명 입력")
-        if save_path:
-            # rows 데이터프레임 저장
-            df = pd.DataFrame(rows)
-            df.to_csv(f"{save_path}.csv")
-            st.success(f"{save_path}.csv 파일로 저장되었습니다.")
+    save_path = st.text_input("저장할 파일명 입력")
+    if st.button("저장") and save_path:
+        # rows 데이터프레임 저장
+        df = pd.DataFrame(rows)
+        df.to_csv(f"{save_path}.csv")
+        st.success(f"{save_path}.csv 파일로 저장되었습니다.")
 
 # 7. 불러오기
 with col3:
     st.subheader("7. 불러오기")
     
     # CSV 파일 불러오기
-    uploaded_save_file = st.file_uploader("저장된 CSV 파일 불러오기")
+    uploaded_save_file = st.file_uploader("저장된 CSV 파일 불러오기", type=["csv"])
     if uploaded_save_file is not None:
-        loaded_data = pd.read_csv(uploaded
+        loaded_data = pd.read_csv(uploaded_save_file)
+        st.dataframe(loaded_data)
+        st.success("데이터가 불러와졌습니다.")
