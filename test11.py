@@ -2,71 +2,29 @@ import streamlit as st
 import pandas as pd
 import os
 import requests
-from io import BytesIO
-import base64
 
 # 서버 측에 파일 저장 디렉토리
 UPLOAD_FOLDER = "uploaded_files"  # 서버에 파일을 저장할 디렉토리
 
-# 서버에 파일 저장 함수
-def save_file_to_server(uploaded_file):
-    if not os.path.exists(UPLOAD_FOLDER):
-        os.makedirs(UPLOAD_FOLDER)
-    
-    file_path = os.path.join(UPLOAD_FOLDER, uploaded_file.name)
-    
-    with open(file_path, "wb") as f:
-        f.write(uploaded_file.getbuffer())
-    
-    return file_path
-
-# GitHub에 파일 업로드 함수
-def upload_file_to_github(file_path, file_name, github_token, repo, branch):
-    # 파일 내용 읽기
-    with open(file_path, "rb") as f:
-        content = f.read()
-    
-    # 파일 내용을 base64로 인코딩
-    encoded_content = base64.b64encode(content).decode("utf-8")
-
-    # GitHub API URL
-    url = f"https://api.github.com/repos/{repo}/contents/{file_name}"
-
-    # 요청 헤더
+# GitHub 저장소에서 파일 목록을 가져오는 함수
+def get_github_files(repo, github_token, branch="main"):
+    url = f"https://api.github.com/repos/{repo}/git/trees/{branch}?recursive=1"
     headers = {
-        "Authorization": f"token {github_token}",
-        "Content-Type": "application/json"
+        "Authorization": f"token {github_token}"
     }
-
-    # GitHub API에 보낼 데이터
-    data = {
-        "message": f"Uploading {file_name} via Streamlit app",
-        "content": encoded_content,
-        "branch": branch
-    }
-
-    # 파일 업로드 요청
-    response = requests.put(url, json=data, headers=headers)
-    
-    if response.status_code == 201:
-        st.success(f"{file_name}가 GitHub에 성공적으로 업로드되었습니다.")
-    elif response.status_code == 401:
-        st.error(f"GitHub 업로드 실패: {response.status_code} - 인증 오류 (Bad credentials). 올바른 Personal Access Token을 입력했는지 확인하세요.")
-    elif response.status_code == 404:
-        st.error(f"GitHub 업로드 실패: {response.status_code} - 저장소 경로를 찾을 수 없습니다. 저장소 경로를 확인해주세요.")
-        st.write(f"GitHub API 응답: {response.json()}")  # API 응답 전체를 출력하여 디버깅
-    else:
-        st.error(f"GitHub 업로드 실패: {response.status_code} - {response.text}")
-
-# GitHub API 사용량 제한 확인 함수
-def check_github_rate_limit(github_token):
-    url = "https://api.github.com/rate_limit"
-    headers = {"Authorization": f"token {github_token}"}
     response = requests.get(url, headers=headers)
+    
     if response.status_code == 200:
-        st.write("GitHub API 사용량 제한 정보:", response.json())
+        tree = response.json().get("tree", [])
+        file_list = [item["path"] for item in tree if item["type"] == "blob"]  # 파일 경로만 추출
+        return file_list
     else:
-        st.error(f"API 사용량 제한 정보를 가져오는 데 실패했습니다: {response.status_code}")
+        st.error(f"GitHub 파일 목록을 가져오지 못했습니다: {response.status_code}")
+        return []
+
+# GitHub 파일의 URL을 생성하는 함수
+def get_file_url(repo, branch, file_path):
+    return f"https://github.com/{repo}/blob/{branch}/{file_path}"
 
 # 0. Streamlit 초기 구성 및 프레임 나누기
 st.set_page_config(layout="wide")  # 페이지 가로길이를 모니터 전체 해상도로 설정
@@ -85,7 +43,6 @@ col1, col2, col3 = st.columns([0.39, 0.10, 0.49])
 
 # 데이터 저장을 위한 임시 변수들
 rows = []
-uploaded_files = []
 llm_results = {}
 
 # 1. 작성 보고서 요청사항
@@ -101,34 +58,30 @@ with col1:
         st.text(f"행 {idx+1}")
         row['제목'] = st.text_input(f"제목 (행 {idx+1})", row['제목'])
         row['요청'] = st.text_input(f"요청 (행 {idx+1})", row['요청'])
-        file_path = st.text_input(f"데이터 (행 {idx+1})", row['데이터'], disabled=True)
+        
+        # GitHub에서 파일 선택
         if st.button(f"선택 (행 {idx+1})"):
-            uploaded_file = st.file_uploader("파일 업로드", type=['txt', 'csv', 'pdf', 'docx', 'xlsx', 'pptx'])
-            if uploaded_file is not None:
-                row['데이터'] = uploaded_file.name
-                uploaded_files.append(uploaded_file)
+            if st.session_state['github_repo'] and st.session_state['api_key']:
+                # GitHub에서 파일 목록 가져오기
+                file_list = get_github_files(st.session_state['github_repo'], st.session_state['api_key'], st.session_state['github_branch'])
+                
+                if file_list:
+                    selected_file = st.selectbox(f"GitHub 파일 선택 (행 {idx+1})", options=file_list)
+                    if selected_file:
+                        file_url = get_file_url(st.session_state['github_repo'], st.session_state['github_branch'], selected_file)
+                        row['데이터'] = file_url  # 선택된 파일의 URL 저장
+                        st.success(f"선택한 파일: {selected_file}\nURL: {file_url}")
+            else:
+                st.warning("GitHub 저장소 정보 또는 API 토큰이 설정되지 않았습니다.")
+        
+        # URL 정보 표시
+        file_path = st.text_input(f"데이터 (행 {idx+1})", row['데이터'], disabled=True)
 
     # 행 추가 및 삭제 버튼
     if st.button("행 추가"):
         rows.append({"제목": f"titleValue{len(rows) + 1}", "요청": f"requestValue{len(rows) + 1}", "데이터": ""})
     if st.button("행 삭제"):
         rows = rows[:-1] if len(rows) > 1 else rows  # 최소 1행은 유지
-
-# 2. 파일 업로드 기능
-with col1:
-    st.subheader("2. 파일 업로드")
-    uploaded_files = st.file_uploader("파일을 여러 개 드래그 앤 드롭하여 업로드하세요.", accept_multiple_files=True)
-
-    if uploaded_files:
-        for uploaded_file in uploaded_files:
-            # 서버에 파일 저장
-            file_path = save_file_to_server(uploaded_file)
-            
-            # GitHub에 파일 업로드, GitHub 저장소 경로와 토큰을 입력받음
-            if st.session_state['api_key'] and st.session_state['github_repo']:
-                upload_file_to_github(file_path, uploaded_file.name, st.session_state['api_key'], st.session_state['github_repo'], st.session_state['github_branch'])
-            else:
-                st.warning("GitHub 저장소 정보 또는 API 토큰을 입력해야 합니다.")
 
 # 3. GitHub 저장소 정보 입력
 with col2:
@@ -153,19 +106,14 @@ with col2:
             if api_key:
                 st.session_state['api_key'] = api_key
                 st.success("API 토큰이 저장되었습니다.")
-                # 토큰 저장 후 GitHub 사용량 제한 확인
-                check_github_rate_limit(st.session_state['api_key'])
     else:
         st.info("API 토큰이 저장되어 있습니다.")
 
-# 5. 참고 템플릿 미리보기
-with col1:
-    st.subheader("5. 참고 템플릿 미리보기")
-    selected_template_file = st.selectbox("템플릿 파일 선택", options=["Template1", "Template2", "Template3"])
-    if st.button("선택"):
-        if selected_template_file:
-            st.write(f"선택한 템플릿: {selected_template_file}")
-            # 파일 내용 미리보기 팝업창 구현은 Streamlit 제한 상 생략
+    # 브랜치 입력
+    github_branch = st.text_input("브랜치 이름 (예: main 또는 master)", value=st.session_state['github_branch'])
+    if st.button("브랜치 저장"):
+        st.session_state['github_branch'] = github_branch
+        st.success(f"브랜치가 '{github_branch}'로 설정되었습니다.")
 
 # 3. 실행 버튼 및 OpenAPI 키 입력
 with col2:
@@ -197,10 +145,13 @@ with col2:
 # 4. 결과 보고서 화면
 with col3:
     st.subheader("4. 결과 보고서")
+    
     if llm_results:
         for idx, result in llm_results.items():
             st.text(f"제목 {rows[idx]['제목']}")
             st.text(f"LLM 응답 결과: {result}")
+    
+    # 결과 보고서 다운로드
     if st.button("Export"):
         file_type = st.selectbox("파일 형식 선택", options=["pdf", "docx", "xlsx", "txt"])
         st.success(f"{file_type} 형식으로 파일 다운로드 가능")
@@ -208,15 +159,21 @@ with col3:
 # 6. 저장
 with col3:
     st.subheader("6. 저장")
+    
+    # 결과 저장
     if st.button("저장"):
         save_path = st.text_input("저장할 파일명 입력")
         if save_path:
+            # rows 데이터프레임 저장
+            df = pd.DataFrame(rows)
             df.to_csv(f"{save_path}.csv")
             st.success(f"{save_path}.csv 파일로 저장되었습니다.")
 
 # 7. 불러오기
 with col3:
     st.subheader("7. 불러오기")
+    
+    # CSV 파일 불러오기
     uploaded_save_file = st.file_uploader("저장된 CSV 파일 불러오기")
     if uploaded_save_file is not None:
         loaded_data = pd.read_csv(uploaded_save_file)
