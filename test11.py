@@ -51,6 +51,32 @@ def upload_file_to_github(repo, folder_name, file_name, content, github_token, b
     else:
         st.error(f"GitHub 업로드 실패: {response.status_code} - {response.text}")
 
+# GitHub에서 파일 목록을 가져오는 함수
+def get_github_files(repo, github_token, folder_name=None, branch="main"):
+    # 특정 폴더가 있으면 해당 폴더에서, 없으면 기본 브랜치에서 가져옴
+    url = f"https://api.github.com/repos/{repo}/git/trees/{branch}?recursive=1"
+    headers = {
+        "Authorization": f"token {github_token}"
+    }
+    response = requests.get(url, headers=headers)
+    
+    if response.status_code == 200:
+        tree = response.json().get("tree", [])
+        if folder_name:
+            # 지정된 폴더 내의 파일만 필터링
+            file_list = [item["path"] for item in tree if folder_name in item["path"] and item["type"] == "blob"]
+        else:
+            file_list = [item["path"] for item in tree if item["type"] == "blob"]
+        return file_list
+    else:
+        st.error(f"GitHub 파일 목록을 가져오지 못했습니다: {response.status_code}")
+        return []
+
+# GitHub 파일의 URL을 생성하는 함수 (한글과 공백 처리)
+def get_file_url(repo, branch, file_path):
+    encoded_file_path = urllib.parse.quote(file_path)  # 파일 경로 인코딩 (한글 및 공백 처리)
+    return f"https://github.com/{repo}/blob/{branch}/{encoded_file_path}"
+
 # 0. Streamlit 초기 구성 및 프레임 나누기
 st.set_page_config(layout="wide")  # 페이지 가로길이를 모니터 전체 해상도로 설정
 st.title("일일 업무 및 보고서 자동화 프로그램")
@@ -85,6 +111,33 @@ with col1:
         st.text(f"행 {idx+1}")
         row['제목'] = st.text_input(f"제목 (행 {idx+1})", row['제목'])
         row['요청'] = st.text_input(f"요청 (행 {idx+1})", row['요청'])
+
+        # [선택] 버튼: updateFiles 폴더 확인 후 파일 리스트 제공
+        if st.button(f"선택 (행 {idx+1})"):
+            if st.session_state['github_repo'] and st.session_state['github_token']:
+                # updateFiles 폴더 존재 여부 확인
+                file_list = []
+                update_files_exist = any("updateFiles" in item for item in get_github_files(st.session_state['github_repo'], st.session_state['github_token'], branch=st.session_state['github_branch']))
+                
+                if update_files_exist:
+                    st.success("updateFiles 폴더가 존재합니다.")
+                    file_list = get_github_files(st.session_state['github_repo'], st.session_state['github_token'], folder_name="updateFiles", branch=st.session_state['github_branch'])
+                else:
+                    st.warning("updateFiles 폴더가 존재하지 않습니다. 기본 폴더의 파일을 표시합니다.")
+                    file_list = get_github_files(st.session_state['github_repo'], st.session_state['github_token'], branch=st.session_state['github_branch'])
+                
+                if file_list:
+                    selected_file = st.selectbox(f"파일 선택 (행 {idx+1})", options=file_list)
+                    if selected_file:
+                        file_url = get_file_url(st.session_state['github_repo'], st.session_state['github_branch'], selected_file)
+                        row['데이터'] = file_url  # 선택된 파일의 URL 저장
+                        st.success(f"선택한 파일: {selected_file}\nURL: {file_url}")
+                else:
+                    st.error("선택할 수 있는 파일이 없습니다.")
+            else:
+                st.warning("GitHub 저장소 정보 또는 API 토큰이 설정되지 않았습니다. 정보를 먼저 입력해주세요.")
+
+        # URL 정보 표시
         file_path = st.text_input(f"데이터 (행 {idx+1})", row['데이터'], disabled=True)
 
     # 행 추가 및 삭제 버튼
