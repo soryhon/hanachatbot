@@ -5,30 +5,39 @@ import requests
 import base64  # base64 인코딩을 위해 필요
 import urllib.parse  # URL 인코딩을 위한 라이브러리
 
-# GitHub 저장소에서 파일 목록을 가져오는 함수
-def get_github_files(repo, github_token, branch="main"):
-    url = f"https://api.github.com/repos/{repo}/git/trees/{branch}?recursive=1"
+# GitHub 저장소에서 파일 또는 폴더가 존재하는지 확인하는 함수
+def check_github_folder_exists(repo, folder_name, github_token, branch="main"):
+    url = f"https://api.github.com/repos/{repo}/contents/{folder_name}?ref={branch}"
     headers = {
-        "Authorization": f"token {github_token}"
+        "Authorization": f"token {github_token}",
+        "Content-Type": "application/json"
     }
     response = requests.get(url, headers=headers)
-    
-    if response.status_code == 200:
-        tree = response.json().get("tree", [])
-        file_list = [item["path"] for item in tree if item["type"] == "blob"]  # 파일 경로만 추출
-        return file_list
-    else:
-        st.error(f"GitHub 파일 목록을 가져오지 못했습니다: {response.status_code}")
-        return []
+    return response.status_code == 200
 
-# GitHub 파일의 URL을 생성하는 함수 (한글과 공백 처리)
-def get_file_url(repo, branch, file_path):
-    encoded_file_path = urllib.parse.quote(file_path)  # 파일 경로 인코딩 (한글 및 공백 처리)
-    return f"https://github.com/{repo}/blob/{branch}/{encoded_file_path}"
+# GitHub에 폴더를 생성하는 함수
+def create_github_folder(repo, folder_name, github_token, branch="main"):
+    url = f"https://api.github.com/repos/{repo}/contents/{folder_name}/.gitkeep"
+    headers = {
+        "Authorization": f"token {github_token}",
+        "Content-Type": "application/json"
+    }
+    content_base64 = base64.b64encode(b"").decode("utf-8")  # 빈 파일 생성
+    data = {
+        "message": f"Create {folder_name} folder",
+        "content": content_base64,
+        "branch": branch
+    }
+    response = requests.put(url, headers=headers, json=data)
+    
+    if response.status_code == 201:
+        st.success(f"{folder_name} 폴더가 생성되었습니다.")
+    else:
+        st.error(f"폴더 생성 실패: {response.status_code} - {response.text}")
 
 # GitHub에 파일을 업로드하는 함수
-def upload_file_to_github(repo, file_name, content, github_token, branch="main"):
-    url = f"https://api.github.com/repos/{repo}/contents/{file_name}"
+def upload_file_to_github(repo, folder_name, file_name, content, github_token, branch="main"):
+    url = f"https://api.github.com/repos/{repo}/contents/{folder_name}/{file_name}"
     headers = {
         "Authorization": f"token {github_token}",
         "Content-Type": "application/json"
@@ -48,9 +57,16 @@ def upload_file_to_github(repo, file_name, content, github_token, branch="main")
         st.error(f"GitHub 업로드 실패: {response.status_code} - {response.text}")
 
 # 파일을 GitHub에 업로드할 때 사용하는 함수
-def save_uploaded_file(uploaded_file, repo, github_token):
+def save_uploaded_file(uploaded_file, repo, github_token, branch="main"):
+    folder_name = "uploadFiles"
+    
+    # 폴더가 존재하는지 확인
+    if not check_github_folder_exists(repo, folder_name, github_token, branch):
+        # 폴더가 존재하지 않으면 생성
+        create_github_folder(repo, folder_name, github_token, branch)
+    
     # 파일을 GitHub에 저장
-    upload_file_to_github(repo, uploaded_file.name, uploaded_file.read(), github_token)
+    upload_file_to_github(repo, folder_name, uploaded_file.name, uploaded_file.read(), github_token, branch)
 
 # 0. Streamlit 초기 구성 및 프레임 나누기
 st.set_page_config(layout="wide")  # 페이지 가로길이를 모니터 전체 해상도로 설정
