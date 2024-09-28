@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import os
 import requests
+import urllib.parse  # URL 인코딩을 위한 라이브러리
 
 # 서버 측에 파일 저장 디렉토리
 UPLOAD_FOLDER = "uploaded_files"  # 서버에 파일을 저장할 디렉토리
@@ -22,9 +23,10 @@ def get_github_files(repo, github_token, branch="main"):
         st.error(f"GitHub 파일 목록을 가져오지 못했습니다: {response.status_code}")
         return []
 
-# GitHub 파일의 URL을 생성하는 함수
+# GitHub 파일의 URL을 생성하는 함수 (한글과 공백 처리)
 def get_file_url(repo, branch, file_path):
-    return f"https://github.com/{repo}/blob/{branch}/{file_path}"
+    encoded_file_path = urllib.parse.quote(file_path)  # 파일 경로 인코딩 (한글 및 공백 처리)
+    return f"https://github.com/{repo}/blob/{branch}/{encoded_file_path}"
 
 # 0. Streamlit 초기 구성 및 프레임 나누기
 st.set_page_config(layout="wide")  # 페이지 가로길이를 모니터 전체 해상도로 설정
@@ -82,6 +84,21 @@ with col1:
         rows.append({"제목": f"titleValue{len(rows) + 1}", "요청": f"requestValue{len(rows) + 1}", "데이터": ""})
     if st.button("행 삭제"):
         rows = rows[:-1] if len(rows) > 1 else rows  # 최소 1행은 유지
+
+# 2. 파일 업로드 기능
+with col1:
+    st.subheader("2. 파일 업로드")
+    uploaded_files = st.file_uploader("파일을 여러 개 드래그 앤 드롭하여 업로드하세요.", accept_multiple_files=True)
+
+    if uploaded_files:
+        for uploaded_file in uploaded_files:
+            # 업로드된 파일을 서버에 저장
+            file_details = {"FileName": uploaded_file.name, "FileType": uploaded_file.type}
+            st.write(file_details)
+            save_path = os.path.join(UPLOAD_FOLDER, uploaded_file.name)
+            with open(save_path, "wb") as f:
+                f.write(uploaded_file.getbuffer())
+            st.success(f"{uploaded_file.name} 파일이 업로드되었습니다.")
 
 # 3. GitHub 저장소 정보 입력
 with col2:
@@ -156,25 +173,33 @@ with col3:
         file_type = st.selectbox("파일 형식 선택", options=["pdf", "docx", "xlsx", "txt"])
         st.success(f"{file_type} 형식으로 파일 다운로드 가능")
 
+# 5. 참고 템플릿 미리보기
+with col1:
+    st.subheader("5. 참고 템플릿 미리보기")
+
+    selected_template_file = st.selectbox("템플릿 파일 선택", options=["Template1", "Template2", "Template3"])
+    if st.button("선택"):
+        st.success(f"선택한 템플릿: {selected_template_file}")
+        # 템플릿 미리보기 구현 (팝업창이나 별도의 영역에 표시)
+
 # 6. 저장
 with col3:
     st.subheader("6. 저장")
     
     # 결과 저장
-    if st.button("저장"):
-        save_path = st.text_input("저장할 파일명 입력")
-        if save_path:
-            # rows 데이터프레임 저장
-            df = pd.DataFrame(rows)
-            df.to_csv(f"{save_path}.csv")
-            st.success(f"{save_path}.csv 파일로 저장되었습니다.")
+    save_path = st.text_input("저장할 파일명 입력")
+    if st.button("저장") and save_path:
+        # rows 데이터프레임 저장
+        df = pd.DataFrame(rows)
+        df.to_csv(f"{save_path}.csv")
+        st.success(f"{save_path}.csv 파일로 저장되었습니다.")
 
 # 7. 불러오기
 with col3:
     st.subheader("7. 불러오기")
     
     # CSV 파일 불러오기
-    uploaded_save_file = st.file_uploader("저장된 CSV 파일 불러오기")
+    uploaded_save_file = st.file_uploader("저장된 CSV 파일 불러오기", type=["csv"])
     if uploaded_save_file is not None:
         loaded_data = pd.read_csv(uploaded_save_file)
         st.dataframe(loaded_data)
