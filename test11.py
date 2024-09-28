@@ -52,6 +52,9 @@ def upload_file_to_github(file_path, file_name, github_token, repo, branch):
         st.success(f"{file_name}가 GitHub에 성공적으로 업로드되었습니다.")
     elif response.status_code == 401:
         st.error(f"GitHub 업로드 실패: {response.status_code} - 인증 오류 (Bad credentials). 올바른 Personal Access Token을 입력했는지 확인하세요.")
+    elif response.status_code == 404:
+        st.error(f"GitHub 업로드 실패: {response.status_code} - 저장소 경로를 찾을 수 없습니다. 저장소 경로를 확인해주세요.")
+        st.write(f"GitHub API 응답: {response.json()}")  # API 응답 전체를 출력하여 디버깅
     else:
         st.error(f"GitHub 업로드 실패: {response.status_code} - {response.text}")
 
