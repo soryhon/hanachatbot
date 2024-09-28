@@ -50,8 +50,20 @@ def upload_file_to_github(file_path, file_name, github_token, repo, branch):
     
     if response.status_code == 201:
         st.success(f"{file_name}가 GitHub에 성공적으로 업로드되었습니다.")
+    elif response.status_code == 401:
+        st.error(f"GitHub 업로드 실패: {response.status_code} - 인증 오류 (Bad credentials). 올바른 Personal Access Token을 입력했는지 확인하세요.")
     else:
         st.error(f"GitHub 업로드 실패: {response.status_code} - {response.text}")
+
+# GitHub API 사용량 제한 확인 함수
+def check_github_rate_limit(github_token):
+    url = "https://api.github.com/rate_limit"
+    headers = {"Authorization": f"token {github_token}"}
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        st.write("GitHub API 사용량 제한 정보:", response.json())
+    else:
+        st.error(f"API 사용량 제한 정보를 가져오는 데 실패했습니다: {response.status_code}")
 
 # 0. Streamlit 초기 구성 및 프레임 나누기
 st.set_page_config(layout="wide")  # 페이지 가로길이를 모니터 전체 해상도로 설정
@@ -138,6 +150,8 @@ with col2:
             if api_key:
                 st.session_state['api_key'] = api_key
                 st.success("API 토큰이 저장되었습니다.")
+                # 토큰 저장 후 GitHub 사용량 제한 확인
+                check_github_rate_limit(st.session_state['api_key'])
     else:
         st.info("API 토큰이 저장되어 있습니다.")
 
