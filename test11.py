@@ -44,8 +44,10 @@ st.set_page_config(layout="wide")  # 페이지 가로길이를 모니터 전체 
 st.title("일일 업무 및 보고서 자동화 프로그램")
 
 # API 키 및 GitHub 저장소 정보를 메모리에 저장하기 위한 변수 (세션 상태에 저장)
-if 'api_key' not in st.session_state:
-    st.session_state['api_key'] = None
+if 'openai_api_key' not in st.session_state:
+    st.session_state['openai_api_key'] = None
+if 'github_token' not in st.session_state:
+    st.session_state['github_token'] = None
 if 'github_repo' not in st.session_state:
     st.session_state['github_repo'] = None
 if 'github_branch' not in st.session_state:
@@ -74,9 +76,9 @@ with col1:
         
         # GitHub에서 파일 선택
         if st.button(f"선택 (행 {idx+1})"):
-            if st.session_state['github_repo'] and st.session_state['api_key']:
+            if st.session_state['github_repo'] and st.session_state['github_token']:
                 # GitHub에서 파일 목록 가져오기
-                file_list = get_github_files(st.session_state['github_repo'], st.session_state['api_key'], st.session_state['github_branch'])
+                file_list = get_github_files(st.session_state['github_repo'], st.session_state['github_token'], st.session_state['github_branch'])
                 
                 if file_list:
                     selected_file = st.selectbox(f"GitHub 파일 선택 (행 {idx+1})", options=file_list)
@@ -127,15 +129,15 @@ with col2:
         st.info(f"저장소: {st.session_state['github_repo']}")
 
     # GitHub API 토큰 입력
-    if st.session_state['api_key'] is None:
+    if st.session_state['github_token'] is None:
         st.warning("GitHub API 토큰을 입력하세요.")
-        api_key = st.text_input("GitHub API 토큰 입력", type="password")
-        if st.button("API 토큰 저장"):
-            if api_key:
-                st.session_state['api_key'] = api_key
-                st.success("API 토큰이 저장되었습니다.")
+        github_token = st.text_input("GitHub API 토큰 입력", type="password")
+        if st.button("GitHub API 토큰 저장"):
+            if github_token:
+                st.session_state['github_token'] = github_token
+                st.success("GitHub API 토큰이 저장되었습니다.")
     else:
-        st.info("API 토큰이 저장되어 있습니다.")
+        st.info("GitHub API 토큰이 저장되어 있습니다.")
 
     # 브랜치 입력
     github_branch = st.text_input("브랜치 이름 (예: main 또는 master)", value=st.session_state['github_branch'])
@@ -143,24 +145,26 @@ with col2:
         st.session_state['github_branch'] = github_branch
         st.success(f"브랜치가 '{github_branch}'로 설정되었습니다.")
 
-# 3. 실행 버튼 및 OpenAPI 키 입력
+# 3. 실행 버튼 및 OpenAI API 키 입력
 with col2:
     st.subheader("3. 실행")
 
     # OpenAI API 키 입력 부분
-    if st.session_state['api_key'] is None:
+    if st.session_state['openai_api_key'] is None:
         st.warning("OpenAI API 키가 필요합니다.")
-        api_key = st.text_input("OpenAI API 키를 입력하세요.", type="password")
-        if st.button("API 키 저장"):
-            if api_key:
-                st.session_state['api_key'] = api_key
-                st.success("API 키가 저장되었습니다.")
+        openai_api_key = st.text_input("OpenAI API 키를 입력하세요.", type="password")
+        if st.button("OpenAI API 키 저장"):
+            if openai_api_key.startswith("sk-"):  # OpenAI API 키는 보통 'sk-'로 시작합니다.
+                st.session_state['openai_api_key'] = openai_api_key
+                st.success("OpenAI API 키가 저장되었습니다.")
+            else:
+                st.error("올바른 OpenAI API 키를 입력하세요. 키는 'sk-'로 시작해야 합니다.")
     else:
-        st.info("OpenAI API 키가 이미 저장되어 있습니다.")
+        st.info("OpenAI API 키가 저장되어 있습니다.")
 
     # LLM 실행 버튼
     if st.button("실행"):
-        if st.session_state['api_key'] is None:
+        if st.session_state['openai_api_key'] is None:
             st.error("OpenAI API 키를 입력해야 실행할 수 있습니다.")
         else:
             # 모든 행의 정보를 기반으로 프롬프트 구성
@@ -182,7 +186,7 @@ with col2:
                 }
                 
                 # LLM에 프롬프트 전달하고 응답 받기
-                llm_response = send_to_llm(prompt, st.session_state['api_key'])
+                llm_response = send_to_llm(prompt, st.session_state['openai_api_key'])
                 
                 if llm_response:
                     llm_results[idx] = llm_response  # 결과 저장
