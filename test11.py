@@ -93,9 +93,40 @@ with col1:
     if st.button("행 삭제"):
         rows = rows[:-1] if len(rows) > 1 else rows  # 최소 1행은 유지
 
-# 2. 파일 업로드 기능 (GitHub 업로드)
+# 2. 파일 업로드 및 GitHub 저장소 정보 입력 기능
 with col1:
-    st.subheader("2. 파일 업로드")
+    st.subheader("2. 파일 업로드 및 GitHub 저장소 정보")
+
+    # GitHub 저장소 경로 입력
+    if st.session_state['github_repo'] is None:
+        st.warning("GitHub 저장소 정보를 입력하세요.")
+        github_repo = st.text_input("GitHub 저장소 경로 (예: username/repo)")
+        if st.button("저장소 정보 저장"):
+            if github_repo:
+                st.session_state['github_repo'] = github_repo
+                st.success("GitHub 저장소 경로가 저장되었습니다.")
+    else:
+        st.info(f"저장소: {st.session_state['github_repo']}")
+
+    # GitHub API 토큰 입력
+    if st.session_state['github_token'] is None:
+        st.warning("GitHub API 토큰을 입력하세요.")
+        github_token = st.text_input("GitHub API 토큰 입력", type="password")
+        if st.button("GitHub API 토큰 저장"):
+            if github_token:
+                st.session_state['github_token'] = github_token
+                st.success("GitHub API 토큰이 저장되었습니다.")
+    else:
+        st.info("GitHub API 토큰이 저장되어 있습니다.")
+
+    # 브랜치 입력
+    github_branch = st.text_input("브랜치 이름 (예: main 또는 master)", value=st.session_state['github_branch'])
+    if st.button("브랜치 저장"):
+        st.session_state['github_branch'] = github_branch
+        st.success(f"브랜치가 '{github_branch}'로 설정되었습니다.")
+
+    # 파일 업로드 기능 (GitHub 업로드)
+    st.subheader("파일 업로드")
     uploaded_files = st.file_uploader("파일을 여러 개 드래그 앤 드롭하여 업로드하세요.", accept_multiple_files=True)
 
     if uploaded_files and st.session_state['github_repo'] and st.session_state['github_token']:
