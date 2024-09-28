@@ -35,6 +35,27 @@ def create_github_folder(repo, folder_name, github_token, branch="main"):
     else:
         st.error(f"폴더 생성 실패: {response.status_code} - {response.text}")
 
+# GitHub 저장소에서 파일 목록을 가져오는 함수
+def get_github_files(repo, github_token, branch="main"):
+    url = f"https://api.github.com/repos/{repo}/git/trees/{branch}?recursive=1"
+    headers = {
+        "Authorization": f"token {github_token}"
+    }
+    response = requests.get(url, headers=headers)
+    
+    if response.status_code == 200:
+        tree = response.json().get("tree", [])
+        file_list = [item["path"] for item in tree if item["type"] == "blob"]  # 파일 경로만 추출
+        return file_list
+    else:
+        st.error(f"GitHub 파일 목록을 가져오지 못했습니다: {response.status_code}")
+        return []
+
+# GitHub 파일의 URL을 생성하는 함수 (한글과 공백 처리)
+def get_file_url(repo, branch, file_path):
+    encoded_file_path = urllib.parse.quote(file_path)  # 파일 경로 인코딩 (한글 및 공백 처리)
+    return f"https://github.com/{repo}/blob/{branch}/{encoded_file_path}"
+
 # GitHub에 파일을 업로드하는 함수
 def upload_file_to_github(repo, folder_name, file_name, content, github_token, branch="main"):
     url = f"https://api.github.com/repos/{repo}/contents/{folder_name}/{file_name}"
@@ -105,6 +126,7 @@ with col1:
         
         # GitHub에서 파일 선택
         if st.button(f"선택 (행 {idx+1})"):
+            # GitHub 정보가 모두 설정되었는지 확인
             if st.session_state['github_repo'] and st.session_state['github_token']:
                 # GitHub에서 파일 목록 가져오기
                 file_list = get_github_files(st.session_state['github_repo'], st.session_state['github_token'], st.session_state['github_branch'])
@@ -115,8 +137,10 @@ with col1:
                         file_url = get_file_url(st.session_state['github_repo'], st.session_state['github_branch'], selected_file)
                         row['데이터'] = file_url  # 선택된 파일의 URL 저장
                         st.success(f"선택한 파일: {selected_file}\nURL: {file_url}")
+                else:
+                    st.error("GitHub 파일 목록을 가져오지 못했습니다.")
             else:
-                st.warning("GitHub 저장소 정보 또는 API 토큰이 설정되지 않았습니다.")
+                st.warning("GitHub 저장소 정보 또는 API 토큰이 설정되지 않았습니다. 정보를 먼저 입력해주세요.")
         
         # URL 정보 표시
         file_path = st.text_input(f"데이터 (행 {idx+1})", row['데이터'], disabled=True)
