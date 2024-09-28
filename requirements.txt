@@ -91,4 +91,4 @@ Pillow
 matplotlib
 xlsxwriter
 fpdf
-
+requests
