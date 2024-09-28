@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import os
 import requests
+import base64  # base64 인코딩을 위해 필요
 import urllib.parse  # URL 인코딩을 위한 라이브러리
 
 # GitHub 저장소에서 파일 목록을 가져오는 함수
@@ -25,41 +26,31 @@ def get_file_url(repo, branch, file_path):
     encoded_file_path = urllib.parse.quote(file_path)  # 파일 경로 인코딩 (한글 및 공백 처리)
     return f"https://github.com/{repo}/blob/{branch}/{encoded_file_path}"
 
-# LLM에 요청하여 응답을 받는 함수 (LLM 연동 부분은 예시)
-def send_to_llm(prompt, api_key):
+# GitHub에 파일을 업로드하는 함수
+def upload_file_to_github(repo, file_name, content, github_token, branch="main"):
+    url = f"https://api.github.com/repos/{repo}/contents/{file_name}"
     headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json"  # Content-Type을 설정하여 요청 헤더가 올바르게 전달되도록 합니다.
+        "Authorization": f"token {github_token}",
+        "Content-Type": "application/json"
     }
-    # OpenAI API 엔드포인트
-    url = "https://api.openai.com/v1/chat/completions"
-
-    # API 요청 내용 (예시로 GPT-4 모델 사용)
+    # 파일 내용을 base64로 인코딩
+    content_base64 = base64.b64encode(content).decode("utf-8")
     data = {
-        "model": "gpt-4",
-        "messages": prompt,
-        "max_tokens": 1000,
-        "temperature": 0.7
+        "message": f"Upload {file_name}",
+        "content": content_base64,
+        "branch": branch
     }
-
-    response = requests.post(url, headers=headers, json=data)
-
-    if response.status_code == 200:
-        return response.json()["choices"][0]["message"]["content"]  # 응답 텍스트 반환
+    response = requests.put(url, headers=headers, json=data)
+    
+    if response.status_code == 201:
+        st.success(f"파일이 GitHub 저장소에 성공적으로 업로드되었습니다: {file_name}")
     else:
-        st.error(f"LLM 요청 실패: {response.status_code} - {response.text}")
-        return None
+        st.error(f"GitHub 업로드 실패: {response.status_code} - {response.text}")
 
-# 파일을 업로드할 때 기본 경로에 저장하는 함수
-def save_uploaded_file(uploaded_file):
-    # 파일 경로 저장 (현재 디렉토리에 저장)
-    save_path = uploaded_file.name
-
-    # 파일을 저장
-    with open(save_path, "wb") as f:
-        f.write(uploaded_file.getbuffer())
-
-    return save_path
+# 파일을 GitHub에 업로드할 때 사용하는 함수
+def save_uploaded_file(uploaded_file, repo, github_token):
+    # 파일을 GitHub에 저장
+    upload_file_to_github(repo, uploaded_file.name, uploaded_file.read(), github_token)
 
 # 0. Streamlit 초기 구성 및 프레임 나누기
 st.set_page_config(layout="wide")  # 페이지 가로길이를 모니터 전체 해상도로 설정
@@ -120,16 +111,15 @@ with col1:
     if st.button("행 삭제"):
         rows = rows[:-1] if len(rows) > 1 else rows  # 최소 1행은 유지
 
-# 2. 파일 업로드 기능
+# 2. 파일 업로드 기능 (GitHub 업로드)
 with col1:
     st.subheader("2. 파일 업로드")
     uploaded_files = st.file_uploader("파일을 여러 개 드래그 앤 드롭하여 업로드하세요.", accept_multiple_files=True)
 
-    if uploaded_files:
+    if uploaded_files and st.session_state['github_repo'] and st.session_state['github_token']:
         for uploaded_file in uploaded_files:
-            # 파일 저장 경로 생성 및 파일 저장
-            save_path = save_uploaded_file(uploaded_file)
-            st.success(f"{uploaded_file.name} 파일이 기본 경로에 {save_path} 경로에 저장되었습니다.")
+            # 파일을 GitHub 저장소에 업로드
+            save_uploaded_file(uploaded_file, st.session_state['github_repo'], st.session_state['github_token'])
 
 # 3. GitHub 저장소 정보 입력
 with col2:
