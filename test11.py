@@ -4,9 +4,6 @@ import os
 import requests
 import urllib.parse  # URL 인코딩을 위한 라이브러리
 
-# 서버 측에 파일 저장 디렉토리
-UPLOAD_FOLDER = "uploaded_files"  # 서버에 파일을 저장할 디렉토리
-
 # GitHub 저장소에서 파일 목록을 가져오는 함수
 def get_github_files(repo, github_token, branch="main"):
     url = f"https://api.github.com/repos/{repo}/git/trees/{branch}?recursive=1"
@@ -53,13 +50,10 @@ def send_to_llm(prompt, api_key):
         st.error(f"LLM 요청 실패: {response.status_code} - {response.text}")
         return None
 
-# 파일을 업로드할 때 디렉토리가 없으면 생성하는 함수
+# 파일을 업로드할 때 기본 경로에 저장하는 함수
 def save_uploaded_file(uploaded_file):
-    # 디렉토리가 없으면 생성 (exist_ok=True로 이미 있어도 에러가 발생하지 않도록 함)
-    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
-    # 파일 경로 저장
-    save_path = os.path.join(UPLOAD_FOLDER, uploaded_file.name)
+    # 파일 경로 저장 (현재 디렉토리에 저장)
+    save_path = uploaded_file.name
 
     # 파일을 저장
     with open(save_path, "wb") as f:
@@ -135,7 +129,7 @@ with col1:
         for uploaded_file in uploaded_files:
             # 파일 저장 경로 생성 및 파일 저장
             save_path = save_uploaded_file(uploaded_file)
-            st.success(f"{uploaded_file.name} 파일이 {save_path} 경로에 저장되었습니다.")
+            st.success(f"{uploaded_file.name} 파일이 기본 경로에 {save_path} 경로에 저장되었습니다.")
 
 # 3. GitHub 저장소 정보 입력
 with col2:
