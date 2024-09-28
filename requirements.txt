@@ -92,4 +92,3 @@ matplotlib
 xlsxwriter
 fpdf
 requests
-urllib
