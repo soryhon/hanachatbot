@@ -53,6 +53,21 @@ def send_to_llm(prompt, api_key):
         st.error(f"LLM 요청 실패: {response.status_code} - {response.text}")
         return None
 
+# 파일을 업로드할 때 디렉토리가 없으면 생성하는 함수
+def save_uploaded_file(uploaded_file):
+    # 디렉토리가 없으면 생성
+    if not os.path.exists(UPLOAD_FOLDER):
+        os.makedirs(UPLOAD_FOLDER)
+
+    # 파일 경로 저장
+    save_path = os.path.join(UPLOAD_FOLDER, uploaded_file.name)
+
+    # 파일을 저장
+    with open(save_path, "wb") as f:
+        f.write(uploaded_file.getbuffer())
+
+    return save_path
+
 # 0. Streamlit 초기 구성 및 프레임 나누기
 st.set_page_config(layout="wide")  # 페이지 가로길이를 모니터 전체 해상도로 설정
 st.title("일일 업무 및 보고서 자동화 프로그램")
@@ -119,13 +134,9 @@ with col1:
 
     if uploaded_files:
         for uploaded_file in uploaded_files:
-            # 업로드된 파일을 서버에 저장
-            file_details = {"FileName": uploaded_file.name, "FileType": uploaded_file.type}
-            st.write(file_details)
-            save_path = os.path.join(UPLOAD_FOLDER, uploaded_file.name)
-            with open(save_path, "wb") as f:
-                f.write(uploaded_file.getbuffer())
-            st.success(f"{uploaded_file.name} 파일이 업로드되었습니다.")
+            # 파일 저장 경로 생성 및 파일 저장
+            save_path = save_uploaded_file(uploaded_file)
+            st.success(f"{uploaded_file.name} 파일이 {save_path} 경로에 저장되었습니다.")
 
 # 3. GitHub 저장소 정보 입력
 with col2:
