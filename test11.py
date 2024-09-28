@@ -127,7 +127,7 @@ with col1:
                     file_list = get_github_files(st.session_state['github_repo'], st.session_state['github_token'], branch=st.session_state['github_branch'])
                 
                 if file_list:
-                    selected_file = st.selectbox(f"파일 선택 (행 {idx+1})", options=file_list)
+                    selected_file = st.selectbox(f"파일 선택 (행 {idx+1})", options=file_list, key=f"file_select_{idx}")
                     if selected_file:
                         file_url = get_file_url(st.session_state['github_repo'], st.session_state['github_branch'], selected_file)
                         row['데이터'] = file_url  # 선택된 파일의 URL 저장
@@ -138,7 +138,7 @@ with col1:
                 st.warning("GitHub 저장소 정보 또는 API 토큰이 설정되지 않았습니다. 정보를 먼저 입력해주세요.")
 
         # URL 정보 표시
-        file_path = st.text_input(f"데이터 (행 {idx+1})", row['데이터'], disabled=True)
+        file_path = st.text_input(f"데이터 (행 {idx+1})", row['데이터'], disabled=True, key=f"file_path_{idx}")
 
     # 행 추가 및 삭제 버튼
     if st.button("행 추가"):
