@@ -127,9 +127,14 @@ with col1:
 
     if uploaded_files:
         for uploaded_file in uploaded_files:
-            # 파일 저장 경로 생성 및 파일 저장
-            save_path = save_uploaded_file(uploaded_file)
-            st.success(f"{uploaded_file.name} 파일이 기본 경로에 {save_path} 경로에 저장되었습니다.")
+            # 서버에 파일 저장
+            file_path = save_file_to_server(uploaded_file)
+            
+            # GitHub에 파일 업로드, GitHub 저장소 경로와 토큰을 입력받음
+            if st.session_state['api_key'] and st.session_state['github_repo']:
+                upload_file_to_github(file_path, uploaded_file.name, st.session_state['api_key'], st.session_state['github_repo'], st.session_state['github_branch'])
+            else:
+                st.warning("GitHub 저장소 정보 또는 API 토큰을 입력해야 합니다.")
 
 # 3. GitHub 저장소 정보 입력
 with col2:
