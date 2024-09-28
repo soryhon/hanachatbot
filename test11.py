@@ -30,11 +30,25 @@ def get_file_url(repo, branch, file_path):
 
 # LLM에 요청하여 응답을 받는 함수 (LLM 연동 부분은 예시)
 def send_to_llm(prompt, api_key):
-    # LLM API에 프롬프트를 전달하고 응답을 받는 예시 (실제로는 OpenAI API나 다른 LLM API 호출)
-    headers = {"Authorization": f"Bearer {api_key}"}
-    response = requests.post("https://api.openai.com/v1/completions", headers=headers, json=prompt)
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"  # Content-Type을 설정하여 요청 헤더가 올바르게 전달되도록 합니다.
+    }
+    # OpenAI API 엔드포인트
+    url = "https://api.openai.com/v1/chat/completions"
+
+    # API 요청 내용 (예시로 GPT-4 모델 사용)
+    data = {
+        "model": "gpt-4",
+        "messages": prompt,
+        "max_tokens": 1000,
+        "temperature": 0.7
+    }
+
+    response = requests.post(url, headers=headers, json=data)
+
     if response.status_code == 200:
-        return response.json()["choices"][0]["text"]  # 응답 텍스트 반환
+        return response.json()["choices"][0]["message"]["content"]  # 응답 텍스트 반환
     else:
         st.error(f"LLM 요청 실패: {response.status_code} - {response.text}")
         return None
@@ -170,20 +184,16 @@ with col2:
             # 모든 행의 정보를 기반으로 프롬프트 구성
             for idx, row in enumerate(rows):
                 # 각 행의 정보를 프롬프트 형식으로 구성
-                prompt = {
-                    "model": "gpt-4",  # GPT-4 모델 사용
-                    "messages": [
-                        {
-                            "role": "system",
-                            "content": "다음 파일을 분석하여 보고서를 작성하세요."
-                        },
-                        {
-                            "role": "user",
-                            "content": f"보고서 제목 : '{row['제목']}'\n요청 문구 : 이 파일을 분석해서 '{row['요청']}'에 맞춰 보고서를 작성해\n데이터 전달 : '{row['데이터']}'"
-                        }
-                    ],
-                    "max_tokens": 1000
-                }
+                prompt = [
+                    {
+                        "role": "system",
+                        "content": "다음 파일을 분석하여 보고서를 작성하세요."
+                    },
+                    {
+                        "role": "user",
+                        "content": f"보고서 제목 : '{row['제목']}'\n요청 문구 : 이 파일을 분석해서 '{row['요청']}'에 맞춰 보고서를 작성해\n데이터 전달 : '{row['데이터']}'"
+                    }
+                ]
                 
                 # LLM에 프롬프트 전달하고 응답 받기
                 llm_response = send_to_llm(prompt, st.session_state['openai_api_key'])
