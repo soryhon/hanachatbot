@@ -8,11 +8,12 @@ import urllib.parse  # URL 인코딩을 위한 라이브러리
 github_info = {
     "github_repo": "soryhon/hanachatbot",
     "github_branch": "main",
-    "github_token": "Z2hwX0dKSU1TT2JDdVVZWWZJVnlkNFVLZ1YwUFdFOTlWcjRIRURkVw=="  # base64로 인코딩된 토큰
+    "github_token": "Z2hwX0dKSU1TT2JDdVVZWWZJVnlkNFVLZ1YwUFdFOTlWcjRIRURkVw=="  # base64로 인코딩된 GitHub 토큰
 }
 
 # GitHub 토큰 Base64 복호화 함수
 def decode_github_token(encoded_token):
+    """Base64로 인코딩된 GitHub 토큰을 복호화합니다."""
     return base64.b64decode(encoded_token).decode('utf-8')
 
 # OpenAI에 LLM 요청을 보내는 함수
@@ -37,10 +38,11 @@ def send_to_llm(prompt, api_key):
 
 # GitHub에 파일을 업로드하는 함수
 def upload_file_to_github(repo, folder_name, file_name, content, encoded_token, branch="main"):
-    token = decode_github_token(encoded_token)  # base64 복호화
+    """GitHub 저장소에 파일을 업로드하는 함수. 매번 Base64로 복호화한 GitHub 토큰을 사용합니다."""
+    token = decode_github_token(encoded_token)  # 매번 Base64 복호화
     url = f"https://api.github.com/repos/{repo}/contents/{folder_name}/{file_name}"
     headers = {
-        "Authorization": f"token {token}",
+        "Authorization": f"token {token}",  # 복호화된 GitHub 토큰 사용
         "Content-Type": "application/json"
     }
     content_base64 = base64.b64encode(content).decode("utf-8")
@@ -57,10 +59,11 @@ def upload_file_to_github(repo, folder_name, file_name, content, encoded_token, 
 
 # GitHub에서 파일 목록을 가져오는 함수
 def get_github_files(repo, encoded_token, folder_name=None, branch="main"):
-    token = decode_github_token(encoded_token)  # base64 복호화
+    """GitHub 저장소의 파일 목록을 가져오는 함수. 매번 Base64로 복호화한 GitHub 토큰을 사용합니다."""
+    token = decode_github_token(encoded_token)  # 매번 Base64 복호화
     url = f"https://api.github.com/repos/{repo}/git/trees/{branch}?recursive=1"
     headers = {
-        "Authorization": f"token {token}"
+        "Authorization": f"token {token}",  # 복호화된 GitHub 토큰 사용
     }
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
@@ -76,6 +79,7 @@ def get_github_files(repo, encoded_token, folder_name=None, branch="main"):
 
 # GitHub 파일의 URL을 생성하는 함수 (한글과 공백 처리)
 def get_file_url(repo, branch, file_path):
+    """GitHub 파일의 URL을 생성하는 함수. 한글 및 공백을 처리하여 인코딩합니다."""
     encoded_file_path = urllib.parse.quote(file_path)  # 파일 경로 인코딩 (한글 및 공백 처리)
     return f"https://github.com/{repo}/blob/{branch}/{encoded_file_path}"
 
@@ -86,7 +90,7 @@ st.title("일일 업무 및 보고서 자동화 프로그램")
 # GitHub 저장소 정보 및 토큰을 JSON 데이터에서 각 변수로 저장
 github_repo = github_info["github_repo"]
 github_branch = github_info["github_branch"]
-github_token = github_info["github_token"]  # Base64로 인코딩된 토큰
+github_token = github_info["github_token"]  # Base64로 인코딩된 GitHub 토큰
 
 # Streamlit의 세로 프레임 구성
 col1, col2, col3 = st.columns([0.39, 0.10, 0.49])
