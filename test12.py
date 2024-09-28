@@ -37,9 +37,7 @@ def send_to_llm(prompt, api_key):
         return None
 
 # GitHub에 파일을 업로드하는 함수
-def upload_file_to_github(repo, folder_name, file_name, content, encoded_token, branch="main"):
-    """GitHub 저장소에 파일을 업로드하는 함수. 매번 Base64로 복호화한 GitHub 토큰을 사용합니다."""
-    token = decode_github_token(encoded_token)  # 매번 Base64 복호화
+def upload_file_to_github(repo, folder_name, file_name, content, token, branch="main"):
     url = f"https://api.github.com/repos/{repo}/contents/{folder_name}/{file_name}"
     headers = {
         "Authorization": f"token {token}",  # 복호화된 GitHub 토큰 사용
@@ -58,9 +56,7 @@ def upload_file_to_github(repo, folder_name, file_name, content, encoded_token, 
         st.error(f"GitHub 업로드 실패: {response.status_code} - {response.text}")
 
 # GitHub에서 파일 목록을 가져오는 함수
-def get_github_files(repo, encoded_token, folder_name=None, branch="main"):
-    """GitHub 저장소의 파일 목록을 가져오는 함수. 매번 Base64로 복호화한 GitHub 토큰을 사용합니다."""
-    token = decode_github_token(encoded_token)  # 매번 Base64 복호화
+def get_github_files(repo, token, folder_name=None, branch="main"):
     url = f"https://api.github.com/repos/{repo}/git/trees/{branch}?recursive=1"
     headers = {
         "Authorization": f"token {token}",  # 복호화된 GitHub 토큰 사용
@@ -90,7 +86,11 @@ st.title("일일 업무 및 보고서 자동화 프로그램")
 # GitHub 저장소 정보 및 토큰을 JSON 데이터에서 각 변수로 저장
 github_repo = github_info["github_repo"]
 github_branch = github_info["github_branch"]
-github_token = github_info["github_token"]  # Base64로 인코딩된 GitHub 토큰
+encoded_github_token = github_info["github_token"]
+
+# GitHub 토큰을 Base64 복호화하여 세션에 저장 (메모리 저장)
+if 'github_token' not in st.session_state:
+    st.session_state['github_token'] = decode_github_token(encoded_github_token)
 
 # Streamlit의 세로 프레임 구성
 col1, col2, col3 = st.columns([0.39, 0.10, 0.49])
@@ -114,14 +114,14 @@ with col1:
 
         # GitHub에서 파일 리스트를 가져옴
         file_list = []
-        if github_repo and github_token:
-            upload_files_exist = any("uploadFiles" in item for item in get_github_files(github_repo, github_token, branch=github_branch))
+        if github_repo and st.session_state['github_token']:
+            upload_files_exist = any("uploadFiles" in item for item in get_github_files(github_repo, st.session_state['github_token'], branch=github_branch))
             if upload_files_exist:
                 st.success("uploadFiles 폴더가 존재합니다.")
-                file_list = get_github_files(github_repo, github_token, folder_name="uploadFiles", branch=github_branch)
+                file_list = get_github_files(github_repo, st.session_state['github_token'], folder_name="uploadFiles", branch=github_branch)
             else:
                 st.warning("uploadFiles 폴더가 존재하지 않습니다. 기본 폴더의 파일을 표시합니다.")
-                file_list = get_github_files(github_repo, github_token, branch=github_branch)
+                file_list = get_github_files(github_repo, st.session_state['github_token'], branch=github_branch)
 
         selected_file = st.selectbox(f"파일 선택 (행 {idx+1})", options=file_list, key=f"file_select_{idx}")
 
@@ -144,12 +144,13 @@ with col1:
 
     st.info(f"저장소: {github_repo}")
     st.info(f"브랜치: {github_branch}")
+    st.info(f"GitHub 토큰: {st.session_state['github_token']}")  # 복호화된 GitHub 토큰을 표시
 
     uploaded_files = st.file_uploader("파일을 여러 개 드래그 앤 드롭하여 업로드하세요.", accept_multiple_files=True)
 
     if uploaded_files:
         for uploaded_file in uploaded_files:
-            upload_file_to_github(github_repo, 'uploadFiles', uploaded_file.name, uploaded_file.read(), github_token, github_branch)
+            upload_file_to_github(github_repo, 'uploadFiles', uploaded_file.name, uploaded_file.read(), st.session_state['github_token'], github_branch)
 
 # 3. 실행 버튼 및 OpenAI API 키 입력
 with col2:
