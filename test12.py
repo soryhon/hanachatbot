@@ -88,10 +88,6 @@ github_repo = github_info["github_repo"]
 github_branch = github_info["github_branch"]
 encoded_github_token = github_info["github_token"]
 
-# GitHub 토큰을 Base64 복호화하여 세션에 저장 (메모리 저장)
-if 'github_token' not in st.session_state:
-    st.session_state['github_token'] = decode_github_token(encoded_github_token)
-
 # Streamlit의 세로 프레임 구성
 col1, col2, col3 = st.columns([0.39, 0.10, 0.49])
 
@@ -103,6 +99,11 @@ llm_results = {}
 with col1:
     st.subheader("1. 작성 보고서 요청사항")
     df = pd.DataFrame(columns=["제목", "요청", "데이터"])
+
+    # GitHub 토큰을 복호화하고 메모리에 저장
+    if 'github_token' not in st.session_state:
+        st.session_state['github_token'] = decode_github_token(encoded_github_token)
+        st.success("GitHub 토큰이 #1 작성 보고서 요청사항에서 성공적으로 복호화 및 저장되었습니다.")
 
     if len(rows) == 0:
         rows.append({"제목": "titleValue1", "요청": "requestValue1", "데이터": ""})
@@ -142,15 +143,19 @@ with col1:
 with col1:
     st.subheader("2. 파일 업로드")
 
+    # GitHub 토큰을 복호화하고 메모리에 저장 (파일 업로드 구분에서 처리)
+    if 'github_token_upload' not in st.session_state:
+        st.session_state['github_token_upload'] = decode_github_token(encoded_github_token)
+        st.success("GitHub 토큰이 #2 파일 업로드에서 성공적으로 복호화 및 저장되었습니다.")
+
     st.info(f"저장소: {github_repo}")
     st.info(f"브랜치: {github_branch}")
-    st.info(f"GitHub 토큰: {st.session_state['github_token']}")  # 복호화된 GitHub 토큰을 표시
 
     uploaded_files = st.file_uploader("파일을 여러 개 드래그 앤 드롭하여 업로드하세요.", accept_multiple_files=True)
 
     if uploaded_files:
         for uploaded_file in uploaded_files:
-            upload_file_to_github(github_repo, 'uploadFiles', uploaded_file.name, uploaded_file.read(), st.session_state['github_token'], github_branch)
+            upload_file_to_github(github_repo, 'uploadFiles', uploaded_file.name, uploaded_file.read(), st.session_state['github_token_upload'], github_branch)
 
 # 3. 실행 버튼 및 OpenAI API 키 입력
 with col2:
