@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import os
 import requests
-import urllib.parse  # URL 인코딩을 위한 라이브러리
 
 # 서버 측에 파일 저장 디렉토리
 UPLOAD_FOLDER = "uploaded_files"  # 서버에 파일을 저장할 디렉토리
@@ -23,10 +22,9 @@ def get_github_files(repo, github_token, branch="main"):
         st.error(f"GitHub 파일 목록을 가져오지 못했습니다: {response.status_code}")
         return []
 
-# GitHub 파일의 URL을 생성하는 함수 (한글과 공백 처리)
+# GitHub 파일의 URL을 생성하는 함수
 def get_file_url(repo, branch, file_path):
-    encoded_file_path = urllib.parse.quote(file_path)  # 파일 경로 인코딩 (한글 및 공백 처리)
-    return f"https://github.com/{repo}/blob/{branch}/{encoded_file_path}"
+    return f"https://github.com/{repo}/blob/{branch}/{file_path}"
 
 # 0. Streamlit 초기 구성 및 프레임 나누기
 st.set_page_config(layout="wide")  # 페이지 가로길이를 모니터 전체 해상도로 설정
@@ -163,19 +161,20 @@ with col3:
     st.subheader("6. 저장")
     
     # 결과 저장
-    save_path = st.text_input("저장할 파일명 입력")
-    if st.button("저장") and save_path:
-        # rows 데이터프레임 저장
-        df = pd.DataFrame(rows)
-        df.to_csv(f"{save_path}.csv")
-        st.success(f"{save_path}.csv 파일로 저장되었습니다.")
+    if st.button("저장"):
+        save_path = st.text_input("저장할 파일명 입력")
+        if save_path:
+            # rows 데이터프레임 저장
+            df = pd.DataFrame(rows)
+            df.to_csv(f"{save_path}.csv")
+            st.success(f"{save_path}.csv 파일로 저장되었습니다.")
 
 # 7. 불러오기
 with col3:
     st.subheader("7. 불러오기")
     
     # CSV 파일 불러오기
-    uploaded_save_file = st.file_uploader("저장된 CSV 파일 불러오기", type=["csv"])
+    uploaded_save_file = st.file_uploader("저장된 CSV 파일 불러오기")
     if uploaded_save_file is not None:
         loaded_data = pd.read_csv(uploaded_save_file)
         st.dataframe(loaded_data)
