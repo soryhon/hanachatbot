@@ -6,7 +6,7 @@ from io import BytesIO
 import base64
 
 # GitHub 저장소 정보
-GITHUB_REPO = "your-github-username/your-repository-name"  # 수정: GitHub 저장소 경로
+GITHUB_REPO = "https://github.com/soryhon/hanachatbot/"  # 수정: GitHub 저장소 경로
 GITHUB_BRANCH = "main"  # 푸시할 브랜치 이름
 GITHUB_TOKEN = st.secrets["github_token"]  # GitHub Personal Access Token을 Streamlit Secrets로 저장
 
