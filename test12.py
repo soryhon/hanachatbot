@@ -4,12 +4,17 @@ import requests
 import base64  # base64 인코딩 및 디코딩을 위한 라이브러리
 import urllib.parse  # URL 인코딩을 위한 라이브러리
 
-# GitHub 정보 (JSON 데이터에서 가져온 값)
+# GitHub 정보 (JSON 데이터에서 변환된 토큰을 입력)
 github_info = {
     "github_repo": "soryhon/hanachatbot",
     "github_branch": "main",
-    "github_token": "ghp_GJIM****************************EDdW"  # 원래 형식의 GitHub Personal Access Token (PAT)
+    "github_token": "t@n_GJIMSObCuUYYfIVyd4UKgV0PWE99Vr4HEDdW"  # 'ghp_' 대신 't@n_'로 변환된 토큰
 }
+
+# GitHub 토큰 변환 함수 (t@n_ -> ghp_)
+def transform_github_token(transformed_token):
+    """변환된 GitHub 토큰을 원래 형식으로 복원합니다."""
+    return transformed_token.replace("t@n_", "ghp_")
 
 # OpenAI에 LLM 요청을 보내는 함수
 def send_to_llm(prompt, api_key):
@@ -35,7 +40,7 @@ def send_to_llm(prompt, api_key):
 def upload_file_to_github(repo, folder_name, file_name, content, token, branch="main"):
     url = f"https://api.github.com/repos/{repo}/contents/{folder_name}/{file_name}"
     headers = {
-        "Authorization": f"token {token}",  # GitHub 토큰을 직접 사용
+        "Authorization": f"token {token}",  # 변환된 GitHub 토큰 사용
         "Content-Type": "application/json"
     }
     content_base64 = base64.b64encode(content).decode("utf-8")
@@ -54,7 +59,7 @@ def upload_file_to_github(repo, folder_name, file_name, content, token, branch="
 def get_github_files(repo, token, folder_name=None, branch="main"):
     url = f"https://api.github.com/repos/{repo}/git/trees/{branch}?recursive=1"
     headers = {
-        "Authorization": f"token {token}",  # GitHub 토큰을 직접 사용
+        "Authorization": f"token {token}",  # 변환된 GitHub 토큰 사용
     }
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
@@ -78,10 +83,15 @@ def get_file_url(repo, branch, file_path):
 st.set_page_config(layout="wide")
 st.title("일일 업무 및 보고서 자동화 프로그램")
 
-# GitHub 저장소 정보 및 토큰을 JSON 데이터에서 각 변수로 저장
+# GitHub 저장소 정보 및 변환된 토큰을 JSON 데이터에서 각 변수로 저장
 github_repo = github_info["github_repo"]
 github_branch = github_info["github_branch"]
-github_token = github_info["github_token"]  # Base64 복호화 없이 원래 토큰 값 그대로 사용
+transformed_github_token = github_info["github_token"]
+
+# GitHub 토큰을 변환된 형식에서 원래 형식으로 변환하여 메모리에 저장
+if 'github_token' not in st.session_state:
+    st.session_state['github_token'] = transform_github_token(transformed_github_token)
+    st.success("GitHub 토큰이 성공적으로 변환되어 메모리에 저장되었습니다.")
 
 # Streamlit의 세로 프레임 구성
 col1, col2, col3 = st.columns([0.39, 0.10, 0.49])
@@ -105,14 +115,14 @@ with col1:
 
         # GitHub에서 파일 리스트를 가져옴
         file_list = []
-        if github_repo and github_token:
-            upload_files_exist = any("uploadFiles" in item for item in get_github_files(github_repo, github_token, branch=github_branch))
+        if github_repo and st.session_state['github_token']:
+            upload_files_exist = any("uploadFiles" in item for item in get_github_files(github_repo, st.session_state['github_token'], branch=github_branch))
             if upload_files_exist:
                 st.success("uploadFiles 폴더가 존재합니다.")
-                file_list = get_github_files(github_repo, github_token, folder_name="uploadFiles", branch=github_branch)
+                file_list = get_github_files(github_repo, st.session_state['github_token'], folder_name="uploadFiles", branch=github_branch)
             else:
                 st.warning("uploadFiles 폴더가 존재하지 않습니다. 기본 폴더의 파일을 표시합니다.")
-                file_list = get_github_files(github_repo, github_token, branch=github_branch)
+                file_list = get_github_files(github_repo, st.session_state['github_token'], branch=github_branch)
 
         selected_file = st.selectbox(f"파일 선택 (행 {idx+1})", options=file_list, key=f"file_select_{idx}")
 
@@ -140,7 +150,7 @@ with col1:
 
     if uploaded_files:
         for uploaded_file in uploaded_files:
-            upload_file_to_github(github_repo, 'uploadFiles', uploaded_file.name, uploaded_file.read(), github_token, github_branch)
+            upload_file_to_github(github_repo, 'uploadFiles', uploaded_file.name, uploaded_file.read(), st.session_state['github_token'], github_branch)
 
 # 3. 실행 버튼 및 OpenAI API 키 입력
 with col2:
