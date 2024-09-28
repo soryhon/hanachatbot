@@ -8,7 +8,7 @@ import base64
 # GitHub 저장소 정보
 GITHUB_REPO = "https://github.com/soryhon/hanachatbot/"  # 수정: GitHub 저장소 경로
 GITHUB_BRANCH = "main"  # 푸시할 브랜치 이름
-GITHUB_TOKEN = st.secrets["github_token"]  # GitHub Personal Access Token을 Streamlit Secrets로 저장
+GITHUB_TOKEN = st.secrets["JliR5DaHbeYRxuux+Ek7XA+0F1sOQYoqptncv3b4HKM"]  # GitHub Personal Access Token을 Streamlit Secrets로 저장
 
 # 서버 측에 파일 저장 디렉토리
 UPLOAD_FOLDER = "uploaded_files"  # 서버에 파일을 저장할 디렉토리
