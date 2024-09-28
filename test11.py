@@ -55,9 +55,8 @@ def send_to_llm(prompt, api_key):
 
 # 파일을 업로드할 때 디렉토리가 없으면 생성하는 함수
 def save_uploaded_file(uploaded_file):
-    # 디렉토리가 없으면 생성
-    if not os.path.exists(UPLOAD_FOLDER):
-        os.makedirs(UPLOAD_FOLDER)
+    # 디렉토리가 없으면 생성 (exist_ok=True로 이미 있어도 에러가 발생하지 않도록 함)
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
     # 파일 경로 저장
     save_path = os.path.join(UPLOAD_FOLDER, uploaded_file.name)
