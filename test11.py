@@ -112,18 +112,18 @@ with col1:
         row['제목'] = st.text_input(f"제목 (행 {idx+1})", row['제목'])
         row['요청'] = st.text_input(f"요청 (행 {idx+1})", row['요청'])
 
-        # [선택] 버튼: updateFiles 폴더 확인 후 파일 리스트 제공
+        # [선택] 버튼: uploadFiles 폴더 확인 후 파일 리스트 제공
         if st.button(f"선택 (행 {idx+1})"):
             if st.session_state['github_repo'] and st.session_state['github_token']:
-                # updateFiles 폴더 존재 여부 확인
+                # uploadFiles 폴더 존재 여부 확인
                 file_list = []
-                update_files_exist = any("updateFiles" in item for item in get_github_files(st.session_state['github_repo'], st.session_state['github_token'], branch=st.session_state['github_branch']))
+                upload_files_exist = any("uploadFiles" in item for item in get_github_files(st.session_state['github_repo'], st.session_state['github_token'], branch=st.session_state['github_branch']))
                 
-                if update_files_exist:
-                    st.success("updateFiles 폴더가 존재합니다.")
-                    file_list = get_github_files(st.session_state['github_repo'], st.session_state['github_token'], folder_name="updateFiles", branch=st.session_state['github_branch'])
+                if upload_files_exist:
+                    st.success("uploadFiles 폴더가 존재합니다.")
+                    file_list = get_github_files(st.session_state['github_repo'], st.session_state['github_token'], folder_name="uploadFiles", branch=st.session_state['github_branch'])
                 else:
-                    st.warning("updateFiles 폴더가 존재하지 않습니다. 기본 폴더의 파일을 표시합니다.")
+                    st.warning("uploadFiles 폴더가 존재하지 않습니다. 기본 폴더의 파일을 표시합니다.")
                     file_list = get_github_files(st.session_state['github_repo'], st.session_state['github_token'], branch=st.session_state['github_branch'])
                 
                 if file_list:
