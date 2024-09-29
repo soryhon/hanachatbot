@@ -1,23 +1,13 @@
 import streamlit as st
 import pandas as pd
 import requests
-import base64  # base64 인코딩 및 디코딩을 위한 라이브러리
 import urllib.parse  # URL 인코딩을 위한 라이브러리
 
-# JSON 데이터
+# JSON 데이터 (github_token과 openai_api_key 삭제)
 json_data = {
     "github_repo": "soryhon/hanachatbot",
-    "github_branch": "main",
-    "github_token": "Z2hwX0dKSU1TT2JDdVVZWWZJVnlkNFVLZ1YwUFdFOTlWcjRIRURkVw==",
-    "openai_api_key": ""
+    "github_branch": "main"
 }
-
-# GitHub API 토큰 복호화 함수
-def decode_base64(encoded_str):
-    return base64.b64decode(encoded_str).decode('utf-8')
-
-# 복호화된 토큰 값 저장
-decoded_github_token = decode_base64(json_data['github_token'])
 
 # OpenAI에 LLM 요청을 보내는 함수
 def send_to_llm(prompt, api_key):
@@ -166,8 +156,8 @@ with col1:
     # GitHub 저장소 경로 입력 (미리 JSON 데이터의 값이 입력됨)
     github_repo = st.text_input("GitHub 저장소 경로 (예: username/repo)", value=st.session_state['github_repo'])
 
-    # GitHub API 토큰 입력 (Base64 복호화된 값 입력)
-    github_token = st.text_input("GitHub API 토큰 입력", value=decoded_github_token if st.session_state['github_token'] is None else st.session_state['github_token'], type="password")
+    # GitHub API 토큰 입력 (빈 값에서 입력)
+    github_token = st.text_input("GitHub API 토큰 입력", type="password")
 
     # 브랜치 입력 (미리 JSON 데이터의 값이 입력됨)
     github_branch = st.text_input("브랜치 이름 (예: main 또는 master)", value=st.session_state['github_branch'])
@@ -195,8 +185,8 @@ with col1:
 with col2:
     st.subheader("3. 실행")
 
-    # OpenAI API 키 입력 부분 (공백으로 유지)
-    openai_api_key = st.text_input("OpenAI API 키를 입력하세요.", value=st.session_state['openai_api_key'], type="password")
+    # OpenAI API 키 입력 부분 (값 미리 입력하지 않고 빈 값 유지)
+    openai_api_key = st.text_input("OpenAI API 키를 입력하세요.", type="password")
 
     if st.button("OpenAI API 키 저장"):
         st.session_state['openai_api_key'] = openai_api_key
