@@ -123,6 +123,15 @@ if st.button("GitHub 정보 저장"):
     if st.session_state['github_token']:
         st.info(f"GitHub 토큰이 저장되었습니다. 저장된 토큰: {st.session_state['github_token'][:5]}...")
 
+# 3. OpenAI API 키 입력 로직 (GitHub 정보 아래로 이동)
+st.subheader("OpenAI API 키 입력")
+
+openai_api_key = st.text_input("OpenAI API 키를 입력하세요.", type="password")
+
+if st.button("OpenAI API 키 저장"):
+    st.session_state['openai_api_key'] = openai_api_key
+    st.success("OpenAI API 키가 저장되었습니다.")
+
 # Streamlit의 세로 프레임 구성
 col1, col2, col3 = st.columns([0.39, 0.10, 0.49])
 
@@ -167,17 +176,9 @@ with col1:
     if st.button("행 삭제"):
         rows = rows[:-1] if len(rows) > 1 else rows  # 최소 1행은 유지
 
-# 2. 파일 업로드 및 GitHub 저장소 정보 입력 기능은 상단으로 이동하여 제거됨
-
-# 3. 실행 버튼 및 OpenAI API 키 입력
+# 3. 실행 버튼
 with col2:
     st.subheader("3. 실행")
-
-    openai_api_key = st.text_input("OpenAI API 키를 입력하세요.", type="password")
-
-    if st.button("OpenAI API 키 저장"):
-        st.session_state['openai_api_key'] = openai_api_key
-        st.success("OpenAI API 키가 저장되었습니다.")
 
     if st.button("실행"):
         if st.session_state['openai_api_key'] == "":
