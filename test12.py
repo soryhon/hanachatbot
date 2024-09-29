@@ -51,14 +51,11 @@ st.markdown("""
 
 # GitHub에서 파일 목록을 가져오는 함수 (간단한 예시)
 def get_github_files(repo, github_token, folder_name=None, branch="main"):
-    # 여기에서는 그냥 예시 파일 리스트를 사용합니다.
+    # 예시 파일 리스트
     return ["파일1.txt", "파일2.csv", "파일3.docx"]
 
-# 컬럼 설정
-col1, col2, col3 = st.columns([0.39, 0.10, 0.49])
-
 # 1. 작성 보고서 요청사항
-with col1:
+with st.container():
     st.markdown('<div class="report-table">', unsafe_allow_html=True)
     st.markdown('<div class="table-header">행 1</div>', unsafe_allow_html=True)
 
@@ -98,7 +95,7 @@ with col1:
     st.markdown('</div>', unsafe_allow_html=True)
 
 # 2. 파일 업로드 및 GitHub 저장소 정보 입력 기능
-with col1:
+with st.container():
     st.subheader("2. 파일 업로드 및 GitHub 저장소 정보")
     uploaded_files = st.file_uploader("파일을 여러 개 드래그 앤 드롭하여 업로드하세요.", accept_multiple_files=True)
 
@@ -107,7 +104,7 @@ with col1:
             st.write(f"업로드된 파일: {uploaded_file.name}")
 
 # 3. 실행 버튼 및 OpenAI API 키 입력
-with col2:
+with st.container():
     st.subheader("3. 실행")
 
     openai_api_key = st.text_input("OpenAI API 키를 입력하세요.", type="password")
@@ -136,7 +133,7 @@ with col2:
             st.success("LLM 요청이 완료되었습니다.")
 
 # 4. 결과 보고서 화면
-with col3:
+with st.container():
     st.subheader("4. 결과 보고서")
 
     if 'llm_results' in locals() and llm_results:
@@ -149,14 +146,14 @@ with col3:
         st.success(f"{file_type} 형식으로 파일 다운로드 가능")
 
 # 5. 참고 템플릿 미리보기
-with col1:
+with st.container():
     st.subheader("5. 참고 템플릿 미리보기")
     selected_template_file = st.selectbox("템플릿 파일 선택", options=["Template1", "Template2", "Template3"])
     if st.button("선택"):
         st.success(f"선택한 템플릿: {selected_template_file}")
 
 # 6. 저장
-with col3:
+with st.container():
     st.subheader("6. 저장")
     save_path = st.text_input("저장할 파일명 입력")
     if st.button("저장") and save_path:
@@ -165,7 +162,7 @@ with col3:
         st.success(f"{save_path}.csv 파일로 저장되었습니다.")
 
 # 7. 불러오기
-with col3:
+with st.container():
     st.subheader("7. 불러오기")
     uploaded_save_file = st.file_uploader("저장된 CSV 파일 불러오기", type=["csv"])
     if uploaded_save_file is not None:
