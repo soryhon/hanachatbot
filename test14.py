@@ -53,79 +53,56 @@ if 'rows' not in st.session_state:
 def toggle_visibility():
     st.session_state['show_info'] = not st.session_state['show_info']
 
-# Custom CSS for the div layout (GitHub and OpenAI sections)
-st.markdown("""
-    <style>
-    .container {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-    }
-    .box {
-        border: 1px solid #ccc;
-        padding: 20px;
-        margin: 10px;
-        width: 48%;  /* 48% width to make them sit side by side */
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
 # GitHub 정보와 OpenAI 정보 모두 저장되었는지 확인
 both_saved = st.session_state['github_saved'] and st.session_state['openai_saved']
-
-# 저장 정보 보기/숨기기 버튼 처리
-if both_saved:
-    if not st.session_state['show_info']:
-        if st.button("저장 정보 보기"):
-            toggle_visibility()
-    else:
-        if st.button("저장 정보 숨기기"):
-            toggle_visibility()
 
 # GitHub 및 OpenAI 정보 입력 폼
 if not both_saved or st.session_state['show_info']:
     # 레이아웃 시작 (GitHub 정보 및 OpenAI API 키 입력 화면)
-    st.markdown('<div class="container">', unsafe_allow_html=True)
+    st.subheader("GitHub 저장소 정보 및 OpenAI API 키 입력")
+
+    col_a, col_b = st.columns(2)
 
     # GitHub 정보 입력 영역
-    st.markdown('<div class="box">', unsafe_allow_html=True)
-    st.subheader("GitHub 저장소 정보 입력")
-    github_repo = st.text_input("GitHub 저장소 경로 (예: username/repo)", value=st.session_state['github_repo'])
-    github_token = st.text_input("GitHub API 토큰 입력", type="password", value=st.session_state['github_token'])
-    github_branch = st.text_input("브랜치 이름 (예: main 또는 master)", value=st.session_state['github_branch'])
-    
-    # GitHub 정보 저장 버튼 클릭 처리
-    if st.button("GitHub 정보 저장"):
-        if github_repo and github_token and github_branch:
-            st.session_state['github_repo'] = github_repo
-            st.session_state['github_token'] = github_token
-            st.session_state['github_branch'] = github_branch
-            st.session_state['github_saved'] = True
-            st.success(f"GitHub 정보가 저장되었습니다!\nRepo: {github_repo}, Branch: {github_branch}")
-        else:
-            st.error("모든 GitHub 정보를 입력해주세요.")
-    st.markdown('</div>', unsafe_allow_html=True)
+    with col_a:
+        st.subheader("GitHub 정보 입력")
+        github_repo = st.text_input("GitHub 저장소 경로 (예: username/repo)", value=st.session_state['github_repo'])
+        github_token = st.text_input("GitHub API 토큰 입력", type="password", value=st.session_state['github_token'])
+        github_branch = st.text_input("브랜치 이름 (예: main 또는 master)", value=st.session_state['github_branch'])
+        
+        # GitHub 정보 저장 버튼 클릭 처리
+        if st.button("GitHub 정보 저장"):
+            if github_repo and github_token and github_branch:
+                st.session_state['github_repo'] = github_repo
+                st.session_state['github_token'] = github_token
+                st.session_state['github_branch'] = github_branch
+                st.session_state['github_saved'] = True
+                st.success(f"GitHub 정보가 저장되었습니다!\nRepo: {github_repo}, Branch: {github_branch}")
+            else:
+                st.error("모든 GitHub 정보를 입력해주세요.")
 
     # OpenAI API 키 입력 영역
-    st.markdown('<div class="box">', unsafe_allow_html=True)
-    st.subheader("OpenAI API 키 입력")
-    openai_api_key = st.text_input("OpenAI API 키를 입력하세요.", type="password", value=st.session_state['openai_api_key'])
-    
-    # OpenAI API 키 저장 버튼 클릭 처리
-    if st.button("OpenAI API 키 저장"):
-        if openai_api_key:
-            st.session_state['openai_api_key'] = openai_api_key
-            st.session_state['openai_saved'] = True
-            st.success("OpenAI API 키가 저장되었습니다.")
-        else:
-            st.error("OpenAI API 키를 입력해주세요.")
-    st.markdown('</div>', unsafe_allow_html=True)
+    with col_b:
+        st.subheader("OpenAI API 키 입력")
+        openai_api_key = st.text_input("OpenAI API 키를 입력하세요.", type="password", value=st.session_state['openai_api_key'])
+        
+        # OpenAI API 키 저장 버튼 클릭 처리
+        if st.button("OpenAI API 키 저장"):
+            if openai_api_key:
+                st.session_state['openai_api_key'] = openai_api_key
+                st.session_state['openai_saved'] = True
+                st.success("OpenAI API 키가 저장되었습니다.")
+            else:
+                st.error("OpenAI API 키를 입력해주세요.")
 
-    st.markdown('</div>', unsafe_allow_html=True)
-
-# GitHub 저장소 정보와 OpenAI API 키 저장 후 정보 숨기기 처리
-if both_saved and st.session_state['show_info']:
-    toggle_visibility()
+# "저장 정보 보기"와 "저장 정보 숨기기" 버튼 처리
+if both_saved:
+    if st.session_state['show_info']:
+        if st.button("저장 정보 숨기기"):
+            toggle_visibility()
+    else:
+        if st.button("저장 정보 보기"):
+            toggle_visibility()
 
 # 3개의 프레임 나누기
 col1, col2, col3 = st.columns([0.39, 0.10, 0.49])  # 세로 구분선을 위해 가로 폭을 지정
