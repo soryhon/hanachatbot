@@ -44,23 +44,18 @@ def get_file_server_path(repo, branch, file_path):
     server_base_path = "/mnt/data/github_files"  # 서버에 GitHub 파일이 저장된 기본 경로
     return os.path.join(server_base_path, file_path)
 
-# 미리보기 팝업 창을 띄우는 HTML/JavaScript 함수
-def preview_file_popup(file_path):
-    st.markdown(
-        f"""
-        <script>
-        function openPreview() {{
-            var win = window.open("", "_blank", "width=800,height=600");
-            win.document.write('<html><head><title>미리보기</title></head><body>');
-            win.document.write('<h3>파일 미리보기: {file_path}</h3>');
-            win.document.write('<iframe src="file://{file_path}" width="100%" height="100%"></iframe>');
-            win.document.write('<button onclick="window.close()">닫기</button>');
-            win.document.write('</body></html>');
-        }}
-        </script>
-        <button onclick="openPreview()">미리보기</button>
-        """, unsafe_allow_html=True
-    )
+# 파일 미리보기 함수 (이미지, PDF, HTML 파일 지원)
+def preview_file(file_path):
+    file_extension = os.path.splitext(file_path)[1].lower()
+
+    if file_extension in [".png", ".jpg", ".jpeg"]:
+        st.image(file_path, caption=f"이미지 미리보기: {file_path}", use_column_width=True)
+    elif file_extension == ".pdf":
+        st.markdown(f'<iframe src="file://{file_path}" width="700" height="500"></iframe>', unsafe_allow_html=True)
+    elif file_extension == ".html":
+        st.components.v1.iframe(f"file://{file_path}", width=700, height=500)
+    else:
+        st.warning(f"지원되지 않는 파일 형식: {file_extension}")
 
 # 세션 상태 초기화
 if 'github_repo' not in st.session_state:
@@ -228,7 +223,7 @@ with col1:
         with col5_2:
             if st.button("미리보기"):
                 if file_path:
-                    preview_file_popup(file_path)  # 미리보기 팝업창 띄우기
+                    preview_file(file_path)  # 미리보기
                 else:
                     st.warning("파일 경로를 입력하세요.")
 
