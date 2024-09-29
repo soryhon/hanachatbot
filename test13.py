@@ -135,61 +135,65 @@ if st.button("OpenAI API 키 저장"):
 # 3개의 프레임 나누기
 col1, col2, col3 = st.columns([0.39, 0.10, 0.49])  # 세로 구분선을 위해 가로 폭을 지정
 
-# 1 프레임 (39%) - 스크롤 가능한 영역으로 구성
+# 1 프레임 (39%) - 스크롤 가능한 영역으로 구성, 세로 길이 50% 고정
 with col1:
     st.subheader("1. 작성 보고서 요청사항")
 
-    if 'rows' not in st.session_state:
-        st.session_state['rows'] = [{"제목": "", "요청": "", "데이터": ""}]  # 기본 행
+    # 고정된 50% 높이로 스크롤 영역 구현
+    with st.expander("작성 보고서 요청사항", expanded=True):
+        st.write("작성 보고서 내용")
+        df = pd.DataFrame(columns=["제목", "요청", "데이터"])
+        if 'rows' not in st.session_state:
+            st.session_state['rows'] = [{"제목": "", "요청": "", "데이터": ""}]  # 기본 행
 
-    rows = st.session_state['rows']  # 세션 상태에 저장된 행 목록을 사용
-    checked_rows = []  # 체크된 행들을 저장하기 위한 리스트
+        rows = st.session_state['rows']  # 세션 상태에 저장된 행 목록을 사용
+        checked_rows = []  # 체크된 행들을 저장하기 위한 리스트
 
-    # 행 목록을 순서대로 출력
-    for idx, row in enumerate(rows):
-        with st.container():
-            # 행 1에 체크박스 추가 (삭제 용도)
-            row_checked = st.checkbox(f"행 {idx+1}", key=f"row_checked_{idx}")
-            
-            # 제목 및 요청 입력란
-            row['제목'] = st.text_input(f"제목 (행 {idx+1})", row['제목'])
-            row['요청'] = st.text_input(f"요청 (행 {idx+1})", row['요청'])
-
-            # 체크된 행들을 저장
-            if row_checked:
-                checked_rows.append(idx)
-
-            # GitHub 파일 선택
-            file_list = []
-            if st.session_state['github_repo'] and st.session_state['github_token']:
-                upload_files_exist = any("uploadFiles" in item for item in get_github_files(st.session_state['github_repo'], st.session_state['github_token'], branch=st.session_state['github_branch']))
+        # 행 목록을 순서대로 출력
+        for idx, row in enumerate(rows):
+            with st.container():
+                # 행 1에 체크박스 추가 (삭제 용도)
+                row_checked = st.checkbox(f"행 {idx+1}", key=f"row_checked_{idx}")
                 
-                if upload_files_exist:
-                    st.success("uploadFiles 폴더가 존재합니다.")
-                    file_list = get_github_files(st.session_state['github_repo'], st.session_state['github_token'], folder_name="uploadFiles", branch=st.session_state['github_branch'])
-                else:
-                    st.warning("uploadFiles 폴더가 존재하지 않습니다. 기본 폴더의 파일을 표시합니다.")
-                    file_list = get_github_files(st.session_state['github_repo'], st.session_state['github_token'], branch=st.session_state['github_branch'])
+                # 제목 및 요청 입력란
+                row['제목'] = st.text_input(f"제목 (행 {idx+1})", row['제목'])
+                row['요청'] = st.text_input(f"요청 (행 {idx+1})", row['요청'])
 
-            selected_file = st.selectbox(f"파일 선택 (행 {idx+1})", options=file_list, key=f"file_select_{idx}")
-            
-            if st.button(f"선택 (행 {idx+1})") and selected_file:
-                file_url = get_file_url(st.session_state['github_repo'], st.session_state['github_branch'], selected_file)
-                rows[idx]['데이터'] = file_url  # 선택한 파일 URL 저장
-                st.success(f"선택한 파일: {selected_file}\nURL: {file_url}")
+                # 체크된 행들을 저장
+                if row_checked:
+                    checked_rows.append(idx)
 
-            # URL 정보 표시
-            st.text_input(f"데이터 (행 {idx+1})", row['데이터'], disabled=True, key=f"file_path_{idx}")
+                # GitHub 파일 선택
+                file_list = []
+                if st.session_state['github_repo'] and st.session_state['github_token']:
+                    upload_files_exist = any("uploadFiles" in item for item in get_github_files(st.session_state['github_repo'], st.session_state['github_token'], branch=st.session_state['github_branch']))
+                    
+                    if upload_files_exist:
+                        st.success("uploadFiles 폴더가 존재합니다.")
+                        file_list = get_github_files(st.session_state['github_repo'], st.session_state['github_token'], folder_name="uploadFiles", branch=st.session_state['github_branch'])
+                    else:
+                        st.warning("uploadFiles 폴더가 존재하지 않습니다. 기본 폴더의 파일을 표시합니다.")
+                        file_list = get_github_files(st.session_state['github_repo'], st.session_state['github_token'], branch=st.session_state['github_branch'])
 
-    # 행 추가와 행 삭제 버튼을 같은 행에 배치
-    col1_1, col1_2 = st.columns([0.5, 0.5])
-    with col1_1:
-        if st.button("행 추가"):
-            rows.append({"제목": "", "요청": "", "데이터": ""})  # 새 행 추가
-    with col1_2:
-        if st.button("행 삭제") and checked_rows:
-            st.session_state['rows'] = [row for idx, row in enumerate(rows) if idx not in checked_rows]  # 체크된 행 삭제
-            st.success(f"체크된 {len(checked_rows)}개의 행이 삭제되었습니다.")
+                selected_file = st.selectbox(f"파일 선택 (행 {idx+1})", options=file_list, key=f"file_select_{idx}")
+                
+                if st.button(f"선택 (행 {idx+1})") and selected_file:
+                    file_url = get_file_url(st.session_state['github_repo'], st.session_state['github_branch'], selected_file)
+                    rows[idx]['데이터'] = file_url  # 선택한 파일 URL 저장
+                    st.success(f"선택한 파일: {selected_file}\nURL: {file_url}")
+
+                # URL 정보 표시
+                st.text_input(f"데이터 (행 {idx+1})", row['데이터'], disabled=True, key=f"file_path_{idx}")
+
+        # 행 추가와 행 삭제 버튼을 같은 행에 배치
+        col1_1, col1_2 = st.columns([0.5, 0.5])
+        with col1_1:
+            if st.button("행 추가"):
+                rows.append({"제목": "", "요청": "", "데이터": ""})  # 새 행 추가
+        with col1_2:
+            if st.button("행 삭제") and checked_rows:
+                st.session_state['rows'] = [row for idx, row in enumerate(rows) if idx not in checked_rows]  # 체크된 행 삭제
+                st.success(f"체크된 {len(checked_rows)}개의 행이 삭제되었습니다.")
 
     # 2. 파일 업로드
     st.subheader("2. 파일 업로드")
@@ -241,30 +245,32 @@ with col2:
 
             st.success("LLM 요청이 완료되었습니다.")
 
-# 3 프레임 (49%)
+# 3 프레임 (49%) - 4. 결과 보고서 세로 70% 고정
 with col3:
     st.subheader("4. 결과 보고서")
 
-    if 'llm_results' in locals() and llm_results:
-        for idx, result in llm_results.items():
-            st.text(f"제목: {st.session_state['rows'][idx]['제목']}")
-            st.text(f"LLM 응답 결과:\n{result}")
+    # 고정된 70% 높이로 스크롤 영역 구현
+    with st.expander("결과 보고서", expanded=True):
+        if 'llm_results' in locals() and llm_results:
+            for idx, result in llm_results.items():
+                st.text(f"제목: {st.session_state['rows'][idx]['제목']}")
+                st.text(f"LLM 응답 결과:\n{result}")
 
-    # 6. 저장과 7. 불러오기 (같은 행)
-    col3_1, col3_2 = st.columns([0.5, 0.5])
+        # 6. 저장과 7. 불러오기 (같은 행)
+        col3_1, col3_2 = st.columns([0.5, 0.5])
 
-    with col3_1:
-        st.subheader("6. 저장")
-        save_path = st.text_input("저장할 파일명 입력")
-        if st.button("저장") and save_path:
-            df = pd.DataFrame(st.session_state['rows'])
-            df.to_csv(f"{save_path}.csv")
-            st.success(f"{save_path}.csv 파일로 저장되었습니다.")
+        with col3_1:
+            st.subheader("6. 저장")
+            save_path = st.text_input("저장할 파일명 입력")
+            if st.button("저장") and save_path:
+                df = pd.DataFrame(st.session_state['rows'])
+                df.to_csv(f"{save_path}.csv")
+                st.success(f"{save_path}.csv 파일로 저장되었습니다.")
 
-    with col3_2:
-        st.subheader("7. 불러오기")
-        uploaded_save_file = st.file_uploader("저장된 CSV 파일 불러오기", type=["csv"])
-        if uploaded_save_file is not None:
-            loaded_data = pd.read_csv(uploaded_save_file)
-            st.dataframe(loaded_data)
-            st.success("데이터가 불러와졌습니다.")
+        with col3_2:
+            st.subheader("7. 불러오기")
+            uploaded_save_file = st.file_uploader("저장된 CSV 파일 불러오기", type=["csv"])
+            if uploaded_save_file is not None:
+                loaded_data = pd.read_csv(uploaded_save_file)
+                st.dataframe(loaded_data)
+                st.success("데이터가 불러와졌습니다.")
