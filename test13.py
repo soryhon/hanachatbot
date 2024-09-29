@@ -183,7 +183,7 @@ with col1:
         st.success(f"체크된 {len(checked_rows)}개의 행이 삭제되었습니다.")
 
 # 2. 파일 업로드 로직 추가
-st.subheader("파일 업로드")
+st.subheader("2. 파일 업로드")
 
 uploaded_files = st.file_uploader("파일을 여러 개 드래그 앤 드롭하여 업로드하세요.", accept_multiple_files=True)
 
@@ -204,6 +204,13 @@ if uploaded_files and st.session_state['github_repo'] and st.session_state['gith
         else:
             # 새 파일 업로드
             upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'])
+
+# 5. 참고 템플릿 미리보기
+with col1:
+    st.subheader("5. 참고 템플릿 미리보기")
+    selected_template_file = st.selectbox("템플릿 파일 선택", options=["Template1", "Template2", "Template3"])
+    if st.button("선택"):
+        st.success(f"선택한 템플릿: {selected_template_file}")
 
 # 3. 실행 버튼
 with col2:
@@ -240,13 +247,6 @@ with col3:
     if st.button("Export"):
         file_type = st.selectbox("파일 형식 선택", options=["pdf", "docx", "xlsx", "txt"])
         st.success(f"{file_type} 형식으로 파일 다운로드 가능")
-
-# 5. 참고 템플릿 미리보기
-with col1:
-    st.subheader("5. 참고 템플릿 미리보기")
-    selected_template_file = st.selectbox("템플릿 파일 선택", options=["Template1", "Template2", "Template3"])
-    if st.button("선택"):
-        st.success(f"선택한 템플릿: {selected_template_file}")
 
 # 6. 저장
 with col3:
