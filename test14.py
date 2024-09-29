@@ -3,9 +3,22 @@ import pandas as pd
 import requests
 import urllib.parse  # URL 인코딩을 위한 라이브러리
 import base64  # base64 인코딩 및 복호화를 위한 라이브러리
+import json
 
 # 페이지 설정
 st.set_page_config(layout="wide")  # 페이지 가로길이를 모니터 전체 해상도로 설정
+
+# JSON 데이터 (예시로 직접 포함)
+json_data = '''
+{
+    "github_repo": "soryhon/hanachatbot",
+    "github_branch": "main",
+    "github_token": "Z2hwX0dKSU1TT2JDdVVZWWZJVnlkNFVLZ1YwUFdFOTlWcjRIRURkVw=="
+}
+'''
+
+# JSON 데이터를 파싱하여 세션 상태에 저장
+data = json.loads(json_data)
 
 # GitHub에서 파일 목록을 가져오는 함수
 def get_github_files(repo, github_token, folder_name=None, branch="main"):
@@ -31,13 +44,13 @@ def get_file_url(repo, branch, file_path):
     encoded_file_path = urllib.parse.quote(file_path)
     return f"https://github.com/{repo}/blob/{branch}/{encoded_file_path}"
 
-# 세션 상태 초기화
+# 세션 상태 초기화 (JSON 데이터가 있다면 그 값으로 초기화)
 if 'github_repo' not in st.session_state:
-    st.session_state['github_repo'] = ""
+    st.session_state['github_repo'] = data.get('github_repo', "")
 if 'github_token' not in st.session_state:
-    st.session_state['github_token'] = ""
+    st.session_state['github_token'] = data.get('github_token', "")
 if 'github_branch' not in st.session_state:
-    st.session_state['github_branch'] = "main"
+    st.session_state['github_branch'] = data.get('github_branch', "main")
 if 'openai_api_key' not in st.session_state:
     st.session_state['openai_api_key'] = ""
 if 'github_saved' not in st.session_state:
