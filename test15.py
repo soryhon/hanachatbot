@@ -287,7 +287,8 @@ with col1:
 
         if uploaded_template_files:
             for template_file in uploaded_template_files:
-                with open(os.path.join(template_folder, template_file.name), "wb") as f:
+                template_path = os.path.join(template_folder, template_file.name)
+                with open(template_path, "wb") as f:
                     f.write(template_file.read())
             st.success("탬플릿 파일이 업로드되었습니다.")
 
