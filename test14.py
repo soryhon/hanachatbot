@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import os
 import requests
 import urllib.parse  # URL 인코딩을 위한 라이브러리
 import base64  # base64 인코딩 및 복호화를 위한 라이브러리
@@ -38,10 +39,11 @@ def get_github_files(repo, github_token, folder_name=None, branch="main"):
         st.error(f"GitHub 파일 목록을 가져오지 못했습니다: {response.status_code}")
         return []
 
-# GitHub 파일의 URL을 생성하는 함수 (한글과 공백 처리)
-def get_file_url(repo, branch, file_path):
-    encoded_file_path = urllib.parse.quote(file_path)
-    return f"https://github.com/{repo}/blob/{branch}/{encoded_file_path}"
+# GitHub 파일의 서버 경로를 생성하는 함수
+def get_file_server_path(repo, branch, file_path):
+    # 서버에서의 경로 예시를 구성합니다. 실제 환경에서는 서버의 구조에 맞게 경로를 수정해야 합니다.
+    server_base_path = "/mnt/data/github_files"  # 서버에 GitHub 파일이 저장된 기본 경로
+    return os.path.join(server_base_path, file_path)
 
 # 세션 상태 초기화 (JSON 데이터가 있다면 그 값으로 초기화)
 if 'github_repo' not in st.session_state:
@@ -161,11 +163,11 @@ with col1:
                 selected_file = st.selectbox(f"파일 선택 (요청사항 {idx+1})", options=file_list, key=f"file_select_{idx}")
                 
                 if st.button(f"선택 (요청사항 {idx+1})") and selected_file:
-                    file_url = get_file_url(st.session_state['github_repo'], st.session_state['github_branch'], selected_file)
-                    rows[idx]['데이터'] = file_url  # 선택한 파일 URL 저장
-                    st.success(f"선택한 파일: {selected_file}\nURL: {file_url}")
+                    server_path = get_file_server_path(st.session_state['github_repo'], st.session_state['github_branch'], selected_file)
+                    rows[idx]['데이터'] = server_path  # 선택한 파일 서버 경로 저장
+                    st.success(f"선택한 파일: {selected_file}\n서버 경로: {server_path}")
 
-                # URL 정보 표시
+                # 서버 경로 정보 표시
                 st.text_input(f"데이터 (요청사항 {idx+1})", row['데이터'], disabled=True, key=f"file_path_{idx}")
 
         # 행 추가, 행 삭제, 새로고침 버튼을 같은 행에 배치
