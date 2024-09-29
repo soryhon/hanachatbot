@@ -7,6 +7,30 @@ import base64  # base64 인코딩 및 복호화를 위한 라이브러리
 # 페이지 설정
 st.set_page_config(layout="wide")  # 페이지 가로길이를 모니터 전체 해상도로 설정
 
+# GitHub에서 파일 목록을 가져오는 함수
+def get_github_files(repo, github_token, folder_name=None, branch="main"):
+    url = f"https://api.github.com/repos/{repo}/git/trees/{branch}?recursive=1"
+    headers = {
+        "Authorization": f"token {github_token}"
+    }
+    response = requests.get(url, headers=headers)
+    
+    if response.status_code == 200:
+        tree = response.json().get("tree", [])
+        if folder_name:
+            file_list = [item["path"] for item in tree if folder_name in item["path"] and item["type"] == "blob"]
+        else:
+            file_list = [item["path"] for item in tree if item["type"] == "blob"]
+        return file_list
+    else:
+        st.error(f"GitHub 파일 목록을 가져오지 못했습니다: {response.status_code}")
+        return []
+
+# GitHub 파일의 URL을 생성하는 함수 (한글과 공백 처리)
+def get_file_url(repo, branch, file_path):
+    encoded_file_path = urllib.parse.quote(file_path)
+    return f"https://github.com/{repo}/blob/{branch}/{encoded_file_path}"
+
 # 세션 상태 초기화
 if 'github_repo' not in st.session_state:
     st.session_state['github_repo'] = ""
