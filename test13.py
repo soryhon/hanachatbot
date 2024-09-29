@@ -101,7 +101,7 @@ if 'github_repo' not in st.session_state:
 if 'github_branch' not in st.session_state:
     st.session_state['github_branch'] = "main"
 
-# 2. GitHub 저장소 정보 입력 기능 (1. 작업 요청사항 위로 이동)
+# 2. GitHub 저장소 정보 입력 기능
 st.subheader("GitHub 저장소 정보 입력")
 
 # GitHub 저장소 경로 입력
@@ -123,7 +123,7 @@ if st.button("GitHub 정보 저장"):
     if st.session_state['github_token']:
         st.info(f"GitHub 토큰이 저장되었습니다. 저장된 토큰: {st.session_state['github_token'][:5]}...")
 
-# 3. OpenAI API 키 입력 로직 (GitHub 정보 아래로 이동)
+# 3. OpenAI API 키 입력 로직
 st.subheader("OpenAI API 키 입력")
 
 openai_api_key = st.text_input("OpenAI API 키를 입력하세요.", type="password")
@@ -140,14 +140,19 @@ with col1:
     st.subheader("1. 작성 보고서 요청사항")
     df = pd.DataFrame(columns=["제목", "요청", "데이터"])
     rows = [{"제목": "", "요청": "", "데이터": ""}]  # 기본값 삭제
+    checked_rows = []  # 체크된 행들을 저장하기 위한 리스트
 
     for idx, row in enumerate(rows):
-        # 행 1에 체크박스 추가
+        # 행 1에 체크박스 추가 (삭제 용도)
         row_checked = st.checkbox(f"행 {idx+1}", key=f"row_checked_{idx}")
         
         # 제목 및 요청 입력란
-        row['제목'] = st.text_input(f"제목 (행 {idx+1})", row['제목'], disabled=not row_checked)
-        row['요청'] = st.text_input(f"요청 (행 {idx+1})", row['요청'], disabled=not row_checked)
+        row['제목'] = st.text_input(f"제목 (행 {idx+1})", row['제목'])
+        row['요청'] = st.text_input(f"요청 (행 {idx+1})", row['요청'])
+
+        # 체크된 행들을 저장
+        if row_checked:
+            checked_rows.append(idx)
 
         # GitHub 파일 선택
         file_list = []
@@ -173,8 +178,11 @@ with col1:
 
     if st.button("행 추가"):
         rows.append({"제목": "", "요청": "", "데이터": ""})
-    if st.button("행 삭제"):
-        rows = rows[:-1] if len(rows) > 1 else rows  # 최소 1행은 유지
+
+    # [행 삭제] 버튼 클릭 시 체크된 행 삭제
+    if st.button("행 삭제") and checked_rows:
+        rows = [row for idx, row in enumerate(rows) if idx not in checked_rows]
+        st.success(f"체크된 {len(checked_rows)}개의 행이 삭제되었습니다.")
 
 # 3. 실행 버튼
 with col2:
