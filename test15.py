@@ -84,6 +84,21 @@ def get_file_server_path(repo, branch, file_path):
     server_base_path = "/mnt/data/github_files"  # 서버에 GitHub 파일이 저장된 기본 경로
     return os.path.join(server_base_path, file_path)
 
+# 파일 미리보기 팝업 함수
+def preview_file(file_path):
+    file_extension = file_path.split('.')[-1].lower()
+    if file_extension in ['png', 'jpg', 'jpeg']:
+        # 이미지 파일 미리보기
+        st.image(file_path, caption="이미지 미리보기", use_column_width=True)
+    elif file_extension == 'pdf':
+        # PDF 파일 미리보기
+        st.markdown(f'<iframe src="{file_path}" width="700" height="500"></iframe>', unsafe_allow_html=True)
+    elif file_extension == 'html':
+        # HTML 파일 미리보기
+        st.markdown(f'<iframe src="{file_path}" width="700" height="500"></iframe>', unsafe_allow_html=True)
+    else:
+        st.warning("미리보기가 지원되지 않는 파일 형식입니다.")
+
 # 세션 상태 초기화
 if 'github_repo' not in st.session_state:
     st.session_state['github_repo'] = data.get('github_repo', "")
@@ -176,10 +191,11 @@ with col1:
 
                 if row_checked:
                     checked_rows.append(idx)
-                    row["checked"] = True
+                    row["checked"] = True  # 체크된 상태 저장
                 else:
-                    row["checked"] = False
+                    row["checked"] = False  # 체크 해제 상태 저장
 
+                # GitHub 파일 선택
                 file_list = []
                 if st.session_state['github_repo'] and st.session_state['github_token']:
                     upload_files_exist = any("uploadFiles" in item for item in get_github_files(st.session_state['github_repo'], st.session_state['github_token'], branch=st.session_state['github_branch']))
@@ -256,7 +272,6 @@ with col1:
 
         selected_template_file = st.selectbox("탬플릿 파일 선택", template_files)
 
-        # 파일 선택 버튼
         if st.button("파일 선택"):
             server_template_path = get_file_server_path(st.session_state['github_repo'], st.session_state['github_branch'], selected_template_file)
             st.session_state['template_file_path'] = server_template_path
