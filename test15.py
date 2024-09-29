@@ -86,15 +86,21 @@ def get_file_server_path(repo, branch, file_path):
 
 # 파일 미리보기 함수 (화면에 직접 출력)
 def preview_file(file_path):
-    file_extension = file_path.split('.')[-1].lower()
-    if file_extension in ['png', 'jpg', 'jpeg']:
-        st.image(file_path, caption="이미지 미리보기", use_column_width=True)
-    elif file_extension == 'pdf':
-        st.write("PDF 파일 미리보기는 지원되지 않습니다.")
-    elif file_extension == 'html':
-        st.markdown(f"HTML 파일: {file_path}", unsafe_allow_html=True)
-    else:
-        st.warning("미리보기가 지원되지 않는 파일 형식입니다.")
+    try:
+        file_extension = file_path.split('.')[-1].lower()
+        # URL 인코딩 적용 (한글 파일 경로 문제 해결)
+        encoded_file_path = urllib.parse.quote(file_path)
+
+        if file_extension in ['png', 'jpg', 'jpeg']:
+            st.image(encoded_file_path, caption="이미지 미리보기", use_column_width=True)
+        elif file_extension == 'pdf':
+            st.write(f"[PDF 보기]({encoded_file_path}) (PDF 파일은 직접 미리보기가 지원되지 않습니다.)", unsafe_allow_html=True)
+        elif file_extension == 'html':
+            st.markdown(f"[HTML 보기]({encoded_file_path})", unsafe_allow_html=True)
+        else:
+            st.warning("미리보기가 지원되지 않는 파일 형식입니다.")
+    except Exception as e:
+        st.error(f"파일 미리보기 오류: {e}")
 
 # 세션 상태 초기화
 if 'github_repo' not in st.session_state:
