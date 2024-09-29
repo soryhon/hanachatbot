@@ -187,8 +187,8 @@ with col1:
                 # URL 정보 표시
                 st.text_input(f"데이터 (요청사항 {idx+1})", row['데이터'], disabled=True, key=f"file_path_{idx}")
 
-        # 행 추가와 행 삭제 버튼을 같은 행에 배치
-        col1_1, col1_2 = st.columns([0.5, 0.5])
+        # 행 추가, 행 삭제, 새로고침 버튼을 같은 행에 배치
+        col1_1, col1_2, col1_3 = st.columns([0.33, 0.33, 0.33])
         with col1_1:
             if st.button("행 추가"):
                 rows.append({"제목": "", "요청": "", "데이터": "", "checked": True})  # 새 행 추가 및 자동 체크
@@ -200,6 +200,9 @@ with col1:
                     st.success(f"체크된 {len(checked_rows)}개의 요청사항이 삭제되었습니다.")
                 else:
                     st.warning("삭제할 요청사항을 선택해주세요.")
+        with col1_3:
+            if st.button("새로고침"):
+                st.experimental_rerun()  # 새로고침
 
     # 2. 파일 업로드 (세로 길이 20% 고정)
     st.subheader("2. 파일 업로드")
