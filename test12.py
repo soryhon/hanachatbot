@@ -177,6 +177,10 @@ with col1:
         st.session_state['github_token'] = github_token
         st.session_state['github_branch'] = github_branch
         st.success("GitHub 정보가 성공적으로 저장되었습니다.")
+        # GitHub 정보가 저장된 후 메모리에 저장
+        st.session_state['github_token'] = github_token
+        st.session_state['github_repo'] = github_repo
+        st.session_state['github_branch'] = github_branch
 
     # 파일 업로드 기능 (GitHub 업로드)
     st.subheader("파일 업로드")
