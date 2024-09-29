@@ -143,7 +143,7 @@ with col1:
     with st.expander("요청사항 리스트", expanded=True):
         df = pd.DataFrame(columns=["제목", "요청", "데이터"])
         if 'rows' not in st.session_state:
-            st.session_state['rows'] = [{"제목": "", "요청": "", "데이터": ""}]  # 기본 행
+            st.session_state['rows'] = [{"제목": "", "요청": "", "데이터": "", "checked": False}]  # 기본 행
 
         rows = st.session_state['rows']  # 세션 상태에 저장된 행 목록을 사용
         checked_rows = []  # 체크된 행들을 저장하기 위한 리스트
@@ -152,7 +152,7 @@ with col1:
         for idx, row in enumerate(rows):
             with st.container():
                 # 요청사항1에 체크박스 추가 (삭제 용도)
-                row_checked = st.checkbox(f"요청사항 {idx+1}", key=f"row_checked_{idx}")
+                row_checked = st.checkbox(f"요청사항 {idx+1}", key=f"row_checked_{idx}", value=row.get("checked", False))
                 
                 # 제목 및 요청 입력란
                 row['제목'] = st.text_input(f"제목 (요청사항 {idx+1})", row['제목'])
@@ -161,6 +161,9 @@ with col1:
                 # 체크된 행들을 저장
                 if row_checked:
                     checked_rows.append(idx)
+                    row["checked"] = True  # 체크된 상태 저장
+                else:
+                    row["checked"] = False  # 체크 해제 상태 저장
 
                 # GitHub 파일 선택
                 file_list = []
@@ -188,7 +191,7 @@ with col1:
         col1_1, col1_2 = st.columns([0.5, 0.5])
         with col1_1:
             if st.button("행 추가"):
-                rows.append({"제목": "", "요청": "", "데이터": ""})  # 새 행 추가
+                rows.append({"제목": "", "요청": "", "데이터": "", "checked": True})  # 새 행 추가 및 자동 체크
                 st.session_state['rows'] = rows  # 세션 상태 업데이트
         with col1_2:
             if st.button("행 삭제"):
