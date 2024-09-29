@@ -7,20 +7,6 @@ import base64  # base64 인코딩 및 복호화를 위한 라이브러리
 # 페이지 설정
 st.set_page_config(layout="wide")  # 페이지 가로길이를 모니터 전체 해상도로 설정
 
-# JSON 데이터에 base64로 인코딩된 GitHub 토큰 추가
-json_data = {
-    "github_repo": "soryhon/hanachatbot",
-    "github_branch": "main",
-    "github_token": "Z2hwX2E5OGJtdE1MSnpnZGVLMmxTMXRyUmdNVExFUFZsWDNTV0RTbg=="  # base64로 인코딩된 GitHub 토큰
-}
-
-# base64로 인코딩된 토큰 복호화 함수
-def decode_base64(encoded_str):
-    return base64.b64decode(encoded_str).decode('utf-8')
-
-# 복호화된 GitHub 토큰 저장
-decoded_github_token = decode_base64(json_data['github_token'])
-
 # OpenAI에 LLM 요청을 보내는 함수
 def send_to_llm(prompt, api_key):
     headers = {
@@ -89,11 +75,11 @@ def get_file_url(repo, branch, file_path):
 if 'openai_api_key' not in st.session_state:
     st.session_state['openai_api_key'] = ""
 if 'github_token' not in st.session_state:
-    st.session_state['github_token'] = decoded_github_token  # JSON 데이터에서 복호화된 GitHub 토큰을 저장
+    st.session_state['github_token'] = None  # GitHub 토큰을 수동으로 입력
 if 'github_repo' not in st.session_state:
-    st.session_state['github_repo'] = json_data['github_repo']
+    st.session_state['github_repo'] = "soryhon/hanachatbot"
 if 'github_branch' not in st.session_state:
-    st.session_state['github_branch'] = json_data['github_branch']
+    st.session_state['github_branch'] = "main"
 
 # Streamlit의 세로 프레임 구성
 col1, col2, col3 = st.columns([0.39, 0.10, 0.49])
@@ -143,8 +129,8 @@ with col1:
     # GitHub 저장소 경로 입력
     github_repo = st.text_input("GitHub 저장소 경로 (예: username/repo)", value=st.session_state['github_repo'])
 
-    # GitHub API 토큰 입력 (복호화된 값을 자동 입력)
-    github_token = st.text_input("GitHub API 토큰 입력", value=st.session_state['github_token'], type="password")
+    # GitHub API 토큰 입력 (수동으로 입력)
+    github_token = st.text_input("GitHub API 토큰 입력", type="password")
 
     # 브랜치 입력
     github_branch = st.text_input("브랜치 이름 (예: main 또는 master)", value=st.session_state['github_branch'])
@@ -155,8 +141,9 @@ with col1:
         st.session_state['github_branch'] = github_branch
         st.success("GitHub 정보가 성공적으로 저장되었습니다.")
         
+        # GitHub 토큰이 제대로 저장되었는지 확인하는 메시지 추가
         if st.session_state['github_token']:
-            st.info(f"GitHub 토큰이 저장되었습니다. 저장된 토큰: {st.session_state['github_token'][:5]}...")
+            st.info(f"GitHub 토큰이 저장되었습니다. 저장된 토큰: {st.session_state['github_token'][:5]}...")  # 토큰의 앞 5자리를 표시해 확인
 
     # 파일 업로드 기능 (GitHub 업로드)
     st.subheader("파일 업로드")
@@ -164,7 +151,9 @@ with col1:
 
     if uploaded_files and st.session_state['github_repo'] and st.session_state['github_token']:
         for uploaded_file in uploaded_files:
+            # 파일을 바이트 형식으로 읽어들임
             file_content = uploaded_file.read()
+            # 파일을 GitHub 저장소에 업로드
             upload_file_to_github(st.session_state['github_repo'], 'uploadFiles', uploaded_file.name, file_content, st.session_state['github_token'])
 
 # 3. 실행 버튼 및 OpenAI API 키 입력
