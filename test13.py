@@ -123,6 +123,29 @@ if st.button("GitHub 정보 저장"):
     if st.session_state['github_token']:
         st.info(f"GitHub 토큰이 저장되었습니다. 저장된 토큰: {st.session_state['github_token'][:5]}...")
 
+# 2. 파일 업로드 로직 추가
+st.subheader("파일 업로드")
+
+uploaded_files = st.file_uploader("파일을 여러 개 드래그 앤 드롭하여 업로드하세요.", accept_multiple_files=True)
+
+if uploaded_files and st.session_state['github_repo'] and st.session_state['github_token']:
+    for uploaded_file in uploaded_files:
+        # 파일을 바이트 형식으로 읽어들임
+        file_content = uploaded_file.read()
+        file_name = uploaded_file.name
+        folder_name = 'uploadFiles'
+
+        # 기존 파일이 있는지 확인
+        sha = get_file_sha(st.session_state['github_repo'], f"{folder_name}/{file_name}", st.session_state['github_token'], branch=st.session_state['github_branch'])
+
+        if sha:
+            # 덮어쓰기 확인
+            if st.checkbox(f"'{file_name}' 파일이 이미 존재합니다. 덮어쓰시겠습니까?", key=f"overwrite_{file_name}"):
+                upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
+        else:
+            # 새 파일 업로드
+            upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'])
+
 # 3. OpenAI API 키 입력 로직
 st.subheader("OpenAI API 키 입력")
 
