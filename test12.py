@@ -27,8 +27,21 @@ def send_to_llm(prompt, api_key):
         st.error(f"LLM 요청 실패: {response.status_code} - {response.text}")
         return None
 
-# GitHub에 파일을 업로드하는 함수
-def upload_file_to_github(repo, folder_name, file_name, content, github_token, branch="main"):
+# GitHub에서 파일의 sha 값을 가져오는 함수
+def get_file_sha(repo, file_path, github_token, branch="main"):
+    url = f"https://api.github.com/repos/{repo}/contents/{file_path}?ref={branch}"
+    headers = {
+        "Authorization": f"token {github_token}"
+    }
+    response = requests.get(url, headers=headers)
+    
+    if response.status_code == 200:
+        return response.json().get("sha")
+    else:
+        return None
+
+# GitHub에 파일을 업로드하거나 덮어쓰는 함수
+def upload_file_to_github(repo, folder_name, file_name, content, github_token, branch="main", sha=None):
     url = f"https://api.github.com/repos/{repo}/contents/{folder_name}/{file_name}"
     headers = {
         "Authorization": f"token {github_token}",
@@ -40,10 +53,17 @@ def upload_file_to_github(repo, folder_name, file_name, content, github_token, b
         "content": content_base64,
         "branch": branch
     }
+
+    # sha 값이 있으면 덮어쓰기
+    if sha:
+        data["sha"] = sha
+
     response = requests.put(url, headers=headers, json=data)
     
     if response.status_code == 201:
         st.success(f"파일이 GitHub 저장소에 성공적으로 업로드되었습니다: {file_name}")
+    elif response.status_code == 200:  # 덮어쓰기 성공
+        st.success(f"파일이 GitHub 저장소에 성공적으로 덮어쓰기되었습니다: {file_name}")
     else:
         st.error(f"GitHub 업로드 실패: {response.status_code} - {response.text}")
 
@@ -143,7 +163,7 @@ with col1:
         
         # GitHub 토큰이 제대로 저장되었는지 확인하는 메시지 추가
         if st.session_state['github_token']:
-            st.info(f"GitHub 토큰이 저장되었습니다. 저장된 토큰: {st.session_state['github_token'][:5]}...")  # 토큰의 앞 5자리를 표시해 확인
+            st.info(f"GitHub 토큰이 저장되었습니다. 저장된 토큰: {st.session_state['github_token'][:5]}...")
 
     # 파일 업로드 기능 (GitHub 업로드)
     st.subheader("파일 업로드")
@@ -153,8 +173,19 @@ with col1:
         for uploaded_file in uploaded_files:
             # 파일을 바이트 형식으로 읽어들임
             file_content = uploaded_file.read()
-            # 파일을 GitHub 저장소에 업로드
-            upload_file_to_github(st.session_state['github_repo'], 'uploadFiles', uploaded_file.name, file_content, st.session_state['github_token'])
+            file_name = uploaded_file.name
+            folder_name = 'uploadFiles'
+
+            # 기존 파일이 있는지 확인
+            sha = get_file_sha(st.session_state['github_repo'], f"{folder_name}/{file_name}", st.session_state['github_token'], branch=st.session_state['github_branch'])
+
+            if sha:
+                # 덮어쓰기 확인
+                if st.checkbox(f"'{file_name}' 파일이 이미 존재합니다. 덮어쓰시겠습니까?", key=f"overwrite_{file_name}"):
+                    upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
+            else:
+                # 새 파일 업로드
+                upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'])
 
 # 3. 실행 버튼 및 OpenAI API 키 입력
 with col2:
