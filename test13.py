@@ -251,14 +251,40 @@ with col3:
     st.subheader("4. 결과 보고서")
 
     # 고정된 70% 높이로 스크롤 영역 구현
+    st.markdown(
+        """
+        <style>
+        div[data-testid="stExpander"] > div[role="group"] {
+            height: 70vh;
+            overflow-y: auto;
+        }
+        </style>
+        """, unsafe_allow_html=True
+    )
+
     with st.expander("결과 보고서", expanded=True):
         if 'llm_results' in locals() and llm_results:
             for idx, result in llm_results.items():
                 st.text(f"제목: {st.session_state['rows'][idx]['제목']}")
                 st.text(f"LLM 응답 결과:\n{result}")
+        else:
+            st.text("결과가 없습니다.")
 
-# 6. 저장과 7. 불러오기 (세로 길이 30% 고정, 4. 결과 보고서 아래에 배치)
+# 6. 저장과 7. 불러오기 (세로 길이 30% 고정, 테두리 추가)
 with col3:
+    st.markdown(
+        """
+        <style>
+        div[data-testid="column"]:nth-child(3) > div > div {
+            border: 1px solid #cccccc;
+            padding: 10px;
+            height: 30vh;
+            overflow-y: auto;
+        }
+        </style>
+        """, unsafe_allow_html=True
+    )
+
     st.subheader("6. 저장 및 7. 불러오기")
 
     # 6. 저장과 7. 불러오기 (같은 행)
