@@ -267,7 +267,10 @@ with col1:
                     st.warning("파일 경로를 입력하세요.")
 
         template_folder = "templateFiles"
-        if st.session_state['github_repo'] and st.session_state['github_token']:
+        template_files = []  # 기본적으로 빈 리스트로 설정
+
+        # GitHub 토큰이 저장된 경우에만 탬플릿 파일 목록을 불러옴
+        if st.session_state['github_token']:
             template_files = get_github_files(st.session_state['github_repo'], st.session_state['github_token'], folder_name=template_folder, branch=st.session_state['github_branch'])
 
         selected_template_file = st.selectbox("탬플릿 파일 선택", template_files)
