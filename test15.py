@@ -75,6 +75,8 @@ if 'preview_open' not in st.session_state:
     st.session_state['preview_open'] = False
 if 'preview_file_path' not in st.session_state:
     st.session_state['preview_file_path'] = ""
+if 'template_file_path' not in st.session_state:
+    st.session_state['template_file_path'] = ""  # 탬플릿 파일 경로를 저장
 
 # 저장 정보 숨기기/보이기 기능
 def toggle_visibility():
@@ -217,7 +219,8 @@ with col1:
     with st.expander("참고 탬플릿 미리보기", expanded=True):
         col5_1, col5_2 = st.columns([0.8, 0.2])
         with col5_1:
-            file_path = st.text_input("탬플릿 파일 경로")
+            # 파일 경로 입력창
+            file_path = st.text_input("탬플릿 파일 경로", value=st.session_state['template_file_path'])
         with col5_2:
             if st.button("미리보기"):
                 if file_path:
@@ -229,17 +232,19 @@ with col1:
         template_folder = "template"
         if not os.path.exists(template_folder):
             os.makedirs(template_folder)
-            st.info("템플릿 폴더가 생성되었습니다.")
+            st.info("탬플릿 폴더가 생성되었습니다.")
 
         template_files = os.listdir(template_folder)
         selected_template_file = st.selectbox("탬플릿 파일 선택", template_files)
 
         # 파일 선택 버튼
         if st.button("파일 선택"):
-            file_path = os.path.join(template_folder, selected_template_file)
-            st.success(f"선택한 파일 경로: {file_path}")
+            # 선택된 파일의 서버 경로 정보 저장
+            server_template_path = os.path.join(template_folder, selected_template_file)
+            st.session_state['template_file_path'] = server_template_path
+            st.success(f"선택한 파일 경로: {server_template_path}")
 
-        # 템플릿 파일 업로드
+        # 탬플릿 파일 업로드
         uploaded_template_files = st.file_uploader("탬플릿 파일 업로드", accept_multiple_files=True, type=["png", "jpg", "pdf", "html"])
 
         if uploaded_template_files:
