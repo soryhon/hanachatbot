@@ -54,8 +54,11 @@ def get_github_files(repo, github_token, folder_name=None, branch="main"):
     # 여기에서는 그냥 예시 파일 리스트를 사용합니다.
     return ["파일1.txt", "파일2.csv", "파일3.docx"]
 
+# 컬럼 설정
+col1, col2, col3 = st.columns([0.39, 0.10, 0.49])
+
 # 1. 작성 보고서 요청사항
-with st.container():
+with col1:
     st.markdown('<div class="report-table">', unsafe_allow_html=True)
     st.markdown('<div class="table-header">행 1</div>', unsafe_allow_html=True)
 
@@ -95,7 +98,7 @@ with st.container():
     st.markdown('</div>', unsafe_allow_html=True)
 
 # 2. 파일 업로드 및 GitHub 저장소 정보 입력 기능
-with st.container():
+with col1:
     st.subheader("2. 파일 업로드 및 GitHub 저장소 정보")
     uploaded_files = st.file_uploader("파일을 여러 개 드래그 앤 드롭하여 업로드하세요.", accept_multiple_files=True)
 
