@@ -9,16 +9,15 @@ json_data = {
     "github_repo": "soryhon/hanachatbot",
     "github_branch": "main",
     "github_token": "Z2hwX0dKSU1TT2JDdVVZWWZJVnlkNFVLZ1YwUFdFOTlWcjRIRURkVw==",
-    "openai_api_key": "c2staVFIM2s4S3dyNGFpemxfNkhFbGRKc0NtVmtETVdpTVVuTkUyZUdlNktzVDNCbGJrRkpROFlZb3plYzJTOHRwbnpORFdLSGIzUzh4VmJxdzYzZlVUTlRoOXdBb0E="
+    "openai_api_key": ""
 }
 
-# GitHub API 토큰과 OpenAI API 키 복호화 함수
+# GitHub API 토큰 복호화 함수
 def decode_base64(encoded_str):
     return base64.b64decode(encoded_str).decode('utf-8')
 
 # 복호화된 토큰 값 저장
 decoded_github_token = decode_base64(json_data['github_token'])
-decoded_openai_api_key = decode_base64(json_data['openai_api_key'])
 
 # OpenAI에 LLM 요청을 보내는 함수
 def send_to_llm(prompt, api_key):
@@ -98,7 +97,7 @@ st.title("일일 업무 및 보고서 자동화 프로그램")
 
 # API 키 및 GitHub 저장소 정보를 메모리에 저장하기 위한 변수 (세션 상태에 저장)
 if 'openai_api_key' not in st.session_state:
-    st.session_state['openai_api_key'] = decoded_openai_api_key
+    st.session_state['openai_api_key'] = ""
 if 'github_token' not in st.session_state:
     st.session_state['github_token'] = None  # 처음엔 None, 정보 저장 후 연동
 if 'github_repo' not in st.session_state:
@@ -179,11 +178,20 @@ with col1:
         st.session_state['github_branch'] = github_branch
         st.success("GitHub 정보가 성공적으로 저장되었습니다.")
 
+    # 파일 업로드 기능 (GitHub 업로드)
+    st.subheader("파일 업로드")
+    uploaded_files = st.file_uploader("파일을 여러 개 드래그 앤 드롭하여 업로드하세요.", accept_multiple_files=True)
+
+    if uploaded_files and st.session_state['github_repo'] and st.session_state['github_token']:
+        for uploaded_file in uploaded_files:
+            # 파일을 GitHub 저장소에 업로드
+            upload_file_to_github(st.session_state['github_repo'], 'uploadFiles', uploaded_file.name, uploaded_file.read(), st.session_state['github_token'])
+
 # 3. 실행 버튼 및 OpenAI API 키 입력
 with col2:
     st.subheader("3. 실행")
 
-    # OpenAI API 키 입력 부분 (Base64 복호화된 값 미리 입력됨)
+    # OpenAI API 키 입력 부분 (공백으로 유지)
     openai_api_key = st.text_input("OpenAI API 키를 입력하세요.", value=st.session_state['openai_api_key'], type="password")
 
     if st.button("OpenAI API 키 저장"):
@@ -192,7 +200,7 @@ with col2:
 
     # LLM 실행 버튼
     if st.button("실행"):
-        if st.session_state['openai_api_key'] is None:
+        if st.session_state['openai_api_key'] == "":
             st.error("OpenAI API 키를 입력해야 실행할 수 있습니다.")
         else:
             # 모든 행의 정보를 기반으로 프롬프트 구성
