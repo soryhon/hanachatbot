@@ -8,12 +8,11 @@ import json
 # 페이지 설정
 st.set_page_config(layout="wide")  # 페이지 가로길이를 모니터 전체 해상도로 설정
 
-# JSON 데이터 (예시로 직접 포함)
+# JSON 데이터 (github_token 삭제됨)
 json_data = '''
 {
     "github_repo": "soryhon/hanachatbot",
-    "github_branch": "main",
-    "github_token": "Z2hwX0dKSU1TT2JDdVVZWWZJVnlkNFVLZ1YwUFdFOTlWcjRIRURkVw=="
+    "github_branch": "main"
 }
 '''
 
@@ -48,7 +47,7 @@ def get_file_url(repo, branch, file_path):
 if 'github_repo' not in st.session_state:
     st.session_state['github_repo'] = data.get('github_repo', "")
 if 'github_token' not in st.session_state:
-    st.session_state['github_token'] = data.get('github_token', "")
+    st.session_state['github_token'] = ""  # GitHub API 토큰은 사용자가 입력하도록 수정
 if 'github_branch' not in st.session_state:
     st.session_state['github_branch'] = data.get('github_branch', "main")
 if 'openai_api_key' not in st.session_state:
@@ -80,7 +79,7 @@ if not both_saved or st.session_state['show_info']:
     with col_a:
         st.subheader("GitHub 정보 입력")
         github_repo = st.text_input("GitHub 저장소 경로 (예: username/repo)", value=st.session_state['github_repo'])
-        github_token = st.text_input("GitHub API 토큰 입력", type="password", value=st.session_state['github_token'])
+        github_token = st.text_input("GitHub API 토큰 입력", type="password")  # 사용자 입력을 받는 창
         github_branch = st.text_input("브랜치 이름 (예: main 또는 master)", value=st.session_state['github_branch'])
         
         # GitHub 정보 저장 버튼 클릭 처리
