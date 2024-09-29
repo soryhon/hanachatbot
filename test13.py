@@ -176,13 +176,15 @@ with col1:
         # URL 정보 표시
         file_path = st.text_input(f"데이터 (행 {idx+1})", row['데이터'], disabled=True, key=f"file_path_{idx}")
 
-    if st.button("행 추가"):
-        rows.append({"제목": "", "요청": "", "데이터": ""})
-
-    # [행 삭제] 버튼 클릭 시 체크된 행 삭제
-    if st.button("행 삭제") and checked_rows:
-        rows = [row for idx, row in enumerate(rows) if idx not in checked_rows]
-        st.success(f"체크된 {len(checked_rows)}개의 행이 삭제되었습니다.")
+    # 행 추가와 행 삭제 버튼을 같은 행에 배치
+    col1_1, col1_2 = st.columns([0.5, 0.5])
+    with col1_1:
+        if st.button("행 추가"):
+            rows.append({"제목": "", "요청": "", "데이터": ""})
+    with col1_2:
+        if st.button("행 삭제") and checked_rows:
+            rows = [row for idx, row in enumerate(rows) if idx not in checked_rows]
+            st.success(f"체크된 {len(checked_rows)}개의 행이 삭제되었습니다.")
 
     # 2. 파일 업로드
     st.subheader("2. 파일 업로드")
