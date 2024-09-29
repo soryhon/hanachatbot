@@ -132,8 +132,10 @@ if st.button("OpenAI API 키 저장"):
     st.session_state['openai_api_key'] = openai_api_key
     st.success("OpenAI API 키가 저장되었습니다.")
 
-# 1. 작성 보고서 요청사항
-col1, col2, col3 = st.columns([0.39, 0.10, 0.49])
+# 3개의 프레임 나누기
+col1, col2, col3 = st.columns([0.39, 0.10, 0.49])  # 세로 구분선을 위해 가로 폭을 지정
+
+# 1 프레임 (39%)
 with col1:
     st.subheader("1. 작성 보고서 요청사항")
     df = pd.DataFrame(columns=["제목", "요청", "데이터"])
@@ -182,40 +184,37 @@ with col1:
         rows = [row for idx, row in enumerate(rows) if idx not in checked_rows]
         st.success(f"체크된 {len(checked_rows)}개의 행이 삭제되었습니다.")
 
-# 2. 파일 업로드 로직 추가
-st.subheader("2. 파일 업로드")
+    # 2. 파일 업로드
+    st.subheader("2. 파일 업로드")
+    uploaded_files = st.file_uploader("파일을 여러 개 드래그 앤 드롭하여 업로드하세요.", accept_multiple_files=True)
 
-uploaded_files = st.file_uploader("파일을 여러 개 드래그 앤 드롭하여 업로드하세요.", accept_multiple_files=True)
+    if uploaded_files and st.session_state['github_repo'] and st.session_state['github_token']:
+        for uploaded_file in uploaded_files:
+            # 파일을 바이트 형식으로 읽어들임
+            file_content = uploaded_file.read()
+            file_name = uploaded_file.name
+            folder_name = 'uploadFiles'
 
-if uploaded_files and st.session_state['github_repo'] and st.session_state['github_token']:
-    for uploaded_file in uploaded_files:
-        # 파일을 바이트 형식으로 읽어들임
-        file_content = uploaded_file.read()
-        file_name = uploaded_file.name
-        folder_name = 'uploadFiles'
+            # 기존 파일이 있는지 확인
+            sha = get_file_sha(st.session_state['github_repo'], f"{folder_name}/{file_name}", st.session_state['github_token'], branch=st.session_state['github_branch'])
 
-        # 기존 파일이 있는지 확인
-        sha = get_file_sha(st.session_state['github_repo'], f"{folder_name}/{file_name}", st.session_state['github_token'], branch=st.session_state['github_branch'])
+            if sha:
+                # 덮어쓰기 확인
+                if st.checkbox(f"'{file_name}' 파일이 이미 존재합니다. 덮어쓰시겠습니까?", key=f"overwrite_{file_name}"):
+                    upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
+            else:
+                # 새 파일 업로드
+                upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'])
 
-        if sha:
-            # 덮어쓰기 확인
-            if st.checkbox(f"'{file_name}' 파일이 이미 존재합니다. 덮어쓰시겠습니까?", key=f"overwrite_{file_name}"):
-                upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
-        else:
-            # 새 파일 업로드
-            upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'])
-
-# 5. 참고 템플릿 미리보기
-with col1:
+    # 5. 참고 템플릿 미리보기
     st.subheader("5. 참고 템플릿 미리보기")
     selected_template_file = st.selectbox("템플릿 파일 선택", options=["Template1", "Template2", "Template3"])
     if st.button("선택"):
         st.success(f"선택한 템플릿: {selected_template_file}")
 
-# 3. 실행 버튼
+# 2 프레임 (10%)
 with col2:
     st.subheader("3. 실행")
-
     if st.button("실행"):
         if st.session_state['openai_api_key'] == "":
             st.error("OpenAI API 키를 입력해야 실행할 수 있습니다.")
@@ -235,7 +234,7 @@ with col2:
 
             st.success("LLM 요청이 완료되었습니다.")
 
-# 4. 결과 보고서 화면
+# 3 프레임 (49%)
 with col3:
     st.subheader("4. 결과 보고서")
 
@@ -244,24 +243,21 @@ with col3:
             st.text(f"제목: {rows[idx]['제목']}")
             st.text(f"LLM 응답 결과:\n{result}")
 
-    if st.button("Export"):
-        file_type = st.selectbox("파일 형식 선택", options=["pdf", "docx", "xlsx", "txt"])
-        st.success(f"{file_type} 형식으로 파일 다운로드 가능")
+    # 6. 저장과 7. 불러오기 (같은 행)
+    col3_1, col3_2 = st.columns([0.5, 0.5])
 
-# 6. 저장
-with col3:
-    st.subheader("6. 저장")
-    save_path = st.text_input("저장할 파일명 입력")
-    if st.button("저장") and save_path:
-        df = pd.DataFrame(rows)
-        df.to_csv(f"{save_path}.csv")
-        st.success(f"{save_path}.csv 파일로 저장되었습니다.")
+    with col3_1:
+        st.subheader("6. 저장")
+        save_path = st.text_input("저장할 파일명 입력")
+        if st.button("저장") and save_path:
+            df = pd.DataFrame(rows)
+            df.to_csv(f"{save_path}.csv")
+            st.success(f"{save_path}.csv 파일로 저장되었습니다.")
 
-# 7. 불러오기
-with col3:
-    st.subheader("7. 불러오기")
-    uploaded_save_file = st.file_uploader("저장된 CSV 파일 불러오기", type=["csv"])
-    if uploaded_save_file is not None:
-        loaded_data = pd.read_csv(uploaded_save_file)
-        st.dataframe(loaded_data)
-        st.success("데이터가 불러와졌습니다.")
+    with col3_2:
+        st.subheader("7. 불러오기")
+        uploaded_save_file = st.file_uploader("저장된 CSV 파일 불러오기", type=["csv"])
+        if uploaded_save_file is not None:
+            loaded_data = pd.read_csv(uploaded_save_file)
+            st.dataframe(loaded_data)
+            st.success("데이터가 불러와졌습니다.")
