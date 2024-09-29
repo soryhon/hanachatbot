@@ -101,7 +101,7 @@ if 'github_repo' not in st.session_state:
 if 'github_branch' not in st.session_state:
     st.session_state['github_branch'] = "main"
 
-# 2. GitHub 저장소 정보 입력 기능
+# GitHub 저장소 정보 입력 기능
 st.subheader("GitHub 저장소 정보 입력")
 
 # GitHub 저장소 경로 입력
@@ -122,6 +122,15 @@ if st.button("GitHub 정보 저장"):
     # GitHub 토큰이 제대로 저장되었는지 확인하는 메시지 추가
     if st.session_state['github_token']:
         st.info(f"GitHub 토큰이 저장되었습니다. 저장된 토큰: {st.session_state['github_token'][:5]}...")
+
+# OpenAI API 키 입력 로직
+st.subheader("OpenAI API 키 입력")
+
+openai_api_key = st.text_input("OpenAI API 키를 입력하세요.", type="password")
+
+if st.button("OpenAI API 키 저장"):
+    st.session_state['openai_api_key'] = openai_api_key
+    st.success("OpenAI API 키가 저장되었습니다.")
 
 # 1. 작성 보고서 요청사항
 col1, col2, col3 = st.columns([0.39, 0.10, 0.49])
@@ -195,15 +204,6 @@ if uploaded_files and st.session_state['github_repo'] and st.session_state['gith
         else:
             # 새 파일 업로드
             upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'])
-
-# 3. OpenAI API 키 입력 로직
-st.subheader("OpenAI API 키 입력")
-
-openai_api_key = st.text_input("OpenAI API 키를 입력하세요.", type="password")
-
-if st.button("OpenAI API 키 저장"):
-    st.session_state['openai_api_key'] = openai_api_key
-    st.success("OpenAI API 키가 저장되었습니다.")
 
 # 3. 실행 버튼
 with col2:
