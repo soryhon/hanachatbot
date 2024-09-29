@@ -39,6 +39,19 @@ def get_github_files(repo, github_token, folder_name=None, branch="main"):
         st.error(f"GitHub 파일 목록을 가져오지 못했습니다: {response.status_code}")
         return []
 
+# GitHub에서 파일의 SHA 값을 가져오는 함수
+def get_file_sha(repo, file_path, github_token, branch="main"):
+    url = f"https://api.github.com/repos/{repo}/contents/{file_path}?ref={branch}"
+    headers = {
+        "Authorization": f"token {github_token}"
+    }
+    response = requests.get(url, headers=headers)
+    
+    if response.status_code == 200:
+        return response.json().get("sha")
+    else:
+        return None
+
 # GitHub 파일의 서버 경로를 생성하는 함수
 def get_file_server_path(repo, branch, file_path):
     server_base_path = "/mnt/data/github_files"  # 서버에 GitHub 파일이 저장된 기본 경로
@@ -136,7 +149,6 @@ col1, col2, col3 = st.columns([0.39, 0.10, 0.49])
 with col1:
     st.subheader("1. 작성 보고서 요청사항")
 
-    # 고정된 50% 높이로 스크롤 영역 구현
     with st.expander("요청사항 리스트", expanded=True):
         df = pd.DataFrame(columns=["제목", "요청", "데이터"])
         rows = st.session_state['rows']  # 세션 상태에 저장된 행 목록을 사용
