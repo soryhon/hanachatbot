@@ -52,6 +52,33 @@ def get_file_sha(repo, file_path, github_token, branch="main"):
     else:
         return None
 
+# GitHub에 파일을 업로드하거나 덮어쓰는 함수
+def upload_file_to_github(repo, folder_name, file_name, content, github_token, branch="main", sha=None):
+    url = f"https://api.github.com/repos/{repo}/contents/{folder_name}/{file_name}"
+    headers = {
+        "Authorization": f"token {github_token}",
+        "Content-Type": "application/json"
+    }
+    content_base64 = base64.b64encode(content).decode("utf-8")
+    data = {
+        "message": f"Upload {file_name}",
+        "content": content_base64,
+        "branch": branch
+    }
+
+    # sha 값이 있으면 덮어쓰기
+    if sha:
+        data["sha"] = sha
+
+    response = requests.put(url, headers=headers, json=data)
+    
+    if response.status_code == 201:
+        st.success(f"파일이 GitHub 저장소에 성공적으로 업로드되었습니다: {file_name}")
+    elif response.status_code == 200:  # 덮어쓰기 성공
+        st.success(f"파일이 GitHub 저장소에 성공적으로 덮어쓰기되었습니다: {file_name}")
+    else:
+        st.error(f"GitHub 업로드 실패: {response.status_code} - {response.text}")
+
 # GitHub 파일의 서버 경로를 생성하는 함수
 def get_file_server_path(repo, branch, file_path):
     server_base_path = "/mnt/data/github_files"  # 서버에 GitHub 파일이 저장된 기본 경로
