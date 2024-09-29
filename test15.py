@@ -44,20 +44,25 @@ def get_file_server_path(repo, branch, file_path):
     server_base_path = "/mnt/data/github_files"  # 서버에 GitHub 파일이 저장된 기본 경로
     return os.path.join(server_base_path, file_path)
 
-# 파일 미리보기 함수 (이미지, PDF, HTML 파일만 미리보기 가능)
-def preview_file(file_path):
+# 미리보기 팝업창 띄우는 함수 (이미지, PDF, HTML 파일만 미리보기 가능)
+def preview_file_modal(file_path):
     file_ext = os.path.splitext(file_path)[1].lower()
 
-    if file_ext in [".png", ".jpg", ".jpeg", ".gif"]:
-        st.image(file_path, use_column_width=True)
-    elif file_ext == ".pdf":
-        # PDF 파일을 iframe을 이용해 미리보기
-        st.markdown(f'<iframe src="file://{file_path}" width="700" height="1000"></iframe>', unsafe_allow_html=True)
-    elif file_ext == ".html":
-        # HTML 파일 미리보기
-        st.markdown(f'<iframe src="file://{file_path}" width="700" height="1000"></iframe>', unsafe_allow_html=True)
-    else:
-        st.warning("미리보기는 이미지, PDF, HTML 파일 형식만 지원됩니다.")
+    with st.modal("미리보기"):
+        st.subheader("파일 미리보기")
+        if file_ext in [".png", ".jpg", ".jpeg", ".gif"]:
+            st.image(file_path, use_column_width=True)
+        elif file_ext == ".pdf":
+            st.markdown(f'<iframe src="file://{file_path}" width="700" height="1000"></iframe>', unsafe_allow_html=True)
+        elif file_ext == ".html":
+            st.markdown(f'<iframe src="file://{file_path}" width="700" height="1000"></iframe>', unsafe_allow_html=True)
+        else:
+            st.warning("미리보기는 이미지, PDF, HTML 파일 형식만 지원됩니다.")
+        st.button("닫기", on_click=close_modal)
+
+# 모달 창 닫기 함수
+def close_modal():
+    st.session_state['preview_open'] = False
 
 # 세션 상태 초기화
 if 'github_repo' not in st.session_state:
@@ -225,7 +230,7 @@ with col1:
         with col5_2:
             if st.button("미리보기"):
                 if file_path:
-                    preview_file(file_path)
+                    preview_file_modal(file_path)  # 미리보기 모달창 띄우기
                 else:
                     st.warning("파일 경로를 입력하세요.")
 
