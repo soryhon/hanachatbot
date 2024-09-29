@@ -1,17 +1,55 @@
 import streamlit as st
 import pandas as pd
-import os
+import requests
+import urllib.parse  # URL 인코딩을 위한 라이브러리
+import base64  # base64 인코딩 및 복호화를 위한 라이브러리
+import json
 
 # 페이지 설정
 st.set_page_config(layout="wide")  # 페이지 가로길이를 모니터 전체 해상도로 설정
 
-# 세션 상태 초기화 (기본값)
+# JSON 데이터 (github_token 삭제됨)
+json_data = '''
+{
+    "github_repo": "soryhon/hanachatbot",
+    "github_branch": "main"
+}
+'''
+
+# JSON 데이터를 파싱하여 세션 상태에 저장
+data = json.loads(json_data)
+
+# GitHub에서 파일 목록을 가져오는 함수
+def get_github_files(repo, github_token, folder_name=None, branch="main"):
+    url = f"https://api.github.com/repos/{repo}/git/trees/{branch}?recursive=1"
+    headers = {
+        "Authorization": f"token {github_token}"
+    }
+    response = requests.get(url, headers=headers)
+    
+    if response.status_code == 200:
+        tree = response.json().get("tree", [])
+        if folder_name:
+            file_list = [item["path"] for item in tree if folder_name in item["path"] and item["type"] == "blob"]
+        else:
+            file_list = [item["path"] for item in tree if item["type"] == "blob"]
+        return file_list
+    else:
+        st.error(f"GitHub 파일 목록을 가져오지 못했습니다: {response.status_code}")
+        return []
+
+# GitHub 파일의 URL을 생성하는 함수 (한글과 공백 처리)
+def get_file_url(repo, branch, file_path):
+    encoded_file_path = urllib.parse.quote(file_path)
+    return f"https://github.com/{repo}/blob/{branch}/{encoded_file_path}"
+
+# 세션 상태 초기화 (JSON 데이터가 있다면 그 값으로 초기화)
 if 'github_repo' not in st.session_state:
-    st.session_state['github_repo'] = "soryhon/hanachatbot"
+    st.session_state['github_repo'] = data.get('github_repo', "")
 if 'github_token' not in st.session_state:
     st.session_state['github_token'] = ""  # GitHub API 토큰은 사용자가 입력하도록 수정
 if 'github_branch' not in st.session_state:
-    st.session_state['github_branch'] = "main"
+    st.session_state['github_branch'] = data.get('github_branch', "main")
 if 'openai_api_key' not in st.session_state:
     st.session_state['openai_api_key'] = ""
 if 'github_saved' not in st.session_state:
@@ -108,23 +146,26 @@ with col1:
                 else:
                     row["checked"] = False  # 체크 해제 상태 저장
 
-                # 파일 선택 (UploadFiles 폴더 내 파일 리스트에서 선택)
-                upload_files_dir = 'UploadFiles'
-                if os.path.exists(upload_files_dir):
-                    file_list = os.listdir(upload_files_dir)
-                else:
-                    file_list = []
-                    st.warning(f"{upload_files_dir} 폴더가 존재하지 않습니다.")
+                # GitHub 파일 선택
+                file_list = []
+                if st.session_state['github_repo'] and st.session_state['github_token']:
+                    upload_files_exist = any("uploadFiles" in item for item in get_github_files(st.session_state['github_repo'], st.session_state['github_token'], branch=st.session_state['github_branch']))
+                    
+                    if upload_files_exist:
+                        st.success("uploadFiles 폴더가 존재합니다.")
+                        file_list = get_github_files(st.session_state['github_repo'], st.session_state['github_token'], folder_name="uploadFiles", branch=st.session_state['github_branch'])
+                    else:
+                        st.warning("uploadFiles 폴더가 존재하지 않습니다. 기본 폴더의 파일을 표시합니다.")
+                        file_list = get_github_files(st.session_state['github_repo'], st.session_state['github_token'], branch=st.session_state['github_branch'])
 
                 selected_file = st.selectbox(f"파일 선택 (요청사항 {idx+1})", options=file_list, key=f"file_select_{idx}")
+                
+                if st.button(f"선택 (요청사항 {idx+1})") and selected_file:
+                    file_url = get_file_url(st.session_state['github_repo'], st.session_state['github_branch'], selected_file)
+                    rows[idx]['데이터'] = file_url  # 선택한 파일 URL 저장
+                    st.success(f"선택한 파일: {selected_file}\nURL: {file_url}")
 
-                # 서버 경로로 저장
-                if selected_file:
-                    server_path = os.path.join(upload_files_dir, selected_file)
-                    rows[idx]['데이터'] = server_path
-                    st.success(f"선택한 파일: {selected_file}\n서버 경로: {server_path}")
-
-                # 서버 경로 정보 표시
+                # URL 정보 표시
                 st.text_input(f"데이터 (요청사항 {idx+1})", row['데이터'], disabled=True, key=f"file_path_{idx}")
 
         # 행 추가, 행 삭제, 새로고침 버튼을 같은 행에 배치
@@ -144,28 +185,35 @@ with col1:
             if st.button("새로고침"):
                 st.session_state['rows'] = st.session_state['rows']  # 단순히 상태 업데이트로 새로고침 효과
 
-# 2. 파일 업로드 (세로 길이 20% 고정)
-st.subheader("2. 파일 업로드")
-with st.expander("파일 업로드", expanded=True):
-    uploaded_files = st.file_uploader("파일을 여러 개 드래그 앤 드롭하여 업로드하세요.", accept_multiple_files=True)
+    # 2. 파일 업로드 (세로 길이 20% 고정)
+    st.subheader("2. 파일 업로드")
+    with st.expander("파일 업로드", expanded=True):
+        uploaded_files = st.file_uploader("파일을 여러 개 드래그 앤 드롭하여 업로드하세요.", accept_multiple_files=True)
 
-    if uploaded_files:
-        for uploaded_file in uploaded_files:
-            # 파일을 저장할 서버 경로
-            server_path = os.path.join('UploadFiles', uploaded_file.name)
+        if uploaded_files and st.session_state['github_repo'] and st.session_state['github_token']:
+            for uploaded_file in uploaded_files:
+                # 파일을 바이트 형식으로 읽어들임
+                file_content = uploaded_file.read()
+                file_name = uploaded_file.name
+                folder_name = 'uploadFiles'
 
-            # 파일을 서버에 저장
-            with open(server_path, 'wb') as f:
-                f.write(uploaded_file.read())
+                # 기존 파일이 있는지 확인
+                sha = get_file_sha(st.session_state['github_repo'], f"{folder_name}/{file_name}", st.session_state['github_token'], branch=st.session_state['github_branch'])
 
-            st.success(f"파일이 서버 경로에 저장되었습니다: {server_path}")
+                if sha:
+                    # 덮어쓰기 확인
+                    if st.checkbox(f"'{file_name}' 파일이 이미 존재합니다. 덮어쓰시겠습니까?", key=f"overwrite_{file_name}"):
+                        upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
+                else:
+                    # 새 파일 업로드
+                    upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'])
 
-# 5. 참고 템플릿 미리보기 (세로 길이 30% 고정)
-st.subheader("5. 참고 템플릿 미리보기")
-with st.expander("참고 템플릿 미리보기", expanded=True):
-    selected_template_file = st.selectbox("템플릿 파일 선택", options=["Template1", "Template2", "Template3"])
-    if st.button("선택"):
-        st.success(f"선택한 템플릿: {selected_template_file}")
+    # 5. 참고 템플릿 미리보기 (세로 길이 30% 고정)
+    st.subheader("5. 참고 템플릿 미리보기")
+    with st.expander("참고 템플릿 미리보기", expanded=True):
+        selected_template_file = st.selectbox("템플릿 파일 선택", options=["Template1", "Template2", "Template3"])
+        if st.button("선택"):
+            st.success(f"선택한 템플릿: {selected_template_file}")
 
 # 2 프레임 (10%)
 with col2:
@@ -180,8 +228,12 @@ with col2:
                     {"role": "system", "content": "다음 파일을 분석하여 보고서를 작성하세요."},
                     {"role": "user", "content": f"보고서 제목 : '{row['제목']}'\n요청 문구 : '{row['요청']}'\n데이터 전달 : '{row['데이터']}'"}
                 ]
-                # LLM 응답 처리 로직은 여기에서 추가될 수 있음
-                llm_results[idx] = f"응답 결과 (요청사항 {idx+1})"
+                llm_response = send_to_llm(prompt, st.session_state['openai_api_key'])
+                
+                if llm_response:
+                    llm_results[idx] = llm_response
+                else:
+                    llm_results[idx] = "LLM 응답을 받지 못했습니다."
 
             st.success("LLM 요청이 완료되었습니다.")
 
