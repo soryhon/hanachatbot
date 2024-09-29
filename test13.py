@@ -250,7 +250,7 @@ with col2:
 with col3:
     st.subheader("4. 결과 보고서")
 
-    # 고정된 70% 높이로 스크롤 영역 구현
+    # 고정된 70% 높이로 설정하고 스크롤 영역 구현
     st.markdown(
         """
         <style>
@@ -270,24 +270,11 @@ with col3:
         else:
             st.text("결과가 없습니다.")
 
-# 6. 저장과 7. 불러오기 (세로 길이 30% 고정, 테두리 추가)
+# 6. 저장과 7. 불러오기 (분리된 영역)
 with col3:
-    st.markdown(
-        """
-        <style>
-        div[data-testid="column"]:nth-child(3) > div > div {
-            border: 1px solid #cccccc;
-            padding: 10px;
-            height: 30vh;
-            overflow-y: auto;
-        }
-        </style>
-        """, unsafe_allow_html=True
-    )
-
     st.subheader("6. 저장 및 7. 불러오기")
 
-    # 6. 저장과 7. 불러오기 (같은 행)
+    # 6. 저장과 7. 불러오기 (각각 분리)
     col3_1, col3_2 = st.columns([0.5, 0.5])
 
     with col3_1:
