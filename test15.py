@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
-import os
 import requests
+import os
 import urllib.parse  # URL 인코딩을 위한 라이브러리
 import base64  # base64 인코딩 및 복호화를 위한 라이브러리
 import json
@@ -83,19 +83,6 @@ def upload_file_to_github(repo, folder_name, file_name, content, github_token, b
 def get_file_server_path(repo, branch, file_path):
     server_base_path = "/mnt/data/github_files"  # 서버에 GitHub 파일이 저장된 기본 경로
     return os.path.join(server_base_path, file_path)
-
-# 파일 미리보기 함수 (이미지, PDF, HTML 파일 지원)
-def preview_file(file_path):
-    file_extension = os.path.splitext(file_path)[1].lower()
-
-    if file_extension in [".png", ".jpg", ".jpeg"]:
-        st.image(file_path, caption=f"이미지 미리보기: {file_path}", use_column_width=True)
-    elif file_extension == ".pdf":
-        st.markdown(f'<iframe src="file://{file_path}" width="700" height="500"></iframe>', unsafe_allow_html=True)
-    elif file_extension == ".html":
-        st.components.v1.iframe(f"file://{file_path}", width=700, height=500)
-    else:
-        st.warning(f"지원되지 않는 파일 형식: {file_extension}")
 
 # 세션 상태 초기화
 if 'github_repo' not in st.session_state:
@@ -236,20 +223,16 @@ with col1:
 
         if uploaded_files and st.session_state['github_repo'] and st.session_state['github_token']:
             for uploaded_file in uploaded_files:
-                # 파일을 바이트 형식으로 읽어들임
                 file_content = uploaded_file.read()
                 file_name = uploaded_file.name
                 folder_name = 'uploadFiles'
 
-                # 기존 파일이 있는지 확인
                 sha = get_file_sha(st.session_state['github_repo'], f"{folder_name}/{file_name}", st.session_state['github_token'], branch=st.session_state['github_branch'])
 
                 if sha:
-                    # 덮어쓰기 확인
                     if st.checkbox(f"'{file_name}' 파일이 이미 존재합니다. 덮어쓰시겠습니까?", key=f"overwrite_{file_name}"):
                         upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
                 else:
-                    # 새 파일 업로드
                     upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'])
 
     # 5. 참고 탬플릿 미리보기 (세로 길이 30% 고정)
@@ -266,31 +249,35 @@ with col1:
                 else:
                     st.warning("파일 경로를 입력하세요.")
 
-        # 템플릿 폴더 파일 리스트 및 파일 선택
-        template_folder = "template"
-        if not os.path.exists(template_folder):
-            os.makedirs(template_folder)
-            st.info("탬플릿 폴더가 생성되었습니다.")
+        # GitHub 저장소 내 templateFiles 폴더 리스트 가져오기
+        template_folder = "templateFiles"
+        if st.session_state['github_repo'] and st.session_state['github_token']:
+            template_files = get_github_files(st.session_state['github_repo'], st.session_state['github_token'], folder_name=template_folder, branch=st.session_state['github_branch'])
 
-        template_files = os.listdir(template_folder)
         selected_template_file = st.selectbox("탬플릿 파일 선택", template_files)
 
         # 파일 선택 버튼
         if st.button("파일 선택"):
-            # 선택된 파일의 서버 경로 정보 저장
-            server_template_path = os.path.join(template_folder, selected_template_file)
+            server_template_path = get_file_server_path(st.session_state['github_repo'], st.session_state['github_branch'], selected_template_file)
             st.session_state['template_file_path'] = server_template_path
             st.success(f"선택한 파일 경로: {server_template_path}")
 
-        # 탬플릿 파일 업로드
+        # GitHub에 탬플릿 파일 업로드
         uploaded_template_files = st.file_uploader("탬플릿 파일 업로드", accept_multiple_files=True, type=["png", "jpg", "pdf", "html"])
 
         if uploaded_template_files:
             for template_file in uploaded_template_files:
-                template_path = os.path.join(template_folder, template_file.name)
-                with open(template_path, "wb") as f:
-                    f.write(template_file.read())
-            st.success("탬플릿 파일이 업로드되었습니다.")
+                template_file_content = template_file.read()
+                template_file_name = template_file.name
+                folder_name = 'templateFiles'
+
+                sha = get_file_sha(st.session_state['github_repo'], f"{folder_name}/{template_file_name}", st.session_state['github_token'], branch=st.session_state['github_branch'])
+
+                if sha:
+                    if st.checkbox(f"'{template_file_name}' 파일이 이미 존재합니다. 덮어쓰시겠습니까?", key=f"overwrite_{template_file_name}"):
+                        upload_file_to_github(st.session_state['github_repo'], folder_name, template_file_name, template_file_content, st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
+                else:
+                    upload_file_to_github(st.session_state['github_repo'], folder_name, template_file_name, template_file_content, st.session_state['github_token'])
 
 # 2 프레임 (10%)
 with col2:
@@ -318,7 +305,6 @@ with col2:
 with col3:
     st.subheader("4. 결과 보고서")
 
-    # 고정된 70% 높이로 설정하고 스크롤 영역 구현
     st.markdown(
         """
         <style>
@@ -342,7 +328,6 @@ with col3:
 with col3:
     st.subheader("6. 저장 및 7. 불러오기")
 
-    # 6. 저장과 7. 불러오기 (각각 분리)
     col3_1, col3_2 = st.columns([0.5, 0.5])
 
     with col3_1:
