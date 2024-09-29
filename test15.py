@@ -91,12 +91,15 @@ def preview_file(file_path):
         # URL 인코딩 적용 (한글 파일 경로 문제 해결)
         encoded_file_path = urllib.parse.quote(file_path)
 
+        # 경로 출력하여 확인
+        st.write(f"미리보기 경로: {file_path}")
+
         if file_extension in ['png', 'jpg', 'jpeg']:
-            st.image(encoded_file_path, caption="이미지 미리보기", use_column_width=True)
+            st.image(file_path, caption="이미지 미리보기", use_column_width=True)
         elif file_extension == 'pdf':
-            st.write(f"[PDF 보기]({encoded_file_path}) (PDF 파일은 직접 미리보기가 지원되지 않습니다.)", unsafe_allow_html=True)
+            st.write(f"[PDF 보기]({file_path}) (PDF 파일은 직접 미리보기가 지원되지 않습니다.)", unsafe_allow_html=True)
         elif file_extension == 'html':
-            st.markdown(f"[HTML 보기]({encoded_file_path})", unsafe_allow_html=True)
+            st.markdown(f"[HTML 보기]({file_path})", unsafe_allow_html=True)
         else:
             st.warning("미리보기가 지원되지 않는 파일 형식입니다.")
     except Exception as e:
@@ -183,8 +186,8 @@ with col1:
 
     with st.expander("요청사항 리스트", expanded=True):
         df = pd.DataFrame(columns=["제목", "요청", "데이터"])
-        rows = st.session_state['rows']  # 세션 상태에 저장된 행 목록을 사용
-        checked_rows = []  # 체크된 행들을 저장하기 위한 리스트
+        rows = st.session_state['rows']
+        checked_rows = []
 
         for idx, row in enumerate(rows):
             with st.container():
