@@ -190,9 +190,12 @@ with col1:
             if st.button("행 추가"):
                 rows.append({"제목": "", "요청": "", "데이터": ""})  # 새 행 추가
         with col1_2:
-            if st.button("행 삭제") and checked_rows:
-                st.session_state['rows'] = [row for idx, row in enumerate(rows) if idx not in checked_rows]  # 체크된 행 삭제
-                st.success(f"체크된 {len(checked_rows)}개의 요청사항이 삭제되었습니다.")
+            if st.button("행 삭제"):
+                if checked_rows:
+                    st.session_state['rows'] = [row for idx, row in enumerate(rows) if idx not in checked_rows]  # 체크된 행 삭제
+                    st.success(f"체크된 {len(checked_rows)}개의 요청사항이 삭제되었습니다.")
+                else:
+                    st.warning("삭제할 요청사항을 선택해주세요.")
 
     # 2. 파일 업로드 (세로 길이 20% 고정)
     st.subheader("2. 파일 업로드")
