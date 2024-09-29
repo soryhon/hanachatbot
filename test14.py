@@ -7,13 +7,23 @@ import base64  # base64 인코딩 및 복호화를 위한 라이브러리
 # 페이지 설정
 st.set_page_config(layout="wide")  # 페이지 가로길이를 모니터 전체 해상도로 설정
 
-# 초기 세션 상태 설정
+# 세션 상태 초기화
+if 'github_repo' not in st.session_state:
+    st.session_state['github_repo'] = ""
+if 'github_token' not in st.session_state:
+    st.session_state['github_token'] = ""
+if 'github_branch' not in st.session_state:
+    st.session_state['github_branch'] = "main"
+if 'openai_api_key' not in st.session_state:
+    st.session_state['openai_api_key'] = ""
 if 'github_saved' not in st.session_state:
     st.session_state['github_saved'] = False
 if 'openai_saved' not in st.session_state:
     st.session_state['openai_saved'] = False
 if 'show_info' not in st.session_state:
     st.session_state['show_info'] = True  # 기본적으로 정보 입력 화면을 표시
+if 'rows' not in st.session_state:
+    st.session_state['rows'] = [{"제목": "", "요청": "", "데이터": "", "checked": False}]  # 기본 행
 
 # 저장 정보 숨기기/보이기 기능
 def toggle_visibility():
@@ -56,13 +66,16 @@ if not both_saved or st.session_state['show_info']:
     # GitHub 정보 입력 영역
     st.markdown('<div class="box">', unsafe_allow_html=True)
     st.subheader("GitHub 저장소 정보 입력")
-    github_repo = st.text_input("GitHub 저장소 경로 (예: username/repo)")
-    github_token = st.text_input("GitHub API 토큰 입력", type="password")
-    github_branch = st.text_input("브랜치 이름 (예: main 또는 master)")
+    github_repo = st.text_input("GitHub 저장소 경로 (예: username/repo)", value=st.session_state['github_repo'])
+    github_token = st.text_input("GitHub API 토큰 입력", type="password", value=st.session_state['github_token'])
+    github_branch = st.text_input("브랜치 이름 (예: main 또는 master)", value=st.session_state['github_branch'])
     
     # GitHub 정보 저장 버튼 클릭 처리
     if st.button("GitHub 정보 저장"):
         if github_repo and github_token and github_branch:
+            st.session_state['github_repo'] = github_repo
+            st.session_state['github_token'] = github_token
+            st.session_state['github_branch'] = github_branch
             st.session_state['github_saved'] = True
             st.success(f"GitHub 정보가 저장되었습니다!\nRepo: {github_repo}, Branch: {github_branch}")
         else:
@@ -72,11 +85,12 @@ if not both_saved or st.session_state['show_info']:
     # OpenAI API 키 입력 영역
     st.markdown('<div class="box">', unsafe_allow_html=True)
     st.subheader("OpenAI API 키 입력")
-    openai_api_key = st.text_input("OpenAI API 키를 입력하세요.", type="password")
+    openai_api_key = st.text_input("OpenAI API 키를 입력하세요.", type="password", value=st.session_state['openai_api_key'])
     
     # OpenAI API 키 저장 버튼 클릭 처리
     if st.button("OpenAI API 키 저장"):
         if openai_api_key:
+            st.session_state['openai_api_key'] = openai_api_key
             st.session_state['openai_saved'] = True
             st.success("OpenAI API 키가 저장되었습니다.")
         else:
@@ -99,9 +113,6 @@ with col1:
     # 고정된 50% 높이로 스크롤 영역 구현
     with st.expander("요청사항 리스트", expanded=True):
         df = pd.DataFrame(columns=["제목", "요청", "데이터"])
-        if 'rows' not in st.session_state:
-            st.session_state['rows'] = [{"제목": "", "요청": "", "데이터": "", "checked": False}]  # 기본 행
-
         rows = st.session_state['rows']  # 세션 상태에 저장된 행 목록을 사용
         checked_rows = []  # 체크된 행들을 저장하기 위한 리스트
 
