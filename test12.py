@@ -110,24 +110,44 @@ with col1:
     df = pd.DataFrame(columns=["제목", "요청", "데이터"])
     rows = [{"제목": "titleValue1", "요청": "requestValue1", "데이터": ""}]  # 기본 1행 추가
 
-    # 테이블 스타일 적용
+    # 스타일 적용
     st.markdown("""
         <style>
-        table, th, td {
+        .input-table {
+            display: table;
+            width: 100%;
+        }
+        .input-row {
+            display: table-row;
+        }
+        .input-cell {
+            display: table-cell;
             border: 1px solid #ccc;
-            border-collapse: collapse;
             padding: 10px;
+            vertical-align: middle;
         }
         </style>
     """, unsafe_allow_html=True)
 
-    # HTML 테이블로 제목, 요청, 데이터 표시
-    table_html = "<table><tr><th>제목</th><th>요청</th><th>데이터</th></tr>"
-
     for idx, row in enumerate(rows):
-        # 각 행의 데이터를 테이블 형태로 구성
-        title_input = st.text_input(f"제목 (행 {idx+1})", row['제목'], key=f"title_{idx}")
-        request_input = st.text_input(f"요청 (행 {idx+1})", row['요청'], key=f"request_{idx}")
+        # 테이블 형태로 제목, 요청, 데이터 입력 필드 표시
+        st.markdown('<div class="input-table">', unsafe_allow_html=True)
+
+        # 제목 입력
+        st.markdown('<div class="input-row">', unsafe_allow_html=True)
+        st.markdown(f'<div class="input-cell">제목 (행 {idx+1})</div>', unsafe_allow_html=True)
+        title_input = st.text_input("", row['제목'], key=f"title_{idx}", label_visibility="collapsed")
+        st.markdown('</div>', unsafe_allow_html=True)
+
+        # 요청 입력
+        st.markdown('<div class="input-row">', unsafe_allow_html=True)
+        st.markdown(f'<div class="input-cell">요청 (행 {idx+1})</div>', unsafe_allow_html=True)
+        request_input = st.text_input("", row['요청'], key=f"request_{idx}", label_visibility="collapsed")
+        st.markdown('</div>', unsafe_allow_html=True)
+
+        # 파일 선택
+        st.markdown('<div class="input-row">', unsafe_allow_html=True)
+        st.markdown(f'<div class="input-cell">데이터 (행 {idx+1})</div>', unsafe_allow_html=True)
         file_list = []
 
         if st.session_state['github_repo'] and st.session_state['github_token']:
@@ -138,23 +158,15 @@ with col1:
             else:
                 file_list = get_github_files(st.session_state['github_repo'], st.session_state['github_token'], branch=st.session_state['github_branch'])
 
-        selected_file = st.selectbox(f"파일 선택 (행 {idx+1})", options=file_list, key=f"file_select_{idx}")
+        selected_file = st.selectbox("", options=file_list, key=f"file_select_{idx}", label_visibility="collapsed")
 
         if st.button(f"선택 (행 {idx+1})") and selected_file:
             file_url = get_file_url(st.session_state['github_repo'], st.session_state['github_branch'], selected_file)
             row['데이터'] = file_url
             st.success(f"선택한 파일: {selected_file}\nURL: {file_url}")
 
-        # 데이터 입력
-        data_display = st.text_input(f"데이터 (행 {idx+1})", row['데이터'], key=f"data_{idx}", disabled=True)
-
-        # HTML 테이블 행 추가
-        table_html += f"<tr><td>{title_input}</td><td>{request_input}</td><td>{data_display}</td></tr>"
-
-    table_html += "</table>"
-
-    # 테이블 표시
-    st.markdown(table_html, unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
     # 행 추가 및 삭제 버튼
     if st.button("행 추가"):
