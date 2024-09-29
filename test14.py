@@ -108,20 +108,21 @@ with col1:
                 else:
                     row["checked"] = False  # 체크 해제 상태 저장
 
-                # 파일 선택 및 서버 경로 저장
-                uploaded_file = st.file_uploader(f"파일 선택 (요청사항 {idx+1})", key=f"file_upload_{idx}")
+                # 파일 선택 (UploadFiles 폴더 내 파일 리스트에서 선택)
+                upload_files_dir = 'UploadFiles'
+                if os.path.exists(upload_files_dir):
+                    file_list = os.listdir(upload_files_dir)
+                else:
+                    file_list = []
+                    st.warning(f"{upload_files_dir} 폴더가 존재하지 않습니다.")
 
-                if uploaded_file:
-                    # 파일을 저장할 서버 경로
-                    server_path = os.path.join('uploaded_files', uploaded_file.name)
+                selected_file = st.selectbox(f"파일 선택 (요청사항 {idx+1})", options=file_list, key=f"file_select_{idx}")
 
-                    # 파일을 서버에 저장
-                    with open(server_path, 'wb') as f:
-                        f.write(uploaded_file.read())
-
-                    # 데이터에 서버 경로 저장
+                # 서버 경로로 저장
+                if selected_file:
+                    server_path = os.path.join(upload_files_dir, selected_file)
                     rows[idx]['데이터'] = server_path
-                    st.success(f"선택한 파일: {uploaded_file.name}\n서버 경로: {server_path}")
+                    st.success(f"선택한 파일: {selected_file}\n서버 경로: {server_path}")
 
                 # 서버 경로 정보 표시
                 st.text_input(f"데이터 (요청사항 {idx+1})", row['데이터'], disabled=True, key=f"file_path_{idx}")
@@ -151,7 +152,7 @@ with st.expander("파일 업로드", expanded=True):
     if uploaded_files:
         for uploaded_file in uploaded_files:
             # 파일을 저장할 서버 경로
-            server_path = os.path.join('uploaded_files', uploaded_file.name)
+            server_path = os.path.join('UploadFiles', uploaded_file.name)
 
             # 파일을 서버에 저장
             with open(server_path, 'wb') as f:
