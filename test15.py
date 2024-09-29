@@ -88,13 +88,10 @@ def get_file_server_path(repo, branch, file_path):
 def preview_file(file_path):
     file_extension = file_path.split('.')[-1].lower()
     if file_extension in ['png', 'jpg', 'jpeg']:
-        # 이미지 파일 미리보기
         st.image(file_path, caption="이미지 미리보기", use_column_width=True)
     elif file_extension == 'pdf':
-        # PDF 파일 미리보기
         st.markdown(f'<iframe src="{file_path}" width="700" height="500"></iframe>', unsafe_allow_html=True)
     elif file_extension == 'html':
-        # HTML 파일 미리보기
         st.markdown(f'<iframe src="{file_path}" width="700" height="500"></iframe>', unsafe_allow_html=True)
     else:
         st.warning("미리보기가 지원되지 않는 파일 형식입니다.")
@@ -191,9 +188,9 @@ with col1:
 
                 if row_checked:
                     checked_rows.append(idx)
-                    row["checked"] = True  # 체크된 상태 저장
+                    row["checked"] = True
                 else:
-                    row["checked"] = False  # 체크 해제 상태 저장
+                    row["checked"] = False
 
                 # GitHub 파일 선택
                 file_list = []
@@ -219,18 +216,18 @@ with col1:
         col1_1, col1_2, col1_3 = st.columns([0.33, 0.33, 0.33])
         with col1_1:
             if st.button("행 추가"):
-                rows.append({"제목": "", "요청": "", "데이터": "", "checked": True})  # 새 행 추가 및 자동 체크
-                st.session_state['rows'] = rows  # 세션 상태 업데이트
+                rows.append({"제목": "", "요청": "", "데이터": "", "checked": True})
+                st.session_state['rows'] = rows
         with col1_2:
             if st.button("행 삭제"):
                 if checked_rows:
-                    st.session_state['rows'] = [row for idx, row in enumerate(rows) if idx not in checked_rows]  # 체크된 행 삭제
+                    st.session_state['rows'] = [row for idx, row in enumerate(rows) if idx not in checked_rows]
                     st.success(f"체크된 {len(checked_rows)}개의 요청사항이 삭제되었습니다.")
                 else:
                     st.warning("삭제할 요청사항을 선택해주세요.")
         with col1_3:
             if st.button("새로고침"):
-                st.session_state['rows'] = st.session_state['rows']  # 단순히 상태 업데이트로 새로고침 효과
+                st.session_state['rows'] = st.session_state['rows']
 
     # 2. 파일 업로드 (세로 길이 20% 고정)
     st.subheader("2. 파일 업로드")
@@ -256,7 +253,6 @@ with col1:
     with st.expander("참고 탬플릿 미리보기", expanded=True):
         col5_1, col5_2 = st.columns([0.8, 0.2])
         with col5_1:
-            # 파일 경로 입력창
             file_path = st.text_input("탬플릿 파일 경로", value=st.session_state['template_file_path'])
         with col5_2:
             if st.button("미리보기"):
