@@ -140,7 +140,7 @@ with col1:
     st.subheader("1. 작성 보고서 요청사항")
 
     # 고정된 50% 높이로 스크롤 영역 구현
-    with st.expander("작성 보고서 요청사항", expanded=True):
+    with st.expander("요청사항 리스트", expanded=True):
         df = pd.DataFrame(columns=["제목", "요청", "데이터"])
         if 'rows' not in st.session_state:
             st.session_state['rows'] = [{"제목": "", "요청": "", "데이터": ""}]  # 기본 행
@@ -151,12 +151,12 @@ with col1:
         # 행 목록을 순서대로 출력
         for idx, row in enumerate(rows):
             with st.container():
-                # 행 1에 체크박스 추가 (삭제 용도)
-                row_checked = st.checkbox(f"행 {idx+1}", key=f"row_checked_{idx}")
+                # 요청사항1에 체크박스 추가 (삭제 용도)
+                row_checked = st.checkbox(f"요청사항 {idx+1}", key=f"row_checked_{idx}")
                 
                 # 제목 및 요청 입력란
-                row['제목'] = st.text_input(f"제목 (행 {idx+1})", row['제목'])
-                row['요청'] = st.text_input(f"요청 (행 {idx+1})", row['요청'])
+                row['제목'] = st.text_input(f"제목 (요청사항 {idx+1})", row['제목'])
+                row['요청'] = st.text_input(f"요청 (요청사항 {idx+1})", row['요청'])
 
                 # 체크된 행들을 저장
                 if row_checked:
@@ -174,15 +174,15 @@ with col1:
                         st.warning("uploadFiles 폴더가 존재하지 않습니다. 기본 폴더의 파일을 표시합니다.")
                         file_list = get_github_files(st.session_state['github_repo'], st.session_state['github_token'], branch=st.session_state['github_branch'])
 
-                selected_file = st.selectbox(f"파일 선택 (행 {idx+1})", options=file_list, key=f"file_select_{idx}")
+                selected_file = st.selectbox(f"파일 선택 (요청사항 {idx+1})", options=file_list, key=f"file_select_{idx}")
                 
-                if st.button(f"선택 (행 {idx+1})") and selected_file:
+                if st.button(f"선택 (요청사항 {idx+1})") and selected_file:
                     file_url = get_file_url(st.session_state['github_repo'], st.session_state['github_branch'], selected_file)
                     rows[idx]['데이터'] = file_url  # 선택한 파일 URL 저장
                     st.success(f"선택한 파일: {selected_file}\nURL: {file_url}")
 
                 # URL 정보 표시
-                st.text_input(f"데이터 (행 {idx+1})", row['데이터'], disabled=True, key=f"file_path_{idx}")
+                st.text_input(f"데이터 (요청사항 {idx+1})", row['데이터'], disabled=True, key=f"file_path_{idx}")
 
         # 행 추가와 행 삭제 버튼을 같은 행에 배치
         col1_1, col1_2 = st.columns([0.5, 0.5])
@@ -192,7 +192,7 @@ with col1:
         with col1_2:
             if st.button("행 삭제") and checked_rows:
                 st.session_state['rows'] = [row for idx, row in enumerate(rows) if idx not in checked_rows]  # 체크된 행 삭제
-                st.success(f"체크된 {len(checked_rows)}개의 행이 삭제되었습니다.")
+                st.success(f"체크된 {len(checked_rows)}개의 요청사항이 삭제되었습니다.")
 
     # 2. 파일 업로드 (세로 길이 20% 고정)
     st.subheader("2. 파일 업로드")
