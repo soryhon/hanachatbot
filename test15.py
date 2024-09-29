@@ -84,15 +84,15 @@ def get_file_server_path(repo, branch, file_path):
     server_base_path = "/mnt/data/github_files"  # 서버에 GitHub 파일이 저장된 기본 경로
     return os.path.join(server_base_path, file_path)
 
-# 파일 미리보기 팝업 함수
+# 파일 미리보기 함수 (화면에 직접 출력)
 def preview_file(file_path):
     file_extension = file_path.split('.')[-1].lower()
     if file_extension in ['png', 'jpg', 'jpeg']:
         st.image(file_path, caption="이미지 미리보기", use_column_width=True)
     elif file_extension == 'pdf':
-        st.markdown(f'<iframe src="{file_path}" width="700" height="500"></iframe>', unsafe_allow_html=True)
+        st.write("PDF 파일 미리보기는 지원되지 않습니다.")
     elif file_extension == 'html':
-        st.markdown(f'<iframe src="{file_path}" width="700" height="500"></iframe>', unsafe_allow_html=True)
+        st.markdown(f"HTML 파일: {file_path}", unsafe_allow_html=True)
     else:
         st.warning("미리보기가 지원되지 않는 파일 형식입니다.")
 
@@ -192,7 +192,6 @@ with col1:
                 else:
                     row["checked"] = False
 
-                # GitHub 파일 선택
                 file_list = []
                 if st.session_state['github_repo'] and st.session_state['github_token']:
                     upload_files_exist = any("uploadFiles" in item for item in get_github_files(st.session_state['github_repo'], st.session_state['github_token'], branch=st.session_state['github_branch']))
@@ -208,7 +207,7 @@ with col1:
                 
                 if st.button(f"선택 (요청사항 {idx+1})") and selected_file:
                     server_path = get_file_server_path(st.session_state['github_repo'], st.session_state['github_branch'], selected_file)
-                    rows[idx]['데이터'] = server_path  # 선택한 파일 서버 경로 저장
+                    rows[idx]['데이터'] = server_path
                     st.success(f"선택한 파일: {selected_file}\n서버 경로: {server_path}")
 
                 st.text_input(f"데이터 (요청사항 {idx+1})", row['데이터'], disabled=True, key=f"file_path_{idx}")
@@ -261,7 +260,6 @@ with col1:
                 else:
                     st.warning("파일 경로를 입력하세요.")
 
-        # GitHub 저장소 내 templateFiles 폴더 리스트 가져오기
         template_folder = "templateFiles"
         if st.session_state['github_repo'] and st.session_state['github_token']:
             template_files = get_github_files(st.session_state['github_repo'], st.session_state['github_token'], folder_name=template_folder, branch=st.session_state['github_branch'])
