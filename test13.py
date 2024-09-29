@@ -189,13 +189,12 @@ with col1:
         with col1_1:
             if st.button("행 추가"):
                 rows.append({"제목": "", "요청": "", "데이터": ""})  # 새 행 추가
-                st.experimental_rerun()  # 행 추가 후 즉시 화면 새로고침
+                st.session_state['rows'] = rows  # 세션 상태 업데이트
         with col1_2:
             if st.button("행 삭제"):
                 if checked_rows:
                     st.session_state['rows'] = [row for idx, row in enumerate(rows) if idx not in checked_rows]  # 체크된 행 삭제
                     st.success(f"체크된 {len(checked_rows)}개의 요청사항이 삭제되었습니다.")
-                    st.experimental_rerun()  # 삭제 후 즉시 화면 새로고침
                 else:
                     st.warning("삭제할 요청사항을 선택해주세요.")
 
