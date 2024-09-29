@@ -138,16 +138,16 @@ col1, col2, col3 = st.columns([0.39, 0.10, 0.49])  # 세로 구분선을 위해 
 # 1 프레임 (39%) - 스크롤 가능한 영역으로 구성
 with col1:
     st.subheader("1. 작성 보고서 요청사항")
-    
-    # 고정된 50% 높이로 스크롤 영역 구현
-    with st.expander("작성 보고서 요청사항", expanded=True):
-        df = pd.DataFrame(columns=["제목", "요청", "데이터"])
-        if 'rows' not in st.session_state:
-            st.session_state['rows'] = [{"제목": "", "요청": "", "데이터": ""}]  # 기본값 삭제
-        rows = st.session_state['rows']
-        checked_rows = []  # 체크된 행들을 저장하기 위한 리스트
 
-        for idx, row in enumerate(rows):
+    if 'rows' not in st.session_state:
+        st.session_state['rows'] = [{"제목": "", "요청": "", "데이터": ""}]  # 기본 행
+
+    rows = st.session_state['rows']  # 세션 상태에 저장된 행 목록을 사용
+    checked_rows = []  # 체크된 행들을 저장하기 위한 리스트
+
+    # 행 목록을 순서대로 출력
+    for idx, row in enumerate(rows):
+        with st.container():
             # 행 1에 체크박스 추가 (삭제 용도)
             row_checked = st.checkbox(f"행 {idx+1}", key=f"row_checked_{idx}")
             
@@ -179,17 +179,17 @@ with col1:
                 st.success(f"선택한 파일: {selected_file}\nURL: {file_url}")
 
             # URL 정보 표시
-            file_path = st.text_input(f"데이터 (행 {idx+1})", row['데이터'], disabled=True, key=f"file_path_{idx}")
+            st.text_input(f"데이터 (행 {idx+1})", row['데이터'], disabled=True, key=f"file_path_{idx}")
 
-        # 행 추가와 행 삭제 버튼을 같은 행에 배치
-        col1_1, col1_2 = st.columns([0.5, 0.5])
-        with col1_1:
-            if st.button("행 추가"):
-                rows.append({"제목": "", "요청": "", "데이터": ""})
-        with col1_2:
-            if st.button("행 삭제") and checked_rows:
-                rows = [row for idx, row in enumerate(rows) if idx not in checked_rows]
-                st.success(f"체크된 {len(checked_rows)}개의 행이 삭제되었습니다.")
+    # 행 추가와 행 삭제 버튼을 같은 행에 배치
+    col1_1, col1_2 = st.columns([0.5, 0.5])
+    with col1_1:
+        if st.button("행 추가"):
+            rows.append({"제목": "", "요청": "", "데이터": ""})  # 새 행 추가
+    with col1_2:
+        if st.button("행 삭제") and checked_rows:
+            st.session_state['rows'] = [row for idx, row in enumerate(rows) if idx not in checked_rows]  # 체크된 행 삭제
+            st.success(f"체크된 {len(checked_rows)}개의 행이 삭제되었습니다.")
 
     # 2. 파일 업로드
     st.subheader("2. 파일 업로드")
