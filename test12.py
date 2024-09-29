@@ -111,9 +111,12 @@ with col1:
     rows = [{"제목": "titleValue1", "요청": "requestValue1", "데이터": ""}]  # 기본 1행 추가
 
     for idx, row in enumerate(rows):
-        st.text(f"행 {idx+1}")
-        row['제목'] = st.text_input(f"제목 (행 {idx+1})", row['제목'])
-        row['요청'] = st.text_input(f"요청 (행 {idx+1})", row['요청'])
+        # 행 1에 체크박스 추가
+        row_checked = st.checkbox(f"행 {idx+1}", key=f"row_checked_{idx}")
+        
+        # 제목 및 요청 입력란
+        row['제목'] = st.text_input(f"제목 (행 {idx+1})", row['제목'], disabled=not row_checked)
+        row['요청'] = st.text_input(f"요청 (행 {idx+1})", row['요청'], disabled=not row_checked)
 
         # GitHub 파일 선택
         file_list = []
