@@ -100,7 +100,7 @@ st.title("일일 업무 및 보고서 자동화 프로그램")
 if 'openai_api_key' not in st.session_state:
     st.session_state['openai_api_key'] = decoded_openai_api_key
 if 'github_token' not in st.session_state:
-    st.session_state['github_token'] = decoded_github_token
+    st.session_state['github_token'] = None  # 처음엔 None, 정보 저장 후 연동
 if 'github_repo' not in st.session_state:
     st.session_state['github_repo'] = json_data['github_repo']
 if 'github_branch' not in st.session_state:
@@ -127,28 +127,29 @@ with col1:
         row['제목'] = st.text_input(f"제목 (행 {idx+1})", row['제목'])
         row['요청'] = st.text_input(f"요청 (행 {idx+1})", row['요청'])
 
-        # GitHub에서 파일 리스트를 선택
+        # GitHub와 연동은 저장 버튼이 클릭된 후에만 실행
         file_list = []
         if st.session_state['github_repo'] and st.session_state['github_token']:
-            # uploadFiles 폴더 존재 여부 확인
-            upload_files_exist = any("uploadFiles" in item for item in get_github_files(st.session_state['github_repo'], st.session_state['github_token'], branch=st.session_state['github_branch']))
-            
-            if upload_files_exist:
-                st.success("uploadFiles 폴더가 존재합니다.")
-                file_list = get_github_files(st.session_state['github_repo'], st.session_state['github_token'], folder_name="uploadFiles", branch=st.session_state['github_branch'])
-            else:
-                st.warning("uploadFiles 폴더가 존재하지 않습니다. 기본 폴더의 파일을 표시합니다.")
-                file_list = get_github_files(st.session_state['github_repo'], st.session_state['github_token'], branch=st.session_state['github_branch'])
+            # GitHub 정보가 저장된 경우에만 연동
+            if st.session_state['github_token'] is not None:
+                # uploadFiles 폴더 존재 여부 확인
+                upload_files_exist = any("uploadFiles" in item for item in get_github_files(st.session_state['github_repo'], st.session_state['github_token'], branch=st.session_state['github_branch']))
+                
+                if upload_files_exist:
+                    st.success("uploadFiles 폴더가 존재합니다.")
+                    file_list = get_github_files(st.session_state['github_repo'], st.session_state['github_token'], folder_name="uploadFiles", branch=st.session_state['github_branch'])
+                else:
+                    st.warning("uploadFiles 폴더가 존재하지 않습니다. 기본 폴더의 파일을 표시합니다.")
+                    file_list = get_github_files(st.session_state['github_repo'], st.session_state['github_token'], branch=st.session_state['github_branch'])
 
         # 파일 선택
         selected_file = st.selectbox(f"파일 선택 (행 {idx+1})", options=file_list, key=f"file_select_{idx}")
 
         # [선택] 버튼 클릭 시 해당 파일의 URL을 데이터에 저장
-        if st.button(f"선택 (행 {idx+1})"):
-            if selected_file:
-                file_url = get_file_url(st.session_state['github_repo'], st.session_state['github_branch'], selected_file)
-                rows[idx]['데이터'] = file_url  # 선택한 파일 URL 저장
-                st.success(f"선택한 파일: {selected_file}\nURL: {file_url}")
+        if st.button(f"선택 (행 {idx+1})") and selected_file:
+            file_url = get_file_url(st.session_state['github_repo'], st.session_state['github_branch'], selected_file)
+            rows[idx]['데이터'] = file_url  # 선택한 파일 URL 저장
+            st.success(f"선택한 파일: {selected_file}\nURL: {file_url}")
 
         # URL 정보 표시
         file_path = st.text_input(f"데이터 (행 {idx+1})", row['데이터'], disabled=True, key=f"file_path_{idx}")
@@ -167,7 +168,7 @@ with col1:
     github_repo = st.text_input("GitHub 저장소 경로 (예: username/repo)", value=st.session_state['github_repo'])
 
     # GitHub API 토큰 입력 (Base64 복호화된 값 입력)
-    github_token = st.text_input("GitHub API 토큰 입력", value=st.session_state['github_token'], type="password")
+    github_token = st.text_input("GitHub API 토큰 입력", value=decoded_github_token if st.session_state['github_token'] is None else st.session_state['github_token'], type="password")
 
     # 브랜치 입력 (미리 JSON 데이터의 값이 입력됨)
     github_branch = st.text_input("브랜치 이름 (예: main 또는 master)", value=st.session_state['github_branch'])
@@ -177,15 +178,6 @@ with col1:
         st.session_state['github_token'] = github_token
         st.session_state['github_branch'] = github_branch
         st.success("GitHub 정보가 성공적으로 저장되었습니다.")
-
-    # 파일 업로드 기능 (GitHub 업로드)
-    st.subheader("파일 업로드")
-    uploaded_files = st.file_uploader("파일을 여러 개 드래그 앤 드롭하여 업로드하세요.", accept_multiple_files=True)
-
-    if uploaded_files and st.session_state['github_repo'] and st.session_state['github_token']:
-        for uploaded_file in uploaded_files:
-            # 파일을 GitHub 저장소에 업로드
-            upload_file_to_github(st.session_state['github_repo'], 'uploadFiles', uploaded_file.name, uploaded_file.read(), st.session_state['github_token'])
 
 # 3. 실행 버튼 및 OpenAI API 키 입력
 with col2:
