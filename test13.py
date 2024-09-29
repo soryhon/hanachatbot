@@ -202,7 +202,7 @@ with col1:
                     st.warning("삭제할 요청사항을 선택해주세요.")
         with col1_3:
             if st.button("새로고침"):
-                st.experimental_rerun()  # 새로고침
+                st.session_state['rows'] = st.session_state['rows']  # 단순히 상태 업데이트로 새로고침 효과
 
     # 2. 파일 업로드 (세로 길이 20% 고정)
     st.subheader("2. 파일 업로드")
