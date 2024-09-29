@@ -44,15 +44,20 @@ def get_file_server_path(repo, branch, file_path):
     server_base_path = "/mnt/data/github_files"  # 서버에 GitHub 파일이 저장된 기본 경로
     return os.path.join(server_base_path, file_path)
 
-# 미리보기 팝업창 띄우는 함수
+# 파일 미리보기 함수 (이미지, PDF, HTML 파일만 미리보기 가능)
 def preview_file(file_path):
-    # 팝업창 띄우기
-    st.session_state['preview_open'] = True
-    st.session_state['preview_file_path'] = file_path
+    file_ext = os.path.splitext(file_path)[1].lower()
 
-# 팝업창 닫기 함수
-def close_preview():
-    st.session_state['preview_open'] = False
+    if file_ext in [".png", ".jpg", ".jpeg", ".gif"]:
+        st.image(file_path, use_column_width=True)
+    elif file_ext == ".pdf":
+        # PDF 파일을 iframe을 이용해 미리보기
+        st.markdown(f'<iframe src="file://{file_path}" width="700" height="1000"></iframe>', unsafe_allow_html=True)
+    elif file_ext == ".html":
+        # HTML 파일 미리보기
+        st.markdown(f'<iframe src="file://{file_path}" width="700" height="1000"></iframe>', unsafe_allow_html=True)
+    else:
+        st.warning("미리보기는 이미지, PDF, HTML 파일 형식만 지원됩니다.")
 
 # 세션 상태 초기화
 if 'github_repo' not in st.session_state:
@@ -71,10 +76,6 @@ if 'show_info' not in st.session_state:
     st.session_state['show_info'] = True  # 기본적으로 정보 입력 화면을 표시
 if 'rows' not in st.session_state:
     st.session_state['rows'] = [{"제목": "", "요청": "", "데이터": "", "checked": False}]  # 기본 행
-if 'preview_open' not in st.session_state:
-    st.session_state['preview_open'] = False
-if 'preview_file_path' not in st.session_state:
-    st.session_state['preview_file_path'] = ""
 if 'template_file_path' not in st.session_state:
     st.session_state['template_file_path'] = ""  # 탬플릿 파일 경로를 저장
 
@@ -252,12 +253,6 @@ with col1:
                 with open(os.path.join(template_folder, template_file.name), "wb") as f:
                     f.write(template_file.read())
             st.success("탬플릿 파일이 업로드되었습니다.")
-
-        # 미리보기 팝업창 구현
-        if st.session_state['preview_open'] and st.session_state['preview_file_path']:
-            st.markdown(f"**미리보기 파일 경로:** {st.session_state['preview_file_path']}")
-            if st.button("닫기"):
-                close_preview()
 
 # 2 프레임 (10%)
 with col2:
