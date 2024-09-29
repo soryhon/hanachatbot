@@ -101,6 +101,28 @@ if 'github_repo' not in st.session_state:
 if 'github_branch' not in st.session_state:
     st.session_state['github_branch'] = "main"
 
+# 2. GitHub 저장소 정보 입력 기능 (1. 작업 요청사항 위로 이동)
+st.subheader("GitHub 저장소 정보 입력")
+
+# GitHub 저장소 경로 입력
+github_repo = st.text_input("GitHub 저장소 경로 (예: username/repo)", value=st.session_state['github_repo'])
+
+# GitHub API 토큰 입력 (수동으로 입력)
+github_token = st.text_input("GitHub API 토큰 입력", type="password")
+
+# 브랜치 입력
+github_branch = st.text_input("브랜치 이름 (예: main 또는 master)", value=st.session_state['github_branch'])
+
+if st.button("GitHub 정보 저장"):
+    st.session_state['github_repo'] = github_repo
+    st.session_state['github_token'] = github_token
+    st.session_state['github_branch'] = github_branch
+    st.success("GitHub 정보가 성공적으로 저장되었습니다.")
+    
+    # GitHub 토큰이 제대로 저장되었는지 확인하는 메시지 추가
+    if st.session_state['github_token']:
+        st.info(f"GitHub 토큰이 저장되었습니다. 저장된 토큰: {st.session_state['github_token'][:5]}...")
+
 # Streamlit의 세로 프레임 구성
 col1, col2, col3 = st.columns([0.39, 0.10, 0.49])
 
@@ -108,7 +130,7 @@ col1, col2, col3 = st.columns([0.39, 0.10, 0.49])
 with col1:
     st.subheader("1. 작성 보고서 요청사항")
     df = pd.DataFrame(columns=["제목", "요청", "데이터"])
-    rows = [{"제목": "titleValue1", "요청": "requestValue1", "데이터": ""}]  # 기본 1행 추가
+    rows = [{"제목": "", "요청": "", "데이터": ""}]  # 기본값 삭제
 
     for idx, row in enumerate(rows):
         # 행 1에 체크박스 추가
@@ -141,54 +163,11 @@ with col1:
         file_path = st.text_input(f"데이터 (행 {idx+1})", row['데이터'], disabled=True, key=f"file_path_{idx}")
 
     if st.button("행 추가"):
-        rows.append({"제목": f"titleValue{len(rows) + 1}", "요청": f"requestValue{len(rows) + 1}", "데이터": ""})
+        rows.append({"제목": "", "요청": "", "데이터": ""})
     if st.button("행 삭제"):
         rows = rows[:-1] if len(rows) > 1 else rows  # 최소 1행은 유지
 
-# 2. 파일 업로드 및 GitHub 저장소 정보 입력 기능
-with col1:
-    st.subheader("2. 파일 업로드 및 GitHub 저장소 정보")
-
-    # GitHub 저장소 경로 입력
-    github_repo = st.text_input("GitHub 저장소 경로 (예: username/repo)", value=st.session_state['github_repo'])
-
-    # GitHub API 토큰 입력 (수동으로 입력)
-    github_token = st.text_input("GitHub API 토큰 입력", type="password")
-
-    # 브랜치 입력
-    github_branch = st.text_input("브랜치 이름 (예: main 또는 master)", value=st.session_state['github_branch'])
-
-    if st.button("GitHub 정보 저장"):
-        st.session_state['github_repo'] = github_repo
-        st.session_state['github_token'] = github_token
-        st.session_state['github_branch'] = github_branch
-        st.success("GitHub 정보가 성공적으로 저장되었습니다.")
-        
-        # GitHub 토큰이 제대로 저장되었는지 확인하는 메시지 추가
-        if st.session_state['github_token']:
-            st.info(f"GitHub 토큰이 저장되었습니다. 저장된 토큰: {st.session_state['github_token'][:5]}...")
-
-    # 파일 업로드 기능 (GitHub 업로드)
-    st.subheader("파일 업로드")
-    uploaded_files = st.file_uploader("파일을 여러 개 드래그 앤 드롭하여 업로드하세요.", accept_multiple_files=True)
-
-    if uploaded_files and st.session_state['github_repo'] and st.session_state['github_token']:
-        for uploaded_file in uploaded_files:
-            # 파일을 바이트 형식으로 읽어들임
-            file_content = uploaded_file.read()
-            file_name = uploaded_file.name
-            folder_name = 'uploadFiles'
-
-            # 기존 파일이 있는지 확인
-            sha = get_file_sha(st.session_state['github_repo'], f"{folder_name}/{file_name}", st.session_state['github_token'], branch=st.session_state['github_branch'])
-
-            if sha:
-                # 덮어쓰기 확인
-                if st.checkbox(f"'{file_name}' 파일이 이미 존재합니다. 덮어쓰시겠습니까?", key=f"overwrite_{file_name}"):
-                    upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
-            else:
-                # 새 파일 업로드
-                upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'])
+# 2. 파일 업로드 및 GitHub 저장소 정보 입력 기능은 상단으로 이동하여 제거됨
 
 # 3. 실행 버튼 및 OpenAI API 키 입력
 with col2:
