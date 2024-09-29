@@ -44,11 +44,12 @@ def get_file_server_path(repo, branch, file_path):
     server_base_path = "/mnt/data/github_files"  # 서버에 GitHub 파일이 저장된 기본 경로
     return os.path.join(server_base_path, file_path)
 
-# 미리보기 팝업창 띄우는 함수 (이미지, PDF, HTML 파일만 미리보기 가능)
-def preview_file_modal(file_path):
+# 미리보기 창 띄우는 함수
+def preview_file(file_path):
     file_ext = os.path.splitext(file_path)[1].lower()
 
-    with st.modal("미리보기"):
+    # 확장 가능한 영역을 사용하여 미리보기 구현
+    with st.expander("미리보기 창", expanded=True):
         st.subheader("파일 미리보기")
         if file_ext in [".png", ".jpg", ".jpeg", ".gif"]:
             st.image(file_path, use_column_width=True)
@@ -58,11 +59,6 @@ def preview_file_modal(file_path):
             st.markdown(f'<iframe src="file://{file_path}" width="700" height="1000"></iframe>', unsafe_allow_html=True)
         else:
             st.warning("미리보기는 이미지, PDF, HTML 파일 형식만 지원됩니다.")
-        st.button("닫기", on_click=close_modal)
-
-# 모달 창 닫기 함수
-def close_modal():
-    st.session_state['preview_open'] = False
 
 # 세션 상태 초기화
 if 'github_repo' not in st.session_state:
@@ -230,7 +226,7 @@ with col1:
         with col5_2:
             if st.button("미리보기"):
                 if file_path:
-                    preview_file_modal(file_path)  # 미리보기 모달창 띄우기
+                    preview_file(file_path)  # 미리보기 창 띄우기
                 else:
                     st.warning("파일 경로를 입력하세요.")
 
