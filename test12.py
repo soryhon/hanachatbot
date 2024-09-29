@@ -1,9 +1,24 @@
 import streamlit as st
 import pandas as pd
 import requests
-import os
-import base64
+import base64  # base64 인코딩 및 디코딩을 위한 라이브러리
 import urllib.parse  # URL 인코딩을 위한 라이브러리
+
+# JSON 데이터
+json_data = {
+    "github_repo": "soryhon/hanachatbot",
+    "github_branch": "main",
+    "github_token": "Z2hwX0dKSU1TT2JDdVVZWWZJVnlkNFVLZ1YwUFdFOTlWcjRIRURkVw==",
+    "openai_api_key": "c2staVFIM2s4S3dyNGFpemxfNkhFbGRKc0NtVmtETVdpTVVuTkUyZUdlNktzVDNCbGJrRkpROFlZb3plYzJTOHRwbnpORFdLSGIzUzh4VmJxdzYzZlVUTlRoOXdBb0E="
+}
+
+# GitHub API 토큰과 OpenAI API 키 복호화 함수
+def decode_base64(encoded_str):
+    return base64.b64decode(encoded_str).decode('utf-8')
+
+# 복호화된 토큰 값 저장
+decoded_github_token = decode_base64(json_data['github_token'])
+decoded_openai_api_key = decode_base64(json_data['openai_api_key'])
 
 # OpenAI에 LLM 요청을 보내는 함수
 def send_to_llm(prompt, api_key):
@@ -83,13 +98,13 @@ st.title("일일 업무 및 보고서 자동화 프로그램")
 
 # API 키 및 GitHub 저장소 정보를 메모리에 저장하기 위한 변수 (세션 상태에 저장)
 if 'openai_api_key' not in st.session_state:
-    st.session_state['openai_api_key'] = None
+    st.session_state['openai_api_key'] = decoded_openai_api_key
 if 'github_token' not in st.session_state:
-    st.session_state['github_token'] = None
+    st.session_state['github_token'] = decoded_github_token
 if 'github_repo' not in st.session_state:
-    st.session_state['github_repo'] = None
+    st.session_state['github_repo'] = json_data['github_repo']
 if 'github_branch' not in st.session_state:
-    st.session_state['github_branch'] = 'main'  # 기본 브랜치 main으로 설정
+    st.session_state['github_branch'] = json_data['github_branch']
 
 # Streamlit의 세로 프레임 구성
 col1, col2, col3 = st.columns([0.39, 0.10, 0.49])
@@ -148,33 +163,20 @@ with col1:
 with col1:
     st.subheader("2. 파일 업로드 및 GitHub 저장소 정보")
 
-    # GitHub 저장소 경로 입력
-    if st.session_state['github_repo'] is None:
-        st.warning("GitHub 저장소 정보를 입력하세요.")
-        github_repo = st.text_input("GitHub 저장소 경로 (예: username/repo)")
-        if st.button("저장소 정보 저장"):
-            if github_repo:
-                st.session_state['github_repo'] = github_repo
-                st.success("GitHub 저장소 경로가 저장되었습니다.")
-    else:
-        st.info(f"저장소: {st.session_state['github_repo']}")
+    # GitHub 저장소 경로 입력 (미리 JSON 데이터의 값이 입력됨)
+    github_repo = st.text_input("GitHub 저장소 경로 (예: username/repo)", value=st.session_state['github_repo'])
 
-    # GitHub API 토큰 입력
-    if st.session_state['github_token'] is None:
-        st.warning("GitHub API 토큰을 입력하세요.")
-        github_token = st.text_input("GitHub API 토큰 입력", type="password")
-        if st.button("GitHub API 토큰 저장"):
-            if github_token:
-                st.session_state['github_token'] = github_token
-                st.success("GitHub API 토큰이 저장되었습니다.")
-    else:
-        st.info("GitHub API 토큰이 저장되어 있습니다.")
+    # GitHub API 토큰 입력 (Base64 복호화된 값 입력)
+    github_token = st.text_input("GitHub API 토큰 입력", value=st.session_state['github_token'], type="password")
 
-    # 브랜치 입력
+    # 브랜치 입력 (미리 JSON 데이터의 값이 입력됨)
     github_branch = st.text_input("브랜치 이름 (예: main 또는 master)", value=st.session_state['github_branch'])
-    if st.button("브랜치 저장"):
+
+    if st.button("GitHub 정보 저장"):
+        st.session_state['github_repo'] = github_repo
+        st.session_state['github_token'] = github_token
         st.session_state['github_branch'] = github_branch
-        st.success(f"브랜치가 '{github_branch}'로 설정되었습니다.")
+        st.success("GitHub 정보가 성공적으로 저장되었습니다.")
 
     # 파일 업로드 기능 (GitHub 업로드)
     st.subheader("파일 업로드")
@@ -189,18 +191,12 @@ with col1:
 with col2:
     st.subheader("3. 실행")
 
-    # OpenAI API 키 입력 부분
-    if st.session_state['openai_api_key'] is None:
-        st.warning("OpenAI API 키가 필요합니다.")
-        openai_api_key = st.text_input("OpenAI API 키를 입력하세요.", type="password")
-        if st.button("OpenAI API 키 저장"):
-            if openai_api_key.startswith("sk-"):  # OpenAI API 키는 보통 'sk-'로 시작합니다.
-                st.session_state['openai_api_key'] = openai_api_key
-                st.success("OpenAI API 키가 저장되었습니다.")
-            else:
-                st.error("올바른 OpenAI API 키를 입력하세요. 키는 'sk-'로 시작해야 합니다.")
-    else:
-        st.info("OpenAI API 키가 저장되어 있습니다.")
+    # OpenAI API 키 입력 부분 (Base64 복호화된 값 미리 입력됨)
+    openai_api_key = st.text_input("OpenAI API 키를 입력하세요.", value=st.session_state['openai_api_key'], type="password")
+
+    if st.button("OpenAI API 키 저장"):
+        st.session_state['openai_api_key'] = openai_api_key
+        st.success("OpenAI API 키가 저장되었습니다.")
 
     # LLM 실행 버튼
     if st.button("실행"):
