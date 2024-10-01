@@ -82,7 +82,7 @@ with col1:
             row_checked = st.checkbox(f"요청사항 {idx+1}", value=row.get("checked", False))
             row['제목'] = st.text_input(f"제목 (요청사항 {idx+1})", row['제목'])
             row['요청'] = st.text_input(f"요청 (요청사항 {idx+1})", row['요청'])
-            
+
             if row_checked:
                 checked_rows.append(idx)
                 row['checked'] = True
@@ -92,16 +92,28 @@ with col1:
             # GitHub 토큰이 입력된 경우에만 파일 목록 가져오기 (uploadFiles 폴더의 파일 리스트)
             file_list = ["파일을 선택하세요"]
             if st.session_state['github_token']:
-                file_list.extend(backend.get_github_files(st.session_state['github_repo'], st.session_state['github_token'], folder_name='uploadFiles', branch=st.session_state['github_branch']))
+                try:
+                    file_list.extend(backend.get_github_files(
+                        st.session_state['github_repo'], 
+                        st.session_state['github_token'], 
+                        folder_name='uploadFiles', 
+                        branch=st.session_state['github_branch']
+                    ))
+                except Exception as e:
+                    st.error(f"파일 목록을 가져오는 중 오류가 발생했습니다: {e}")
+            
             selected_file = st.selectbox(f"파일 선택 (요청사항 {idx+1})", options=file_list)
 
             # 데이터 요청사항 객체 추가 및 파일 선택 처리
             if st.session_state['github_token'] and st.button(f"선택 (요청사항 {idx+1})") and selected_file != "파일을 선택하세요":
-                # 서버 경로 가져오기 (파일 경로 계산)
-                server_path = backend.get_file_server_path(st.session_state['github_repo'], st.session_state['github_branch'], selected_file)
-                # 선택된 파일을 rows 객체의 데이터 필드에 저장
-                rows[idx]['데이터'] = server_path
-                st.success(f"선택한 파일: {selected_file}\n서버 경로: {server_path}")
+                try:
+                    # 서버 경로 가져오기 (파일 경로 계산)
+                    server_path = backend.get_file_server_path(st.session_state['github_repo'], st.session_state['github_branch'], selected_file)
+                    # 선택된 파일을 rows 객체의 데이터 필드에 저장
+                    rows[idx]['데이터'] = server_path
+                    st.success(f"선택한 파일: {selected_file}\n서버 경로: {server_path}")
+                except Exception as e:
+                    st.error(f"파일 경로를 생성하는 중 오류가 발생했습니다: {e}")
             elif selected_file == "파일을 선택하세요":
                 st.warning("파일을 선택해주세요.")
             
@@ -110,7 +122,7 @@ with col1:
 
         # 추가, 삭제, 새로고침 버튼 구성
         col1_1, col1_2, col1_3 = st.columns([0.33, 0.33, 0.33])
-        
+
         with col1_1:
             if st.button("행 추가"):
                 rows.append({"제목": "", "요청": "", "데이터": "", "checked": True})
@@ -123,7 +135,7 @@ with col1:
                     st.success(f"체크된 {len(checked_rows)}개의 요청사항이 삭제되었습니다.")
                 else:
                     st.warning("삭제할 요청사항을 선택해주세요.")
-                    
+
         with col1_3:
             if st.button("새로고침"):
                 st.session_state['rows'] = st.session_state['rows']
@@ -198,26 +210,21 @@ with col1:
 # 2 프레임 (3. 실행)
 with col2:
     st.subheader("3. 실행")
+    if st.button("실행"):
+        llm_results = {}
+        for idx, row in enumerate(st.session_state['rows']):
+            prompt = [
+                {"role": "system", "content": "다음 파일을 분석하여 보고서를 작성하세요."},
+                {"role": "user", "content": f"보고서 제목 : '{row['제목']}'\n요청 문구 : '{row['요청']}'\n데이터 전달 : '{row['데이터']}'"}
+            ]
+            llm_response = backend.send_to_llm(prompt, row['데이터'], st.session_state['openai_api_key'])
+            if llm_response:
+                llm_results[idx] = llm_response
+            else:
+                llm_results[idx] = "LLM 응답을 받지 못했습니다."
 
-    # OpenAI API 키가 저장되지 않았다면 실행되지 않도록 경고
-    if not st.session_state.get('openai_saved'):
-        st.warning("OpenAI API 키를 먼저 저장해주세요.")
-    else:
-        if st.button("실행"):
-            llm_results = {}
-            for idx, row in enumerate(st.session_state['rows']):
-                prompt = [
-                    {"role": "system", "content": "다음 파일을 분석하여 보고서를 작성하세요."},
-                    {"role": "user", "content": f"보고서 제목 : '{row['제목']}'\n요청 문구 : '{row['요청']}'\n데이터 전달 : '{row['데이터']}'"}
-                ]
-                llm_response = backend.send_to_llm(prompt, row['데이터'], st.session_state['openai_api_key'])
-                if llm_response:
-                    llm_results[idx] = llm_response
-                else:
-                    llm_results[idx] = "LLM 응답을 받지 못했습니다."
-
-            st.session_state['llm_results'] = llm_results
-            st.success("LLM 요청이 완료되었습니다.")
+        st.session_state['llm_results'] = llm_results
+        st.success("LLM 요청이 완료되었습니다.")
 
 # 3 프레임 (4. 결과 보고서 및 6. 저장 및 7. 불러오기)
 with col3:
