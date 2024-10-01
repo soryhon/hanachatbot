@@ -77,11 +77,6 @@ def send_to_llm(prompt, file_path, openai_api_key):
         llm = OpenAI(api_key=openai_api_key)
         file_extension = file_path.split('.')[-1].lower()
 
-        # 실제 파일 경로 확인 및 로컬 파일 읽기
-        if not os.path.exists(file_path):
-            st.error(f"파일이 존재하지 않습니다: {file_path}")
-            return None
-
         # 엑셀 파일 처리
         if file_extension in ['xlsx', 'xls']:
             df = pd.read_excel(file_path)
@@ -175,6 +170,16 @@ def send_to_llm(prompt, file_path, openai_api_key):
 def get_file_server_path(repo, branch, file_path):
     base_server_path = "/mnt/data/github_files"
     full_path = os.path.join(base_server_path, repo, branch, file_path)
+
+    # 파일 경로 디버깅 출력
+    st.write(f"생성된 파일 경로: {full_path}")
+
+    # 파일이 실제로 존재하는지 확인
+    if not os.path.exists(full_path):
+        st.error(f"파일이 존재하지 않습니다: {full_path}")
+    else:
+        st.success(f"파일이 존재합니다: {full_path}")
+
     return full_path
 
 # 파일 미리보기 함수 (이미지 파일에 대한 추가 처리)
