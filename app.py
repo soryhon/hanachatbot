@@ -95,13 +95,18 @@ with col1:
                 file_list.extend(backend.get_github_files(st.session_state['github_repo'], st.session_state['github_token'], folder_name='uploadFiles', branch=st.session_state['github_branch']))
             selected_file = st.selectbox(f"파일 선택 (요청사항 {idx+1})", options=file_list)
 
-            if st.session_state['github_token'] and st.button(f"파일 선택 (요청사항 {idx+1})"):
-                if selected_file != "파일을 선택하세요":
-                    server_path = backend.get_file_server_path(st.session_state['github_repo'], st.session_state['github_branch'], selected_file)
-                    row['데이터'] = server_path
-                    st.success(f"선택한 파일: {selected_file}\n서버 경로: {server_path}")
-                else:
-                    st.warning("파일을 먼저 선택하세요.")
+            # 데이터 요청사항 객체 추가 및 파일 선택 처리
+            if st.session_state['github_token'] and st.button(f"선택 (요청사항 {idx+1})") and selected_file != "파일을 선택하세요":
+                # 서버 경로 가져오기 (파일 경로 계산)
+                server_path = backend.get_file_server_path(st.session_state['github_repo'], st.session_state['github_branch'], selected_file)
+                # 선택된 파일을 rows 객체의 데이터 필드에 저장
+                rows[idx]['데이터'] = server_path
+                st.success(f"선택한 파일: {selected_file}\n서버 경로: {server_path}")
+            elif selected_file == "파일을 선택하세요":
+                st.warning("파일을 선택해주세요.")
+            
+            # 선택한 파일 경로 표시
+            st.text_input(f"데이터 (요청사항 {idx+1})", row['데이터'], disabled=True, key=f"file_path_{idx}")
 
         # 추가, 삭제, 새로고침 버튼 구성
         col1_1, col1_2, col1_3 = st.columns([0.33, 0.33, 0.33])
