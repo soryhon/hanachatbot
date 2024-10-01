@@ -1,115 +1,173 @@
+# app.py
+
 import streamlit as st
-import backend  # backend.py 파일의 함수를 가져옴
+import pandas as pd
+import backend
 
 # 페이지 설정
 st.set_page_config(layout="wide")
 
-# HTML과 JavaScript를 이용한 화면 구성
-html_code = """
-<div style="width:100%; text-align:center;">
-    <h2>Streamlit 기반 GitHub 및 OpenAI 인터페이스</h2>
-    
-    <div style="margin-bottom: 20px;">
-        <h3>GitHub 정보 입력</h3>
-        <input type="text" id="github_repo" placeholder="GitHub 저장소 경로 (예: username/repo)" style="width: 80%; padding: 10px; margin-bottom: 10px;"><br>
-        <input type="password" id="github_token" placeholder="GitHub API 토큰 입력" style="width: 80%; padding: 10px; margin-bottom: 10px;"><br>
-        <input type="text" id="github_branch" placeholder="브랜치 이름 (예: main)" value="main" style="width: 80%; padding: 10px; margin-bottom: 20px;"><br>
-        <button onclick="getGithubFiles()" style="padding: 10px 20px;">GitHub 파일 목록 가져오기</button>
-    </div>
-    
-    <div id="fileList"></div>
+# 세션 상태 초기화
+if 'rows' not in st.session_state:
+    st.session_state['rows'] = [{"제목": "", "요청": "", "데이터": "", "checked": False}]
+if 'github_repo' not in st.session_state:
+    st.session_state['github_repo'] = ""
+if 'github_token' not in st.session_state:
+    st.session_state['github_token'] = ""
+if 'github_branch' not in st.session_state:
+    st.session_state['github_branch'] = "main"
+if 'openai_api_key' not in st.session_state:
+    st.session_state['openai_api_key'] = ""
+if 'github_saved' not in st.session_state:
+    st.session_state['github_saved'] = False
+if 'openai_saved' not in st.session_state:
+    st.session_state['openai_saved'] = False
+if 'show_info' not in st.session_state:
+    st.session_state['show_info'] = True
 
-    <div style="margin-top: 30px;">
-        <h3>OpenAI API 키 입력 및 요청</h3>
-        <input type="password" id="openai_api_key" placeholder="OpenAI API 키 입력" style="width: 80%; padding: 10px; margin-bottom: 10px;"><br>
-        <textarea id="openai_prompt" placeholder="OpenAI에 보낼 메시지를 입력하세요." style="width: 80%; height: 100px; padding: 10px;"></textarea><br>
-        <button onclick="sendToOpenAI()" style="padding: 10px 20px;">OpenAI로 전송</button>
-    </div>
+# GitHub 및 OpenAI 정보 입력
+if not (st.session_state['github_saved'] and st.session_state['openai_saved']):
+    st.subheader("GitHub 저장소 정보 및 OpenAI API 키 입력")
 
-    <div id="openaiResponse"></div>
-</div>
+    col_a, col_b = st.columns(2)
 
-<script>
-    // GitHub 파일 목록 가져오기
-    function getGithubFiles() {
-        const githubRepo = document.getElementById("github_repo").value;
-        const githubToken = document.getElementById("github_token").value;
-        const githubBranch = document.getElementById("github_branch").value;
+    with col_a:
+        st.subheader("GitHub 정보 입력")
+        st.session_state['github_repo'] = st.text_input("GitHub 저장소 경로 (예: username/repo)")
+        st.session_state['github_token'] = st.text_input("GitHub API 토큰 입력", type="password")
+        st.session_state['github_branch'] = st.text_input("브랜치 이름 (예: main 또는 master)", value="main")
 
-        if (!githubRepo || !githubToken || !githubBranch) {
-            alert("모든 GitHub 정보를 입력해주세요.");
-            return;
+        if st.button("GitHub 정보 저장"):
+            if st.session_state['github_repo'] and st.session_state['github_token'] and st.session_state['github_branch']:
+                st.session_state['github_saved'] = True
+                st.success(f"GitHub 정보가 저장되었습니다!\nRepo: {st.session_state['github_repo']}, Branch: {st.session_state['github_branch']}")
+            else:
+                st.error("모든 GitHub 정보를 입력해주세요.")
+
+    with col_b:
+        st.subheader("OpenAI API 키 입력")
+        st.session_state['openai_api_key'] = st.text_input("OpenAI API 키를 입력하세요.", type="password")
+
+        if st.button("OpenAI API 키 저장"):
+            if st.session_state['openai_api_key']:
+                st.session_state['openai_saved'] = True
+                st.success("OpenAI API 키가 저장되었습니다.")
+            else:
+                st.error("OpenAI API 키를 입력해주세요.")
+
+# 요청사항 리스트 및 보고서 구성
+col1, col2, col3 = st.columns([0.39, 0.10, 0.49])
+
+# 1. 작성 보고서 요청사항
+with col1:
+    st.subheader("1. 작성 보고서 요청사항")
+    with st.expander("요청사항 리스트", expanded=True):
+        rows = st.session_state['rows']
+        checked_rows = []
+
+        for idx, row in enumerate(rows):
+            row_checked = st.checkbox(f"요청사항 {idx+1}", value=row.get("checked", False))
+            row['제목'] = st.text_input(f"제목 (요청사항 {idx+1})", row['제목'])
+            row['요청'] = st.text_input(f"요청 (요청사항 {idx+1})", row['요청'])
+            
+            if row_checked:
+                checked_rows.append(idx)
+                row['checked'] = True
+            else:
+                row['checked'] = False
+
+            file_list = backend.get_github_files(st.session_state['github_repo'], st.session_state['github_token'], branch=st.session_state['github_branch'])
+            selected_file = st.selectbox(f"파일 선택 (요청사항 {idx+1})", options=file_list)
+
+            if st.button(f"파일 선택 (요청사항 {idx+1})"):
+                server_path = backend.get_file_server_path(st.session_state['github_repo'], st.session_state['github_branch'], selected_file)
+                row['데이터'] = server_path
+                st.success(f"선택한 파일: {selected_file}\n서버 경로: {server_path}")
+
+        if st.button("행 추가"):
+            rows.append({"제목": "", "요청": "", "데이터": "", "checked": False})
+
+        if st.button("행 삭제"):
+            st.session_state['rows'] = [row for idx, row in enumerate(rows) if idx not in checked_rows]
+
+# 2. 파일 업로드
+with col2:
+    st.subheader("2. 파일 업로드")
+    uploaded_files = st.file_uploader("파일을 여러 개 드래그 앤 드롭하여 업로드하세요.", accept_multiple_files=True)
+
+    if uploaded_files:
+        for uploaded_file in uploaded_files:
+            file_content = uploaded_file.read()
+            file_name = uploaded_file.name
+            folder_name = 'uploadFiles'
+
+            sha = backend.get_file_sha(st.session_state['github_repo'], f"{folder_name}/{file_name}", st.session_state['github_token'], branch=st.session_state['github_branch'])
+            if sha:
+                if st.checkbox(f"'{file_name}' 파일이 이미 존재합니다. 덮어쓰시겠습니까?"):
+                    backend.upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
+            else:
+                backend.upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'])
+
+# 3. 실행
+with col2:
+    st.subheader("3. 실행")
+    if st.button("실행"):
+        llm_results = {}
+        for idx, row in enumerate(st.session_state['rows']):
+            prompt = [
+                {"role": "system", "content": "다음 파일을 분석하여 보고서를 작성하세요."},
+                {"role": "user", "content": f"보고서 제목 : '{row['제목']}'\n요청 문구 : '{row['요청']}'\n데이터 전달 : '{row['데이터']}'"}
+            ]
+            llm_response = backend.send_to_llm(prompt, st.session_state['openai_api_key'])
+            if llm_response:
+                llm_results[idx] = llm_response
+            else:
+                llm_results[idx] = "LLM 응답을 받지 못했습니다."
+
+        st.session_state['llm_results'] = llm_results
+        st.success("LLM 요청이 완료되었습니다.")
+
+# 4. 결과 보고서
+with col3:
+    st.subheader("4. 결과 보고서")
+
+    st.markdown(
+        """
+        <style>
+        div[data-testid="stExpander"] > div[role="group"] {
+            height: 70vh;
+            overflow-y: auto;
         }
+        </style>
+        """, unsafe_allow_html=True
+    )
 
-        // Python 함수를 호출하여 GitHub 파일 목록 가져오기
-        streamlitAPI("get_github_files", githubRepo, githubToken, githubBranch).then((fileList) => {
-            if (fileList.length > 0) {
-                let fileListHTML = "<h4>GitHub 파일 목록</h4><ul>";
-                fileList.forEach(file => {
-                    fileListHTML += `<li>${file}</li>`;
-                });
-                fileListHTML += "</ul>";
-                document.getElementById("fileList").innerHTML = fileListHTML;
-            } else {
-                document.getElementById("fileList").innerHTML = "<p>파일 목록을 가져오지 못했습니다.</p>";
-            }
-        });
-    }
+    with st.expander("결과 보고서", expanded=True):
+        llm_results = st.session_state.get('llm_results', {})
+        if llm_results:
+            for idx, result in llm_results.items():
+                st.text(f"제목: {st.session_state['rows'][idx]['제목']}")
+                st.text(f"LLM 응답 결과:\n{result}")
+        else:
+            st.text("결과가 없습니다.")
 
-    // OpenAI API 요청
-    function sendToOpenAI() {
-        const apiKey = document.getElementById("openai_api_key").value;
-        const prompt = document.getElementById("openai_prompt").value;
+# 5. 저장 및 불러오기
+st.subheader("6. 저장 및 7. 불러오기")
 
-        if (!apiKey || !prompt) {
-            alert("OpenAI API 키와 메시지를 모두 입력해주세요.");
-            return;
-        }
+col3_1, col3_2 = st.columns([0.5, 0.5])
 
-        // Python 함수를 호출하여 OpenAI 요청 보내기
-        streamlitAPI("send_to_openai", apiKey, prompt).then((response) => {
-            document.getElementById("openaiResponse").innerHTML = `<h4>OpenAI 응답</h4><p>${response}</p>`;
-        });
-    }
+with col3_1:
+    st.subheader("6. 저장")
+    save_path = st.text_input("저장할 파일명 입력")
+    if st.button("저장") and save_path:
+        df = pd.DataFrame(st.session_state['rows'])
+        df.to_csv(f"{save_path}.csv", index=False)
+        st.success(f"{save_path}.csv 파일로 저장되었습니다.")
 
-    // Python 함수를 호출하는 Streamlit API 호출 함수
-    async function streamlitAPI(functionName, ...args) {
-        const result = await fetch(`/streamlit/${functionName}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ args })
-        });
-
-        const data = await result.json();
-        return data.result;
-    }
-</script>
-"""
-
-# HTML 코드 삽입
-st.components.v1.html(html_code, height=600)
-
-# GitHub 파일 목록 가져오기 (백엔드 함수 호출)
-def get_github_files():
-    github_repo = st.session_state['github_repo']
-    github_token = st.session_state['github_token']
-    github_branch = st.session_state['github_branch']
-
-    if github_repo and github_token and github_branch:
-        return backend.get_github_files(github_repo, github_token, branch=github_branch)
-    else:
-        return []
-
-# OpenAI API 요청 보내기 (백엔드 함수 호출)
-def send_to_openai():
-    openai_api_key = st.session_state['openai_api_key']
-    prompt_text = st.session_state['openai_prompt']
-
-    if openai_api_key and prompt_text:
-        prompt = [
-            {"role": "system", "content": "You are an AI that helps users based on the prompt."},
-            {"role": "user", "content": prompt_text}
-        ]
-        return backend.send_to_llm(prompt, openai_api_key)
-    else:
-        return "OpenAI API 키와 메시지를 모두 입력해야 합니다."
+with col3_2:
+    st.subheader("7. 불러오기")
+    uploaded_save_file = st.file_uploader("저장된 CSV 파일 불러오기", type=["csv"])
+    if uploaded_save_file is not None:
+        loaded_data = pd.read_csv(uploaded_save_file)
+        st.session_state['rows'] = loaded_data.to_dict(orient="records")
+        st.success("CSV 파일 데이터가 불러와졌습니다.")
