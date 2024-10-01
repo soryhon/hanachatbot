@@ -1,10 +1,10 @@
 import requests
 import base64
 import streamlit as st
-import os
-import urllib.parse
+import os  # 서버 경로 생성에 필요
+import urllib.parse  # URL 인코딩을 위한 라이브러리
 from langchain.llms import OpenAI
-from langchain.agents import create_csv_agent  # create_csv_agent로 수정
+from langchain.agents import create_pandas_dataframe_agent
 import pandas as pd
 
 # GitHub에서 파일 목록을 가져오는 함수
@@ -77,8 +77,8 @@ def send_to_llm(prompt, file_path, openai_api_key):
             # OpenAI API 설정
             llm = OpenAI(openai_api_key=openai_api_key)
 
-            # Langchain CSV Agent 생성 (CSV 데이터를 기반으로 질문을 수행하는 Agent)
-            agent = create_csv_agent(llm, df, verbose=True)
+            # Langchain Pandas Agent 생성 (Pandas DataFrame 데이터를 기반으로 질문을 수행하는 Agent)
+            agent = create_pandas_dataframe_agent(llm, df, verbose=True)
 
             # 프롬프트를 Agent에게 전달하여 처리
             result = agent.run(prompt)
