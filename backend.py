@@ -77,6 +77,11 @@ def send_to_llm(prompt, file_path, openai_api_key):
         llm = OpenAI(api_key=openai_api_key)
         file_extension = file_path.split('.')[-1].lower()
 
+        # 실제 파일 경로 확인 및 로컬 파일 읽기
+        if not os.path.exists(file_path):
+            st.error(f"파일이 존재하지 않습니다: {file_path}")
+            return None
+
         # 엑셀 파일 처리
         if file_extension in ['xlsx', 'xls']:
             df = pd.read_excel(file_path)
