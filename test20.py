@@ -11,7 +11,8 @@ if "api_key" not in st.session_state:
 
 st.subheader("OpenAI API 키 설정")
 
-api_key_input = st.text_input("OpenAI API 키를 입력하세요", type="password", value=st.session_state["api_key"])
+# API 키 입력란 및 저장
+api_key_input = st.text_input("OpenAI API 키를 입력하세요", type="password")
 
 # API 키 저장 버튼
 if st.button("API 키 저장"):
@@ -19,11 +20,12 @@ if st.button("API 키 저장"):
         st.session_state["api_key"] = api_key_input
         st.success("API 키가 성공적으로 저장되었습니다!")
     else:
-        st.error("API 키가 필요합니다!")
+        st.error("API 키를 입력해야 합니다!")
 
 # LLM 연동 화면
 st.subheader("LLM 입력 폼")
 
+# 제목과 요청 사항 입력
 title = st.text_input("제목을 입력하세요:")
 request = st.text_area("요청 사항을 입력하세요:")
 
@@ -38,7 +40,7 @@ if st.button("실행"):
         try:
             # OpenAI GPT-4 LLM 인스턴스 생성
             llm = OpenAI(
-                openai_api_key=st.session_state["api_key"],  # API 키를 직접 전달
+                openai_api_key=st.session_state["api_key"],  # 세션에 저장된 API 키 사용
                 model_name="gpt-4"
             )
 
