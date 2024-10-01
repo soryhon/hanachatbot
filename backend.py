@@ -1,38 +1,33 @@
+import os
+import pandas as pd
 import requests
 import base64
 import streamlit as st
-import os
 import urllib.parse
-import pandas as pd
-from langchain.llms import OpenAI
-from langchain.prompts import PromptTemplate
-from langchain.chains import LLMChain
-from langchain.agents import create_pandas_dataframe_agent
-import docx2txt
+from io import BytesIO
+from docx import Document
 from pptx import Presentation
 from PyPDF2 import PdfReader
-from io import BytesIO
 from PIL import Image
+from langchain.prompts import PromptTemplate
+from langchain.llms import OpenAI
+from langchain.chains import LLMChain
 
 # GitHub에서 파일 목록을 가져오는 함수
 def get_github_files(repo, github_token, folder_name=None, branch="main"):
-    try:
-        url = f"https://api.github.com/repos/{repo}/git/trees/{branch}?recursive=1"
-        headers = {"Authorization": f"token {github_token}"}
-        response = requests.get(url, headers=headers)
-
-        if response.status_code == 200:
-            tree = response.json().get("tree", [])
-            if folder_name:
-                file_list = [item["path"] for item in tree if folder_name in item["path"] and item["type"] == "blob"]
-            else:
-                file_list = [item["path"] for item in tree if item["type"] == "blob"]
-            return file_list
+    url = f"https://api.github.com/repos/{repo}/git/trees/{branch}?recursive=1"
+    headers = {"Authorization": f"token {github_token}"}
+    response = requests.get(url, headers=headers)
+    
+    if response.status_code == 200:
+        tree = response.json().get("tree", [])
+        if folder_name:
+            file_list = [item["path"] for item in tree if folder_name in item["path"] and item["type"] == "blob"]
         else:
-            st.error(f"GitHub 파일 목록을 가져오지 못했습니다: {response.status_code}")
-            return []
-    except Exception as e:
-        st.error(f"파일 목록을 가져오는 중 오류가 발생했습니다: {str(e)}")
+            file_list = [item["path"] for item in tree if item["type"] == "blob"]
+        return file_list
+    else:
+        st.error(f"GitHub 파일 목록을 가져오지 못했습니다: {response.status_code}")
         return []
 
 # GitHub에서 파일의 SHA 값을 가져오는 함수
@@ -72,67 +67,96 @@ def upload_file_to_github(repo, folder_name, file_name, content, github_token, b
     else:
         st.error(f"GitHub 업로드 실패: {response.status_code} - {response.text}")
 
-# OpenAI 및 Langchain을 사용하여 파일 처리와 LLM 요청을 수행하는 함수
+# 파일 경로를 인코딩하는 함수 (한글과 공백 처리)
+def encode_file_path(file_path):
+    return urllib.parse.quote(file_path)
+
+# Langchain을 사용한 LLM 요청 함수
 def send_to_llm(prompt, file_path, openai_api_key):
     try:
-        # OpenAI LLM 생성
         llm = OpenAI(api_key=openai_api_key)
-
-        # 파일 확장자에 따라 처리
         file_extension = file_path.split('.')[-1].lower()
 
         # 엑셀 파일 처리
         if file_extension in ['xlsx', 'xls']:
             df = pd.read_excel(file_path)
             st.write("읽은 엑셀 데이터 미리보기:", df.head())
-            agent = create_pandas_dataframe_agent(llm, df, verbose=True)
-            result = agent.run(prompt)
+
+            template = PromptTemplate(
+                input_variables=["data", "user_prompt"],
+                template="다음 데이터를 기반으로 보고서를 작성하세요: {data}. 요청사항: {user_prompt}"
+            )
+            chain = LLMChain(llm=llm, prompt=template)
+            result = chain.run(data=df.to_string(), user_prompt=prompt[1]['content'])
             return result
 
         # CSV 파일 처리
         elif file_extension == 'csv':
             df = pd.read_csv(file_path)
             st.write("읽은 CSV 데이터 미리보기:", df.head())
-            agent = create_pandas_dataframe_agent(llm, df, verbose=True)
-            result = agent.run(prompt)
+
+            template = PromptTemplate(
+                input_variables=["data", "user_prompt"],
+                template="다음 데이터를 기반으로 보고서를 작성하세요: {data}. 요청사항: {user_prompt}"
+            )
+            chain = LLMChain(llm=llm, prompt=template)
+            result = chain.run(data=df.to_string(), user_prompt=prompt[1]['content'])
             return result
 
         # Word 파일 처리
         elif file_extension == 'docx':
-            text = docx2txt.process(file_path)
-            st.write("읽은 Word 파일 내용:", text[:500])
-            prompt_content = prompt[1]['content'] + f"\n\n문서 내용:\n{text}"
-            result = llm(prompt_content)
+            doc = Document(file_path)
+            doc_text = '\n'.join([para.text for para in doc.paragraphs])
+            st.write("읽은 Word 문서 데이터 미리보기:", doc_text[:500])
+
+            template = PromptTemplate(
+                input_variables=["data", "user_prompt"],
+                template="다음 문서를 기반으로 보고서를 작성하세요: {data}. 요청사항: {user_prompt}"
+            )
+            chain = LLMChain(llm=llm, prompt=template)
+            result = chain.run(data=doc_text, user_prompt=prompt[1]['content'])
             return result
 
         # PPT 파일 처리
         elif file_extension == 'pptx':
-            presentation = Presentation(file_path)
-            text = ""
-            for slide in presentation.slides:
+            ppt = Presentation(file_path)
+            ppt_text = ''
+            for slide in ppt.slides:
                 for shape in slide.shapes:
                     if hasattr(shape, "text"):
-                        text += shape.text + "\n"
-            st.write("읽은 PPT 파일 내용:", text[:500])
-            prompt_content = prompt[1]['content'] + f"\n\n프레젠테이션 내용:\n{text}"
-            result = llm(prompt_content)
+                        ppt_text += shape.text + "\n"
+            st.write("읽은 PPT 데이터 미리보기:", ppt_text[:500])
+
+            template = PromptTemplate(
+                input_variables=["data", "user_prompt"],
+                template="다음 프레젠테이션을 기반으로 보고서를 작성하세요: {data}. 요청사항: {user_prompt}"
+            )
+            chain = LLMChain(llm=llm, prompt=template)
+            result = chain.run(data=ppt_text, user_prompt=prompt[1]['content'])
             return result
 
         # PDF 파일 처리
         elif file_extension == 'pdf':
-            reader = PdfReader(file_path)
-            text = ""
-            for page in reader.pages:
-                text += page.extract_text() + "\n"
-            st.write("읽은 PDF 파일 내용:", text[:500])
-            prompt_content = prompt[1]['content'] + f"\n\nPDF 내용:\n{text}"
-            result = llm(prompt_content)
+            pdf_text = ""
+            with open(file_path, "rb") as f:
+                pdf = PdfReader(f)
+                for page in pdf.pages:
+                    pdf_text += page.extract_text()
+            st.write("읽은 PDF 데이터 미리보기:", pdf_text[:500])
+
+            template = PromptTemplate(
+                input_variables=["data", "user_prompt"],
+                template="다음 PDF 문서를 기반으로 보고서를 작성하세요: {data}. 요청사항: {user_prompt}"
+            )
+            chain = LLMChain(llm=llm, prompt=template)
+            result = chain.run(data=pdf_text, user_prompt=prompt[1]['content'])
             return result
 
-        # 이미지 파일 처리 (OCR 적용 가능)
-        elif file_extension in ['png', 'jpg', 'jpeg']:
-            st.image(file_path, caption='이미지 미리보기')
-            return "이미지 파일에 대한 분석은 아직 지원되지 않습니다."
+        # 이미지 파일 처리
+        elif file_extension in ['png', 'jpg', 'jpeg', 'gif']:
+            image = Image.open(file_path)
+            st.image(image, caption="이미지 미리보기", use_column_width=True)
+            return "이미지 파일은 텍스트 분석이 지원되지 않습니다."
 
         else:
             st.error("지원되지 않는 파일 형식입니다.")
@@ -144,22 +168,15 @@ def send_to_llm(prompt, file_path, openai_api_key):
 
 # 서버에서 GitHub 파일 경로를 생성하는 함수
 def get_file_server_path(repo, branch, file_path):
-    try:
-        base_server_path = "/mnt/data/github_files"
-        decoded_file_path = urllib.parse.unquote(file_path)
-        full_path = os.path.join(base_server_path, repo, branch, decoded_file_path)
-        if not os.path.exists(full_path):
-            raise FileNotFoundError(f"파일이 존재하지 않습니다: {full_path}")
-        return full_path
-    except Exception as e:
-        st.error(f"파일 경로 생성 중 오류가 발생했습니다: {e}")
-        return None
+    base_server_path = "/mnt/data/github_files"
+    full_path = os.path.join(base_server_path, repo, branch, file_path)
+    return full_path
 
 # 파일 미리보기 함수 (이미지 파일에 대한 추가 처리)
 def preview_file(file_path):
     try:
         file_extension = file_path.split('.')[-1].lower()
-        encoded_file_path = urllib.parse.quote(file_path)
+        encoded_file_path = encode_file_path(file_path)
 
         if file_extension in ['png', 'jpg', 'jpeg', 'gif']:
             return f'<img src="{encoded_file_path}" alt="이미지 미리보기" style="max-width: 100%;">'
