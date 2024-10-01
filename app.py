@@ -163,8 +163,12 @@ with col1:
         
         # 미리보기 결과화면 추가 - GitHub 토큰이 입력된 경우에만 파일 목록을 가져오기 전에 표시
         if st.session_state['template_file_path']:
-            st.markdown(f"### 미리보기 결과", unsafe_allow_html=False)
-            st.markdown(backend.preview_file(st.session_state['template_file_path']), unsafe_allow_html=True)
+            st.markdown(f"### 탬플릿 미리보기", unsafe_allow_html=False)
+            # 이미지 파일이면 이미지로 출력
+            if st.session_state['template_file_path'].lower().endswith(('.png', '.jpg', '.jpeg')):
+                st.image(st.session_state['template_file_path'], caption="탬플릿 미리보기")
+            else:
+                st.markdown(backend.preview_file(st.session_state['template_file_path']), unsafe_allow_html=True)
 
         template_folder = "templateFiles"
 
