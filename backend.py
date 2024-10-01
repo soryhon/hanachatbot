@@ -4,7 +4,6 @@ import streamlit as st
 import os  # 서버 경로 생성에 필요
 import urllib.parse  # URL 인코딩을 위한 라이브러리
 from langchain.llms import OpenAI
-from langchain.agents import create_pandas_dataframe_agent
 import pandas as pd
 
 # GitHub에서 파일 목록을 가져오는 함수
@@ -65,10 +64,10 @@ def upload_file_to_github(repo, folder_name, file_name, content, github_token, b
     else:
         st.error(f"GitHub 업로드 실패: {response.status_code} - {response.text}")
 
-# Langchain을 사용한 LLM 요청 함수
+# OpenAI API를 사용하여 LLM 요청 함수
 def send_to_llm(prompt, file_path, openai_api_key):
     try:
-        # 파일이 CSV인 경우 Pandas로 읽고, Langchain Agent로 처리
+        # 파일이 CSV인 경우 Pandas로 읽고 처리
         if file_path.endswith(".csv"):
             # 파일 읽기
             df = pd.read_csv(file_path)
@@ -77,20 +76,22 @@ def send_to_llm(prompt, file_path, openai_api_key):
             # OpenAI API 설정
             llm = OpenAI(openai_api_key=openai_api_key)
 
-            # Langchain Pandas Agent 생성 (Pandas DataFrame 데이터를 기반으로 질문을 수행하는 Agent)
-            agent = create_pandas_dataframe_agent(llm, df, verbose=True)
+            # 프롬프트를 OpenAI LLM에게 전달하여 처리
+            # 'system', 'user' 역할로 프롬프트 생성
+            messages = [
+                {"role": "system", "content": "이 CSV 데이터를 분석해 보고서를 생성하세요."},
+                {"role": "user", "content": f"프롬프트: {prompt}, 데이터: {df.to_string()}"}
+            ]
 
-            # 프롬프트를 Agent에게 전달하여 처리
-            result = agent.run(prompt)
-
-            return result
+            result = llm.generate(messages)
+            return result['choices'][0]['message']['content']
         
         else:
             st.error("지원되지 않는 파일 형식입니다. 현재는 CSV 파일만 지원됩니다.")
             return None
 
     except Exception as e:
-        st.error(f"Langchain을 사용한 LLM 요청 중 오류가 발생했습니다: {e}")
+        st.error(f"LLM 요청 중 오류가 발생했습니다: {e}")
         return None
 
 # 서버에서 GitHub 파일 경로를 생성하는 함수
