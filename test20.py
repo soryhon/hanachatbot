@@ -3,7 +3,7 @@ from langchain.prompts import PromptTemplate
 from langchain.llms import OpenAI
 
 # OpenAI API 키 저장 변수
-st.title("LangChain 및 OpenAI 연동 (Streamlit)")
+st.title("LangChain 및 OpenAI GPT-4 연동 (Streamlit)")
 
 # OpenAI API 키 입력받기
 if "api_key" not in st.session_state:
@@ -36,8 +36,11 @@ if st.button("실행"):
     else:
         # LangChain과 OpenAI 연동
         try:
-            # OpenAI LLM 인스턴스 생성
-            llm = OpenAI(api_key=st.session_state["api_key"])
+            # OpenAI GPT-4 LLM 인스턴스 생성
+            llm = OpenAI(
+                api_key=st.session_state["api_key"],
+                model_name="gpt-4"
+            )
 
             # 프롬프트 템플릿 생성
             prompt_template = PromptTemplate(
