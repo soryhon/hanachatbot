@@ -71,19 +71,15 @@ def upload_file_to_github(repo, folder_name, file_name, content, github_token, b
 def encode_file_path(file_path):
     return urllib.parse.quote(file_path)
 
-# Langchain을 사용한 LLM 요청 함수 (상대 경로로 파일 읽기)
+# Langchain을 사용한 LLM 요청 함수
 def send_to_llm(prompt, file_path, openai_api_key):
     try:
         llm = OpenAI(api_key=openai_api_key)
         file_extension = file_path.split('.')[-1].lower()
 
-        # 상대 경로로 변경 (현재 backend.py 파일이 있는 폴더를 기준으로)
-        relative_path = os.path.join('./uploadFiles', os.path.basename(file_path))
-        st.write(f"파일 경로: {relative_path}")
-
         # 엑셀 파일 처리
         if file_extension in ['xlsx', 'xls']:
-            df = pd.read_excel(relative_path)
+            df = pd.read_excel(file_path)
             st.write("읽은 엑셀 데이터 미리보기:", df.head())
 
             template = PromptTemplate(
@@ -96,7 +92,7 @@ def send_to_llm(prompt, file_path, openai_api_key):
 
         # CSV 파일 처리
         elif file_extension == 'csv':
-            df = pd.read_csv(relative_path)
+            df = pd.read_csv(file_path)
             st.write("읽은 CSV 데이터 미리보기:", df.head())
 
             template = PromptTemplate(
@@ -109,7 +105,7 @@ def send_to_llm(prompt, file_path, openai_api_key):
 
         # Word 파일 처리
         elif file_extension == 'docx':
-            doc = Document(relative_path)
+            doc = Document(file_path)
             doc_text = '\n'.join([para.text for para in doc.paragraphs])
             st.write("읽은 Word 문서 데이터 미리보기:", doc_text[:500])
 
@@ -123,7 +119,7 @@ def send_to_llm(prompt, file_path, openai_api_key):
 
         # PPT 파일 처리
         elif file_extension == 'pptx':
-            ppt = Presentation(relative_path)
+            ppt = Presentation(file_path)
             ppt_text = ''
             for slide in ppt.slides:
                 for shape in slide.shapes:
@@ -142,7 +138,7 @@ def send_to_llm(prompt, file_path, openai_api_key):
         # PDF 파일 처리
         elif file_extension == 'pdf':
             pdf_text = ""
-            with open(relative_path, "rb") as f:
+            with open(file_path, "rb") as f:
                 pdf = PdfReader(f)
                 for page in pdf.pages:
                     pdf_text += page.extract_text()
@@ -158,7 +154,7 @@ def send_to_llm(prompt, file_path, openai_api_key):
 
         # 이미지 파일 처리
         elif file_extension in ['png', 'jpg', 'jpeg', 'gif']:
-            image = Image.open(relative_path)
+            image = Image.open(file_path)
             st.image(image, caption="이미지 미리보기", use_column_width=True)
             return "이미지 파일은 텍스트 분석이 지원되지 않습니다."
 
@@ -167,7 +163,7 @@ def send_to_llm(prompt, file_path, openai_api_key):
             return None
 
     except Exception as e:
-        st.error(f"파일 내용을 추출하는 중 오류가 발생했습니다: {e}")  # 에러 메시지를 표시
+        st.error(f"파일 내용을 추출하는 중 오류가 발생했습니다: {e}")
         return None
 
 # 서버에서 GitHub 파일 경로를 생성하는 함수
@@ -176,21 +172,17 @@ def get_file_server_path(repo, branch, file_path):
     full_path = os.path.join(base_server_path, repo, branch, file_path)
     return full_path
 
-# 파일 미리보기 함수 (상대 경로로 변경)
-def preview_file(file_path):
+# 파일 미리보기 함수 (URL 기반으로 변경)
+def preview_file(file_url):
     try:
-        file_extension = file_path.split('.')[-1].lower()
-        
-        # 상대 경로로 변경 (templateFiles 폴더에서 파일 읽기)
-        relative_path = os.path.join('./templateFiles', os.path.basename(file_path))
-        encoded_file_path = encode_file_path(relative_path)
+        file_extension = file_url.split('.')[-1].lower()
 
         if file_extension in ['png', 'jpg', 'jpeg', 'gif']:
-            return f'<img src="{encoded_file_path}" alt="이미지 미리보기" style="max-width: 100%;">'
+            return f'<img src="{file_url}" alt="이미지 미리보기" style="max-width: 100%;">'
         elif file_extension == 'pdf':
-            return f'<iframe src="{encoded_file_path}" width="100%" height="600px"></iframe>'
+            return f'<iframe src="{file_url}" width="100%" height="600px"></iframe>'
         elif file_extension == 'html':
-            return f'<a href="{encoded_file_path}" target="_blank">HTML 파일 열기</a>'
+            return f'<a href="{file_url}" target="_blank">HTML 파일 열기</a>'
         else:
             return '<p>미리보기가 지원되지 않는 파일 형식입니다.</p>'
     except Exception as e:
