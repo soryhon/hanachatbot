@@ -100,11 +100,25 @@ with col1:
                 row['데이터'] = server_path
                 st.success(f"선택한 파일: {selected_file}\n서버 경로: {server_path}")
 
-        if st.button("행 추가"):
-            rows.append({"제목": "", "요청": "", "데이터": "", "checked": False})
+        # 추가, 삭제, 새로고침 버튼 구성
+        col1_1, col1_2, col1_3 = st.columns([0.33, 0.33, 0.33])
+        
+        with col1_1:
+            if st.button("행 추가"):
+                rows.append({"제목": "", "요청": "", "데이터": "", "checked": True})
+                st.session_state['rows'] = rows
 
-        if st.button("행 삭제"):
-            st.session_state['rows'] = [row for idx, row in enumerate(rows) if idx not in checked_rows]
+        with col1_2:
+            if st.button("행 삭제"):
+                if checked_rows:
+                    st.session_state['rows'] = [row for idx, row in enumerate(rows) if idx not in checked_rows]
+                    st.success(f"체크된 {len(checked_rows)}개의 요청사항이 삭제되었습니다.")
+                else:
+                    st.warning("삭제할 요청사항을 선택해주세요.")
+                    
+        with col1_3:
+            if st.button("새로고침"):
+                st.session_state['rows'] = st.session_state['rows']
 
     # 2. 파일 업로드
     st.subheader("2. 파일 업로드")
