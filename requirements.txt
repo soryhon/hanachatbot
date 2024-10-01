@@ -83,8 +83,8 @@ wheel==0.43.0
 yarl==1.9.7
 streamlit
 pandas
-openai
-langchain
+langchain==0.0.268
+openai==0.28.1
 python-docx
 PyPDF2
 Pillow
@@ -94,4 +94,3 @@ fpdf
 requests
 python-pptx
 docx2txt
-langchain.agents
