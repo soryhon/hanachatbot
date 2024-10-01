@@ -71,17 +71,19 @@ def upload_file_to_github(repo, folder_name, file_name, content, github_token, b
 def encode_file_path(file_path):
     return urllib.parse.quote(file_path)
 
-# Langchain을 사용한 LLM 요청 함수
+# Langchain을 사용한 LLM 요청 함수 (상대 경로로 파일 읽기)
 def send_to_llm(prompt, file_path, openai_api_key):
     try:
         llm = OpenAI(api_key=openai_api_key)
         file_extension = file_path.split('.')[-1].lower()
 
-        st.write(f"파일 경로: {file_path}")
+        # 상대 경로로 변경 (현재 backend.py 파일이 있는 폴더를 기준으로)
+        relative_path = os.path.join('./uploadFiles', os.path.basename(file_path))
+        st.write(f"파일 경로: {relative_path}")
 
         # 엑셀 파일 처리
         if file_extension in ['xlsx', 'xls']:
-            df = pd.read_excel(file_path)
+            df = pd.read_excel(relative_path)
             st.write("읽은 엑셀 데이터 미리보기:", df.head())
 
             template = PromptTemplate(
@@ -94,7 +96,7 @@ def send_to_llm(prompt, file_path, openai_api_key):
 
         # CSV 파일 처리
         elif file_extension == 'csv':
-            df = pd.read_csv(file_path)
+            df = pd.read_csv(relative_path)
             st.write("읽은 CSV 데이터 미리보기:", df.head())
 
             template = PromptTemplate(
@@ -107,7 +109,7 @@ def send_to_llm(prompt, file_path, openai_api_key):
 
         # Word 파일 처리
         elif file_extension == 'docx':
-            doc = Document(file_path)
+            doc = Document(relative_path)
             doc_text = '\n'.join([para.text for para in doc.paragraphs])
             st.write("읽은 Word 문서 데이터 미리보기:", doc_text[:500])
 
@@ -121,7 +123,7 @@ def send_to_llm(prompt, file_path, openai_api_key):
 
         # PPT 파일 처리
         elif file_extension == 'pptx':
-            ppt = Presentation(file_path)
+            ppt = Presentation(relative_path)
             ppt_text = ''
             for slide in ppt.slides:
                 for shape in slide.shapes:
@@ -140,7 +142,7 @@ def send_to_llm(prompt, file_path, openai_api_key):
         # PDF 파일 처리
         elif file_extension == 'pdf':
             pdf_text = ""
-            with open(file_path, "rb") as f:
+            with open(relative_path, "rb") as f:
                 pdf = PdfReader(f)
                 for page in pdf.pages:
                     pdf_text += page.extract_text()
@@ -156,7 +158,7 @@ def send_to_llm(prompt, file_path, openai_api_key):
 
         # 이미지 파일 처리
         elif file_extension in ['png', 'jpg', 'jpeg', 'gif']:
-            image = Image.open(file_path)
+            image = Image.open(relative_path)
             st.image(image, caption="이미지 미리보기", use_column_width=True)
             return "이미지 파일은 텍스트 분석이 지원되지 않습니다."
 
