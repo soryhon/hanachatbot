@@ -4,7 +4,7 @@ import streamlit as st
 import os
 import urllib.parse
 from langchain.llms import OpenAI
-from langchain.agents import create_pandas_dataframe_agent
+from langchain.agents import create_csv_agent  # create_csv_agent로 수정
 import pandas as pd
 
 # GitHub에서 파일 목록을 가져오는 함수
@@ -77,8 +77,8 @@ def send_to_llm(prompt, file_path, openai_api_key):
             # OpenAI API 설정
             llm = OpenAI(openai_api_key=openai_api_key)
 
-            # Langchain Pandas Agent 생성 (CSV 데이터를 기반으로 질문을 수행하는 Agent)
-            agent = create_pandas_dataframe_agent(llm, df, verbose=True)
+            # Langchain CSV Agent 생성 (CSV 데이터를 기반으로 질문을 수행하는 Agent)
+            agent = create_csv_agent(llm, df, verbose=True)
 
             # 프롬프트를 Agent에게 전달하여 처리
             result = agent.run(prompt)
