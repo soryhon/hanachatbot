@@ -77,6 +77,12 @@ def extract_file_content(file_path):
     try:
         # URL 인코딩된 파일 경로 처리
         file_path = urllib.parse.unquote(file_path)
+        
+        # 파일 경로가 실제로 존재하는지 확인
+        if not os.path.exists(file_path):
+            st.error(f"파일이 존재하지 않습니다: {file_path}")
+            return None
+
         file_extension = file_path.split('.')[-1].lower()
 
         # CSV 파일 처리
@@ -147,8 +153,9 @@ def send_to_llm(prompt, file_path, openai_api_key):
 # 서버에서 GitHub 파일 경로를 생성하는 함수
 def get_file_server_path(repo, branch, file_path):
     base_server_path = "/mnt/data/github_files"
-    encoded_file_path = urllib.parse.quote(file_path)
-    full_path = os.path.join(base_server_path, repo, branch, encoded_file_path)
+    # URL 인코딩 처리된 파일 경로 디코딩
+    decoded_file_path = urllib.parse.unquote(file_path)
+    full_path = os.path.join(base_server_path, repo, branch, decoded_file_path)
     return full_path
 
 # 파일 미리보기 함수 (이미지 파일에 대한 추가 처리)
