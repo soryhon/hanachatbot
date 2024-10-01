@@ -55,7 +55,7 @@ if not (st.session_state['github_saved'] and st.session_state['openai_saved']):
             else:
                 st.error("OpenAI API 키를 입력해주세요.")
 
-# 요청사항 리스트 및 보고서 구성
+# 1 프레임 (작성 보고서 요청사항, 파일 업로드, 참고 탬플릿 미리보기)
 col1, col2, col3 = st.columns([0.39, 0.10, 0.49])
 
 # 1. 작성 보고서 요청사항
@@ -90,8 +90,7 @@ with col1:
         if st.button("행 삭제"):
             st.session_state['rows'] = [row for idx, row in enumerate(rows) if idx not in checked_rows]
 
-# 2. 파일 업로드
-with col2:
+    # 2. 파일 업로드
     st.subheader("2. 파일 업로드")
     uploaded_files = st.file_uploader("파일을 여러 개 드래그 앤 드롭하여 업로드하세요.", accept_multiple_files=True)
 
@@ -108,7 +107,20 @@ with col2:
             else:
                 backend.upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'])
 
-# 3. 실행
+    # 5. 참고 탬플릿 미리보기
+    st.subheader("5. 참고 탬플릿 미리보기")
+    template_files = backend.get_github_files(st.session_state['github_repo'], st.session_state['github_token'], folder_name="templateFiles", branch=st.session_state['github_branch'])
+    selected_template_file = st.selectbox("참고 탬플릿 파일 선택", template_files)
+    
+    if st.button("참고 탬플릿 파일 선택"):
+        server_template_path = backend.get_file_server_path(st.session_state['github_repo'], st.session_state['github_branch'], selected_template_file)
+        st.session_state['template_file_path'] = server_template_path
+        st.success(f"선택한 파일 경로: {server_template_path}")
+
+    if st.session_state['template_file_path']:
+        st.markdown(backend.preview_file(st.session_state['template_file_path']), unsafe_allow_html=True)
+
+# 2 프레임 (3. 실행)
 with col2:
     st.subheader("3. 실행")
     if st.button("실행"):
@@ -127,10 +139,9 @@ with col2:
         st.session_state['llm_results'] = llm_results
         st.success("LLM 요청이 완료되었습니다.")
 
-# 4. 결과 보고서
+# 3 프레임 (4. 결과 보고서 및 6. 저장 및 7. 불러오기)
 with col3:
     st.subheader("4. 결과 보고서")
-
     st.markdown(
         """
         <style>
@@ -141,7 +152,6 @@ with col3:
         </style>
         """, unsafe_allow_html=True
     )
-
     with st.expander("결과 보고서", expanded=True):
         llm_results = st.session_state.get('llm_results', {})
         if llm_results:
@@ -151,23 +161,21 @@ with col3:
         else:
             st.text("결과가 없습니다.")
 
-# 5. 저장 및 불러오기
-st.subheader("6. 저장 및 7. 불러오기")
+    st.subheader("6. 저장 및 7. 불러오기")
+    col3_1, col3_2 = st.columns([0.5, 0.5])
 
-col3_1, col3_2 = st.columns([0.5, 0.5])
+    with col3_1:
+        st.subheader("6. 저장")
+        save_path = st.text_input("저장할 파일명 입력")
+        if st.button("저장") and save_path:
+            df = pd.DataFrame(st.session_state['rows'])
+            df.to_csv(f"{save_path}.csv", index=False)
+            st.success(f"{save_path}.csv 파일로 저장되었습니다.")
 
-with col3_1:
-    st.subheader("6. 저장")
-    save_path = st.text_input("저장할 파일명 입력")
-    if st.button("저장") and save_path:
-        df = pd.DataFrame(st.session_state['rows'])
-        df.to_csv(f"{save_path}.csv", index=False)
-        st.success(f"{save_path}.csv 파일로 저장되었습니다.")
-
-with col3_2:
-    st.subheader("7. 불러오기")
-    uploaded_save_file = st.file_uploader("저장된 CSV 파일 불러오기", type=["csv"])
-    if uploaded_save_file is not None:
-        loaded_data = pd.read_csv(uploaded_save_file)
-        st.session_state['rows'] = loaded_data.to_dict(orient="records")
-        st.success("CSV 파일 데이터가 불러와졌습니다.")
+    with col3_2:
+        st.subheader("7. 불러오기")
+        uploaded_save_file = st.file_uploader("저장된 CSV 파일 불러오기", type=["csv"])
+        if uploaded_save_file is not None:
+            loaded_data = pd.read_csv(uploaded_save_file)
+            st.session_state['rows'] = loaded_data.to_dict(orient="records")
+            st.success("CSV 파일 데이터가 불러와졌습니다.")
