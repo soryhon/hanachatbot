@@ -3,6 +3,7 @@
 import requests
 import base64
 import streamlit as st
+import os  # 서버 경로 생성에 필요
 
 # GitHub에서 파일 목록을 가져오는 함수
 def get_github_files(repo, github_token, folder_name=None, branch="main"):
@@ -82,3 +83,24 @@ def send_to_llm(prompt, openai_api_key):
     else:
         st.error(f"OpenAI API 요청 실패: {response.status_code} - {response.text}")
         return None
+
+# 서버에서 GitHub 파일 경로를 생성하는 함수 (새로 추가된 부분)
+def get_file_server_path(repo, branch, file_path):
+    """
+    주어진 GitHub 저장소 경로와 브랜치, 파일 경로를 사용하여 서버의 파일 경로를 반환합니다.
+    
+    Parameters:
+        repo (str): GitHub 저장소 경로 (username/repo 형식)
+        branch (str): GitHub 브랜치 이름
+        file_path (str): 저장소 내의 파일 경로
+        
+    Returns:
+        str: 서버에서 파일이 저장될 경로
+    """
+    # 기본적으로 서버에서 파일을 저장하는 경로를 설정 (예시로 /mnt/data 경로 사용)
+    base_server_path = "/mnt/data/github_files"
+    
+    # 서버에서 파일 경로를 생성
+    full_path = os.path.join(base_server_path, repo, branch, file_path)
+    
+    return full_path
