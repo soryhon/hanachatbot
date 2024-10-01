@@ -160,16 +160,19 @@ with col1:
         with col5_2:
             if st.button("미리보기"):
                 if file_path:
+                    # GitHub URL로 변환
+                    raw_url = f"https://raw.githubusercontent.com/{st.session_state['github_repo']}/{st.session_state['github_branch']}/{file_path}"
+                    
                     # 이미지 파일 처리
                     if file_path.lower().endswith(('.png', '.jpg', '.jpeg')):
                         try:
-                            response = requests.get(file_path)
+                            response = requests.get(raw_url)
                             img = Image.open(BytesIO(response.content))
                             st.image(img, caption="탬플릿 미리보기")
                         except Exception as e:
                             st.error(f"이미지를 불러오는 중 오류가 발생했습니다: {e}")
                     else:
-                        st.markdown(backend.preview_file(file_path), unsafe_allow_html=True)
+                        st.markdown(backend.preview_file(raw_url), unsafe_allow_html=True)
                 else:
                     st.warning("파일 경로를 입력하세요.")
 
