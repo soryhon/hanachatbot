@@ -32,7 +32,7 @@ def get_github_files(repo, github_token, folder_name=None, branch="main"):
 
 # GitHub에서 파일의 SHA 값을 가져오는 함수
 def get_file_sha(repo, file_path, github_token, branch="main"):
-    url = f"https://api.github.com/repos/{repo}/contents/{file_path}?ref={branch}"
+    url = f"https://api.github.com/repos/{repo}/contents/{urllib.parse.quote(file_path)}?ref={branch}"
     headers = {
         "Authorization": f"token {github_token}"
     }
@@ -45,7 +45,7 @@ def get_file_sha(repo, file_path, github_token, branch="main"):
 
 # GitHub에 파일을 업로드하거나 덮어쓰는 함수
 def upload_file_to_github(repo, folder_name, file_name, content, github_token, branch="main", sha=None):
-    url = f"https://api.github.com/repos/{repo}/contents/{folder_name}/{file_name}"
+    url = f"https://api.github.com/repos/{repo}/contents/{urllib.parse.quote(folder_name)}/{urllib.parse.quote(file_name)}"
     headers = {
         "Authorization": f"token {github_token}",
         "Content-Type": "application/json"
@@ -75,6 +75,8 @@ def extract_file_content(file_path):
     주어진 파일 경로에서 파일 내용을 추출합니다. 다양한 형식 (CSV, Excel, PDF, 이미지, Word, PPT) 지원.
     """
     try:
+        # URL 인코딩된 파일 경로 처리
+        file_path = urllib.parse.unquote(file_path)
         file_extension = file_path.split('.')[-1].lower()
 
         # CSV 파일 처리
@@ -145,7 +147,8 @@ def send_to_llm(prompt, file_path, openai_api_key):
 # 서버에서 GitHub 파일 경로를 생성하는 함수
 def get_file_server_path(repo, branch, file_path):
     base_server_path = "/mnt/data/github_files"
-    full_path = os.path.join(base_server_path, repo, branch, file_path)
+    encoded_file_path = urllib.parse.quote(file_path)
+    full_path = os.path.join(base_server_path, repo, branch, encoded_file_path)
     return full_path
 
 # 파일 미리보기 함수 (이미지 파일에 대한 추가 처리)
