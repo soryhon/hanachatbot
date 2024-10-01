@@ -38,7 +38,7 @@ if st.button("실행"):
         try:
             # OpenAI GPT-4 LLM 인스턴스 생성
             llm = OpenAI(
-                api_key=st.session_state["api_key"],
+                openai_api_key=st.session_state["api_key"],  # API 키를 직접 전달
                 model_name="gpt-4"
             )
 
