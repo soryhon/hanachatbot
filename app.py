@@ -45,6 +45,7 @@ if not (st.session_state['github_saved'] and st.session_state['openai_saved']):
 
     with col_a:
         st.subheader("GitHub 정보 입력")
+        # JSON 데이터에서 자동으로 repo와 branch 값을 가져와서 입력
         st.session_state['github_repo'] = st.text_input("GitHub 저장소 경로 (예: username/repo)", value=st.session_state['github_repo'])
         st.session_state['github_branch'] = st.text_input("브랜치 이름 (예: main 또는 master)", value=st.session_state['github_branch'])
         st.session_state['github_token'] = st.text_input("GitHub API 토큰 입력", type="password")
@@ -96,12 +97,15 @@ with col1:
 
             # 데이터 요청사항 객체 추가 및 파일 선택 처리
             if st.session_state['github_token'] and st.button(f"선택 (요청사항 {idx+1})") and selected_file != "파일을 선택하세요":
+                # 서버 경로 가져오기 (파일 경로 계산)
                 server_path = backend.get_file_server_path(st.session_state['github_repo'], st.session_state['github_branch'], selected_file)
+                # 선택된 파일을 rows 객체의 데이터 필드에 저장
                 rows[idx]['데이터'] = server_path
                 st.success(f"선택한 파일: {selected_file}\n서버 경로: {server_path}")
             elif selected_file == "파일을 선택하세요":
                 st.warning("파일을 선택해주세요.")
             
+            # 선택한 파일 경로 표시
             st.text_input(f"데이터 (요청사항 {idx+1})", row['데이터'], disabled=True, key=f"file_path_{idx}")
 
         # 추가, 삭제, 새로고침 버튼 구성
@@ -163,6 +167,7 @@ with col1:
 
         selected_template_file = st.selectbox("탬플릿 파일 선택", template_files)
 
+        # 파일 선택 버튼
         if st.session_state['github_token'] and st.button("파일 선택"):
             if selected_template_file != "파일을 선택하세요":
                 server_template_path = backend.get_file_server_path(st.session_state['github_repo'], st.session_state['github_branch'], selected_template_file)
@@ -171,6 +176,7 @@ with col1:
             else:
                 st.warning("파일을 먼저 선택하세요.")
 
+        # GitHub에 탬플릿 파일 업로드
         uploaded_template_files = st.file_uploader("탬플릿 파일 업로드", accept_multiple_files=True, type=["png", "jpg", "pdf", "html"])
 
         if uploaded_template_files and st.session_state['github_token']:
@@ -179,8 +185,10 @@ with col1:
                 template_file_name = template_file.name
                 folder_name = 'templateFiles'
 
+                # GitHub에 동일한 파일이 있는지 확인
                 sha = backend.get_file_sha(st.session_state['github_repo'], f"{folder_name}/{template_file_name}", st.session_state['github_token'], branch=st.session_state['github_branch'])
 
+                # 파일이 이미 존재하면 덮어쓰기 여부 확인
                 if sha:
                     if st.checkbox(f"'{template_file_name}' 파일이 이미 존재합니다. 덮어쓰시겠습니까?", key=f"overwrite_{template_file_name}"):
                         backend.upload_file_to_github(st.session_state['github_repo'], folder_name, template_file_name, template_file_content, st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
@@ -190,22 +198,26 @@ with col1:
 # 2 프레임 (3. 실행)
 with col2:
     st.subheader("3. 실행")
-    if st.button("실행"):
-        llm_results = {}
-        for idx, row in enumerate(st.session_state['rows']):
-            prompt = [
-                {"role": "system", "content": "다음 파일을 분석하여 보고서를 작성하세요."},
-                {"role": "user", "content": f"보고서 제목 : '{row['제목']}'\n요청 문구 : '{row['요청']}'\n데이터 전달 : '{row['데이터']}'"}
-            ]
-            file_path = row['데이터']  # 요청사항에서 선택된 파일의 경로 전달
-            llm_response = backend.send_to_llm(prompt, file_path, st.session_state['openai_api_key'])
-            if llm_response:
-                llm_results[idx] = llm_response
-            else:
-                llm_results[idx] = "LLM 응답을 받지 못했습니다."
 
-        st.session_state['llm_results'] = llm_results
-        st.success("LLM 요청이 완료되었습니다.")
+    # OpenAI API 키가 저장되지 않았다면 실행되지 않도록 경고
+    if not st.session_state.get('openai_saved'):
+        st.warning("OpenAI API 키를 먼저 저장해주세요.")
+    else:
+        if st.button("실행"):
+            llm_results = {}
+            for idx, row in enumerate(st.session_state['rows']):
+                prompt = [
+                    {"role": "system", "content": "다음 파일을 분석하여 보고서를 작성하세요."},
+                    {"role": "user", "content": f"보고서 제목 : '{row['제목']}'\n요청 문구 : '{row['요청']}'\n데이터 전달 : '{row['데이터']}'"}
+                ]
+                llm_response = backend.send_to_llm(prompt, row['데이터'], st.session_state['openai_api_key'])
+                if llm_response:
+                    llm_results[idx] = llm_response
+                else:
+                    llm_results[idx] = "LLM 응답을 받지 못했습니다."
+
+            st.session_state['llm_results'] = llm_results
+            st.success("LLM 요청이 완료되었습니다.")
 
 # 3 프레임 (4. 결과 보고서 및 6. 저장 및 7. 불러오기)
 with col3:
