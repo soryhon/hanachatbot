@@ -76,38 +76,41 @@ def extract_file_content(file_path):
     """
     try:
         # URL 인코딩된 파일 경로 처리
-        file_path = urllib.parse.unquote(file_path)
+        decoded_file_path = urllib.parse.unquote(file_path)
+
+        # 경로 출력 (디버깅을 위해)
+        st.write(f"실제 파일 경로: {decoded_file_path}")
         
         # 파일 경로가 실제로 존재하는지 확인
-        if not os.path.exists(file_path):
-            st.error(f"파일이 존재하지 않습니다: {file_path}")
+        if not os.path.exists(decoded_file_path):
+            st.error(f"파일이 존재하지 않습니다: {decoded_file_path}")
             return None
 
-        file_extension = file_path.split('.')[-1].lower()
+        file_extension = decoded_file_path.split('.')[-1].lower()
 
         # CSV 파일 처리
         if file_extension == "csv":
-            df = pd.read_csv(file_path)
+            df = pd.read_csv(decoded_file_path)
             return df.to_string()
 
         # Excel 파일 처리
         elif file_extension in ["xls", "xlsx"]:
-            df = pd.read_excel(file_path)
+            df = pd.read_excel(decoded_file_path)
             return df.to_string()
 
         # Word 파일 처리
         elif file_extension == "docx":
-            doc = Document(file_path)
+            doc = Document(decoded_file_path)
             return "\n".join([para.text for para in doc.paragraphs])
 
         # PowerPoint 파일 처리
         elif file_extension == "pptx":
-            prs = Presentation(file_path)
+            prs = Presentation(decoded_file_path)
             return "\n".join([slide.shapes.title.text for slide in prs.slides if slide.shapes.title])
 
         # PDF 파일 처리
         elif file_extension == "pdf":
-            reader = PdfReader(file_path)
+            reader = PdfReader(decoded_file_path)
             text = ""
             for page in reader.pages:
                 text += page.extract_text()
@@ -115,7 +118,7 @@ def extract_file_content(file_path):
 
         # 이미지 파일 처리
         elif file_extension in ["png", "jpg", "jpeg", "gif"]:
-            img = Image.open(file_path)
+            img = Image.open(decoded_file_path)
             return f"이미지 파일 처리됨 (크기: {img.width}x{img.height})"
 
         else:
