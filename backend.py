@@ -3,6 +3,8 @@ import base64
 import streamlit as st
 import os  # 서버 경로 생성에 필요
 import urllib.parse  # URL 인코딩을 위한 라이브러리
+from PIL import Image
+from io import BytesIO
 
 # GitHub에서 파일 목록을 가져오는 함수
 def get_github_files(repo, github_token, folder_name=None, branch="main"):
@@ -104,7 +106,7 @@ def get_file_server_path(repo, branch, file_path):
     
     return full_path
 
-# 파일 미리보기 함수 (새로 추가된 부분)
+# 파일 미리보기 함수 (이미지 파일에 대한 추가 처리)
 def preview_file(file_path):
     """
     주어진 파일 경로에 따라 미리보기를 생성합니다.
