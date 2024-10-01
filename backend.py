@@ -75,7 +75,26 @@ def get_file_server_path(repo, branch, file_path):
     
     # 공백과 한글이 포함된 경로에 대해서는 처리하지 않음 (인코딩 하지 않음)
     return full_path
+    
+def send_to_llm(prompt, file_path, openai_api_key):
+    try:
+        st.write(f"LLM 요청 시작: prompt = {prompt}, file_path = {file_path}")
+        # 파일이 CSV인 경우 Pandas로 읽고, Langchain Agent로 처리
+        if file_path.endswith(".csv"):
+            df = pd.read_csv(file_path)
+            st.write("읽은 파일 데이터 미리보기:", df.head())  # 파일 미리보기
+            llm = OpenAI(api_key=openai_api_key)
+            agent = create_pandas_dataframe_agent(llm, df, verbose=True)
+            result = agent.run(prompt)
+            return result
+        else:
+            st.error("지원되지 않는 파일 형식입니다. 현재는 CSV 파일만 지원됩니다.")
+            return None
 
+    except Exception as e:
+        st.error(f"LLM 요청 중 오류가 발생했습니다: {e}")
+        return None
+        
 # 파일 내용을 추출하는 함수
 def extract_file_content(file_path):
     try:
