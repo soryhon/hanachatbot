@@ -2,9 +2,6 @@ import streamlit as st
 import pandas as pd
 import backend
 import json
-import requests
-from PIL import Image
-from io import BytesIO
 
 # 페이지 설정
 st.set_page_config(layout="wide")
@@ -152,32 +149,14 @@ with col1:
     # 5. 참고 탬플릿 미리보기 (세로 길이 30% 고정)
     st.subheader("5. 참고 탬플릿 미리보기")
     with st.expander("참고 탬플릿 미리보기", expanded=True):
-        col5_1, col5_2 = st.columns([0.8, 0.2])
+        # 세로로 템플릿 파일 경로와 미리보기 버튼 및 결과 화면
+        file_path = st.text_input("탬플릿 파일 경로", value=st.session_state.get('template_file_path', ""))
 
-        with col5_1:
-            file_path = st.text_input("탬플릿 파일 경로", value=st.session_state.get('template_file_path', ""))
-
-        with col5_2:
-            if st.button("미리보기"):
-                if file_path:
-                    # GitHub URL로 변환
-                    raw_url = f"https://raw.githubusercontent.com/{st.session_state['github_repo']}/{st.session_state['github_branch']}/{file_path}"
-
-                    # 이미지 파일 처리
-                    if file_path.lower().endswith(('.png', '.jpg', '.jpeg')):
-                        try:
-                            response = requests.get(raw_url)
-                            if response.headers['Content-Type'].startswith('image'):
-                                img = Image.open(BytesIO(response.content))
-                                st.image(img, caption="탬플릿 미리보기")
-                            else:
-                                st.error("이미지 파일 형식이 올바르지 않습니다.")
-                        except Exception as e:
-                            st.error(f"이미지를 불러오는 중 오류가 발생했습니다: {e}")
-                    else:
-                        st.markdown(backend.preview_file(raw_url), unsafe_allow_html=True)
-                else:
-                    st.warning("파일 경로를 입력하세요.")
+        if st.button("미리보기"):
+            if file_path:
+                st.markdown(backend.preview_file(file_path), unsafe_allow_html=True)  # 미리보기 함수 호출
+            else:
+                st.warning("파일 경로를 입력하세요.")
 
         template_folder = "templateFiles"
 
