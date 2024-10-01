@@ -3,36 +3,36 @@ from langchain.prompts import PromptTemplate
 from langchain.llms import OpenAI
 
 # OpenAI API 키 저장 변수
-st.title("LangChain & OpenAI Integration with Streamlit")
+st.title("LangChain 및 OpenAI 연동 (Streamlit)")
 
 # OpenAI API 키 입력받기
 if "api_key" not in st.session_state:
     st.session_state["api_key"] = None
 
-st.subheader("OpenAI API Key Configuration")
+st.subheader("OpenAI API 키 설정")
 
-api_key_input = st.text_input("Enter your OpenAI API Key", type="password", value=st.session_state["api_key"])
+api_key_input = st.text_input("OpenAI API 키를 입력하세요", type="password", value=st.session_state["api_key"])
 
 # API 키 저장 버튼
-if st.button("Save API Key"):
+if st.button("API 키 저장"):
     if api_key_input:
         st.session_state["api_key"] = api_key_input
-        st.success("API Key saved successfully!")
+        st.success("API 키가 성공적으로 저장되었습니다!")
     else:
-        st.error("API Key is required!")
+        st.error("API 키가 필요합니다!")
 
 # LLM 연동 화면
-st.subheader("LLM Input Form")
+st.subheader("LLM 입력 폼")
 
-title = st.text_input("Enter the title:")
-request = st.text_area("Enter the request details:")
+title = st.text_input("제목을 입력하세요:")
+request = st.text_area("요청 사항을 입력하세요:")
 
 # 실행 버튼 클릭 시 동작
-if st.button("Execute"):
+if st.button("실행"):
     if not st.session_state["api_key"]:
-        st.error("Please enter and save the OpenAI API Key first!")
+        st.error("먼저 OpenAI API 키를 입력하고 저장하세요!")
     elif not title or not request:
-        st.error("Title and request details are required!")
+        st.error("제목과 요청 사항을 입력해야 합니다!")
     else:
         # LangChain과 OpenAI 연동
         try:
@@ -43,10 +43,10 @@ if st.button("Execute"):
             prompt_template = PromptTemplate(
                 input_variables=["title", "request"],
                 template="""
-                You are given the following title: {title}
-                Here is the detailed request: {request}
+                다음과 같은 제목이 주어졌습니다: {title}
+                여기에는 상세한 요청 사항이 포함되어 있습니다: {request}
                 
-                Based on this, provide a relevant and well-structured response.
+                이를 기반으로 관련된 잘 구성된 응답을 제공해주세요.
                 """
             )
 
@@ -57,7 +57,7 @@ if st.button("Execute"):
             response = llm(prompt)
 
             # 응답 출력
-            st.subheader("LLM Response:")
+            st.subheader("LLM 응답:")
             st.write(response)
         except Exception as e:
-            st.error(f"Error during LLM processing: {str(e)}")
+            st.error(f"LLM 처리 중 오류 발생: {str(e)}")
