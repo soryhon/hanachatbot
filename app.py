@@ -2,6 +2,9 @@ import streamlit as st
 import pandas as pd
 import backend
 import json
+import requests
+from PIL import Image
+from io import BytesIO
 
 # 페이지 설정
 st.set_page_config(layout="wide")
@@ -157,18 +160,18 @@ with col1:
         with col5_2:
             if st.button("미리보기"):
                 if file_path:
-                    st.markdown(backend.preview_file(file_path), unsafe_allow_html=True)  # 미리보기 함수 호출
+                    # 이미지 파일 처리
+                    if file_path.lower().endswith(('.png', '.jpg', '.jpeg')):
+                        try:
+                            response = requests.get(file_path)
+                            img = Image.open(BytesIO(response.content))
+                            st.image(img, caption="탬플릿 미리보기")
+                        except Exception as e:
+                            st.error(f"이미지를 불러오는 중 오류가 발생했습니다: {e}")
+                    else:
+                        st.markdown(backend.preview_file(file_path), unsafe_allow_html=True)
                 else:
                     st.warning("파일 경로를 입력하세요.")
-        
-        # 미리보기 결과화면 추가 - GitHub 토큰이 입력된 경우에만 파일 목록을 가져오기 전에 표시
-        if st.session_state['template_file_path']:
-            st.markdown(f"### 탬플릿 미리보기", unsafe_allow_html=False)
-            # 이미지 파일이면 이미지로 출력
-            if st.session_state['template_file_path'].lower().endswith(('.png', '.jpg', '.jpeg')):
-                st.image(st.session_state['template_file_path'], caption="탬플릿 미리보기")
-            else:
-                st.markdown(backend.preview_file(st.session_state['template_file_path']), unsafe_allow_html=True)
 
         template_folder = "templateFiles"
 
@@ -203,7 +206,6 @@ with col1:
                 # 파일이 이미 존재하면 덮어쓰기 여부 확인
                 if sha:
                     if st.checkbox(f"'{template_file_name}' 파일이 이미 존재합니다. 덮어쓰시겠습니까?", key=f"overwrite_{template_file_name}"):
-
                         backend.upload_file_to_github(st.session_state['github_repo'], folder_name, template_file_name, template_file_content, st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
                 else:
                     backend.upload_file_to_github(st.session_state['github_repo'], folder_name, template_file_name, template_file_content, st.session_state['github_token'])
