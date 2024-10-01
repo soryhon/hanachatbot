@@ -1,17 +1,20 @@
 import requests
 import base64
 import streamlit as st
-import os  # 서버 경로 생성에 필요
-import urllib.parse  # URL 인코딩을 위한 라이브러리
-from langchain.llms import OpenAI
+import os
+import urllib.parse
 import pandas as pd
+from io import BytesIO
+from langchain.llms import OpenAI
+from PyPDF2 import PdfReader
+from docx import Document
+from pptx import Presentation
+from PIL import Image
 
 # GitHub에서 파일 목록을 가져오는 함수
 def get_github_files(repo, github_token, folder_name=None, branch="main"):
     url = f"https://api.github.com/repos/{repo}/git/trees/{branch}?recursive=1"
-    headers = {
-        "Authorization": f"token {github_token}"
-    }
+    headers = {"Authorization": f"token {github_token}"}
     response = requests.get(url, headers=headers)
     
     if response.status_code == 200:
@@ -28,9 +31,7 @@ def get_github_files(repo, github_token, folder_name=None, branch="main"):
 # GitHub에서 파일의 SHA 값을 가져오는 함수
 def get_file_sha(repo, file_path, github_token, branch="main"):
     url = f"https://api.github.com/repos/{repo}/contents/{file_path}?ref={branch}"
-    headers = {
-        "Authorization": f"token {github_token}"
-    }
+    headers = {"Authorization": f"token {github_token}"}
     response = requests.get(url, headers=headers)
     
     if response.status_code == 200:
@@ -41,10 +42,7 @@ def get_file_sha(repo, file_path, github_token, branch="main"):
 # GitHub에 파일을 업로드하거나 덮어쓰는 함수
 def upload_file_to_github(repo, folder_name, file_name, content, github_token, branch="main", sha=None):
     url = f"https://api.github.com/repos/{repo}/contents/{folder_name}/{file_name}"
-    headers = {
-        "Authorization": f"token {github_token}",
-        "Content-Type": "application/json"
-    }
+    headers = {"Authorization": f"token {github_token}", "Content-Type": "application/json"}
     content_base64 = base64.b64encode(content).decode("utf-8")
     data = {
         "message": f"Upload {file_name}",
@@ -64,31 +62,81 @@ def upload_file_to_github(repo, folder_name, file_name, content, github_token, b
     else:
         st.error(f"GitHub 업로드 실패: {response.status_code} - {response.text}")
 
+# 파일 형식에 맞는 내용을 추출하는 함수
+def extract_file_content(file_path):
+    try:
+        file_extension = file_path.split('.')[-1].lower()
+
+        # CSV 파일 처리
+        if file_extension == "csv":
+            df = pd.read_csv(file_path)
+            return df.to_string()
+
+        # Excel 파일 처리
+        elif file_extension in ["xls", "xlsx"]:
+            df = pd.read_excel(file_path)
+            return df.to_string()
+
+        # PDF 파일 처리
+        elif file_extension == "pdf":
+            with open(file_path, "rb") as file:
+                reader = PdfReader(file)
+                text = ''
+                for page in reader.pages:
+                    text += page.extract_text()
+            return text
+
+        # Word 파일 처리
+        elif file_extension == "docx":
+            doc = Document(file_path)
+            text = '\n'.join([para.text for para in doc.paragraphs])
+            return text
+
+        # PPT 파일 처리
+        elif file_extension == "pptx":
+            prs = Presentation(file_path)
+            text = ''
+            for slide in prs.slides:
+                for shape in slide.shapes:
+                    if hasattr(shape, "text"):
+                        text += shape.text + "\n"
+            return text
+
+        # 이미지 파일 처리
+        elif file_extension in ["png", "jpg", "jpeg", "gif"]:
+            img = Image.open(file_path)
+            buffer = BytesIO()
+            img.save(buffer, format="PNG")
+            return "[이미지 파일]"
+
+        else:
+            return None
+
+    except Exception as e:
+        st.error(f"파일 내용을 추출하는 중 오류가 발생했습니다: {e}")
+        return None
+
 # OpenAI API를 사용하여 LLM 요청 함수
 def send_to_llm(prompt, file_path, openai_api_key):
     try:
-        # 파일이 CSV인 경우 Pandas로 읽고 처리
-        if file_path.endswith(".csv"):
-            # 파일 읽기
-            df = pd.read_csv(file_path)
-            st.write("읽은 파일 데이터 미리보기:", df.head())  # 파일 미리보기
+        # 파일 내용 추출
+        file_content = extract_file_content(file_path)
 
-            # OpenAI API 설정
-            llm = OpenAI(openai_api_key=openai_api_key)
-
-            # 프롬프트를 OpenAI LLM에게 전달하여 처리
-            # 'system', 'user' 역할로 프롬프트 생성
-            messages = [
-                {"role": "system", "content": "이 CSV 데이터를 분석해 보고서를 생성하세요."},
-                {"role": "user", "content": f"프롬프트: {prompt}, 데이터: {df.to_string()}"}
-            ]
-
-            result = llm.generate(messages)
-            return result['choices'][0]['message']['content']
-        
-        else:
-            st.error("지원되지 않는 파일 형식입니다. 현재는 CSV 파일만 지원됩니다.")
+        if file_content is None:
+            st.error("지원되지 않는 파일 형식입니다.")
             return None
+
+        # OpenAI API 설정
+        llm = OpenAI(openai_api_key=openai_api_key)
+
+        # 프롬프트를 OpenAI LLM에게 전달하여 처리
+        messages = [
+            {"role": "system", "content": "파일을 분석하고 보고서를 생성하세요."},
+            {"role": "user", "content": f"프롬프트: {prompt}, 파일 내용: {file_content}"}
+        ]
+
+        result = llm.generate(messages)
+        return result['choices'][0]['message']['content']
 
     except Exception as e:
         st.error(f"LLM 요청 중 오류가 발생했습니다: {e}")
@@ -100,7 +148,7 @@ def get_file_server_path(repo, branch, file_path):
     full_path = os.path.join(base_server_path, repo, branch, file_path)
     return full_path
 
-# 파일 미리보기 함수 (이미지 파일에 대한 추가 처리)
+# 파일 미리보기 함수
 def preview_file(file_path):
     try:
         file_extension = file_path.split('.')[-1].lower()
