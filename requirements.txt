@@ -94,3 +94,4 @@ fpdf
 requests
 python-pptx
 docx2txt
+langchain.agents
