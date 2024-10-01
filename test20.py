@@ -1,9 +1,9 @@
 import os
+import openai
 import streamlit as st
 from langchain.prompts import PromptTemplate
-from langchain.llms import OpenAI
 
-# OpenAI API 키 저장 변수
+# Streamlit 설정
 st.title("LangChain 및 OpenAI GPT-4 연동 (Streamlit)")
 
 # OpenAI API 키 입력받기
@@ -19,7 +19,7 @@ api_key_input = st.text_input("OpenAI API 키를 입력하세요", type="passwor
 if st.button("API 키 저장"):
     if api_key_input:
         st.session_state["api_key"] = api_key_input
-        # 환경 변수에 API 키 저장
+        # 환경 변수에 API 키 설정
         os.environ["OPENAI_API_KEY"] = api_key_input
         st.success("API 키가 성공적으로 저장되었습니다!")
     else:
@@ -39,13 +39,10 @@ if st.button("실행"):
     elif not title or not request:
         st.error("제목과 요청 사항을 입력해야 합니다!")
     else:
-        # LangChain과 OpenAI 연동
+        # OpenAI API 호출
         try:
-            # OpenAI GPT-4 LLM 인스턴스 생성
-            llm = OpenAI(
-                openai_api_key=st.session_state["api_key"],  # 세션에 저장된 API 키 사용
-                model_name="gpt-4"  # GPT-4 모델 지정
-            )
+            # API 키 설정
+            openai.api_key = st.session_state["api_key"]
 
             # 프롬프트 템플릿 생성
             prompt_template = PromptTemplate(
@@ -60,12 +57,17 @@ if st.button("실행"):
 
             # 프롬프트 생성
             prompt = prompt_template.format(title=title, request=request)
-            
-            # LLM에게 프롬프트 전달 및 응답 받기
-            response = llm(prompt)
+
+            # GPT-4 모델 호출
+            response = openai.Completion.create(
+                model="gpt-4",  # GPT-4 모델 사용
+                prompt=prompt,
+                max_tokens=150  # 응답 길이 제한 설정
+            )
 
             # 응답 출력
             st.subheader("LLM 응답:")
-            st.write(response)
+            st.write(response.choices[0].text)
+        
         except Exception as e:
             st.error(f"LLM 처리 중 오류 발생: {str(e)}")
