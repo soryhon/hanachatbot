@@ -59,7 +59,7 @@ if st.button("실행"):
             prompt = prompt_template.format(title=title, request=request)
 
             # GPT-4 모델 호출 (최신 API 방식)
-            response = openai.Chat.create(
+            response = openai.ChatCompletion.create(
                 model="gpt-4",  # GPT-4 모델 사용
                 messages=[{"role": "system", "content": "You are a helpful assistant."},
                           {"role": "user", "content": prompt}],
