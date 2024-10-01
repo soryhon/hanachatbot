@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 from langchain.prompts import PromptTemplate
 from langchain.llms import OpenAI
@@ -18,6 +19,8 @@ api_key_input = st.text_input("OpenAI API 키를 입력하세요", type="passwor
 if st.button("API 키 저장"):
     if api_key_input:
         st.session_state["api_key"] = api_key_input
+        # 환경 변수에 API 키 저장
+        os.environ["OPENAI_API_KEY"] = api_key_input
         st.success("API 키가 성공적으로 저장되었습니다!")
     else:
         st.error("API 키를 입력해야 합니다!")
@@ -40,7 +43,7 @@ if st.button("실행"):
         try:
             # OpenAI GPT-4 LLM 인스턴스 생성
             llm = OpenAI(
-                api_key=st.session_state["api_key"],  # 세션에 저장된 API 키 사용
+                openai_api_key=st.session_state["api_key"],  # 세션에 저장된 API 키 사용
                 model_name="gpt-4"  # GPT-4 모델 지정
             )
 
