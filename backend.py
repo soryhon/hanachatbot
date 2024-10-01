@@ -1,14 +1,11 @@
 import requests
 import base64
 import streamlit as st
-import os  # 서버 경로 생성에 필요
-import urllib.parse  # URL 인코딩을 위한 라이브러리
+import os
+import urllib.parse
 from langchain.llms import OpenAI
-from langchain.prompts import PromptTemplate
-from langchain.chains import LLMChain
-from langchain.agents import create_csv_agent
+from langchain.agents import create_pandas_dataframe_agent
 import pandas as pd
-from io import StringIO
 
 # GitHub에서 파일 목록을 가져오는 함수
 def get_github_files(repo, github_token, folder_name=None, branch="main"):
@@ -80,8 +77,8 @@ def send_to_llm(prompt, file_path, openai_api_key):
             # OpenAI API 설정
             llm = OpenAI(openai_api_key=openai_api_key)
 
-            # Langchain CSV Agent 생성 (CSV 데이터를 기반으로 질문을 수행하는 Agent)
-            agent = create_csv_agent(llm, df, verbose=True)
+            # Langchain Pandas Agent 생성 (CSV 데이터를 기반으로 질문을 수행하는 Agent)
+            agent = create_pandas_dataframe_agent(llm, df, verbose=True)
 
             # 프롬프트를 Agent에게 전달하여 처리
             result = agent.run(prompt)
@@ -96,7 +93,7 @@ def send_to_llm(prompt, file_path, openai_api_key):
         st.error(f"Langchain을 사용한 LLM 요청 중 오류가 발생했습니다: {e}")
         return None
 
-# 서버에서 GitHub 파일 경로를 생성하는 함수 (새로 추가된 부분)
+# 서버에서 GitHub 파일 경로를 생성하는 함수
 def get_file_server_path(repo, branch, file_path):
     base_server_path = "/mnt/data/github_files"
     full_path = os.path.join(base_server_path, repo, branch, file_path)
