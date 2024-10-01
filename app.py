@@ -162,13 +162,16 @@ with col1:
                 if file_path:
                     # GitHub URL로 변환
                     raw_url = f"https://raw.githubusercontent.com/{st.session_state['github_repo']}/{st.session_state['github_branch']}/{file_path}"
-                    
+
                     # 이미지 파일 처리
                     if file_path.lower().endswith(('.png', '.jpg', '.jpeg')):
                         try:
                             response = requests.get(raw_url)
-                            img = Image.open(BytesIO(response.content))
-                            st.image(img, caption="탬플릿 미리보기")
+                            if response.headers['Content-Type'].startswith('image'):
+                                img = Image.open(BytesIO(response.content))
+                                st.image(img, caption="탬플릿 미리보기")
+                            else:
+                                st.error("이미지 파일 형식이 올바르지 않습니다.")
                         except Exception as e:
                             st.error(f"이미지를 불러오는 중 오류가 발생했습니다: {e}")
                     else:
