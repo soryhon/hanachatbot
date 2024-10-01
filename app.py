@@ -76,10 +76,13 @@ with col1:
             else:
                 row['checked'] = False
 
-            file_list = backend.get_github_files(st.session_state['github_repo'], st.session_state['github_token'], branch=st.session_state['github_branch'])
-            selected_file = st.selectbox(f"파일 선택 (요청사항 {idx+1})", options=file_list)
+            # GitHub 토큰이 입력된 경우에만 파일 목록 가져오기
+            file_list = []
+            if st.session_state['github_token']:
+                file_list = backend.get_github_files(st.session_state['github_repo'], st.session_state['github_token'], branch=st.session_state['github_branch'])
+            selected_file = st.selectbox(f"파일 선택 (요청사항 {idx+1})", options=file_list if file_list else ["(파일 없음)"])
 
-            if st.button(f"파일 선택 (요청사항 {idx+1})"):
+            if st.session_state['github_token'] and st.button(f"파일 선택 (요청사항 {idx+1})"):
                 server_path = backend.get_file_server_path(st.session_state['github_repo'], st.session_state['github_branch'], selected_file)
                 row['데이터'] = server_path
                 st.success(f"선택한 파일: {selected_file}\n서버 경로: {server_path}")
@@ -100,19 +103,23 @@ with col1:
             file_name = uploaded_file.name
             folder_name = 'uploadFiles'
 
-            sha = backend.get_file_sha(st.session_state['github_repo'], f"{folder_name}/{file_name}", st.session_state['github_token'], branch=st.session_state['github_branch'])
-            if sha:
-                if st.checkbox(f"'{file_name}' 파일이 이미 존재합니다. 덮어쓰시겠습니까?"):
-                    backend.upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
-            else:
-                backend.upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'])
+            if st.session_state['github_token']:
+                sha = backend.get_file_sha(st.session_state['github_repo'], f"{folder_name}/{file_name}", st.session_state['github_token'], branch=st.session_state['github_branch'])
+                if sha:
+                    if st.checkbox(f"'{file_name}' 파일이 이미 존재합니다. 덮어쓰시겠습니까?"):
+                        backend.upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
+                else:
+                    backend.upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'])
 
     # 5. 참고 탬플릿 미리보기
     st.subheader("5. 참고 탬플릿 미리보기")
-    template_files = backend.get_github_files(st.session_state['github_repo'], st.session_state['github_token'], folder_name="templateFiles", branch=st.session_state['github_branch'])
-    selected_template_file = st.selectbox("참고 탬플릿 파일 선택", template_files)
+    template_files = []
+    if st.session_state['github_token']:
+        template_files = backend.get_github_files(st.session_state['github_repo'], st.session_state['github_token'], folder_name="templateFiles", branch=st.session_state['github_branch'])
+
+    selected_template_file = st.selectbox("참고 탬플릿 파일 선택", template_files if template_files else ["(파일 없음)"])
     
-    if st.button("참고 탬플릿 파일 선택"):
+    if st.session_state['github_token'] and st.button("참고 탬플릿 파일 선택"):
         server_template_path = backend.get_file_server_path(st.session_state['github_repo'], st.session_state['github_branch'], selected_template_file)
         st.session_state['template_file_path'] = server_template_path
         st.success(f"선택한 파일 경로: {server_template_path}")
@@ -170,12 +177,4 @@ with col3:
         if st.button("저장") and save_path:
             df = pd.DataFrame(st.session_state['rows'])
             df.to_csv(f"{save_path}.csv", index=False)
-            st.success(f"{save_path}.csv 파일로 저장되었습니다.")
-
-    with col3_2:
-        st.subheader("7. 불러오기")
-        uploaded_save_file = st.file_uploader("저장된 CSV 파일 불러오기", type=["csv"])
-        if uploaded_save_file is not None:
-            loaded_data = pd.read_csv(uploaded_save_file)
-            st.session_state['rows'] = loaded_data.to_dict(orient="records")
-            st.success("CSV 파일 데이터가 불러와졌습니다.")
+            st.success
