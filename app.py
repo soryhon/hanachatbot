@@ -170,9 +170,10 @@ with col1:
         # 파일 선택 버튼
         if st.session_state['github_token'] and st.button("파일 선택"):
             if selected_template_file != "파일을 선택하세요":
-                server_template_path = backend.get_file_server_path(st.session_state['github_repo'], st.session_state['github_branch'], selected_template_file)
-                st.session_state['template_file_path'] = server_template_path
-                st.success(f"선택한 파일 경로: {server_template_path}")
+                server_template_url = f"https://raw.githubusercontent.com/{st.session_state['github_repo']}/{st.session_state['github_branch']}/{selected_template_file}"
+                st.session_state['template_file_path'] = server_template_url
+                st.markdown(backend.preview_file(server_template_url), unsafe_allow_html=True)
+                st.success(f"선택한 파일 경로: {server_template_url}")    
             else:
                 st.warning("파일을 먼저 선택하세요.")
 
