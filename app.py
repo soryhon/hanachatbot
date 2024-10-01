@@ -24,6 +24,8 @@ if 'openai_saved' not in st.session_state:
     st.session_state['openai_saved'] = False
 if 'show_info' not in st.session_state:
     st.session_state['show_info'] = True
+if 'template_file_path' not in st.session_state:
+    st.session_state['template_file_path'] = ""  # 템플릿 파일 경로 초기화
 
 # GitHub 및 OpenAI 정보 입력
 if not (st.session_state['github_saved'] and st.session_state['openai_saved']):
@@ -124,7 +126,7 @@ with col1:
         st.session_state['template_file_path'] = server_template_path
         st.success(f"선택한 파일 경로: {server_template_path}")
 
-    if st.session_state['template_file_path']:
+    if st.session_state.get('template_file_path', ""):
         st.markdown(backend.preview_file(st.session_state['template_file_path']), unsafe_allow_html=True)
 
 # 2 프레임 (3. 실행)
@@ -177,4 +179,12 @@ with col3:
         if st.button("저장") and save_path:
             df = pd.DataFrame(st.session_state['rows'])
             df.to_csv(f"{save_path}.csv", index=False)
-            st.success
+            st.success(f"{save_path}.csv 파일로 저장되었습니다.")
+
+    with col3_2:
+        st.subheader("7. 불러오기")
+        uploaded_save_file = st.file_uploader("저장된 CSV 파일 불러오기", type=["csv"])
+        if uploaded_save_file is not None:
+            loaded_data = pd.read_csv(uploaded_save_file)
+            st.session_state['rows'] = loaded_data.to_dict(orient="records")
+            st.success("CSV 파일 데이터가 불러와졌습니다.")
