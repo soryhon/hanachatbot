@@ -1,9 +1,8 @@
-# backend.py
-
 import requests
 import base64
 import streamlit as st
 import os  # 서버 경로 생성에 필요
+import urllib.parse  # URL 인코딩을 위한 라이브러리
 
 # GitHub에서 파일 목록을 가져오는 함수
 def get_github_files(repo, github_token, folder_name=None, branch="main"):
@@ -104,3 +103,37 @@ def get_file_server_path(repo, branch, file_path):
     full_path = os.path.join(base_server_path, repo, branch, file_path)
     
     return full_path
+
+# 파일 미리보기 함수 (새로 추가된 부분)
+def preview_file(file_path):
+    """
+    주어진 파일 경로에 따라 미리보기를 생성합니다.
+    
+    Parameters:
+        file_path (str): 미리보기할 파일의 경로
+        
+    Returns:
+        str: HTML 콘텐츠로 미리보기를 표시
+    """
+    try:
+        # 파일 확장자를 확인하여 미리보기 처리
+        file_extension = file_path.split('.')[-1].lower()
+
+        # URL 인코딩 적용 (한글 파일 경로 문제 해결)
+        encoded_file_path = urllib.parse.quote(file_path)
+
+        if file_extension in ['png', 'jpg', 'jpeg', 'gif']:
+            # 이미지 미리보기
+            return f'<img src="{encoded_file_path}" alt="이미지 미리보기" style="max-width: 100%;">'
+        elif file_extension == 'pdf':
+            # PDF 미리보기
+            return f'<iframe src="{encoded_file_path}" width="100%" height="600px"></iframe>'
+        elif file_extension == 'html':
+            # HTML 파일 미리보기 링크
+            return f'<a href="{encoded_file_path}" target="_blank">HTML 파일 열기</a>'
+        else:
+            # 미리보기가 지원되지 않는 파일 형식
+            return '<p>미리보기가 지원되지 않는 파일 형식입니다.</p>'
+    except Exception as e:
+        st.error(f"파일 미리보기 오류: {e}")
+        return '<p>미리보기 중 오류가 발생했습니다.</p>'
