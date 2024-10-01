@@ -92,4 +92,4 @@ matplotlib
 xlsxwriter
 fpdf
 requests
-pptx
+python-pptx
