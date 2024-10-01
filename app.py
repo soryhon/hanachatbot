@@ -68,185 +68,194 @@ if not (st.session_state['github_saved'] and st.session_state['openai_saved']):
             else:
                 st.error("OpenAI API 키를 입력해주세요.")
 
-# 실행 버튼 표시 여부를 결정
-if st.session_state['openai_saved']:
-    st.subheader("3. 실행")
-    if st.button("실행"):
-        llm_results = {}
-        for idx, row in enumerate(st.session_state['rows']):
-            prompt = [
-                {"role": "system", "content": "다음 파일을 분석하여 보고서를 작성하세요."},
-                {"role": "user", "content": f"보고서 제목 : '{row['제목']}'\n요청 문구 : '{row['요청']}'\n데이터 전달 : '{row['데이터']}'"}
-            ]
-            # 파일 경로와 프롬프트를 전달하여 LLM 호출
-            llm_response = backend.send_to_llm(prompt, row['데이터'], st.session_state['openai_api_key'])
-            if llm_response:
-                llm_results[idx] = llm_response
-            else:
-                llm_results[idx] = "LLM 응답을 받지 못했습니다."
-
-        st.session_state['llm_results'] = llm_results
-        st.success("LLM 요청이 완료되었습니다.")
+# 1 프레임 (작성 보고서 요청사항, 파일 업로드, 참고 탬플릿 미리보기)
+col1, col2, col3 = st.columns([0.39, 0.10, 0.49])
 
 # 1. 작성 보고서 요청사항
-st.subheader("1. 작성 보고서 요청사항")
-with st.expander("요청사항 리스트", expanded=True):
-    rows = st.session_state['rows']
-    checked_rows = []
+with col1:
+    st.subheader("1. 작성 보고서 요청사항")
+    with st.expander("요청사항 리스트", expanded=True):
+        rows = st.session_state['rows']
+        checked_rows = []
 
-    for idx, row in enumerate(rows):
-        row_checked = st.checkbox(f"요청사항 {idx+1}", value=row.get("checked", False))
-        row['제목'] = st.text_input(f"제목 (요청사항 {idx+1})", row['제목'])
-        row['요청'] = st.text_input(f"요청 (요청사항 {idx+1})", row['요청'])
+        for idx, row in enumerate(rows):
+            row_checked = st.checkbox(f"요청사항 {idx+1}", value=row.get("checked", False))
+            row['제목'] = st.text_input(f"제목 (요청사항 {idx+1})", row['제목'])
+            row['요청'] = st.text_input(f"요청 (요청사항 {idx+1})", row['요청'])
+            
+            if row_checked:
+                checked_rows.append(idx)
+                row['checked'] = True
+            else:
+                row['checked'] = False
+
+            # GitHub 토큰이 입력된 경우에만 파일 목록 가져오기 (uploadFiles 폴더의 파일 리스트)
+            file_list = ["파일을 선택하세요"]
+            if st.session_state['github_token']:
+                file_list.extend(backend.get_github_files(st.session_state['github_repo'], st.session_state['github_token'], folder_name='uploadFiles', branch=st.session_state['github_branch']))
+            selected_file = st.selectbox(f"파일 선택 (요청사항 {idx+1})", options=file_list)
+
+            # 데이터 요청사항 객체 추가 및 파일 선택 처리
+            if st.session_state['github_token'] and st.button(f"선택 (요청사항 {idx+1})") and selected_file != "파일을 선택하세요":
+                # 서버 경로 가져오기 (파일 경로 계산)
+                server_path = backend.get_file_server_path(st.session_state['github_repo'], st.session_state['github_branch'], selected_file)
+                # 선택된 파일을 rows 객체의 데이터 필드에 저장
+                rows[idx]['데이터'] = server_path
+                st.success(f"선택한 파일: {selected_file}\n서버 경로: {server_path}")
+            elif selected_file == "파일을 선택하세요":
+                st.warning("파일을 선택해주세요.")
+            
+            # 선택한 파일 경로 표시
+            st.text_input(f"데이터 (요청사항 {idx+1})", row['데이터'], disabled=True, key=f"file_path_{idx}")
+
+        # 추가, 삭제, 새로고침 버튼 구성
+        col1_1, col1_2, col1_3 = st.columns([0.33, 0.33, 0.33])
         
-        if row_checked:
-            checked_rows.append(idx)
-            row['checked'] = True
-        else:
-            row['checked'] = False
+        with col1_1:
+            if st.button("행 추가"):
+                rows.append({"제목": "", "요청": "", "데이터": "", "checked": True})
+                st.session_state['rows'] = rows
 
-        # GitHub 토큰이 입력된 경우에만 파일 목록 가져오기 (uploadFiles 폴더의 파일 리스트)
-        file_list = ["파일을 선택하세요"]
-        if st.session_state['github_token']:
-            file_list.extend(backend.get_github_files(st.session_state['github_repo'], st.session_state['github_token'], folder_name='uploadFiles', branch=st.session_state['github_branch']))
-        selected_file = st.selectbox(f"파일 선택 (요청사항 {idx+1})", options=file_list)
+        with col1_2:
+            if st.button("행 삭제"):
+                if checked_rows:
+                    st.session_state['rows'] = [row for idx, row in enumerate(rows) if idx not in checked_rows]
+                    st.success(f"체크된 {len(checked_rows)}개의 요청사항이 삭제되었습니다.")
+                else:
+                    st.warning("삭제할 요청사항을 선택해주세요.")
+                    
+        with col1_3:
+            if st.button("새로고침"):
+                st.session_state['rows'] = st.session_state['rows']
 
-        # 데이터 요청사항 객체 추가 및 파일 선택 처리
-        if st.session_state['github_token'] and st.button(f"선택 (요청사항 {idx+1})") and selected_file != "파일을 선택하세요":
-            # 서버 경로 가져오기 (파일 경로 계산)
-            server_path = backend.get_file_server_path(st.session_state['github_repo'], st.session_state['github_branch'], selected_file)
-            # 선택된 파일을 rows 객체의 데이터 필드에 저장
-            rows[idx]['데이터'] = server_path
-            st.success(f"선택한 파일: {selected_file}\n서버 경로: {server_path}")
-        elif selected_file == "파일을 선택하세요":
-            st.warning("파일을 선택해주세요.")
-        
-        # 선택한 파일 경로 표시
-        st.text_input(f"데이터 (요청사항 {idx+1})", row['데이터'], disabled=True, key=f"file_path_{idx}")
+    # 2. 파일 업로드
+    st.subheader("2. 파일 업로드")
+    uploaded_files = st.file_uploader("파일을 여러 개 드래그 앤 드롭하여 업로드하세요.", accept_multiple_files=True)
 
-    # 추가, 삭제, 새로고침 버튼 구성
-    col1_1, col1_2, col1_3 = st.columns([0.33, 0.33, 0.33])
-    
-    with col1_1:
-        if st.button("행 추가"):
-            rows.append({"제목": "", "요청": "", "데이터": "", "checked": True})
-            st.session_state['rows'] = rows
+    if uploaded_files:
+        for uploaded_file in uploaded_files:
+            file_content = uploaded_file.read()
+            file_name = uploaded_file.name
+            folder_name = 'uploadFiles'
 
-    with col1_2:
-        if st.button("행 삭제"):
-            if checked_rows:
-                st.session_state['rows'] = [row for idx, row in enumerate(rows) if idx not in checked_rows]
-                st.success(f"체크된 {len(checked_rows)}개의 요청사항이 삭제되었습니다.")
+            if st.session_state['github_token']:
+                sha = backend.get_file_sha(st.session_state['github_repo'], f"{folder_name}/{file_name}", st.session_state['github_token'], branch=st.session_state['github_branch'])
+                if sha:
+                    if st.checkbox(f"'{file_name}' 파일이 이미 존재합니다. 덮어쓰시겠습니까?"):
+                        backend.upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
+                else:
+                    backend.upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'])
+
+    # 5. 참고 탬플릿 미리보기 (세로 길이 30% 고정)
+    st.subheader("5. 참고 탬플릿 미리보기")
+    with st.expander("참고 탬플릿 미리보기", expanded=True):
+        # 세로로 템플릿 파일 경로와 미리보기 버튼 및 결과 화면
+        file_path = st.text_input("탬플릿 파일 경로", value=st.session_state.get('template_file_path', ""))
+
+        if st.button("미리보기"):
+            if file_path:
+                st.markdown(backend.preview_file(file_path), unsafe_allow_html=True)  # 미리보기 함수 호출
             else:
-                st.warning("삭제할 요청사항을 선택해주세요.")
-                
-    with col1_3:
-        if st.button("새로고침"):
-            st.session_state['rows'] = st.session_state['rows']
+                st.warning("파일 경로를 입력하세요.")
 
-# 2. 파일 업로드
-st.subheader("2. 파일 업로드")
-uploaded_files = st.file_uploader("파일을 여러 개 드래그 앤 드롭하여 업로드하세요.", accept_multiple_files=True)
+        template_folder = "templateFiles"
 
-if uploaded_files:
-    for uploaded_file in uploaded_files:
-        file_content = uploaded_file.read()
-        file_name = uploaded_file.name
-        folder_name = 'uploadFiles'
+        # GitHub 토큰이 입력된 경우에만 파일 목록 가져오기
+        template_files = ["파일을 선택하세요"]
+        if st.session_state['github_repo'] and st.session_state['github_token']:
+            template_files.extend(backend.get_github_files(st.session_state['github_repo'], st.session_state['github_token'], folder_name=template_folder, branch=st.session_state['github_branch']))
 
-        if st.session_state['github_token']:
-            sha = backend.get_file_sha(st.session_state['github_repo'], f"{folder_name}/{file_name}", st.session_state['github_token'], branch=st.session_state['github_branch'])
-            if sha:
-                if st.checkbox(f"'{file_name}' 파일이 이미 존재합니다. 덮어쓰시겠습니까?"):
-                    backend.upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
+        selected_template_file = st.selectbox("탬플릿 파일 선택", template_files)
+
+        # 파일 선택 버튼
+        if st.session_state['github_token'] and st.button("파일 선택"):
+            if selected_template_file != "파일을 선택하세요":
+                server_template_path = backend.get_file_server_path(st.session_state['github_repo'], st.session_state['github_branch'], selected_template_file)
+                st.session_state['template_file_path'] = server_template_path
+                st.success(f"선택한 파일 경로: {server_template_path}")
             else:
-                backend.upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'])
+                st.warning("파일을 먼저 선택하세요.")
 
-# 5. 참고 탬플릿 미리보기 (세로 길이 30% 고정)
-st.subheader("5. 참고 탬플릿 미리보기")
-with st.expander("참고 탬플릿 미리보기", expanded=True):
-    # 세로로 템플릿 파일 경로와 미리보기 버튼 및 결과 화면
-    file_path = st.text_input("탬플릿 파일 경로", value=st.session_state.get('template_file_path', ""))
+        # GitHub에 탬플릿 파일 업로드
+        uploaded_template_files = st.file_uploader("탬플릿 파일 업로드", accept_multiple_files=True, type=["png", "jpg", "pdf", "html"])
 
-    if st.button("미리보기"):
-        if file_path:
-            st.markdown(backend.preview_file(file_path), unsafe_allow_html=True)  # 미리보기 함수 호출
-        else:
-            st.warning("파일 경로를 입력하세요.")
+        if uploaded_template_files and st.session_state['github_token']:
+            for template_file in uploaded_template_files:
+                template_file_content = template_file.read()
+                template_file_name = template_file.name
+                folder_name = 'templateFiles'
 
-    template_folder = "templateFiles"
+                # GitHub에 동일한 파일이 있는지 확인
+                sha = backend.get_file_sha(st.session_state['github_repo'], f"{folder_name}/{template_file_name}", st.session_state['github_token'], branch=st.session_state['github_branch'])
 
-    # GitHub 토큰이 입력된 경우에만 파일 목록 가져오기
-    template_files = ["파일을 선택하세요"]
-    if st.session_state['github_repo'] and st.session_state['github_token']:
-        template_files.extend(backend.get_github_files(st.session_state['github_repo'], st.session_state['github_token'], folder_name=template_folder, branch=st.session_state['github_branch']))
+                # 파일이 이미 존재하면 덮어쓰기 여부 확인
+                if sha:
+                    if st.checkbox(f"'{template_file_name}' 파일이 이미 존재합니다. 덮어쓰시겠습니까?", key=f"overwrite_{template_file_name}"):
+                        backend.upload_file_to_github(st.session_state['github_repo'], folder_name, template_file_name, template_file_content, st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
+                else:
+                    backend.upload_file_to_github(st.session_state['github_repo'], folder_name, template_file_name, template_file_content, st.session_state['github_token'])
 
-    selected_template_file = st.selectbox("탬플릿 파일 선택", template_files)
+# 2 프레임 (3. 실행)
+with col2:
+    st.subheader("3. 실행")
 
-    # 파일 선택 버튼
-    if st.session_state['github_token'] and st.button("파일 선택"):
-        if selected_template_file != "파일을 선택하세요":
-            server_template_path = backend.get_file_server_path(st.session_state['github_repo'], st.session_state['github_branch'], selected_template_file)
-            st.session_state['template_file_path'] = server_template_path
-            st.success(f"선택한 파일 경로: {server_template_path}")
-        else:
-            st.warning("파일을 먼저 선택하세요.")
+    # OpenAI API 키가 저장되지 않았다면 실행되지 않도록 경고
+    if not st.session_state.get('openai_saved'):
+        st.warning("OpenAI API 키를 먼저 저장해주세요.")
+    else:
+        if st.button("실행"):
+            llm_results = {}
+            for idx, row in enumerate(st.session_state['rows']):
+                prompt = [
+                    {"role": "system", "content": "다음 파일을 분석하여 보고서를 작성하세요."},
+                    {"role": "user", "content": f"보고서 제목 : '{row['제목']}'\n요청 문구 : '{row['요청']}'\n데이터 전달 : '{row['데이터']}'"}
+                ]
+                llm_response = backend.send_to_llm(prompt, row['데이터'], st.session_state['openai_api_key'])
+                if llm_response:
+                    llm_results[idx] = llm_response
+                else:
+                    llm_results[idx] = "LLM 응답을 받지 못했습니다."
 
-    # GitHub에 탬플릿 파일 업로드
-    uploaded_template_files = st.file_uploader("탬플릿 파일 업로드", accept_multiple_files=True, type=["png", "jpg", "pdf", "html"])
-
-    if uploaded_template_files and st.session_state['github_token']:
-        for template_file in uploaded_template_files:
-            template_file_content = template_file.read()
-            template_file_name = template_file.name
-            folder_name = 'templateFiles'
-
-            # GitHub에 동일한 파일이 있는지 확인
-            sha = backend.get_file_sha(st.session_state['github_repo'], f"{folder_name}/{template_file_name}", st.session_state['github_token'], branch=st.session_state['github_branch'])
-
-            # 파일이 이미 존재하면 덮어쓰기 여부 확인
-            if sha:
-                if st.checkbox(f"'{template_file_name}' 파일이 이미 존재합니다. 덮어쓰시겠습니까?", key=f"overwrite_{template_file_name}"):
-                    backend.upload_file_to_github(st.session_state['github_repo'], folder_name, template_file_name, template_file_content, st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
-            else:
-                backend.upload_file_to_github(st.session_state['github_repo'], folder_name, template_file_name, template_file_content, st.session_state['github_token'])
+            st.session_state['llm_results'] = llm_results
+            st.success("LLM 요청이 완료되었습니다.")
 
 # 3 프레임 (4. 결과 보고서 및 6. 저장 및 7. 불러오기)
-st.subheader("4. 결과 보고서")
-st.markdown(
-    """
-    <style>
-    div[data-testid="stExpander"] > div[role="group"] {
-        height: 70vh;
-        overflow-y: auto;
-    }
-    </style>
-    """, unsafe_allow_html=True
-)
-with st.expander("결과 보고서", expanded=True):
-    llm_results = st.session_state.get('llm_results', {})
-    if llm_results:
-        for idx, result in llm_results.items():
-            st.text(f"제목: {st.session_state['rows'][idx]['제목']}")
-            st.text(f"LLM 응답 결과:\n{result}")
-    else:
-        st.text("결과가 없습니다.")
+with col3:
+    st.subheader("4. 결과 보고서")
+    st.markdown(
+        """
+        <style>
+        div[data-testid="stExpander"] > div[role="group"] {
+            height: 70vh;
+            overflow-y: auto;
+        }
+        </style>
+        """, unsafe_allow_html=True
+    )
+    with st.expander("결과 보고서", expanded=True):
+        llm_results = st.session_state.get('llm_results', {})
+        if llm_results:
+            for idx, result in llm_results.items():
+                st.text(f"제목: {st.session_state['rows'][idx]['제목']}")
+                st.text(f"LLM 응답 결과:\n{result}")
+        else:
+            st.text("결과가 없습니다.")
 
-st.subheader("6. 저장 및 7. 불러오기")
-col3_1, col3_2 = st.columns([0.5, 0.5])
+    st.subheader("6. 저장 및 7. 불러오기")
+    col3_1, col3_2 = st.columns([0.5, 0.5])
 
-with col3_1:
-    st.subheader("6. 저장")
-    save_path = st.text_input("저장할 파일명 입력")
-    if st.button("저장") and save_path:
-        df = pd.DataFrame(st.session_state['rows'])
-        df.to_csv(f"{save_path}.csv", index=False)
-        st.success(f"{save_path}.csv 파일로 저장되었습니다.")
+    with col3_1:
+        st.subheader("6. 저장")
+        save_path = st.text_input("저장할 파일명 입력")
+        if st.button("저장") and save_path:
+            df = pd.DataFrame(st.session_state['rows'])
+            df.to_csv(f"{save_path}.csv", index=False)
+            st.success(f"{save_path}.csv 파일로 저장되었습니다.")
 
-with col3_2:
-    st.subheader("7. 불러오기")
-    uploaded_save_file = st.file_uploader("저장된 CSV 파일 불러오기", type=["csv"])
-    if uploaded_save_file is not None:
-        loaded_data = pd.read_csv(uploaded_save_file)
-        st.session_state['rows'] = loaded_data.to_dict(orient="records")
-        st.success("CSV 파일 데이터가 불러와졌습니다.")
+    with col3_2:
+        st.subheader("7. 불러오기")
+        uploaded_save_file = st.file_uploader("저장된 CSV 파일 불러오기", type=["csv"])
+        if uploaded_save_file is not None:
+            loaded_data = pd.read_csv(uploaded_save_file)
+            st.session_state['rows'] = loaded_data.to_dict(orient="records")
+            st.success("CSV 파일 데이터가 불러와졌습니다.")
