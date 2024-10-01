@@ -58,16 +58,17 @@ if st.button("실행"):
             # 프롬프트 생성
             prompt = prompt_template.format(title=title, request=request)
 
-            # GPT-4 모델 호출
-            response = openai.Completion.create(
+            # GPT-4 모델 호출 (최신 API 방식)
+            response = openai.ChatCompletion.create(
                 model="gpt-4",  # GPT-4 모델 사용
-                prompt=prompt,
+                messages=[{"role": "system", "content": "You are a helpful assistant."},
+                          {"role": "user", "content": prompt}],
                 max_tokens=150  # 응답 길이 제한 설정
             )
 
             # 응답 출력
             st.subheader("LLM 응답:")
-            st.write(response.choices[0].text)
+            st.write(response['choices'][0]['message']['content'])
         
         except Exception as e:
             st.error(f"LLM 처리 중 오류 발생: {str(e)}")
