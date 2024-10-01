@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import backend
 import json
-import urllib.parse  # URL 인코딩을 위해 추가
 
 # 페이지 설정
 st.set_page_config(layout="wide")
@@ -100,10 +99,6 @@ with col1:
             if st.session_state['github_token'] and st.button(f"선택 (요청사항 {idx+1})") and selected_file != "파일을 선택하세요":
                 # 서버 경로 가져오기 (파일 경로 계산)
                 server_path = backend.get_file_server_path(st.session_state['github_repo'], st.session_state['github_branch'], selected_file)
-                
-                # URL 인코딩 처리하여 경로 수정
-                server_path = urllib.parse.quote(server_path, safe="/:")
-                
                 # 선택된 파일을 rows 객체의 데이터 필드에 저장
                 rows[idx]['데이터'] = server_path
                 st.success(f"선택한 파일: {selected_file}\n서버 경로: {server_path}")
@@ -151,54 +146,54 @@ with col1:
                 else:
                     backend.upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'])
 
-# 5. 참고 탬플릿 미리보기 (세로 길이 30% 고정)
-st.subheader("5. 참고 탬플릿 미리보기")
-with st.expander("참고 탬플릿 미리보기", expanded=True):
-    # 세로로 템플릿 파일 경로와 미리보기 버튼 및 결과 화면
-    file_path = st.text_input("탬플릿 파일 경로", value=st.session_state.get('template_file_path', ""))
+    # 5. 참고 탬플릿 미리보기 (세로 길이 30% 고정)
+    st.subheader("5. 참고 탬플릿 미리보기")
+    with st.expander("참고 탬플릿 미리보기", expanded=True):
+        # 세로로 템플릿 파일 경로와 미리보기 버튼 및 결과 화면
+        file_path = st.text_input("탬플릿 파일 경로", value=st.session_state.get('template_file_path', ""))
 
-    if st.button("미리보기"):
-        if file_path:
-            st.markdown(backend.preview_file(file_path), unsafe_allow_html=True)  # 미리보기 함수 호출
-        else:
-            st.warning("파일 경로를 입력하세요.")
-
-    template_folder = "templateFiles"
-
-    # GitHub 토큰이 입력된 경우에만 파일 목록 가져오기
-    template_files = ["파일을 선택하세요"]
-    if st.session_state['github_repo'] and st.session_state['github_token']:
-        template_files.extend(backend.get_github_files(st.session_state['github_repo'], st.session_state['github_token'], folder_name=template_folder, branch=st.session_state['github_branch']))
-
-    selected_template_file = st.selectbox("탬플릿 파일 선택", template_files)
-
-    # 파일 선택 버튼
-    if st.session_state['github_token'] and st.button("파일 선택"):
-        if selected_template_file != "파일을 선택하세요":
-            server_template_path = backend.get_file_server_path(st.session_state['github_repo'], st.session_state['github_branch'], selected_template_file)
-            st.session_state['template_file_path'] = server_template_path
-            st.success(f"선택한 파일 경로: {server_template_path}")
-        else:
-            st.warning("파일을 먼저 선택하세요.")
-
-    # GitHub에 탬플릿 파일 업로드
-    uploaded_template_files = st.file_uploader("탬플릿 파일 업로드", accept_multiple_files=True, type=["png", "jpg", "pdf", "html"])
-
-    if uploaded_template_files and st.session_state['github_token']:
-        for template_file in uploaded_template_files:
-            template_file_content = template_file.read()
-            template_file_name = template_file.name
-            folder_name = 'templateFiles'
-
-            # GitHub에 동일한 파일이 있는지 확인
-            sha = backend.get_file_sha(st.session_state['github_repo'], f"{folder_name}/{template_file_name}", st.session_state['github_token'], branch=st.session_state['github_branch'])
-
-            # 파일이 이미 존재하면 덮어쓰기 여부 확인
-            if sha:
-                if st.checkbox(f"'{template_file_name}' 파일이 이미 존재합니다. 덮어쓰시겠습니까?", key=f"overwrite_{template_file_name}"):
-                    backend.upload_file_to_github(st.session_state['github_repo'], folder_name, template_file_name, template_file_content, st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
+        if st.button("미리보기"):
+            if file_path:
+                st.markdown(backend.preview_file(file_path), unsafe_allow_html=True)  # 미리보기 함수 호출
             else:
-                backend.upload_file_to_github(st.session_state['github_repo'], folder_name, template_file_name, template_file_content, st.session_state['github_token'])
+                st.warning("파일 경로를 입력하세요.")
+
+        template_folder = "templateFiles"
+
+        # GitHub 토큰이 입력된 경우에만 파일 목록 가져오기
+        template_files = ["파일을 선택하세요"]
+        if st.session_state['github_repo'] and st.session_state['github_token']:
+            template_files.extend(backend.get_github_files(st.session_state['github_repo'], st.session_state['github_token'], folder_name=template_folder, branch=st.session_state['github_branch']))
+
+        selected_template_file = st.selectbox("탬플릿 파일 선택", template_files)
+
+        # 파일 선택 버튼
+        if st.session_state['github_token'] and st.button("파일 선택"):
+            if selected_template_file != "파일을 선택하세요":
+                server_template_path = backend.get_file_server_path(st.session_state['github_repo'], st.session_state['github_branch'], selected_template_file)
+                st.session_state['template_file_path'] = server_template_path
+                st.success(f"선택한 파일 경로: {server_template_path}")
+            else:
+                st.warning("파일을 먼저 선택하세요.")
+
+        # GitHub에 탬플릿 파일 업로드
+        uploaded_template_files = st.file_uploader("탬플릿 파일 업로드", accept_multiple_files=True, type=["png", "jpg", "pdf", "html"])
+
+        if uploaded_template_files and st.session_state['github_token']:
+            for template_file in uploaded_template_files:
+                template_file_content = template_file.read()
+                template_file_name = template_file.name
+                folder_name = 'templateFiles'
+
+                # GitHub에 동일한 파일이 있는지 확인
+                sha = backend.get_file_sha(st.session_state['github_repo'], f"{folder_name}/{template_file_name}", st.session_state['github_token'], branch=st.session_state['github_branch'])
+
+                # 파일이 이미 존재하면 덮어쓰기 여부 확인
+                if sha:
+                    if st.checkbox(f"'{template_file_name}' 파일이 이미 존재합니다. 덮어쓰시겠습니까?", key=f"overwrite_{template_file_name}"):
+                        backend.upload_file_to_github(st.session_state['github_repo'], folder_name, template_file_name, template_file_content, st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
+                else:
+                    backend.upload_file_to_github(st.session_state['github_repo'], folder_name, template_file_name, template_file_content, st.session_state['github_token'])
 
 # 2 프레임 (3. 실행)
 with col2:
