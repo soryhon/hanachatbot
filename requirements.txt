@@ -93,3 +93,4 @@ xlsxwriter
 fpdf
 requests
 python-pptx
+docx2txt
