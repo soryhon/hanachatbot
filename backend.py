@@ -41,35 +41,27 @@ def get_file_sha(repo, file_path, github_token, branch="main"):
     else:
         return None
 
-# GitHub에 파일을 업로드하거나 덮어쓰는 함수
-def upload_file_to_github(repo, folder_name, file_name, content, github_token, branch="main", sha=None):
-    url = f"https://api.github.com/repos/{repo}/contents/{folder_name}/{file_name}"
-    headers = {
-        "Authorization": f"token {github_token}",
-        "Content-Type": "application/json"
-    }
-    content_base64 = base64.b64encode(content).decode("utf-8")
-    data = {
-        "message": f"Upload {file_name}",
-        "content": content_base64,
-        "branch": branch
-    }
-
-    if sha:
-        data["sha"] = sha
-
-    response = requests.put(url, headers=headers, json=data)
+# GitHub에서 파일을 다운로드하여 서버에 저장하는 함수
+def download_github_file(repo, file_path, github_token, branch="main"):
+    url = f"https://api.github.com/repos/{repo}/contents/{file_path}?ref={branch}"
+    headers = {"Authorization": f"token {github_token}"}
+    response = requests.get(url, headers=headers)
     
-    if response.status_code == 201:
-        st.success(f"파일이 GitHub 저장소에 성공적으로 업로드되었습니다: {file_name}")
-    elif response.status_code == 200:
-        st.success(f"파일이 GitHub 저장소에 성공적으로 덮어쓰기되었습니다: {file_name}")
+    if response.status_code == 200:
+        file_content = base64.b64decode(response.json()["content"])
+        local_path = os.path.join("/mnt/data/github_files", repo, branch, file_path)
+        
+        # 파일이 저장될 폴더가 없다면 생성
+        os.makedirs(os.path.dirname(local_path), exist_ok=True)
+        
+        # 파일 저장
+        with open(local_path, "wb") as f:
+            f.write(file_content)
+        
+        return local_path
     else:
-        st.error(f"GitHub 업로드 실패: {response.status_code} - {response.text}")
-
-# 파일 경로를 인코딩하는 함수 (한글과 공백 처리)
-def encode_file_path(file_path):
-    return urllib.parse.quote(file_path)
+        st.error(f"GitHub 파일을 다운로드하지 못했습니다: {response.status_code}")
+        return None
 
 # Langchain을 사용한 LLM 요청 함수
 def send_to_llm(prompt, file_path, openai_api_key):
@@ -168,19 +160,8 @@ def send_to_llm(prompt, file_path, openai_api_key):
 
 # 서버에서 GitHub 파일 경로를 생성하는 함수
 def get_file_server_path(repo, branch, file_path):
-    base_server_path = "/mnt/data/github_files"
-    full_path = os.path.join(base_server_path, repo, branch, file_path)
-
-    # 파일 경로 디버깅 출력
-    st.write(f"생성된 파일 경로: {full_path}")
-
-    # 파일이 실제로 존재하는지 확인
-    if not os.path.exists(full_path):
-        st.error(f"파일이 존재하지 않습니다: {full_path}")
-    else:
-        st.success(f"파일이 존재합니다: {full_path}")
-
-    return full_path
+    local_path = os.path.join("/mnt/data/github_files", repo, branch, file_path)
+    return local_path
 
 # 파일 미리보기 함수 (이미지 파일에 대한 추가 처리)
 def preview_file(file_path):
