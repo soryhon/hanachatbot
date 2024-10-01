@@ -85,7 +85,6 @@ streamlit
 pandas
 langchain
 openai
-openai==0.28.0
 python-docx
 PyPDF2
 Pillow
