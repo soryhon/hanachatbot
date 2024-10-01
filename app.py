@@ -89,10 +89,10 @@ with col1:
             else:
                 row['checked'] = False
 
-            # GitHub 토큰이 입력된 경우에만 파일 목록 가져오기
+            # GitHub 토큰이 입력된 경우에만 파일 목록 가져오기 (uploadFiles 폴더의 파일 리스트)
             file_list = []
             if st.session_state['github_token']:
-                file_list = backend.get_github_files(st.session_state['github_repo'], st.session_state['github_token'], branch=st.session_state['github_branch'])
+                file_list = backend.get_github_files(st.session_state['github_repo'], st.session_state['github_token'], folder_name='uploadFiles', branch=st.session_state['github_branch'])
             selected_file = st.selectbox(f"파일 선택 (요청사항 {idx+1})", options=file_list if file_list else ["(파일 없음)"])
 
             if st.session_state['github_token'] and st.button(f"파일 선택 (요청사항 {idx+1})"):
