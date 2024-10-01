@@ -90,15 +90,18 @@ with col1:
                 row['checked'] = False
 
             # GitHub 토큰이 입력된 경우에만 파일 목록 가져오기 (uploadFiles 폴더의 파일 리스트)
-            file_list = []
+            file_list = ["파일을 선택하세요"]
             if st.session_state['github_token']:
-                file_list = backend.get_github_files(st.session_state['github_repo'], st.session_state['github_token'], folder_name='uploadFiles', branch=st.session_state['github_branch'])
-            selected_file = st.selectbox(f"파일 선택 (요청사항 {idx+1})", options=file_list if file_list else ["(파일 없음)"])
+                file_list.extend(backend.get_github_files(st.session_state['github_repo'], st.session_state['github_token'], folder_name='uploadFiles', branch=st.session_state['github_branch']))
+            selected_file = st.selectbox(f"파일 선택 (요청사항 {idx+1})", options=file_list)
 
             if st.session_state['github_token'] and st.button(f"파일 선택 (요청사항 {idx+1})"):
-                server_path = backend.get_file_server_path(st.session_state['github_repo'], st.session_state['github_branch'], selected_file)
-                row['데이터'] = server_path
-                st.success(f"선택한 파일: {selected_file}\n서버 경로: {server_path}")
+                if selected_file != "파일을 선택하세요":
+                    server_path = backend.get_file_server_path(st.session_state['github_repo'], st.session_state['github_branch'], selected_file)
+                    row['데이터'] = server_path
+                    st.success(f"선택한 파일: {selected_file}\n서버 경로: {server_path}")
+                else:
+                    st.warning("파일을 먼저 선택하세요.")
 
         # 추가, 삭제, 새로고침 버튼 구성
         col1_1, col1_2, col1_3 = st.columns([0.33, 0.33, 0.33])
@@ -156,18 +159,20 @@ with col1:
         template_folder = "templateFiles"
 
         # GitHub 토큰이 입력된 경우에만 파일 목록 가져오기
+        template_files = ["파일을 선택하세요"]
         if st.session_state['github_repo'] and st.session_state['github_token']:
-            template_files = backend.get_github_files(st.session_state['github_repo'], st.session_state['github_token'], folder_name=template_folder, branch=st.session_state['github_branch'])
-        else:
-            template_files = []
+            template_files.extend(backend.get_github_files(st.session_state['github_repo'], st.session_state['github_token'], folder_name=template_folder, branch=st.session_state['github_branch']))
 
-        selected_template_file = st.selectbox("탬플릿 파일 선택", template_files if template_files else ["(파일 없음)"])
+        selected_template_file = st.selectbox("탬플릿 파일 선택", template_files)
 
         # 파일 선택 버튼
         if st.session_state['github_token'] and st.button("파일 선택"):
-            server_template_path = backend.get_file_server_path(st.session_state['github_repo'], st.session_state['github_branch'], selected_template_file)
-            st.session_state['template_file_path'] = server_template_path
-            st.success(f"선택한 파일 경로: {server_template_path}")
+            if selected_template_file != "파일을 선택하세요":
+                server_template_path = backend.get_file_server_path(st.session_state['github_repo'], st.session_state['github_branch'], selected_template_file)
+                st.session_state['template_file_path'] = server_template_path
+                st.success(f"선택한 파일 경로: {server_template_path}")
+            else:
+                st.warning("파일을 먼저 선택하세요.")
 
         # GitHub에 탬플릿 파일 업로드
         uploaded_template_files = st.file_uploader("탬플릿 파일 업로드", accept_multiple_files=True, type=["png", "jpg", "pdf", "html"])
