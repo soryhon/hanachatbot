@@ -1,21 +1,31 @@
-# app.py
-
 import streamlit as st
 import pandas as pd
 import backend
+import json
 
 # 페이지 설정
 st.set_page_config(layout="wide")
+
+# JSON 데이터 (github 저장 정보)
+json_data = '''
+{
+    "github_repo": "soryhon/hanachatbot",
+    "github_branch": "main"
+}
+'''
+
+# JSON 데이터를 파싱하여 세션 상태에 저장
+data = json.loads(json_data)
 
 # 세션 상태 초기화
 if 'rows' not in st.session_state:
     st.session_state['rows'] = [{"제목": "", "요청": "", "데이터": "", "checked": False}]
 if 'github_repo' not in st.session_state:
-    st.session_state['github_repo'] = ""
+    st.session_state['github_repo'] = data.get('github_repo', "")  # JSON 데이터에서 repo 정보 입력
 if 'github_token' not in st.session_state:
-    st.session_state['github_token'] = ""
+    st.session_state['github_token'] = ""  # GitHub API 토큰은 사용자가 입력하도록 수정
 if 'github_branch' not in st.session_state:
-    st.session_state['github_branch'] = "main"
+    st.session_state['github_branch'] = data.get('github_branch', "main")  # JSON 데이터에서 branch 정보 입력
 if 'openai_api_key' not in st.session_state:
     st.session_state['openai_api_key'] = ""
 if 'github_saved' not in st.session_state:
@@ -35,9 +45,10 @@ if not (st.session_state['github_saved'] and st.session_state['openai_saved']):
 
     with col_a:
         st.subheader("GitHub 정보 입력")
-        st.session_state['github_repo'] = st.text_input("GitHub 저장소 경로 (예: username/repo)")
+        # JSON 데이터에서 자동으로 repo와 branch 값을 가져와서 입력
+        st.session_state['github_repo'] = st.text_input("GitHub 저장소 경로 (예: username/repo)", value=st.session_state['github_repo'])
+        st.session_state['github_branch'] = st.text_input("브랜치 이름 (예: main 또는 master)", value=st.session_state['github_branch'])
         st.session_state['github_token'] = st.text_input("GitHub API 토큰 입력", type="password")
-        st.session_state['github_branch'] = st.text_input("브랜치 이름 (예: main 또는 master)", value="main")
 
         if st.button("GitHub 정보 저장"):
             if st.session_state['github_repo'] and st.session_state['github_token'] and st.session_state['github_branch']:
