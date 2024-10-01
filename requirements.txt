@@ -83,8 +83,8 @@ wheel==0.43.0
 yarl==1.9.7
 streamlit
 pandas
-langchain==0.0.268
-openai==0.28.1
+langchain
+openai
 python-docx
 PyPDF2
 Pillow
