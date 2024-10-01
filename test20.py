@@ -40,8 +40,8 @@ if st.button("실행"):
         try:
             # OpenAI GPT-4 LLM 인스턴스 생성
             llm = OpenAI(
-                openai_api_key=st.session_state["api_key"],  # 세션에 저장된 API 키 사용
-                model_name="gpt-4"
+                api_key=st.session_state["api_key"],  # 세션에 저장된 API 키 사용
+                model_name="gpt-4"  # GPT-4 모델 지정
             )
 
             # 프롬프트 템플릿 생성
