@@ -176,21 +176,20 @@ def get_file_server_path(repo, branch, file_path):
     full_path = os.path.join(base_server_path, repo, branch, file_path)
     return full_path
 
-# 파일 미리보기 함수 (상대 경로로 변경)
+# 파일 미리보기 함수 (URL을 통한 미리보기)
 def preview_file(file_path):
     try:
         file_extension = file_path.split('.')[-1].lower()
         
-        # 상대 경로로 변경 (templateFiles 폴더에서 파일 읽기)
-        relative_path = os.path.join('./templateFiles', os.path.basename(file_path))
-        encoded_file_path = encode_file_path(relative_path)
+        # URL 경로로 변경
+        url = f"https://raw.githubusercontent.com/your-github-repo/{file_path}"
 
         if file_extension in ['png', 'jpg', 'jpeg', 'gif']:
-            return f'<img src="{encoded_file_path}" alt="이미지 미리보기" style="max-width: 100%;">'
+            return f'<img src="{url}" alt="이미지 미리보기" style="max-width: 100%;">'
         elif file_extension == 'pdf':
-            return f'<iframe src="{encoded_file_path}" width="100%" height="600px"></iframe>'
+            return f'<iframe src="{url}" width="100%" height="600px"></iframe>'
         elif file_extension == 'html':
-            return f'<a href="{encoded_file_path}" target="_blank">HTML 파일 열기</a>'
+            return f'<a href="{url}" target="_blank">HTML 파일 열기</a>'
         else:
             return '<p>미리보기가 지원되지 않는 파일 형식입니다.</p>'
     except Exception as e:
