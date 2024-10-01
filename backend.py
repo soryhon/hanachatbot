@@ -43,24 +43,30 @@ def get_file_sha(repo, file_path, github_token, branch="main"):
 
 # GitHub에서 파일을 다운로드하여 서버에 저장하는 함수
 def download_github_file(repo, file_path, github_token, branch="main"):
-    url = f"https://api.github.com/repos/{repo}/contents/{file_path}?ref={branch}"
-    headers = {"Authorization": f"token {github_token}"}
-    response = requests.get(url, headers=headers)
-    
-    if response.status_code == 200:
-        file_content = base64.b64decode(response.json()["content"])
-        local_path = os.path.join("/mnt/data/github_files", repo, branch, file_path)
-        
-        # 파일이 저장될 폴더가 없다면 생성
-        os.makedirs(os.path.dirname(local_path), exist_ok=True)
-        
-        # 파일 저장
-        with open(local_path, "wb") as f:
-            f.write(file_content)
-        
-        return local_path
-    else:
-        st.error(f"GitHub 파일을 다운로드하지 못했습니다: {response.status_code}")
+    try:
+        url = f"https://api.github.com/repos/{repo}/contents/{file_path}?ref={branch}"
+        headers = {"Authorization": f"token {github_token}"}
+        response = requests.get(url, headers=headers)
+
+        if response.status_code == 200:
+            file_content = base64.b64decode(response.json()["content"])
+            local_path = os.path.join("/mnt/data/github_files", repo, branch, file_path)
+
+            # 파일이 저장될 폴더가 없다면 생성
+            os.makedirs(os.path.dirname(local_path), exist_ok=True)
+
+            # 파일 저장
+            with open(local_path, "wb") as f:
+                f.write(file_content)
+            
+            # 로그로 파일 경로를 출력하여 확인
+            st.write(f"파일이 다운로드되었습니다. 경로: {local_path}")
+            return local_path
+        else:
+            st.error(f"GitHub 파일을 다운로드하지 못했습니다: {response.status_code}")
+            return None
+    except Exception as e:
+        st.error(f"GitHub 파일 다운로드 중 오류가 발생했습니다: {e}")
         return None
 
 # Langchain을 사용한 LLM 요청 함수
@@ -68,6 +74,8 @@ def send_to_llm(prompt, file_path, openai_api_key):
     try:
         llm = OpenAI(api_key=openai_api_key)
         file_extension = file_path.split('.')[-1].lower()
+
+        st.write(f"파일 경로: {file_path}")
 
         # 엑셀 파일 처리
         if file_extension in ['xlsx', 'xls']:
