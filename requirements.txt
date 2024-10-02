@@ -84,7 +84,6 @@ yarl==1.9.7
 streamlit
 pandas
 langchain
-openai
 python-docx
 PyPDF2
 Pillow
