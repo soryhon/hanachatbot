@@ -57,7 +57,7 @@ if st.button("실행"):
             prompt = prompt_template.format(title=title, request=request)
 
             # GPT-3.5 모델 호출
-            response = openai.ChatCompletion.create(
+            response = openai.chat.completions.create(  # 최신 메서드 사용
                 model="gpt-3.5-turbo",  # gpt-3.5-turbo 모델 사용
                 messages=[
                     {"role": "system", "content": "You are a helpful assistant."},
