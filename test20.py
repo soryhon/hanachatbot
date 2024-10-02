@@ -4,7 +4,7 @@ import streamlit as st
 from langchain.prompts import PromptTemplate
 
 # Streamlit 설정
-st.title("LangChain 및 OpenAI GPT-4 연동 (Streamlit)")
+st.title("LangChain 및 OpenAI GPT-3.5 연동 (Streamlit)")
 
 # OpenAI API 키 입력받기
 if "api_key" not in st.session_state:
@@ -56,9 +56,9 @@ if st.button("실행"):
             # 프롬프트 생성
             prompt = prompt_template.format(title=title, request=request)
 
-            # GPT-4 모델 호출
+            # GPT-3.5 모델 호출
             response = openai.ChatCompletion.create(
-                model="gpt-4o",  # gpt-4 모델 사용
+                model="gpt-3.5-turbo",  # gpt-3.5-turbo 모델 사용
                 messages=[
                     {"role": "system", "content": "You are a helpful assistant."},
                     {"role": "user", "content": prompt}
