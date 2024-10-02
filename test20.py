@@ -57,8 +57,8 @@ if st.button("실행"):
             prompt = prompt_template.format(title=title, request=request)
 
             # GPT-3.5 모델 호출
-            response = openai.chat.completions.create(  # 최신 메서드 사용
-                model="gpt-3.5-turbo",  # gpt-3.5-turbo 모델 사용
+            response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system", "content": "You are a helpful assistant."},
                     {"role": "user", "content": prompt}
@@ -66,9 +66,11 @@ if st.button("실행"):
                 max_tokens=150
             )
 
-            # 응답 출력
+            # 응답 출력 (응답 구조에 맞게 변경)
+            message = response.choices[0].message["content"]
+
             st.subheader("LLM 응답:")
-            st.write(response['choices'][0]['message']['content'])
+            st.write(message)
         
         except Exception as e:
             st.error(f"LLM 처리 중 오류 발생: {str(e)}")
