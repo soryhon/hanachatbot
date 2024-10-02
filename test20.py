@@ -19,7 +19,6 @@ api_key_input = st.text_input("OpenAI API 키를 입력하세요", type="passwor
 if st.button("API 키 저장"):
     if api_key_input:
         st.session_state["api_key"] = api_key_input
-        # 환경 변수에 API 키 설정
         os.environ["OPENAI_API_KEY"] = api_key_input
         st.success("API 키가 성공적으로 저장되었습니다!")
     else:
@@ -39,7 +38,6 @@ if st.button("실행"):
     elif not title or not request:
         st.error("제목과 요청 사항을 입력해야 합니다!")
     else:
-        # OpenAI API 호출
         try:
             # API 키 설정
             openai.api_key = st.session_state["api_key"]
@@ -58,9 +56,9 @@ if st.button("실행"):
             # 프롬프트 생성
             prompt = prompt_template.format(title=title, request=request)
 
-            # GPT-4 모델 호출 (올바른 메서드 사용)
+            # GPT-4 모델 호출
             response = openai.ChatCompletion.create(
-                model="gpt-4",
+                model="gpt-4o",  # gpt-4 모델 사용
                 messages=[
                     {"role": "system", "content": "You are a helpful assistant."},
                     {"role": "user", "content": prompt}
