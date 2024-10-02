@@ -63,12 +63,12 @@ if st.button("실행"):
                     {"role": "system", "content": "You are a helpful assistant."},
                     {"role": "user", "content": prompt}
                 ],
-                max_tokens=150
+                max_tokens=1500  # 토큰 수를 늘려서 더 긴 응답 처리
             )
 
-            # 응답 출력
+            # 응답 출력 (긴 결과 표시를 위해 text_area 사용)
             st.subheader("LLM 응답:")
-            st.write(response['choices'][0]['message']['content'])
+            st.text_area("응답:", value=response['choices'][0]['message']['content'], height=300)
         
         except Exception as e:
             st.error(f"LLM 처리 중 오류 발생: {str(e)}")
