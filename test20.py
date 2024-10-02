@@ -58,8 +58,8 @@ if st.button("실행"):
             # 프롬프트 생성
             prompt = prompt_template.format(title=title, request=request)
 
-            # 최신 API 방식 사용 (최신 ChatCompletion 호출 방식)
-            response = openai.chat_completions.create(
+            # GPT-4 모델 호출 (올바른 메서드 사용)
+            response = openai.ChatCompletion.create(
                 model="gpt-4",
                 messages=[
                     {"role": "system", "content": "You are a helpful assistant."},
