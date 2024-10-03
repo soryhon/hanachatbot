@@ -23,7 +23,7 @@ st.set_page_config(layout="wide")
 
 # GitHub API 요청을 처리하는 함수 수정
 def get_github_files(repo, branch, token, folder_name=None):
-    # 필수 정보가 누락된 경우 경고 메시지 출력
+    # GitHub 정보가 누락되었는지 확인
     if not repo or not branch or not token:
         st.error("GitHub 정보가 누락되었습니다. 저장소, 브랜치, 또는 토큰이 제대로 설정되지 않았습니다.")
         return []
