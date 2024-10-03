@@ -384,6 +384,9 @@ st.text_area("전달된 프롬프트:", value="\n\n".join(global_generated_promp
 if "response" in st.session_state:
     for idx, response in enumerate(st.session_state["response"]):
         st.text_area(f"응답 {idx+1}:", value=response, height=300)
-    
-    for idx, response in enumerate(st.session_state["response"]):
-        st.components.v1.html(response, height=600, scrolling=True)
+        
+        # HTML 형식인지 확인 후 출력
+        if "<html" in response.lower() or "<body" in response.lower():
+            st.components.v1.html(response, height=600, scrolling=True)
+        else:
+            st.warning(f"응답 {idx+1}은 HTML 형식이 아니므로 HTML로 출력할 수 없습니다.")
