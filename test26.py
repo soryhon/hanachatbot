@@ -428,7 +428,7 @@ with col1:
                 st.error("파일을 선택하세요.")
             else:
                 file_extension = selected_template.split('.')[-1].lower()
-                template_url = f"https://raw.githubusercontent.com/{st.session_state['github_repo']}/blob/{st.session_state['github_branch']}/templateFiles/{selected_template}"
+                template_url = f"https://raw.githubusercontent.com/{st.session_state['github_repo']}/{st.session_state['github_branch']}/templateFiles/{selected_template}"
                 template_relative_path = f"{st.session_state['github_repo']}/{st.session_state['github_branch']}/templateFiles/{selected_template}"
                 st.session_state['selected_template_info'] = {
                     'url': template_url,
