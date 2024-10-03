@@ -390,38 +390,43 @@ col1, col2 = st.columns([0.5, 0.5])
 
 with col1:
     st.subheader("5. 참고 탬플릿 보기")
-    uploaded_template = st.file_uploader("참고 템플릿 파일 업로드", type=["png", "jpg", "jpeg", "html", "pdf", "docx", "xlsx"])
+    
+    if not st.session_state.get("github_token") or not st.session_state.get("github_repo"):
+        st.warning("GitHub 정보가 저장되기 전에는 템플릿 파일을 업로드하거나 선택할 수 없습니다. 먼저 GitHub 정보를 입력해 주세요.")
+    else:
+        uploaded_template = st.file_uploader("참고 템플릿 파일 업로드", type=["png", "jpg", "jpeg", "html", "pdf", "docx", "xlsx"])
 
-    if uploaded_template:
-        file_content = uploaded_template.read()
-        file_name = uploaded_template.name
-        folder_name = 'templateFiles'
+        if uploaded_template:
+            file_content = uploaded_template.read()
+            file_name = uploaded_template.name
+            folder_name = 'templateFiles'
 
-        # 템플릿 폴더 확인 및 생성
-        sha = get_file_sha(st.session_state['github_repo'], f"{folder_name}/{file_name}", st.session_state['github_token'], branch=st.session_state['github_branch'])
+            # 템플릿 폴더 확인 및 생성
+            sha = get_file_sha(st.session_state['github_repo'], f"{folder_name}/{file_name}", st.session_state['github_token'], branch=st.session_state['github_branch'])
 
-        if not sha:
-            upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'])
-            st.success(f"'{file_name}' 템플릿이 업로드되었습니다.")
+            if not sha:
+                upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'])
+                st.success(f"'{file_name}' 템플릿이 업로드되었습니다.")
 
-    template_files = get_github_files(st.session_state["github_repo"], st.session_state["github_branch"], st.session_state["github_token"], folder_name="templateFiles")
+        # 템플릿 파일 리스트를 가져옴
+        template_files = get_github_files(st.session_state["github_repo"], st.session_state["github_branch"], st.session_state["github_token"], folder_name="templateFiles")
+        
+        selected_template = st.selectbox("탬플릿 리스트 선택", ["파일을 선택하세요."] + template_files)
 
-    selected_template = st.selectbox("탬플릿 리스트 선택", ["파일을 선택하세요."] + template_files)
+        if st.button("저장"):
+            if selected_template == "파일을 선택하세요.":
+                st.error("파일을 선택하세요.")
+            else:
+                template_url = f"https://github.com/{st.session_state['github_repo']}/blob/{st.session_state['github_branch']}/templateFiles/{selected_template}"
+                template_relative_path = f"{st.session_state['github_repo']}/{st.session_state['github_branch']}/templateFiles/{selected_template}"
+                st.session_state['selected_template_info'] = {
+                    'url': template_url,
+                    'relative_path': template_relative_path
+                }
 
-    if st.button("저장"):
-        if selected_template == "파일을 선택하세요.":
-            st.error("파일을 선택하세요.")
-        else:
-            template_url = f"https://github.com/{st.session_state['github_repo']}/blob/{st.session_state['github_branch']}/templateFiles/{selected_template}"
-            template_relative_path = f"{st.session_state['github_repo']}/{st.session_state['github_branch']}/templateFiles/{selected_template}"
-            st.session_state['selected_template_info'] = {
-                'url': template_url,
-                'relative_path': template_relative_path
-            }
-
-    if 'selected_template_info' in st.session_state:
-        st.text_input("템플릿 파일 정보", st.session_state['selected_template_info']['relative_path'], disabled=True)
-        st.components.v1.html(f'<iframe src="{st.session_state["selected_template_info"]["url"]}" width="100%" height="400px"></iframe>', height=400)
+        if 'selected_template_info' in st.session_state:
+            st.text_input("템플릿 파일 정보", st.session_state['selected_template_info']['relative_path'], disabled=True)
+            st.components.v1.html(f'<iframe src="{st.session_state["selected_template_info"]["url"]}" width="100%" height="400px"></iframe>', height=400)
 
 with col2:
     st.subheader("4. 결과 보고서")
