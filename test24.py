@@ -234,15 +234,27 @@ else:
                 sha = get_file_sha(st.session_state['github_repo'], f"{folder_name}/{file_name}", st.session_state['github_token'], branch=st.session_state['github_branch'])
 
                 if sha:
-                    if st.checkbox(f"'{file_name}' 파일이 이미 존재합니다. 덮어쓰시겠습니까?", key=f"overwrite_{file_name}"):
-                        upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
+                    st.warning(f"'{file_name}' 파일이 이미 존재합니다. 덮어쓰시겠습니까?")
+                    col1, col2 = st.columns(2)
+
+                    # 덮어쓰기 버튼
+                    with col1:
+                        if st.button(f"'{file_name}' 덮어쓰기"):
+                            upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
+                            st.success(f"'{file_name}' 파일이 성공적으로 덮어쓰기 되었습니다.")
+                            uploaded_files = None  # 업로드 후 파일 리스트 초기화
+                            break  # 업로드 완료 후 루프 종료
+
+                    # 취소 버튼
+                    with col2:
+                        if st.button("취소"):
+                            st.info("덮어쓰기가 취소되었습니다.")
+                            uploaded_files = None  # 취소 후 파일 리스트 초기화
+                            break  # 루프 종료
                 else:
                     upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'])
-
-            st.success("파일 업로드가 완료되었습니다.")
-            
-            # 업로드가 완료된 후에 파일 목록을 다시 가져와 업데이트
-            files = get_github_files(st.session_state["github_repo"], st.session_state["github_branch"], st.session_state["github_token"])
+                    st.success(f"'{file_name}' 파일이 성공적으로 업로드되었습니다.")
+                    uploaded_files = None  # 업로드 후 파일 리스트 초기화
 
 # 3 프레임
 # 3. 작성 보고서 요청사항 및 실행 버튼
