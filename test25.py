@@ -14,7 +14,7 @@ import base64
 from langchain.chat_models import ChatOpenAI
 
 # 전역변수로 프롬프트 저장
-global_generated_prompt = ""
+global_generated_prompt = []
 
 # 페이지 너비를 전체 화면으로 설정
 st.set_page_config(layout="wide")
@@ -107,45 +107,45 @@ def extract_text_from_image(file_content):
     image = Image.open(file_content)
     return "이미지에서 텍스트를 추출하는 기능은 구현되지 않았습니다."
 
-# LLM을 통해 프롬프트와 파일을 전달하고 응답을 받는 함수
-def run_llm_with_file_and_prompt(api_key, title, request, file_data):
+# LLM을 통해 프롬프트와 파일을 전달하고 응답을 받는 함수 (배열로 데이터 전달)
+def run_llm_with_file_and_prompt(api_key, titles, requests, file_data_list):
     global global_generated_prompt
     openai.api_key = api_key
 
-    # file_data_str 변수: 파일 데이터를 텍스트 형태로 변환하여 LLM에 전달
-    if isinstance(file_data, pd.DataFrame):  # 엑셀, CSV의 경우 DataFrame을 텍스트로 변환
-        file_data_str = file_data.to_string()
-    elif isinstance(file_data, dict):  # 여러 시트를 가져온 경우
-        file_data_str = "\n".join([f"시트 이름: {sheet_name}\n{data.to_string()}" for sheet_name, data in file_data.items()])
-    else:
-        file_data_str = str(file_data)
+    # 프롬프트를 담을 리스트
+    prompts = []
+    global_generated_prompt = []  # 프롬프트들을 담을 리스트 초기화
 
-    # 프롬프트 템플릿 구성
-    generated_prompt = f"""
-    보고서 제목은 '{title}'로 하고, 아래의 파일 데이터를 분석하여 '{request}'를 요구 사항을 만족할 수 있도록 최적화된 보고서를 완성해.
-    표로 표현 할 때는 table 태그 형식으로 구현해야 한다. th과 td 태그는 border는 사이즈 1이고 색상은 검정색으로 구성한다.
-    표의 첫번째 행은 타이틀이 이므로 th태그로 구현하고 가운데 정렬, bold처리 해야 한다. 바탕색은 '#E7E6E6' 이어야 한다.
-    예시와 같은 구조로 구성한다. 보고서 제목은 앞에 순번을 표시하고 바로 아래 요구 사항에 맞는 내용을 이어서 보여줘야 한다.
-    예시 : '\r\n 1. 보고서 제목\r\n보고서 내용'
-    파일 데이터: {file_data_str}
-    """
+    for i, (title, request, file_data) in enumerate(zip(titles, requests, file_data_list)):
+        # file_data_str 변수: 파일 데이터를 텍스트 형태로 변환하여 LLM에 전달
+        if isinstance(file_data, pd.DataFrame):  # 엑셀, CSV의 경우 DataFrame을 텍스트로 변환
+            file_data_str = file_data.to_string()
+        elif isinstance(file_data, dict):  # 여러 시트를 가져온 경우
+            file_data_str = "\n".join([f"시트 이름: {sheet_name}\n{data.to_string()}" for sheet_name, data in file_data.items()])
+        else:
+            file_data_str = str(file_data)
 
-    # 전역변수에 프롬프트 저장
-    global_generated_prompt = generated_prompt
+        # 프롬프트 템플릿 구성 (기본 템플릿 활용)
+        generated_prompt = f"""
+        보고서 제목은 '{title}'로 하고, 아래의 파일 데이터를 분석하여 '{request}'를 요구 사항을 만족할 수 있도록 최적화된 보고서를 완성해.
+        표로 표현 할 때는 table 태그 형식으로 구현해야 한다. th과 td 태그는 border는 사이즈 1이고 색상은 검정색으로 구성한다.
+        표의 첫번째 행은 타이틀이 이므로 th태그로 구현하고 가운데 정렬, bold처리 해야 한다. 바탕색은 '#E7E6E6' 이어야 한다.
+        예시와 같은 구조로 구성한다. 보고서 제목은 앞에 순번을 표시하고 바로 아래 요구 사항에 맞는 내용을 이어서 보여줘야 한다.
+        예시 : '\r\n {i+1}. 보고서 제목\r\n보고서 내용'
+        파일 데이터: {file_data_str}
+        """
 
-    # PromptTemplate 설정
-    prompt_template = PromptTemplate(
-        template=generated_prompt,
-        input_variables=[]
-    )
+        # 각 프롬프트를 저장
+        prompts.append(generated_prompt)
+        global_generated_prompt.append(generated_prompt)
 
-    # LangChain의 LLMChain 사용
+    # LangChain의 LLMChain 사용 (for 밖에서 한 번 실행)
     llm = ChatOpenAI(model_name="gpt-4o")
-    chain = LLMChain(llm=llm, prompt=prompt_template)
-    
-    # LLM에 프롬프트를 전달하고 응답 받기
-    response = chain.run({})
+    chain = LLMChain(llm=llm, prompt=PromptTemplate(template="\n\n".join(prompts), input_variables=[]))
 
+    # LLM에 프롬프트를 전달하고 응답 받기 (한 번 실행)
+    response = chain.run({})
+    
     return response
 
 # 1 프레임
@@ -329,15 +329,20 @@ with col2:
     if st.button("실행"):
         if not st.session_state.get("api_key"):
             st.error("먼저 OpenAI API 키를 입력하고 저장하세요!")
-        elif not st.session_state['rows'] or all(not row["제목"] or not row["요청"] for row in st.session_state['rows']):
-            st.error("요청사항의 제목과 요청을 모두 입력해야 합니다!")
+        elif not st.session_state['rows'] or all(not row["제목"] or not row["요청"] or not row["데이터"] for row in st.session_state['rows']):
+            st.error("요청사항의 제목, 요청, 파일을 모두 입력해야 합니다!")
         else:
-            # 요청사항을 기반으로 보고서를 생성
+            # 요청사항의 title, request, file_data를 배열로 추출
+            titles = [row['제목'] for row in st.session_state['rows']]
+            requests = [row['요청'] for row in st.session_state['rows']]
+            file_data_list = [row['데이터'] for row in st.session_state['rows']]
+
+            # 요청사항을 기반으로 보고서를 생성 (배열로 전달)
             response = run_llm_with_file_and_prompt(
                 st.session_state["api_key"], 
-                st.session_state['rows'][0]["제목"], 
-                st.session_state['rows'][0]["요청"], 
-                st.session_state['rows'][0]["데이터"]
+                titles, 
+                requests, 
+                file_data_list
             )
             st.session_state["response"] = response
 
@@ -346,7 +351,7 @@ with col2:
 st.subheader("4. 결과 보고서")
 
 # 전달 프롬프트 출력
-st.text_area("전달된 프롬프트:", value=global_generated_prompt, height=150)
+st.text_area("전달된 프롬프트:", value="\n\n".join(global_generated_prompt), height=150)
 
 if "response" in st.session_state:
     # 응답 텍스트 출력
