@@ -428,7 +428,7 @@ with col1:
                 st.error("파일을 선택하세요.")
             else:
                 file_extension = selected_template.split('.')[-1].lower()
-                template_url = f"https://github.com/{st.session_state['github_repo']}/blob/{st.session_state['github_branch']}/templateFiles/{selected_template}"
+                template_url = f"https://raw.githubusercontent.com/{st.session_state['github_repo']}/blob/{st.session_state['github_branch']}/templateFiles/{selected_template}"
                 template_relative_path = f"{st.session_state['github_repo']}/{st.session_state['github_branch']}/templateFiles/{selected_template}"
                 st.session_state['selected_template_info'] = {
                     'url': template_url,
@@ -446,7 +446,6 @@ with col1:
             file_url = st.session_state['selected_template_info']['url']
 
             if file_extension in ['png', 'jpg', 'jpeg', 'gif']:
-                st.components.v1.html(f'<img src="./templateFiles/2024-09-29_232209.png" alt="이미지 미리보기" style="max-width: 100%;">', height=400)
                 st.components.v1.html(f'<img src="{file_url}" alt="이미지 미리보기" style="max-width: 100%;">', height=400)
             elif file_extension == 'pdf':
                 st.components.v1.html(f'<iframe src="{file_url}" width="100%" height="600px"></iframe>', height=600)
