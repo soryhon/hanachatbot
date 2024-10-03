@@ -2,6 +2,7 @@ import os
 import openai
 import streamlit as st
 from langchain.prompts import PromptTemplate
+from langchain import LLMChain
 import requests
 import PyPDF2
 import pandas as pd
@@ -9,7 +10,6 @@ import docx
 import pptx
 from PIL import Image
 from io import BytesIO
-from langchain.agents import create_pandas_dataframe_agent
 from langchain.chat_models import ChatOpenAI
 
 # 전역변수로 프롬프트 저장
@@ -98,7 +98,7 @@ def extract_text_from_image(file_content):
     image = Image.open(file_content)
     return "이미지에서 텍스트를 추출하는 기능은 구현되지 않았습니다."
 
-# LLM과 에이전트를 통해 프롬프트와 파일을 전달하고 응답을 받는 함수
+# LLM을 통해 프롬프트와 파일을 전달하고 응답을 받는 함수
 def run_llm_with_file_and_prompt(api_key, title, request, file_data):
     global global_generated_prompt
     openai.api_key = api_key
@@ -112,11 +112,12 @@ def run_llm_with_file_and_prompt(api_key, title, request, file_data):
     # 전역변수에 프롬프트 저장
     global_generated_prompt = generated_prompt
 
-    # Pandas DataFrame을 LLM 에이전트와 함께 사용
-    agent = create_pandas_dataframe_agent(ChatOpenAI(temperature=0, model="gpt-3.5-turbo"), file_data, verbose=True)
-
-    # LLM 에이전트에 프롬프트를 전달하고 응답 받기
-    return agent.run(generated_prompt)
+    # LangChain의 LLMChain 사용
+    llm = ChatOpenAI(model_name="gpt-3.5-turbo")
+    chain = LLMChain(llm=llm, prompt_template=generated_prompt)
+    
+    # LLM에 프롬프트를 전달하고 응답 받기
+    return chain.run(generated_prompt)
 
 # 1. 프레임: GitHub 정보 저장 및 OpenAI API 키 저장
 st.subheader("1. GitHub 정보 저장 및 OpenAI API 키 저장")
