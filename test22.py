@@ -2,7 +2,6 @@ import os
 import openai
 import streamlit as st
 from langchain.prompts import PromptTemplate
-from langchain import LLMChain
 import requests
 import PyPDF2
 import pandas as pd
@@ -85,6 +84,7 @@ def extract_text_from_ppt(file_content):
 # 이미지에서 텍스트 추출 (OCR)
 def extract_text_from_image(file_content):
     image = Image.open(file_content)
+    # OCR 처리가 필요할 경우 여기 추가 가능
     return "이미지에서 텍스트를 추출하는 기능은 구현되지 않았습니다."
 
 # 프롬프트를 구성하고 LLM에 전달하는 함수
@@ -142,27 +142,20 @@ with col2:
         else:
             st.error("API 키를 입력해야 합니다!")
 
-# 2. 컬럼: 작성 보고서 요청사항 및 실행 버튼
+# 2. 프레임: 작성 보고서 요청사항 및 실행 버튼
 st.subheader("2. 작성 보고서 요청사항 및 실행 버튼")
 
-# 요청사항 테이블
-st.markdown("### 요청사항")
+col1, col2 = st.columns([0.8, 0.2])  # 가로 길이 80%, 20%
 
-col1, col2 = st.columns([0.1, 0.9])  # 가로 길이 10%, 90%
-
+# 작성 보고서 요청사항 테이블
 with col1:
-    st.markdown("**제목**", unsafe_allow_html=True)
-with col2:
+    st.write("제목")
     title = st.text_input("", value="", disabled=False)
 
-with col1:
-    st.markdown("**요청**", unsafe_allow_html=True)
-with col2:
+    st.write("요청")
     request = st.text_area("", disabled=False)
 
-with col1:
-    st.markdown("**파일**", unsafe_allow_html=True)
-with col2:
+    st.write("파일")
     selected_file = None
     if "github_token" in st.session_state:
         files = get_github_files(st.session_state["github_repo"], st.session_state["github_branch"], st.session_state["github_token"])
@@ -170,10 +163,8 @@ with col2:
             selected_file = st.selectbox("GitHub 파일을 선택하세요", ["파일을 선택하세요"] + files, index=0)
         else:
             st.info("저장소에 파일이 없습니다.")
-
-with col1:
-    st.markdown("**데이터**", unsafe_allow_html=True)
-with col2:
+    
+    st.write("데이터")
     if selected_file and selected_file != "파일을 선택하세요":
         file_path = selected_file
         file_content = get_file_from_github(st.session_state["github_repo"], st.session_state["github_branch"], file_path, st.session_state["github_token"])
@@ -181,17 +172,18 @@ with col2:
         file_data = extract_data_from_file(file_content, file_type)
         st.text_input("", value=f"선택한 파일 경로: {selected_file}", disabled=True)
 
-# 2. 컬럼: 실행 버튼
-st.subheader("2. 실행 버튼")
-
-if st.button("실행"):
-    if not st.session_state.get("api_key"):
-        st.error("먼저 OpenAI API 키를 입력하고 저장하세요!")
-    elif not title or not request or selected_file == "파일을 선택하세요":
-        st.error("제목, 요청사항, 또는 파일을 선택해야 합니다!")
-    else:
-        response = create_prompt_and_send_to_llm(st.session_state["api_key"], title, request, file_data)
-        st.session_state["response"] = response
+# 실행 버튼
+with col2:
+    st.write(" ")
+    st.write(" ")
+    if st.button("실행"):
+        if not st.session_state.get("api_key"):
+            st.error("먼저 OpenAI API 키를 입력하고 저장하세요!")
+        elif not title or not request or selected_file == "파일을 선택하세요":
+            st.error("제목, 요청사항, 또는 파일을 선택해야 합니다!")
+        else:
+            response = create_prompt_and_send_to_llm(st.session_state["api_key"], title, request, file_data)
+            st.session_state["response"] = response
 
 # 3. 프레임: 결과 보고서
 st.subheader("3. 결과 보고서")
