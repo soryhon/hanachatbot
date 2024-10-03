@@ -234,7 +234,7 @@ with col1:
     with st.expander("요청사항 리스트", expanded=True):
         if 'rows' not in st.session_state:
             # 페이지 접속 시 기본 행 1개 생성
-            st.session_state['rows'] = [{"제목": "", "요청": "", "데이터": "", "checked": False}]
+            st.session_state['rows'] = [{"제목": "", "요청": "", "파일": "", "데이터": "", "checked": False}]
 
         rows = st.session_state['rows']  # 세션 상태에 저장된 행 목록을 사용
         checked_rows = []  # 체크된 행들을 저장하기 위한 리스트
@@ -284,12 +284,12 @@ with col1:
                         else:
                             st.error(f"지원되지 않는 파일 형식입니다: {file_type}")
 
-                        # 데이터 자동 입력
-                        server_path = f"/{st.session_state['github_repo']}/{st.session_state['github_branch']}/uploadFiles/{selected_file}"
-                        row['데이터'] = server_path
+                        # 데이터 처리
+                        row['파일'] = f"/{st.session_state['github_repo']}/{st.session_state['github_branch']}/uploadFiles/{selected_file}"
+                        row['데이터'] = file_data
 
-                    # 데이터 (선택된 파일의 경로)
-                    st.text_input(f"데이터 (요청사항 {idx+1})", row['데이터'], disabled=True, key=f"data_{idx}")
+                    # 파일 경로 출력
+                    st.text_input(f"파일 경로 (요청사항 {idx+1})", row['파일'], disabled=True, key=f"file_{idx}")
 
                 if row_checked:
                     checked_rows.append(idx)
@@ -303,7 +303,7 @@ with col1:
         with col1_1:
             # 행 추가
             if st.button("행 추가"):
-                new_row = {"제목": "", "요청": "", "데이터": "", "checked": False}
+                new_row = {"제목": "", "요청": "", "파일": "", "데이터": "", "checked": False}
                 st.session_state['rows'].append(new_row)
 
         with col1_2:
