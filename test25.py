@@ -287,7 +287,7 @@ with col1:
                     # GitHub 파일 목록 불러오기
                     file_list = []
                     if st.session_state.get('github_repo') and st.session_state.get('github_token'):
-                        file_list = get_github_files(st.session_state['github_repo'], st.session_state['github_token'], branch=st.session_state.get('github_branch', 'main'))
+                        file_list = get_github_files(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
                     
                     selected_file = st.selectbox(f"파일 선택 (요청사항 {idx+1})", options=file_list, key=f"file_select_{idx}")
 
