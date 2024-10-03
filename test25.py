@@ -77,15 +77,19 @@ def get_file_from_github(repo, branch, filepath, token):
     url = f"https://api.github.com/repos/{repo}/contents/{filepath}?ref={branch}"
     headers = {"Authorization": f"token {token}"}
     response = requests.get(url, headers=headers)
-    
-    if response.status_code == 200:
-        try:
-            return BytesIO(requests.get(response.json()['download_url']).content)
-        except Exception as e:
-            st.error(f"파일 데이터를 처리하는 중 오류가 발생했습니다: {str(e)}")
-            return None
-    else:
+
+    # 404 오류를 처리하고 파일 경로 문제를 명확하게 알림
+    if response.status_code == 404:
+        st.error(f"{filepath} 파일을 가져오지 못했습니다. 상태 코드: 404 (파일을 찾을 수 없습니다). 경로를 확인하세요.")
+        return None
+    elif response.status_code != 200:
         st.error(f"{filepath} 파일을 가져오지 못했습니다. 상태 코드: {response.status_code}")
+        return None
+
+    try:
+        return BytesIO(requests.get(response.json()['download_url']).content)
+    except Exception as e:
+        st.error(f"파일 데이터를 처리하는 중 오류가 발생했습니다: {str(e)}")
         return None
 
 # 다양한 파일 형식에서 데이터를 추출하는 함수
@@ -118,14 +122,16 @@ def extract_text_from_pdf(file_content):
 def extract_text_from_excel(file_content):
     try:
         if file_content is None:
-            raise ValueError("유효하지 않은 파일입니다.")
-        excel_data = pd.read_excel(file_content, sheet_name=None)
+            raise ValueError("유효하지 않은 파일입니다. 파일이 없거나 경로가 잘못되었을 수 있습니다.")
+        # 엑셀 데이터를 BytesIO에서 읽어옴
+        excel_data = pd.read_excel(file_content, sheet_name=None)  # 모든 시트를 불러옴
         all_data = {}
 
+        # 각 시트의 데이터를 사전 형식으로 저장
         for sheet_name, data in excel_data.items():
             all_data[sheet_name] = data
 
-        return all_data
+        return all_data  # 각 시트 이름과 데이터가 포함된 딕셔너리 반환
     except Exception as e:
         st.error(f"엑셀 파일을 불러오는 중 오류가 발생했습니다: {str(e)}")
         return None
