@@ -124,7 +124,8 @@ def run_llm_with_file_and_prompt(api_key, title, request, file_data):
     # 프롬프트 템플릿 구성
     generated_prompt = f"""
     보고서 제목은 '{title}'로 하고, 아래의 파일 데이터를 분석하여 '{request}'를 요구 사항을 만족할 수 있도록 최적화된 보고서를 완성해.
-    표형식 이라 함은 html의 table 태그 형식으로 구현해야 한다. tr과 td 태그는 border-width=1, border-color:black 으로 구성한다.
+    표로 표현 할 때는 html의 table 태그 형식으로 구현해야 한다. th과 td 태그는 border는 사이즈 1이고 색상은 검정색으로 구성한다.
+    표의 첫번째 행은 타이틀이 이므로 th태그로 구현하고 가운데 정렬, bold처리 해야 한다.
     예시와 같은 구조로 구성한다. 보고서 제목은 앞에 순번을 표시하고 바로 아래 요구 사항에 맞는 내용을 이어서 보여줘야 한다.
     예시 : '\r\n 1. 보고서 제목\r\n보고서 내용'    
     파일 데이터: {file_data_str}
