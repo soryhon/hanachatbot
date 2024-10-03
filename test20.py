@@ -58,7 +58,8 @@ if st.button("실행"):
 
             # GPT-3.5 모델 호출 (chat completion 엔드포인트 사용)
             response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",  # gpt-3.5-turbo 모델 사용
+                #model="gpt-3.5-turbo",  # gpt-3.5-turbo 모델 사용
+                model="gpt-4o",
                 messages=[
                     {"role": "system", "content": "You are a helpful assistant."},
                     {"role": "user", "content": prompt}
