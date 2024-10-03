@@ -71,11 +71,10 @@ def extract_text_from_pdf(file_content):
 # 엑셀 파일에서 텍스트 추출 (시트 정보를 정확하게 가져오도록 수정)
 def extract_text_from_excel(file_content):
     try:
-        # 모든 시트의 데이터를 불러오도록 수정
-        excel_data = pd.read_excel(file_content, sheet_name=None)  # sheet_name=None: 모든 시트를 불러옴
+        # 모든 시트의 데이터를 불러옴
+        excel_data = pd.read_excel(file_content, sheet_name=None)
         all_data = {}
 
-        # 각 시트의 데이터를 사전 형식으로 저장
         for sheet_name, data in excel_data.items():
             all_data[sheet_name] = data
 
@@ -114,22 +113,37 @@ def run_llm_with_file_and_prompt(api_key, title, request, file_data):
     global global_generated_prompt
     openai.api_key = api_key
 
+    # file_data_str 변수: 파일 데이터를 텍스트 형태로 변환하여 LLM에 전달
+    if isinstance(file_data, pd.DataFrame):  # 엑셀, CSV의 경우 DataFrame을 텍스트로 변환
+        file_data_str = file_data.to_string()
+    elif isinstance(file_data, dict):  # 여러 시트를 가져온 경우
+        file_data_str = "\n".join([f"시트 이름: {sheet_name}\n{data.to_string()}" for sheet_name, data in file_data.items()])
+    else:
+        file_data_str = str(file_data)
+
     # 프롬프트 템플릿 구성
     generated_prompt = f"""
     보고서 제목은 '{title}'로 하고, 이 파일에서 '{request}'를 요구 사항을 만족할 수 있도록 최적화된 보고서를 완성해.
-    파일 데이터: {file_data}
+    파일 데이터: {file_data_str}
     """
-    
+
     # 전역변수에 프롬프트 저장
     global_generated_prompt = generated_prompt
 
+    # PromptTemplate 설정
+    prompt_template = PromptTemplate(
+        template=generated_prompt,
+        input_variables=[]
+    )
+
     # LangChain의 LLMChain 사용
-    #llm = ChatOpenAI(model_name="gpt-3.5-turbo")
     llm = ChatOpenAI(model_name="gpt-4o")
-    chain = LLMChain(llm=llm, prompt=PromptTemplate(template=generated_prompt, input_variables=[]))
+    chain = LLMChain(llm=llm, prompt=prompt_template)
     
     # LLM에 프롬프트를 전달하고 응답 받기
-    return chain.run({})
+    response = chain.run({})
+
+    return response
 
 # 1. 프레임: GitHub 정보 저장 및 OpenAI API 키 저장
 st.subheader("1. GitHub 정보 저장 및 OpenAI API 키 저장")
