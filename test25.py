@@ -277,7 +277,7 @@ else:
 
                     # 덮어쓰기 버튼
                     with col1:
-                        if st.button(f"'{file_name}' 덮어쓰기"):
+                        if st.button(f"'{file_name}' 덮어쓰기", key=f"overwrite_{file_name}"):
                             upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
                             st.success(f"'{file_name}' 파일이 성공적으로 덮어쓰기 되었습니다.")
                             uploaded_files = None  # 업로드 후 파일 리스트 초기화
@@ -285,7 +285,7 @@ else:
 
                     # 취소 버튼
                     with col2:
-                        if st.button("취소"):
+                        if st.button("취소", key=f"cancel_{file_name}"):
                             st.info("덮어쓰기가 취소되었습니다.")
                             uploaded_files = None  # 취소 후 파일 리스트 초기화
                             break  # 루프 종료
