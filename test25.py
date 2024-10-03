@@ -31,6 +31,21 @@ def get_github_files(repo, branch, token, folder_name=None):
     else:
         return []
 
+# GitHub에서 파일의 SHA 값을 가져오는 함수
+def get_file_sha(repo, file_path, token, branch='main'):
+    """
+    GitHub 저장소에서 특정 파일의 SHA 값을 가져오는 함수.
+    """
+    url = f"https://api.github.com/repos/{repo}/contents/{file_path}?ref={branch}"
+    headers = {"Authorization": f"token {token}"}
+    response = requests.get(url, headers=headers)
+    
+    if response.status_code == 200:
+        # 파일의 SHA 값 반환
+        return response.json().get('sha', None)
+    else:
+        return None
+
 # GitHub에서 파일을 다운로드하는 함수
 def get_file_from_github(repo, branch, filepath, token):
     url = f"https://api.github.com/repos/{repo}/contents/{filepath}?ref={branch}"
