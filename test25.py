@@ -108,7 +108,7 @@ def extract_text_from_image(file_content):
     image = Image.open(file_content)
     return "이미지에서 텍스트를 추출하는 기능은 구현되지 않았습니다."
 
-# LLM을 통해 프롬프트와 파일을 전달하고 응답을 받는 함수 (순차적으로 처리)
+# LLM을 통해 프롬프트와 파일을 전달하고 응답을 받는 함수 (순차적으로 처리 및 RateLimitError 처리 강화)
 def run_llm_with_file_and_prompt(api_key, titles, requests, file_data_list):
     global global_generated_prompt
     openai.api_key = api_key
@@ -150,15 +150,22 @@ def run_llm_with_file_and_prompt(api_key, titles, requests, file_data_list):
         chain = LLMChain(llm=llm, prompt=prompt_template)
         
         # LLM에 프롬프트를 전달하고 응답 받기 (RateLimitError 예외 처리)
-        try:
-            response = chain.run({})
-            responses.append(response)
-            time.sleep(5)  # 각 요청 사이에 5초 대기
-        except RateLimitError:
-            st.warning("API 요청 한도를 초과했습니다. 10초 후 다시 시도합니다.")
-            time.sleep(10)  # 일정 시간 대기 후 재시도
-            response = chain.run({})
-            responses.append(response)
+        success = False
+        retry_count = 0
+        max_retries = 5  # 최대 재시도 횟수
+        
+        while not success and retry_count < max_retries:
+            try:
+                response = chain.run({})
+                responses.append(response)
+                success = True  # 성공했을 때 True로 설정
+            except RateLimitError:
+                retry_count += 1
+                st.warning(f"API 요청 한도를 초과했습니다. 10초 후 다시 시도합니다. 재시도 횟수: {retry_count}/{max_retries}")
+                time.sleep(10)  # 10초 대기 후 재시도
+
+            # 요청 사이에 10초 대기
+            time.sleep(10)
 
     return responses
 
