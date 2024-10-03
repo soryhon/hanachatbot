@@ -153,6 +153,7 @@ def run_llm_with_file_and_prompt(api_key, titles, requests, file_data_list):
         try:
             response = chain.run({})
             responses.append(response)
+            time.sleep(5)  # 각 요청 사이에 5초 대기
         except RateLimitError:
             st.warning("API 요청 한도를 초과했습니다. 10초 후 다시 시도합니다.")
             time.sleep(10)  # 일정 시간 대기 후 재시도
