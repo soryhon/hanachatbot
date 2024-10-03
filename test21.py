@@ -33,37 +33,42 @@ def call_openai_api(api_key, prompt):
     return response['choices'][0]['message']['content']
 
 # 1. 프레임
-# GitHub 정보 저장 프레임
-st.subheader("GitHub 정보 입력")
+# GitHub 정보 저장 및 OpenAI API 키 저장 (가로로 이어서 50%씩 구성)
+st.subheader("1. GitHub 정보 저장 및 OpenAI API 키 저장")
 
-repo_input = st.text_input("GitHub 저장소 (owner/repo 형식)", value="owner/repo")
-branch_input = st.text_input("GitHub 브랜치", value="main")
-token_input = st.text_input("GitHub Token", type="password")
+col1, col2 = st.columns(2)  # 두 개의 컬럼으로 나눔
 
-if st.button("GitHub 정보 저장"):
-    if repo_input and branch_input and token_input:
-        st.session_state["github_repo"] = repo_input
-        st.session_state["github_branch"] = branch_input
-        st.session_state["github_token"] = token_input
-        st.success("GitHub 정보가 성공적으로 저장되었습니다!")
-    else:
-        st.error("모든 GitHub 정보를 입력해야 합니다!")
+# GitHub 정보 저장 프레임 (50%)
+with col1:
+    st.subheader("GitHub 정보 입력")
+    repo_input = st.text_input("GitHub 저장소 (owner/repo 형식)", value="owner/repo")
+    branch_input = st.text_input("GitHub 브랜치", value="main")
+    token_input = st.text_input("GitHub Token", type="password")
+
+    if st.button("GitHub 정보 저장"):
+        if repo_input and branch_input and token_input:
+            st.session_state["github_repo"] = repo_input
+            st.session_state["github_branch"] = branch_input
+            st.session_state["github_token"] = token_input
+            st.success("GitHub 정보가 성공적으로 저장되었습니다!")
+        else:
+            st.error("모든 GitHub 정보를 입력해야 합니다!")
+
+# OpenAI API 키 저장 프레임 (50%)
+with col2:
+    st.subheader("OpenAI API 키 저장")
+    api_key_input = st.text_input("OpenAI API 키를 입력하세요", type="password")
+    if st.button("API 키 저장"):
+        if api_key_input:
+            st.session_state["api_key"] = api_key_input
+            os.environ["OPENAI_API_KEY"] = api_key_input
+            st.success("API 키가 성공적으로 저장되었습니다!")
+        else:
+            st.error("API 키를 입력해야 합니다!")
 
 # 2. 프레임
-# OpenAI API 키 저장
-st.subheader("OpenAI API 키 저장")
-api_key_input = st.text_input("OpenAI API 키를 입력하세요", type="password")
-if st.button("API 키 저장"):
-    if api_key_input:
-        st.session_state["api_key"] = api_key_input
-        os.environ["OPENAI_API_KEY"] = api_key_input
-        st.success("API 키가 성공적으로 저장되었습니다!")
-    else:
-        st.error("API 키를 입력해야 합니다!")
-
-# 3. 프레임
 # 작성 보고서 요청사항
-st.subheader("작성 보고서 요청사항")
+st.subheader("2. 작성 보고서 요청사항")
 
 title = st.text_input("제목을 입력하세요:")
 request = st.text_area("요청 사항을 입력하세요:")
@@ -84,9 +89,9 @@ if "github_token" in st.session_state:
 else:
     st.info("먼저 GitHub 토큰을 입력하고 저장하세요.")
 
-# 4. 프레임
+# 3. 프레임
 # 실행 버튼
-st.subheader("실행 버튼")
+st.subheader("3. 실행 버튼")
 if st.button("실행"):
     if not st.session_state.get("api_key"):
         st.error("먼저 OpenAI API 키를 입력하고 저장하세요!")
@@ -95,8 +100,8 @@ if st.button("실행"):
     else:
         st.session_state["response"] = call_openai_api(st.session_state["api_key"], st.session_state["prompt"])
 
-# 5. 프레임
+# 4. 프레임
 # 결과 보고서
-st.subheader("결과 보고서")
+st.subheader("4. 결과 보고서")
 if "response" in st.session_state:
     st.text_area("응답:", value=st.session_state["response"], height=300)
