@@ -104,6 +104,7 @@ with st.container():
     with col1:
         st.write("파일")
     with col2:
+        selected_file = None  # selected_file 초기화
         if "github_token" in st.session_state:
             files = get_github_files(st.session_state["github_repo"], st.session_state["github_branch"], st.session_state["github_token"])
 
