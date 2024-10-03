@@ -112,11 +112,19 @@ def extract_data_from_file(file_content, file_type):
 
 # PDF 파일에서 텍스트 추출
 def extract_text_from_pdf(file_content):
-    reader = PyPDF2.PdfReader(file_content)
-    text = ''
-    for page in range(len(reader.pages)):
-        text += reader.pages[page].extract_text()
-    return text
+    try:
+        if file_content is None:
+            raise ValueError("유효하지 않은 파일입니다. PDF 파일이 없습니다.")
+        
+        file_content.seek(0)  # 파일 포인터를 처음으로 이동
+        reader = PyPDF2.PdfReader(file_content)
+        text = ''
+        for page in range(len(reader.pages)):
+            text += reader.pages[page].extract_text()
+        return text
+    except Exception as e:
+        st.error(f"PDF 파일을 처리하는 중 오류가 발생했습니다: {str(e)}")
+        return None
 
 # 엑셀 파일에서 텍스트 추출 (시트 정보를 정확하게 가져오도록 수정)
 def extract_text_from_excel(file_content):
