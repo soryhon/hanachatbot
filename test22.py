@@ -191,4 +191,4 @@ if "response" in st.session_state:
     st.text_area("응답:", value=st.session_state["response"], height=300)
     
     # 응답 데이터를 HTML 형식으로 표시
-    st.components.v1.html(st.session_state["response"], height=400)
+    st.components.v1.html(st.session_state["response"], height=600, scrolling=True)
