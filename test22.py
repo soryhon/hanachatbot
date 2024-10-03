@@ -84,7 +84,6 @@ def extract_text_from_ppt(file_content):
 # 이미지에서 텍스트 추출 (OCR)
 def extract_text_from_image(file_content):
     image = Image.open(file_content)
-    # OCR 처리가 필요할 경우 여기 추가 가능
     return "이미지에서 텍스트를 추출하는 기능은 구현되지 않았습니다."
 
 # 프롬프트를 구성하고 LLM에 전달하는 함수
@@ -188,4 +187,8 @@ with col2:
 # 3. 프레임: 결과 보고서
 st.subheader("3. 결과 보고서")
 if "response" in st.session_state:
+    # 응답 텍스트 출력 (text_area)
     st.text_area("응답:", value=st.session_state["response"], height=300)
+    
+    # 응답 데이터를 HTML 형식으로 표시
+    st.components.v1.html(st.session_state["response"], height=400)
