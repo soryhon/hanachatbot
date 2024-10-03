@@ -10,6 +10,7 @@ import docx
 import pptx
 from PIL import Image
 from io import BytesIO
+import base64  # base64 인코딩을 위해 추가
 from langchain.chat_models import ChatOpenAI
 
 # 전역변수로 프롬프트 저장
@@ -34,9 +35,13 @@ def get_github_files(repo, branch, token):
 def upload_file_to_github(repo, folder, file_name, content, token, branch="main", sha=None):
     url = f"https://api.github.com/repos/{repo}/contents/{folder}/{file_name}"
     headers = {"Authorization": f"token {token}"}
+    
+    # 파일 콘텐츠를 base64로 인코딩
+    content_base64 = base64.b64encode(content).decode('utf-8')
+
     data = {
         "message": f"Upload {file_name} to {folder}",
-        "content": content.decode("utf-8"),
+        "content": content_base64,  # base64 인코딩된 콘텐츠
         "branch": branch
     }
     if sha:  # 덮어쓰기인 경우 SHA 값 전달
@@ -212,7 +217,6 @@ with col2:
 
 # 2 프레임
 # 2. 파일 업로드
-st.subheader("2. 파일 업로드")
 
 # GitHub 정보가 저장되지 않은 경우 업로드 금지
 if not st.session_state.get("github_token") or not st.session_state.get("github_repo"):
