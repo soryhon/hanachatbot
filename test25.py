@@ -281,8 +281,8 @@ with col1:
                     # 제목
                     row['제목'] = st.text_input(f"제목 (요청사항 {idx+1})", row['제목'], key=f"title_{idx}")
 
-                    # 요청
-                    row['요청'] = st.text_input(f"요청 (요청사항 {idx+1})", row['요청'], key=f"request_{idx}")
+                    # 요청 (text_area로 변경됨)
+                    row['요청'] = st.text_area(f"요청 (요청사항 {idx+1})", row['요청'], key=f"request_{idx}")
 
                     # GitHub 파일 목록 불러오기
                     file_list = []
