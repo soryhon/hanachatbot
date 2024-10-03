@@ -446,6 +446,7 @@ with col1:
             file_url = st.session_state['selected_template_info']['url']
 
             if file_extension in ['png', 'jpg', 'jpeg', 'gif']:
+                st.components.v1.html(f'<img src="./templateFiles/2024-09-29_232209.png" alt="이미지 미리보기" style="max-width: 100%;">', height=400)
                 st.components.v1.html(f'<img src="{file_url}" alt="이미지 미리보기" style="max-width: 100%;">', height=400)
             elif file_extension == 'pdf':
                 st.components.v1.html(f'<iframe src="{file_url}" width="100%" height="600px"></iframe>', height=600)
