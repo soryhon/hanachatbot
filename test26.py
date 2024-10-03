@@ -247,6 +247,7 @@ with col2:
             st.error("API 키를 입력해야 합니다!")
 
 # 2 프레임: 파일 업로드
+st.subheader("2. 파일 업로드")
 if not st.session_state.get("github_token") or not st.session_state.get("github_repo"):
     st.warning("GitHub 정보가 저장되기 전에는 파일 업로드를 할 수 없습니다. 먼저 GitHub 정보를 입력해 주세요.")
 else:
