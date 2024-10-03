@@ -10,6 +10,7 @@ import docx
 import pptx
 from PIL import Image
 from io import BytesIO
+import base64
 import time
 from openai.error import RateLimitError
 from langchain.chat_models import ChatOpenAI
@@ -45,6 +46,40 @@ def get_file_sha(repo, file_path, token, branch='main'):
         return response.json().get('sha', None)
     else:
         return None
+
+# GitHub에 파일 업로드 함수
+def upload_file_to_github(repo, folder_name, file_name, file_content, token, branch='main', sha=None):
+    """
+    GitHub 저장소에 파일을 업로드하는 함수.
+    """
+    url = f"https://api.github.com/repos/{repo}/contents/{folder_name}/{file_name}"
+    headers = {
+        "Authorization": f"token {token}",
+        "Content-Type": "application/json"
+    }
+
+    # 파일 내용을 base64로 인코딩
+    content_encoded = base64.b64encode(file_content).decode('utf-8')
+
+    # 요청할 데이터 구성
+    data = {
+        "message": f"Upload {file_name}",
+        "content": content_encoded,
+        "branch": branch
+    }
+
+    if sha:
+        data["sha"] = sha
+
+    response = requests.put(url, json=data, headers=headers)
+
+    if response.status_code == 201:
+        st.success(f"{file_name} 파일이 성공적으로 업로드되었습니다.")
+    elif response.status_code == 200:
+        st.success(f"{file_name} 파일이 성공적으로 덮어쓰기 되었습니다.")
+    else:
+        st.error(f"파일 업로드에 실패했습니다: {response.status_code}")
+        st.error(response.json())
 
 # GitHub에서 파일을 다운로드하는 함수
 def get_file_from_github(repo, branch, filepath, token):
