@@ -23,6 +23,12 @@ st.set_page_config(layout="wide")
 
 # GitHub API 요청을 처리하는 함수 수정
 def get_github_files(repo, branch, token, folder_name=None):
+    # 필수 정보가 누락된 경우 경고 메시지 출력
+    if not repo or not branch or not token:
+        st.error("GitHub 정보가 누락되었습니다. 저장소, 브랜치, 또는 토큰이 제대로 설정되지 않았습니다.")
+        return []
+
+    # 폴더 경로가 있으면 해당 폴더의 파일을 가져오도록 설정
     if folder_name:
         url = f"https://api.github.com/repos/{repo}/contents/{folder_name}?ref={branch}"
     else:
@@ -30,13 +36,13 @@ def get_github_files(repo, branch, token, folder_name=None):
 
     headers = {"Authorization": f"token {token}"}
     response = requests.get(url, headers=headers)
-    
-    # 예외 처리 추가
+
+    # API 요청에 대한 상태 코드 확인 및 예외 처리
     if response.status_code == 200:
         files = [item['name'] for item in response.json() if item['type'] == 'file']
         return files
     elif response.status_code == 404:
-        st.error(f"폴더 '{folder_name}'가 존재하지 않거나 파일을 찾을 수 없습니다.")
+        st.error(f"폴더 '{folder_name}'가 존재하지 않거나 파일을 찾을 수 없습니다. 상태 코드: 404")
         return []
     else:
         st.error(f"파일 목록을 가져오는 중 오류가 발생했습니다. 상태 코드: {response.status_code}")
