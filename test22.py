@@ -105,7 +105,7 @@ def run_llm_with_file_and_prompt(api_key, title, request, file_data):
 
     # 프롬프트 템플릿 구성
     generated_prompt = f"""
-    보고서 제목은 '{title}'로 하고, 이 파일에서 '{request}'를 만족할 수 있도록 최적화된 보고서를 완성해.
+    보고서 제목은 '{title}'로 하고, 이 파일에서 '{request}'를 요구 사항을 만족할 수 있도록 최적화된 보고서를 완성해.
     파일 데이터: {file_data}
     """
     
@@ -113,7 +113,8 @@ def run_llm_with_file_and_prompt(api_key, title, request, file_data):
     global_generated_prompt = generated_prompt
 
     # LangChain의 LLMChain 사용
-    llm = ChatOpenAI(model_name="gpt-3.5-turbo")
+    #llm = ChatOpenAI(model_name="gpt-3.5-turbo")
+    llm = ChatOpenAI(model_name="gpt-4o")
     chain = LLMChain(llm=llm, prompt=PromptTemplate(template=generated_prompt, input_variables=[]))
     
     # LLM에 프롬프트를 전달하고 응답 받기
