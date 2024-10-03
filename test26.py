@@ -363,8 +363,8 @@ with col1:
                 st.session_state['rows'] = st.session_state['rows']
 
 with col2:
-    st.write(" ")
-    st.write(" ")
+    st.write("3. 실행 버튼 ")
+
     if st.button("실행"):
         if not st.session_state.get("api_key"):
             st.error("먼저 OpenAI API 키를 입력하고 저장하세요!")
