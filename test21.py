@@ -67,46 +67,44 @@ with col2:
             st.error("API 키를 입력해야 합니다!")
 
 # 2. 프레임
-# 작성 보고서 요청사항 (테이블 형식으로 묶기)
+# 요청사항 테이블 형식으로 구성
 st.subheader("2. 요청사항")
 
-# 테이블을 테두리로 둘러싸는 스타일 적용
-st.markdown("""
-<style>
-    .custom-table {
-        border: 2px solid #4CAF50;
-        padding: 10px;
-        border-radius: 5px;
-    }
-    .custom-table div {
-        padding: 10px;
-    }
-    .center-text {
-        text-align: center;
-        font-weight: bold;
-    }
-</style>
-""", unsafe_allow_html=True)
-
+# 요청사항 테이블을 50% 가로 크기로 설정하고 세로 스크롤 추가
 with st.container():
-    st.markdown('<div class="custom-table">', unsafe_allow_html=True)
-    # 테이블 형식의 컬럼 나눔
-    col1, col2 = st.columns([0.1, 0.9])  # 가로 길이 10%, 90%
-
+    st.markdown("""
+    <style>
+    .scrollable-table {
+        width: 50%;
+        height: 300px;
+        overflow-y: scroll;
+        border: 1px solid #cccccc;
+        padding: 10px;
+    }
+    .scrollable-table div {
+        padding: 10px;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    st.markdown('<div class="scrollable-table">', unsafe_allow_html=True)
+    
+    col1, col2 = st.columns([0.2, 0.8])  # 타이틀과 입력 필드 비율 20%와 80%
+    
     with col1:
-        st.markdown('<div class="center-text">제목</div>', unsafe_allow_html=True)
+        st.write("제목")
     with col2:
         title = st.text_input("", value="", disabled=False)
 
-    col1, col2 = st.columns([0.1, 0.9])
+    col1, col2 = st.columns([0.2, 0.8])
     with col1:
-        st.markdown('<div class="center-text">요청</div>', unsafe_allow_html=True)
+        st.write("요청")
     with col2:
         request = st.text_area("", disabled=False)
 
-    col1, col2 = st.columns([0.1, 0.9])
+    col1, col2 = st.columns([0.2, 0.8])
     with col1:
-        st.markdown('<div class="center-text">파일</div>', unsafe_allow_html=True)
+        st.write("파일")
     with col2:
         selected_file = None  # selected_file 초기화
         if "github_token" in st.session_state:
@@ -119,13 +117,13 @@ with st.container():
         else:
             st.info("먼저 GitHub 토큰을 입력하고 저장하세요.")
 
-    col1, col2 = st.columns([0.1, 0.9])
+    col1, col2 = st.columns([0.2, 0.8])
     with col1:
-        st.markdown('<div class="center-text">데이터</div>', unsafe_allow_html=True)
+        st.write("데이터")
     with col2:
         if selected_file and selected_file != "파일을 선택하세요":
             st.text_input("", value=f"선택한 파일 경로: {selected_file}", disabled=True)
-
+    
     st.markdown('</div>', unsafe_allow_html=True)
 
 # 3. 프레임
