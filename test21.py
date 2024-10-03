@@ -67,28 +67,30 @@ with col2:
             st.error("API 키를 입력해야 합니다!")
 
 # 2. 프레임
-# 요청사항 테이블 형식으로 구성
+# 요청사항 테이블 형식으로 구성 (테두리와 테이블 안에 객체들 포함)
 st.subheader("2. 요청사항")
 
-# 요청사항 테이블을 50% 가로 크기로 설정하고 세로 스크롤 추가
-with st.container():
-    st.markdown("""
-    <style>
+# 요청사항 테이블을 테두리 안에 포함하고, 가로 50%로 설정
+st.markdown("""
+<style>
     .scrollable-table {
         width: 50%;
         height: 300px;
         overflow-y: scroll;
-        border: 1px solid #cccccc;
+        border: 2px solid #cccccc;
+        border-radius: 5px;
         padding: 10px;
     }
     .scrollable-table div {
-        padding: 10px;
+        padding: 5px;
     }
-    </style>
-    """, unsafe_allow_html=True)
-    
+</style>
+""", unsafe_allow_html=True)
+
+# 테두리 안에 모든 객체를 포함
+with st.container():
     st.markdown('<div class="scrollable-table">', unsafe_allow_html=True)
-    
+
     col1, col2 = st.columns([0.2, 0.8])  # 타이틀과 입력 필드 비율 20%와 80%
     
     with col1:
@@ -103,42 +105,4 @@ with st.container():
         request = st.text_area("", disabled=False)
 
     col1, col2 = st.columns([0.2, 0.8])
-    with col1:
-        st.write("파일")
-    with col2:
-        selected_file = None  # selected_file 초기화
-        if "github_token" in st.session_state:
-            files = get_github_files(st.session_state["github_repo"], st.session_state["github_branch"], st.session_state["github_token"])
-
-            if files:
-                selected_file = st.selectbox("GitHub 파일을 선택하세요", ["파일을 선택하세요"] + files, index=0)
-            else:
-                st.info("저장소에 파일이 없습니다.")
-        else:
-            st.info("먼저 GitHub 토큰을 입력하고 저장하세요.")
-
-    col1, col2 = st.columns([0.2, 0.8])
-    with col1:
-        st.write("데이터")
-    with col2:
-        if selected_file and selected_file != "파일을 선택하세요":
-            st.text_input("", value=f"선택한 파일 경로: {selected_file}", disabled=True)
-    
-    st.markdown('</div>', unsafe_allow_html=True)
-
-# 3. 프레임
-# 실행 버튼
-st.subheader("3. 실행 버튼")
-if st.button("실행"):
-    if not st.session_state.get("api_key"):
-        st.error("먼저 OpenAI API 키를 입력하고 저장하세요!")
-    elif not st.session_state.get("prompt"):
-        st.error("제목과 요청 사항을 입력해야 합니다!")
-    else:
-        st.session_state["response"] = call_openai_api(st.session_state["api_key"], st.session_state["prompt"])
-
-# 4. 프레임
-# 결과 보고서
-st.subheader("4. 결과 보고서")
-if "response" in st.session_state:
-    st.text_area("응답:", value=st.session_state["response"], height=300)
+   
