@@ -295,11 +295,10 @@ with col1:
                     
                     selected_file = st.selectbox(f"파일 선택 (요청사항 {idx+1})", options=file_list, key=f"file_select_{idx}")
 
-                    # 선택된 파일 서버 경로 저장
-                    if selected_file != '파일을 선택하세요.' and st.button(f"선택 (요청사항 {idx+1})"):
+                    # 선택된 파일 서버 경로 자동 입력
+                    if selected_file != '파일을 선택하세요.':
                         server_path = f"/{st.session_state['github_repo']}/{st.session_state['github_branch']}/uploadFiles/{selected_file}"
                         row['데이터'] = server_path
-                        st.success(f"선택한 파일: {selected_file}\n서버 경로: {server_path}")
 
                     # 데이터 (선택된 파일의 경로)
                     st.text_input(f"데이터 (요청사항 {idx+1})", row['데이터'], disabled=True, key=f"data_{idx}")
@@ -316,8 +315,8 @@ with col1:
         with col1_1:
             # 행 추가
             if st.button("행 추가"):
-                st.session_state['rows'].append({"제목": "", "요청": "", "데이터": "", "checked": False})
-                st.experimental_rerun()  # 새로고침을 통해 페이지 갱신
+                new_row = {"제목": "", "요청": "", "데이터": "", "checked": False}
+                st.session_state['rows'].append(new_row)
 
         with col1_2:
             # 행 삭제
@@ -326,14 +325,13 @@ with col1:
                     # 선택된 요청사항 삭제
                     st.session_state['rows'] = [row for idx, row in enumerate(rows) if idx not in checked_rows]
                     st.success(f"체크된 {len(checked_rows)}개의 요청사항이 삭제되었습니다.")
-                    st.experimental_rerun()  # 새로고침을 통해 페이지 갱신
                 else:
                     st.warning("삭제할 요청사항을 선택해주세요.")
 
         with col1_3:
             # 새로고침
             if st.button("새로고침"):
-                st.experimental_rerun()  # 페이지를 새로고침
+                st.session_state['rows'] = st.session_state['rows']
 
 # 실행 버튼 영역
 with col2:
