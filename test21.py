@@ -68,6 +68,10 @@ st.subheader("작성 보고서 요청사항")
 title = st.text_input("제목을 입력하세요:")
 request = st.text_area("요청 사항을 입력하세요:")
 
+# 프롬프트를 세션 상태에 저장
+if title and request:
+    st.session_state["prompt"] = f"다음과 같은 제목이 주어졌습니다: {title}\n요청 사항: {request}"
+
 # GitHub 토큰이 저장된 경우에만 파일 리스트 가져오기
 if "github_token" in st.session_state:
     files = get_github_files(st.session_state["github_repo"], st.session_state["github_branch"], st.session_state["github_token"])
