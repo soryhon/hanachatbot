@@ -439,15 +439,18 @@ with col1:
         if 'selected_template_info' in st.session_state:
             st.text_input("템플릿 파일 정보", st.session_state['selected_template_info']['relative_path'], disabled=True)
 
+            # 템플릿 URL 정보 입력 추가
+            st.text_input("템플릿 URL 정보", st.session_state['selected_template_info']['url'], disabled=True)
+
             file_extension = st.session_state['selected_template_info']['extension']
-            file_path = st.session_state['selected_template_info']['url']
+            file_url = st.session_state['selected_template_info']['url']
 
             if file_extension in ['png', 'jpg', 'jpeg', 'gif']:
-                st.components.v1.html(f'<img src="{file_path}" alt="이미지 미리보기" style="max-width: 100%;">', height=400)
+                st.components.v1.html(f'<img src="{file_url}" alt="이미지 미리보기" style="max-width: 100%;">', height=400)
             elif file_extension == 'pdf':
-                st.components.v1.html(f'<iframe src="{file_path}" width="100%" height="600px"></iframe>', height=600)
+                st.components.v1.html(f'<iframe src="{file_url}" width="100%" height="600px"></iframe>', height=600)
             elif file_extension == 'html':
-                st.components.v1.html(f'<iframe src="{file_path}" width="100%" height="600px"></iframe>', height=600)
+                st.components.v1.html(f'<iframe src="{file_url}" width="100%" height="600px"></iframe>', height=600)
             elif file_extension == 'docx':
                 st.write("Word 파일은 HTML 형식으로 변환하여 표시합니다.")
                 file_content = get_file_from_github(st.session_state["github_repo"], st.session_state["github_branch"], f"templateFiles/{selected_template}", st.session_state["github_token"])
