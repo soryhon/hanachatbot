@@ -70,9 +70,20 @@ def extract_text_from_pdf(file_content):
 
 # 엑셀 파일에서 텍스트 추출
 def extract_text_from_excel(file_content):
-    excel_data = pd.read_excel(file_content)
-    return excel_data
+    try:
+        # 모든 시트의 데이터를 불러오도록 수정
+        excel_data = pd.read_excel(file_content, sheet_name=None)  # sheet_name=None: 모든 시트를 불러옴
+        all_data = {}
 
+        # 각 시트의 데이터를 사전 형식으로 저장
+        for sheet_name, data in excel_data.items():
+            all_data[sheet_name] = data
+
+        return all_data  # 각 시트 이름과 데이터가 포함된 딕셔너리 반환
+    except Exception as e:
+        st.error(f"엑셀 파일을 불러오는 중 오류가 발생했습니다: {str(e)}")
+        return None
+        
 # CSV 파일에서 텍스트 추출
 def extract_text_from_csv(file_content):
     csv_data = pd.read_csv(file_content)
