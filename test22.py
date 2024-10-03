@@ -9,6 +9,8 @@ import docx
 import pptx
 from PIL import Image
 from io import BytesIO
+from langchain.agents import create_pandas_dataframe_agent
+from langchain.chat_models import ChatOpenAI
 
 # 전역변수로 프롬프트 저장
 global_generated_prompt = ""
@@ -46,6 +48,8 @@ def extract_data_from_file(file_content, file_type):
         return extract_text_from_pdf(file_content)
     elif file_type == 'xlsx':
         return extract_text_from_excel(file_content)
+    elif file_type == 'csv':
+        return extract_text_from_csv(file_content)
     elif file_type == 'docx':
         return extract_text_from_word(file_content)
     elif file_type == 'pptx':
@@ -67,7 +71,12 @@ def extract_text_from_pdf(file_content):
 # 엑셀 파일에서 텍스트 추출
 def extract_text_from_excel(file_content):
     excel_data = pd.read_excel(file_content)
-    return excel_data.to_string()
+    return excel_data
+
+# CSV 파일에서 텍스트 추출
+def extract_text_from_csv(file_content):
+    csv_data = pd.read_csv(file_content)
+    return csv_data
 
 # 워드 파일에서 텍스트 추출
 def extract_text_from_word(file_content):
@@ -89,8 +98,8 @@ def extract_text_from_image(file_content):
     image = Image.open(file_content)
     return "이미지에서 텍스트를 추출하는 기능은 구현되지 않았습니다."
 
-# 프롬프트를 구성하고 LLM에 전달하는 함수 (전역변수에 프롬프트 저장)
-def create_prompt_and_send_to_llm(api_key, title, request, file_data):
+# LLM과 에이전트를 통해 프롬프트와 파일을 전달하고 응답을 받는 함수
+def run_llm_with_file_and_prompt(api_key, title, request, file_data):
     global global_generated_prompt
     openai.api_key = api_key
 
@@ -99,21 +108,15 @@ def create_prompt_and_send_to_llm(api_key, title, request, file_data):
     보고서 제목은 '{title}'로 하고, 이 파일에서 '{request}'를 만족할 수 있도록 최적화된 보고서를 완성해.
     파일 데이터: {file_data}
     """
-
+    
     # 전역변수에 프롬프트 저장
     global_generated_prompt = generated_prompt
 
-    # LLM에 프롬프트 전달하고 응답 받기
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": generated_prompt}
-        ],
-        max_tokens=1500
-    )
+    # Pandas DataFrame을 LLM 에이전트와 함께 사용
+    agent = create_pandas_dataframe_agent(ChatOpenAI(temperature=0, model="gpt-3.5-turbo"), file_data, verbose=True)
 
-    return response['choices'][0]['message']['content']
+    # LLM 에이전트에 프롬프트를 전달하고 응답 받기
+    return agent.run(generated_prompt)
 
 # 1. 프레임: GitHub 정보 저장 및 OpenAI API 키 저장
 st.subheader("1. GitHub 정보 저장 및 OpenAI API 키 저장")
@@ -175,7 +178,22 @@ with col1:
         file_path = selected_file
         file_content = get_file_from_github(st.session_state["github_repo"], st.session_state["github_branch"], file_path, st.session_state["github_token"])
         file_type = file_path.split('.')[-1].lower()
-        file_data = extract_data_from_file(file_content, file_type)
+        
+        if file_type == 'xlsx':
+            file_data = extract_text_from_excel(file_content)
+        elif file_type == 'csv':
+            file_data = extract_text_from_csv(file_content)
+        elif file_type == 'docx':
+            file_data = extract_text_from_word(file_content)
+        elif file_type == 'pptx':
+            file_data = extract_text_from_ppt(file_content)
+        elif file_type == 'pdf':
+            file_data = extract_text_from_pdf(file_content)
+        elif file_type in ['png', 'jpg', 'jpeg']:
+            file_data = extract_text_from_image(file_content)
+        else:
+            st.error(f"지원되지 않는 파일 형식입니다: {file_type}")
+        
         st.text_input("", value=f"선택한 파일 경로: {selected_file}", disabled=True)
 
 # 실행 버튼
@@ -188,11 +206,12 @@ with col2:
         elif not title or not request or selected_file == "파일을 선택하세요":
             st.error("제목, 요청사항, 또는 파일을 선택해야 합니다!")
         else:
-            response = create_prompt_and_send_to_llm(st.session_state["api_key"], title, request, file_data)
+            response = run_llm_with_file_and_prompt(st.session_state["api_key"], title, request, file_data)
             st.session_state["response"] = response
 
 # 3. 프레임: 결과 보고서
 st.subheader("3. 결과 보고서")
+
 
 # 전달 프롬프트 출력
 st.text_area("전달된 프롬프트:", value=global_generated_prompt, height=150)
