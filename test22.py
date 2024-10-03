@@ -114,10 +114,10 @@ def run_llm_with_file_and_prompt(api_key, title, request, file_data):
 
     # LangChain의 LLMChain 사용
     llm = ChatOpenAI(model_name="gpt-3.5-turbo")
-    chain = LLMChain(llm=llm, prompt_template=generated_prompt)
+    chain = LLMChain(llm=llm, prompt=PromptTemplate(template=generated_prompt, input_variables=[]))
     
     # LLM에 프롬프트를 전달하고 응답 받기
-    return chain.run(generated_prompt)
+    return chain.run({})
 
 # 1. 프레임: GitHub 정보 저장 및 OpenAI API 키 저장
 st.subheader("1. GitHub 정보 저장 및 OpenAI API 키 저장")
@@ -212,7 +212,6 @@ with col2:
 
 # 3. 프레임: 결과 보고서
 st.subheader("3. 결과 보고서")
-
 
 # 전달 프롬프트 출력
 st.text_area("전달된 프롬프트:", value=global_generated_prompt, height=150)
