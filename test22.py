@@ -10,6 +10,9 @@ import pptx
 from PIL import Image
 from io import BytesIO
 
+# 전역변수로 프롬프트 저장
+global_generated_prompt = ""
+
 # 페이지 너비를 전체 화면으로 설정
 st.set_page_config(layout="wide")
 
@@ -86,22 +89,26 @@ def extract_text_from_image(file_content):
     image = Image.open(file_content)
     return "이미지에서 텍스트를 추출하는 기능은 구현되지 않았습니다."
 
-# 프롬프트를 구성하고 LLM에 전달하는 함수
+# 프롬프트를 구성하고 LLM에 전달하는 함수 (전역변수에 프롬프트 저장)
 def create_prompt_and_send_to_llm(api_key, title, request, file_data):
+    global global_generated_prompt
     openai.api_key = api_key
 
     # 프롬프트 템플릿 구성
-    prompt = f"""
+    generated_prompt = f"""
     보고서 제목은 '{title}'로 하고, 이 파일에서 '{request}'를 만족할 수 있도록 최적화된 보고서를 완성해.
     파일 데이터: {file_data}
     """
+
+    # 전역변수에 프롬프트 저장
+    global_generated_prompt = generated_prompt
 
     # LLM에 프롬프트 전달하고 응답 받기
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=[
             {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": prompt}
+            {"role": "user", "content": generated_prompt}
         ],
         max_tokens=1500
     )
@@ -186,8 +193,12 @@ with col2:
 
 # 3. 프레임: 결과 보고서
 st.subheader("3. 결과 보고서")
+
+# 전달 프롬프트 출력
+st.text_area("전달된 프롬프트:", value=global_generated_prompt, height=150)
+
 if "response" in st.session_state:
-    # 응답 텍스트 출력 (text_area)
+    # 응답 텍스트 출력
     st.text_area("응답:", value=st.session_state["response"], height=300)
     
     # 응답 데이터를 HTML 형식으로 표시
