@@ -67,58 +67,64 @@ with col2:
             st.error("API 키를 입력해야 합니다!")
 
 # 2. 프레임
+# 작성 보고서 요청사항과 실행 버튼을 가로로 배치
+st.subheader("2. 작성 보고서 요청사항 및 실행 버튼")
+
+# 두 개의 컬럼으로 나눠서 작성 보고서 요청사항과 실행 버튼 배치 (80%, 20%)
+col1, col2 = st.columns([0.8, 0.2])  # 가로 길이 80%, 20%
+
 # 작성 보고서 요청사항
-st.subheader("2. 요청사항")
-
-# 테이블 형식의 컬럼 나눔
-col1, col2 = st.columns([0.1, 0.9])  # 가로 길이 10%, 90%
-
 with col1:
-    st.write("제목")
-with col2:
-    title = st.text_input("", value="", disabled=False)
+    # 테이블 형식의 컬럼 나눔
+    col1_1, col1_2 = st.columns([0.1, 0.9])  # 가로 길이 10%, 90%
 
-col1, col2 = st.columns([0.1, 0.9])
-with col1:
-    st.write("요청")
-with col2:
-    request = st.text_area("", disabled=False)
+    with col1_1:
+        st.write("제목")
+    with col1_2:
+        title = st.text_input("", value="", disabled=False)
 
-col1, col2 = st.columns([0.1, 0.9])
-with col1:
-    st.write("파일")
-with col2:
-    selected_file = None  # selected_file 초기화
-    if "github_token" in st.session_state:
-        files = get_github_files(st.session_state["github_repo"], st.session_state["github_branch"], st.session_state["github_token"])
+    col1_1, col1_2 = st.columns([0.1, 0.9])
+    with col1_1:
+        st.write("요청")
+    with col1_2:
+        request = st.text_area("", disabled=False)
 
-        if files:
-            selected_file = st.selectbox("GitHub 파일을 선택하세요", ["파일을 선택하세요"] + files, index=0)
+    col1_1, col1_2 = st.columns([0.1, 0.9])
+    with col1_1:
+        st.write("파일")
+    with col1_2:
+        selected_file = None  # selected_file 초기화
+        if "github_token" in st.session_state:
+            files = get_github_files(st.session_state["github_repo"], st.session_state["github_branch"], st.session_state["github_token"])
+
+            if files:
+                selected_file = st.selectbox("GitHub 파일을 선택하세요", ["파일을 선택하세요"] + files, index=0)
+            else:
+                st.info("저장소에 파일이 없습니다.")
         else:
-            st.info("저장소에 파일이 없습니다.")
-    else:
-        st.info("먼저 GitHub 토큰을 입력하고 저장하세요.")
+            st.info("먼저 GitHub 토큰을 입력하고 저장하세요.")
 
-col1, col2 = st.columns([0.1, 0.9])
-with col1:
-    st.write("데이터")
+    col1_1, col1_2 = st.columns([0.1, 0.9])
+    with col1_1:
+        st.write("데이터")
+    with col1_2:
+        if selected_file and selected_file != "파일을 선택하세요":
+            st.text_input("", value=f"선택한 파일 경로: {selected_file}", disabled=True)
+
+# 실행 버튼
 with col2:
-    if selected_file and selected_file != "파일을 선택하세요":
-        st.text_input("", value=f"선택한 파일 경로: {selected_file}", disabled=True)
+    st.write(" ")
+    st.write(" ")
+    if st.button("실행"):
+        if not st.session_state.get("api_key"):
+            st.error("먼저 OpenAI API 키를 입력하고 저장하세요!")
+        elif not st.session_state.get("prompt"):
+            st.error("제목과 요청 사항을 입력해야 합니다!")
+        else:
+            st.session_state["response"] = call_openai_api(st.session_state["api_key"], st.session_state["prompt"])
 
 # 3. 프레임
-# 실행 버튼
-st.subheader("3. 실행 버튼")
-if st.button("실행"):
-    if not st.session_state.get("api_key"):
-        st.error("먼저 OpenAI API 키를 입력하고 저장하세요!")
-    elif not st.session_state.get("prompt"):
-        st.error("제목과 요청 사항을 입력해야 합니다!")
-    else:
-        st.session_state["response"] = call_openai_api(st.session_state["api_key"], st.session_state["prompt"])
-
-# 4. 프레임
 # 결과 보고서
-st.subheader("4. 결과 보고서")
+st.subheader("3. 결과 보고서")
 if "response" in st.session_state:
     st.text_area("응답:", value=st.session_state["response"], height=300)
