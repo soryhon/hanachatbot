@@ -401,14 +401,24 @@ with col1:
             file_name = uploaded_template.name
             folder_name = 'templateFiles'
 
-            # 템플릿 폴더 확인 및 생성
             sha = get_file_sha(st.session_state['github_repo'], f"{folder_name}/{file_name}", st.session_state['github_token'], branch=st.session_state['github_branch'])
 
-            if not sha:
-                upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'])
-                st.success(f"'{file_name}' 템플릿이 업로드되었습니다.")
+            if sha:
+                st.warning(f"'{file_name}' 파일이 이미 존재합니다. 덮어쓰시겠습니까?")
+                col1_1, col1_2 = st.columns([0.5, 0.5])
 
-        # 템플릿 파일 리스트를 가져옴
+                with col1_1:
+                    if st.button(f"'{file_name}' 덮어쓰기", key=f"overwrite_template_{file_name}"):
+                        upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
+                        st.success(f"'{file_name}' 파일이 성공적으로 덮어쓰기 되었습니다.")
+
+                with col1_2:
+                    if st.button("취소", key=f"cancel_template_{file_name}"):
+                        st.info("덮어쓰기가 취소되었습니다.")
+            else:
+                upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'])
+                st.success(f"'{file_name}' 템플릿 파일이 성공적으로 업로드되었습니다.")
+
         template_files = get_github_files(st.session_state["github_repo"], st.session_state["github_branch"], st.session_state["github_token"], folder_name="templateFiles")
         
         selected_template = st.selectbox("탬플릿 리스트 선택", ["파일을 선택하세요."] + template_files)
@@ -429,7 +439,6 @@ with col1:
         if 'selected_template_info' in st.session_state:
             st.text_input("템플릿 파일 정보", st.session_state['selected_template_info']['relative_path'], disabled=True)
 
-            # 확장자별 미리보기
             file_extension = st.session_state['selected_template_info']['extension']
             file_path = st.session_state['selected_template_info']['url']
 
