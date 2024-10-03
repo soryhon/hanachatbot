@@ -417,16 +417,39 @@ with col1:
             if selected_template == "파일을 선택하세요.":
                 st.error("파일을 선택하세요.")
             else:
+                file_extension = selected_template.split('.')[-1].lower()
                 template_url = f"https://github.com/{st.session_state['github_repo']}/blob/{st.session_state['github_branch']}/templateFiles/{selected_template}"
                 template_relative_path = f"{st.session_state['github_repo']}/{st.session_state['github_branch']}/templateFiles/{selected_template}"
                 st.session_state['selected_template_info'] = {
                     'url': template_url,
-                    'relative_path': template_relative_path
+                    'relative_path': template_relative_path,
+                    'extension': file_extension
                 }
 
         if 'selected_template_info' in st.session_state:
             st.text_input("템플릿 파일 정보", st.session_state['selected_template_info']['relative_path'], disabled=True)
-            st.components.v1.html(f'<iframe src="{st.session_state["selected_template_info"]["url"]}" width="100%" height="400px"></iframe>', height=400)
+
+            # 확장자별 미리보기
+            file_extension = st.session_state['selected_template_info']['extension']
+            file_path = st.session_state['selected_template_info']['url']
+
+            if file_extension in ['png', 'jpg', 'jpeg', 'gif']:
+                st.components.v1.html(f'<img src="{file_path}" alt="이미지 미리보기" style="max-width: 100%;">', height=400)
+            elif file_extension == 'pdf':
+                st.components.v1.html(f'<iframe src="{file_path}" width="100%" height="600px"></iframe>', height=600)
+            elif file_extension == 'html':
+                st.components.v1.html(f'<iframe src="{file_path}" width="100%" height="600px"></iframe>', height=600)
+            elif file_extension == 'docx':
+                st.write("Word 파일은 HTML 형식으로 변환하여 표시합니다.")
+                file_content = get_file_from_github(st.session_state["github_repo"], st.session_state["github_branch"], f"templateFiles/{selected_template}", st.session_state["github_token"])
+                word_data = extract_text_from_word(file_content)
+                st.components.v1.html(f"<div>{word_data}</div>", height=600)
+            elif file_extension == 'xlsx':
+                st.write("Excel 파일은 HTML 형식으로 변환하여 표시합니다.")
+                file_content = get_file_from_github(st.session_state["github_repo"], st.session_state["github_branch"], f"templateFiles/{selected_template}", st.session_state["github_token"])
+                excel_data = extract_text_from_excel(file_content)
+                excel_html = "".join([f"<h3>시트: {sheet_name}</h3>{data.to_html()}" for sheet_name, data in excel_data.items()])
+                st.components.v1.html(f"<div>{excel_html}</div>", height=600)
 
 with col2:
     st.subheader("4. 결과 보고서")
