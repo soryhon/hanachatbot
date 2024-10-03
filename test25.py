@@ -21,11 +21,14 @@ st.set_page_config(layout="wide")
 
 # GitHub API 요청을 처리하는 함수
 def get_github_files(repo, branch, token, folder_name=None):
-    # GitHub API 호출 (예시로 파일 리스트 반환)
-    if folder_name:
-        return [f"{folder_name}/file1.txt", f"{folder_name}/file2.txt"]
+    url = f"https://api.github.com/repos/{repo}/contents/{folder_name}?ref={branch}"
+    headers = {"Authorization": f"token {token}"}
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        files = [item['name'] for item in response.json() if item['type'] == 'file']
+        return files
     else:
-        return ["file1.txt", "file2.txt"]
+        return []
 
 # GitHub에 파일 업로드 함수 (폴더 없으면 생성)
 def upload_file_to_github(repo, folder, file_name, content, token, branch="main", sha=None):
@@ -285,15 +288,16 @@ with col1:
                     row['요청'] = st.text_area(f"요청 (요청사항 {idx+1})", row['요청'], key=f"request_{idx}")
 
                     # GitHub 파일 목록 불러오기
-                    file_list = []
-                    if st.session_state.get('github_repo') and st.session_state.get('github_token'):
-                        file_list = get_github_files(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
+                    file_list = ['파일을 선택하세요.']  # 기본값
+                    if st.session_state.get('github_token') and st.session_state.get('github_repo'):
+                        # uploadFiles 폴더의 파일 리스트 가져오기
+                        file_list += get_github_files(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'], folder_name='uploadFiles')
                     
                     selected_file = st.selectbox(f"파일 선택 (요청사항 {idx+1})", options=file_list, key=f"file_select_{idx}")
 
                     # 선택된 파일 서버 경로 저장
-                    if st.button(f"선택 (요청사항 {idx+1})") and selected_file:
-                        server_path = get_file_server_path(st.session_state['github_repo'], st.session_state.get('github_branch', 'main'), selected_file)
+                    if selected_file != '파일을 선택하세요.' and st.button(f"선택 (요청사항 {idx+1})"):
+                        server_path = f"/{st.session_state['github_repo']}/{st.session_state['github_branch']}/uploadFiles/{selected_file}"
                         row['데이터'] = server_path
                         st.success(f"선택한 파일: {selected_file}\n서버 경로: {server_path}")
 
