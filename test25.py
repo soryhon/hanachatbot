@@ -10,7 +10,8 @@ import docx
 import pptx
 from PIL import Image
 from io import BytesIO
-import base64
+import time
+from openai.error import RateLimitError
 from langchain.chat_models import ChatOpenAI
 
 # 전역변수로 프롬프트 저장
@@ -107,13 +108,13 @@ def extract_text_from_image(file_content):
     image = Image.open(file_content)
     return "이미지에서 텍스트를 추출하는 기능은 구현되지 않았습니다."
 
-# LLM을 통해 프롬프트와 파일을 전달하고 응답을 받는 함수 (배열로 데이터 전달)
+# LLM을 통해 프롬프트와 파일을 전달하고 응답을 받는 함수 (순차적으로 처리)
 def run_llm_with_file_and_prompt(api_key, titles, requests, file_data_list):
     global global_generated_prompt
     openai.api_key = api_key
 
-    # 프롬프트를 담을 리스트
-    prompts = []
+    # 각 요청사항 리스트에 맞게 여러 프롬프트 생성 및 순차적으로 응답 처리
+    responses = []
     global_generated_prompt = []  # 프롬프트들을 담을 리스트 초기화
 
     for i, (title, request, file_data) in enumerate(zip(titles, requests, file_data_list)):
@@ -125,7 +126,7 @@ def run_llm_with_file_and_prompt(api_key, titles, requests, file_data_list):
         else:
             file_data_str = str(file_data)
 
-        # 프롬프트 템플릿 구성 (기본 템플릿 활용)
+        # 프롬프트 템플릿 구성
         generated_prompt = f"""
         보고서 제목은 '{title}'로 하고, 아래의 파일 데이터를 분석하여 '{request}'를 요구 사항을 만족할 수 있도록 최적화된 보고서를 완성해.
         표로 표현 할 때는 table 태그 형식으로 구현해야 한다. th과 td 태그는 border는 사이즈 1이고 색상은 검정색으로 구성한다.
@@ -136,17 +137,29 @@ def run_llm_with_file_and_prompt(api_key, titles, requests, file_data_list):
         """
 
         # 각 프롬프트를 저장
-        prompts.append(generated_prompt)
         global_generated_prompt.append(generated_prompt)
 
-    # LangChain의 LLMChain 사용 (for 밖에서 한 번 실행)
-    llm = ChatOpenAI(model_name="gpt-4o")
-    chain = LLMChain(llm=llm, prompt=PromptTemplate(template="\n\n".join(prompts), input_variables=[]))
+        # PromptTemplate 설정
+        prompt_template = PromptTemplate(
+            template=generated_prompt,
+            input_variables=[]
+        )
 
-    # LLM에 프롬프트를 전달하고 응답 받기 (한 번 실행)
-    response = chain.run({})
-    
-    return response
+        # LangChain의 LLMChain 사용
+        llm = ChatOpenAI(model_name="gpt-4o")
+        chain = LLMChain(llm=llm, prompt=prompt_template)
+        
+        # LLM에 프롬프트를 전달하고 응답 받기 (RateLimitError 예외 처리)
+        try:
+            response = chain.run({})
+            responses.append(response)
+        except RateLimitError:
+            st.warning("API 요청 한도를 초과했습니다. 10초 후 다시 시도합니다.")
+            time.sleep(10)  # 일정 시간 대기 후 재시도
+            response = chain.run({})
+            responses.append(response)
+
+    return responses
 
 # 1 프레임
 # 1. GitHub 정보 저장 및 OpenAI API 키 저장
@@ -337,14 +350,14 @@ with col2:
             requests = [row['요청'] for row in st.session_state['rows']]
             file_data_list = [row['데이터'] for row in st.session_state['rows']]
 
-            # 요청사항을 기반으로 보고서를 생성 (배열로 전달)
-            response = run_llm_with_file_and_prompt(
+            # 요청사항을 기반으로 보고서를 생성 (순차적으로 처리)
+            responses = run_llm_with_file_and_prompt(
                 st.session_state["api_key"], 
                 titles, 
                 requests, 
                 file_data_list
             )
-            st.session_state["response"] = response
+            st.session_state["response"] = responses
 
 # 4 프레임
 # 4. 결과 보고서
@@ -355,7 +368,9 @@ st.text_area("전달된 프롬프트:", value="\n\n".join(global_generated_promp
 
 if "response" in st.session_state:
     # 응답 텍스트 출력
-    st.text_area("응답:", value=st.session_state["response"], height=300)
+    for idx, response in enumerate(st.session_state["response"]):
+        st.text_area(f"응답 {idx+1}:", value=response, height=300)
     
     # 응답 데이터를 HTML 형식으로 표시
-    st.components.v1.html(st.session_state["response"], height=600, scrolling=True)
+    for idx, response in enumerate(st.session_state["response"]):
+        st.components.v1.html(response, height=600, scrolling=True)
