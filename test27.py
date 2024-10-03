@@ -21,15 +21,25 @@ global_generated_prompt = []
 # 페이지 너비를 전체 화면으로 설정
 st.set_page_config(layout="wide")
 
-# GitHub API 요청을 처리하는 함수
+# GitHub API 요청을 처리하는 함수 수정
 def get_github_files(repo, branch, token, folder_name=None):
-    url = f"https://api.github.com/repos/{repo}/contents/{folder_name}?ref={branch}"
+    if folder_name:
+        url = f"https://api.github.com/repos/{repo}/contents/{folder_name}?ref={branch}"
+    else:
+        url = f"https://api.github.com/repos/{repo}/contents?ref={branch}"
+
     headers = {"Authorization": f"token {token}"}
     response = requests.get(url, headers=headers)
+    
+    # 예외 처리 추가
     if response.status_code == 200:
         files = [item['name'] for item in response.json() if item['type'] == 'file']
         return files
+    elif response.status_code == 404:
+        st.error(f"폴더 '{folder_name}'가 존재하지 않거나 파일을 찾을 수 없습니다.")
+        return []
     else:
+        st.error(f"파일 목록을 가져오는 중 오류가 발생했습니다. 상태 코드: {response.status_code}")
         return []
 
 # GitHub에서 파일의 SHA 값을 가져오는 함수
@@ -247,7 +257,7 @@ with col2:
             st.error("API 키를 입력해야 합니다!")
 
 # 2 프레임: 파일 업로드
-st.subheader("2. 파일 업로드")  # 이 부분을 추가
+st.subheader("2. 파일 업로드")
 
 if not st.session_state.get("github_token") or not st.session_state.get("github_repo"):
     st.warning("GitHub 정보가 저장되기 전에는 파일 업로드를 할 수 없습니다. 먼저 GitHub 정보를 입력해 주세요.")
@@ -365,7 +375,7 @@ with col1:
                 st.session_state['rows'] = st.session_state['rows']
 
 with col2:
-    st.write("3. 실행 버튼")  # 이 부분을 추가
+    st.write("3. 실행 버튼")
     if st.button("실행"):
         if not st.session_state.get("api_key"):
             st.error("먼저 OpenAI API 키를 입력하고 저장하세요!")
