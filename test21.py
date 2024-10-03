@@ -81,6 +81,10 @@ st.markdown("""
     .custom-table div {
         padding: 10px;
     }
+    .center-text {
+        text-align: center;
+        font-weight: bold;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -90,19 +94,19 @@ with st.container():
     col1, col2 = st.columns([0.1, 0.9])  # 가로 길이 10%, 90%
 
     with col1:
-        st.write("제목")
+        st.markdown('<div class="center-text">제목</div>', unsafe_allow_html=True)
     with col2:
-        title = st.text_input("")
+        title = st.text_input("", value="", disabled=False)
 
     col1, col2 = st.columns([0.1, 0.9])
     with col1:
-        st.write("요청")
+        st.markdown('<div class="center-text">요청</div>', unsafe_allow_html=True)
     with col2:
-        request = st.text_area("")
+        request = st.text_area("", disabled=False)
 
     col1, col2 = st.columns([0.1, 0.9])
     with col1:
-        st.write("파일")
+        st.markdown('<div class="center-text">파일</div>', unsafe_allow_html=True)
     with col2:
         selected_file = None  # selected_file 초기화
         if "github_token" in st.session_state:
@@ -117,10 +121,10 @@ with st.container():
 
     col1, col2 = st.columns([0.1, 0.9])
     with col1:
-        st.write("데이터")
+        st.markdown('<div class="center-text">데이터</div>', unsafe_allow_html=True)
     with col2:
         if selected_file and selected_file != "파일을 선택하세요":
-            st.text(f"선택한 파일 경로: {selected_file}")
+            st.text_input("", value=f"선택한 파일 경로: {selected_file}", disabled=True)
 
     st.markdown('</div>', unsafe_allow_html=True)
 
