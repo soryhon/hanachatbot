@@ -28,7 +28,7 @@ jsonpatch==1.33
 jsonpointer==3.0.0
 jsonschema==4.23.0
 jsonschema-specifications==2023.12.1
-langchain==0.2.15
+langchain==0.0.268
 langchain-community==0.2.15
 langchain-core==0.2.37
 langchain-text-splitters==0.2.2
@@ -41,7 +41,7 @@ multidict==6.0.5
 mypy-extensions==1.0.0
 narwhals==1.6.1
 numpy==1.26.4
-openai==0.28.0
+openai==0.28.1
 orjson==3.10.7
 packaging==24.1
 pandas==2.2.2
