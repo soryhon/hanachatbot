@@ -41,7 +41,7 @@ col1, col2 = st.columns(2)  # 두 개의 컬럼으로 나눔
 # GitHub 정보 저장 프레임 (50%)
 with col1:
     st.subheader("GitHub 정보 입력")
-    repo_input = st.text_input("GitHub 저장소 (owner/repo 형식)", value="owner/repo")
+    repo_input = st.text_input("GitHub 저장소 (owner/repo 형식)", value="")  # 공백으로 설정
     branch_input = st.text_input("GitHub 브랜치", value="main")
     token_input = st.text_input("GitHub Token", type="password")
 
@@ -82,10 +82,13 @@ if "github_token" in st.session_state:
     files = get_github_files(st.session_state["github_repo"], st.session_state["github_branch"], st.session_state["github_token"])
     
     if files:
-        selected_file = st.selectbox("GitHub 파일을 선택하세요", files)
-        if selected_file:
+        # 파일이 선택되지 않은 기본 상태로 '파일을 선택하세요' 표시
+        selected_file = st.selectbox("GitHub 파일을 선택하세요", ["파일을 선택하세요"] + files, index=0)
+        if selected_file and selected_file != "파일을 선택하세요":
             st.session_state["selected_file_path"] = selected_file
             st.text(f"선택한 파일 경로: {selected_file}")
+    else:
+        st.info("저장소에 파일이 없습니다.")
 else:
     st.info("먼저 GitHub 토큰을 입력하고 저장하세요.")
 
