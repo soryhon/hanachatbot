@@ -213,27 +213,32 @@ with col2:
 # 2 프레임
 # 2. 파일 업로드
 st.subheader("2. 파일 업로드")
-with st.expander("파일 업로드", expanded=True):
-    uploaded_files = st.file_uploader("파일을 여러 개 드래그 앤 드롭하여 업로드하세요.", accept_multiple_files=True)
 
-    if uploaded_files and st.session_state.get("github_repo") and st.session_state.get("github_token"):
-        for uploaded_file in uploaded_files:
-            file_content = uploaded_file.read()
-            file_name = uploaded_file.name
-            folder_name = 'uploadFiles'
+# GitHub 정보가 저장되지 않은 경우 업로드 금지
+if not st.session_state.get("github_token") or not st.session_state.get("github_repo"):
+    st.warning("GitHub 정보가 저장되기 전에는 파일 업로드를 할 수 없습니다. 먼저 GitHub 정보를 입력해 주세요.")
+else:
+    with st.expander("파일 업로드", expanded=True):
+        uploaded_files = st.file_uploader("파일을 여러 개 드래그 앤 드롭하여 업로드하세요.", accept_multiple_files=True)
 
-            sha = get_file_sha(st.session_state['github_repo'], f"{folder_name}/{file_name}", st.session_state['github_token'], branch=st.session_state['github_branch'])
+        if uploaded_files:
+            for uploaded_file in uploaded_files:
+                file_content = uploaded_file.read()
+                file_name = uploaded_file.name
+                folder_name = 'uploadFiles'
 
-            if sha:
-                if st.checkbox(f"'{file_name}' 파일이 이미 존재합니다. 덮어쓰시겠습니까?", key=f"overwrite_{file_name}"):
-                    upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
-            else:
-                upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'])
+                sha = get_file_sha(st.session_state['github_repo'], f"{folder_name}/{file_name}", st.session_state['github_token'], branch=st.session_state['github_branch'])
 
-        st.success("파일 업로드가 완료되었습니다.")
-        
-        # 업로드가 완료된 후에 파일 목록을 다시 가져와 업데이트
-        files = get_github_files(st.session_state["github_repo"], st.session_state["github_branch"], st.session_state["github_token"])
+                if sha:
+                    if st.checkbox(f"'{file_name}' 파일이 이미 존재합니다. 덮어쓰시겠습니까?", key=f"overwrite_{file_name}"):
+                        upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
+                else:
+                    upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'])
+
+            st.success("파일 업로드가 완료되었습니다.")
+            
+            # 업로드가 완료된 후에 파일 목록을 다시 가져와 업데이트
+            files = get_github_files(st.session_state["github_repo"], st.session_state["github_branch"], st.session_state["github_token"])
 
 # 3 프레임
 # 3. 작성 보고서 요청사항 및 실행 버튼
