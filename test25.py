@@ -10,7 +10,7 @@ import docx
 import pptx
 from PIL import Image
 from io import BytesIO
-import base64  # base64 인코딩을 위해 추가
+import base64
 from langchain.chat_models import ChatOpenAI
 
 # 전역변수로 프롬프트 저장
@@ -29,38 +29,6 @@ def get_github_files(repo, branch, token, folder_name=None):
         return files
     else:
         return []
-
-# GitHub에 파일 업로드 함수 (폴더 없으면 생성)
-def upload_file_to_github(repo, folder, file_name, content, token, branch="main", sha=None):
-    url = f"https://api.github.com/repos/{repo}/contents/{folder}/{file_name}"
-    headers = {"Authorization": f"token {token}"}
-    
-    # 파일 콘텐츠를 base64로 인코딩
-    content_base64 = base64.b64encode(content).decode('utf-8')
-
-    data = {
-        "message": f"Upload {file_name} to {folder}",
-        "content": content_base64,  # base64 인코딩된 콘텐츠
-        "branch": branch
-    }
-    if sha:  # 덮어쓰기인 경우 SHA 값 전달
-        data["sha"] = sha
-
-    response = requests.put(url, headers=headers, json=data)
-    if response.status_code in [200, 201]:
-        st.success(f"'{file_name}' 파일이 성공적으로 업로드되었습니다!")
-    else:
-        st.error(f"파일 업로드 실패: {response.status_code}")
-
-# GitHub에 폴더가 존재하는지 확인하는 함수
-def get_file_sha(repo, path, token, branch="main"):
-    url = f"https://api.github.com/repos/{repo}/contents/{path}?ref={branch}"
-    headers = {"Authorization": f"token {token}"}
-    response = requests.get(url, headers=headers)
-    if response.status_code == 200:
-        return response.json().get("sha", None)
-    else:
-        return None
 
 # GitHub에서 파일을 다운로드하는 함수
 def get_file_from_github(repo, branch, filepath, token):
@@ -295,8 +263,28 @@ with col1:
                     
                     selected_file = st.selectbox(f"파일 선택 (요청사항 {idx+1})", options=file_list, key=f"file_select_{idx}")
 
-                    # 선택된 파일 서버 경로 자동 입력
+                    # 파일 선택에 따라 데이터 처리
                     if selected_file != '파일을 선택하세요.':
+                        file_path = selected_file
+                        file_content = get_file_from_github(st.session_state["github_repo"], st.session_state["github_branch"], file_path, st.session_state["github_token"])
+                        file_type = file_path.split('.')[-1].lower()
+
+                        if file_type == 'xlsx':
+                            file_data = extract_text_from_excel(file_content)
+                        elif file_type == 'csv':
+                            file_data = extract_text_from_csv(file_content)
+                        elif file_type == 'docx':
+                            file_data = extract_text_from_word(file_content)
+                        elif file_type == 'pptx':
+                            file_data = extract_text_from_ppt(file_content)
+                        elif file_type == 'pdf':
+                            file_data = extract_text_from_pdf(file_content)
+                        elif file_type in ['png', 'jpg', 'jpeg']:
+                            file_data = extract_text_from_image(file_content)
+                        else:
+                            st.error(f"지원되지 않는 파일 형식입니다: {file_type}")
+
+                        # 데이터 자동 입력
                         server_path = f"/{st.session_state['github_repo']}/{st.session_state['github_branch']}/uploadFiles/{selected_file}"
                         row['데이터'] = server_path
 
