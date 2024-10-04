@@ -23,8 +23,10 @@ global_generated_prompt = []
 # 페이지 너비를 전체 화면으로 설정
 st.set_page_config(layout="wide")
 
-# GitHub 정보 및 OpenAI API 키 자동 설정
+
+# GitHub 정보 및 OpenAI API 키 자동 설정 또는 입력창을 통해 설정
 def load_env_info():
+    # JSON 데이터에서 정보 추출
     json_data = '''
     {
         "github_repo": "soryhon/hanachatbot",
@@ -32,30 +34,30 @@ def load_env_info():
     }
     '''
     
-    # JSON 데이터에서 정보 추출
     github_info = json.loads(json_data)
     github_repo = github_info['github_repo']
     github_branch = github_info['github_branch']
     
-    # 서버 환경 변수에서 GitHub Token 가져오기
+    # 환경 변수에서 GitHub Token 및 OpenAI API Key 가져오기
     github_token = os.getenv("GITHUB_TOKEN")
-    if not github_token:
-        st.error("GITHUB_TOKEN 환경 변수가 설정되지 않았습니다!")
-        return None
-    
-    # 서버 환경 변수에서 OpenAI API 키 가져오기
     openai_api_key = os.getenv("OPENAI_API_KEY")
-    if not openai_api_key:
-        st.error("OPENAI_API_KEY 환경 변수가 설정되지 않았습니다!")
-        return None
-    
-    # 세션 상태에 GitHub 정보 및 OpenAI API 키 저장
+
+    # 입력창을 가로로 배치 (각각 50%의 너비)
+    col1, col2 = st.columns(2)
+
+    with col1:
+        if not github_token:
+            github_token = st.text_input("GitHub Token을 입력하세요", type="password", key="github_token_input")
+        st.session_state["github_token"] = github_token
+
+    with col2:
+        if not openai_api_key:
+            openai_api_key = st.text_input("OpenAI API 키를 입력하세요", type="password", key="openai_api_key_input")
+        st.session_state["openai_api_key"] = openai_api_key
+
+    # GitHub 저장소 정보 세션에 저장
     st.session_state["github_repo"] = github_repo
     st.session_state["github_branch"] = github_branch
-    st.session_state["github_token"] = github_token
-    st.session_state["openai_api_key"] = openai_api_key
-    
-    st.success("GitHub 정보 및 OpenAI API 키가 자동으로 설정되었습니다!")
 
 # 페이지가 로드될 때 GitHub 정보와 OpenAI API 키를 자동으로 불러옴
 load_env_info()
