@@ -365,35 +365,12 @@ with col1:
 
 
 
-# HTML과 CSS를 사용하여 [보고서 작성] 버튼을 구현
-st.markdown("""
-    <style>
-    .custom-button {
-        display: inline-block;
-        width: 80%;  /* 가로 길이 80% */
-        text-align: center;
-        padding: 10px;
-        font-size: 16px;
-        font-weight: bold;
-        background-color: #008CBA;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-    }
-
-    .custom-button:hover {
-        background-color: #005f75;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
 with col2:
     st.write(" ")
     st.write(" ")
 
-    # [보고서 작성] 버튼 (줄바꿈과 중앙 정렬 포함)
-    if st.markdown('<button class="custom-button">보고서 작성<br>실행</button>', unsafe_allow_html=True):
+    # [보고서 작성] 버튼
+    if st.button("보고서 작성", key="generate_report", use_container_width=True):
         if not st.session_state.get("openai_api_key"):
             st.error("먼저 OpenAI API 키를 입력하고 저장하세요!")
         elif not st.session_state['rows'] or all(not row["제목"] or not row["요청"] or not row["데이터"] for row in st.session_state['rows']):
@@ -409,14 +386,16 @@ with col2:
                 file_data_list
             )
             st.session_state["response"] = responses
-    
+
     # [양식 저장] 버튼
     if st.button("양식 저장", key="save_template", use_container_width=True):
         st.success("양식이 저장되었습니다.")
+        # 양식 저장 기능 추가 가능
 
     # [양식 불러오기] 버튼
     if st.button("양식 불러오기", key="load_template", use_container_width=True):
         st.success("양식이 불러와졌습니다.")
+        # 양식 불러오기 기능 추가 가능
 
 # 4 프레임: 결과 보고서
 st.subheader("4. 결과 보고서")
