@@ -366,7 +366,8 @@ with col1:
 with col2:
     st.write(" ")
     st.write(" ")
-    # [실행] 버튼을 [보고서 작성]으로 변경하고, 가로 길이를 80%로 설정
+    
+    # [보고서 작성] 버튼
     if st.button("보고서 작성", key="generate_report", use_container_width=True):
         if not st.session_state.get("openai_api_key"):
             st.error("먼저 OpenAI API 키를 입력하고 저장하세요!")
@@ -383,6 +384,16 @@ with col2:
                 file_data_list
             )
             st.session_state["response"] = responses
+    
+    # [양식 저장] 버튼
+    if st.button("양식 저장", key="save_template", use_container_width=True):
+        st.success("양식이 저장되었습니다.")
+        # 양식 저장 기능 추가 가능
+
+    # [양식 불러오기] 버튼
+    if st.button("양식 불러오기", key="load_template", use_container_width=True):
+        st.success("양식이 불러와졌습니다.")
+        # 양식 불러오기 기능 추가 가능
 
 # 4 프레임: 결과 보고서
 st.subheader("4. 결과 보고서")
