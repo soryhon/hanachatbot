@@ -23,8 +23,8 @@ global_generated_prompt = []
 # 페이지 너비를 전체 화면으로 설정
 st.set_page_config(layout="wide")
 
-# GitHub 정보 자동 설정
-def load_github_info():
+# GitHub 정보 및 OpenAI API 키 자동 설정
+def load_env_info():
     json_data = '''
     {
         "github_repo": "soryhon/hanachatbot",
@@ -39,20 +39,26 @@ def load_github_info():
     
     # 서버 환경 변수에서 GitHub Token 가져오기
     github_token = os.getenv("GITHUB_TOKEN")
-    
     if not github_token:
         st.error("GITHUB_TOKEN 환경 변수가 설정되지 않았습니다!")
         return None
     
-    # 세션 상태에 GitHub 정보 저장
+    # 서버 환경 변수에서 OpenAI API 키 가져오기
+    openai_api_key = os.getenv("OPENAI_API_KEY")
+    if not openai_api_key:
+        st.error("OPENAI_API_KEY 환경 변수가 설정되지 않았습니다!")
+        return None
+    
+    # 세션 상태에 GitHub 정보 및 OpenAI API 키 저장
     st.session_state["github_repo"] = github_repo
     st.session_state["github_branch"] = github_branch
     st.session_state["github_token"] = github_token
+    st.session_state["openai_api_key"] = openai_api_key
     
-    st.success("GitHub 정보가 자동으로 설정되었습니다!")
+    st.success("GitHub 정보 및 OpenAI API 키가 자동으로 설정되었습니다!")
 
-# 페이지가 로드될 때 GitHub 정보를 자동으로 불러옴
-load_github_info()
+# 페이지가 로드될 때 GitHub 정보와 OpenAI API 키를 자동으로 불러옴
+load_env_info()
 
 # GitHub API 요청을 처리하는 함수 (파일 목록을 가져옴)
 def get_github_files(repo, branch, token):
@@ -178,9 +184,9 @@ def extract_text_from_image(file_content):
     return "이미지에서 텍스트를 추출하는 기능은 구현되지 않았습니다."
 
 # LLM을 통해 프롬프트와 파일을 전달하고 응답을 받는 함수
-def run_llm_with_file_and_prompt(api_key, titles, requests, file_data_list):
+def run_llm_with_file_and_prompt(titles, requests, file_data_list):
     global global_generated_prompt
-    openai.api_key = api_key
+    openai.api_key = st.session_state["openai_api_key"]
 
     responses = []
     global_generated_prompt = []  # 프롬프트들을 담을 리스트 초기화
@@ -227,8 +233,7 @@ def run_llm_with_file_and_prompt(api_key, titles, requests, file_data_list):
             except RateLimitError:
                 retry_count += 1
                 st.warning(f"API 요청 한도를 초과했습니다. 10초 후 다시 시도합니다. 재시도 횟수: {retry_count}/{max_retries}")
-            
-            time.sleep(10)
+                time.sleep(10)
 
     return responses
 
@@ -352,7 +357,7 @@ with col2:
     st.write(" ")
     st.write(" ")
     if st.button("실행"):
-        if not st.session_state.get("api_key"):
+        if not st.session_state.get("openai_api_key"):
             st.error("먼저 OpenAI API 키를 입력하고 저장하세요!")
         elif not st.session_state['rows'] or all(not row["제목"] or not row["요청"] or not row["데이터"] for row in st.session_state['rows']):
             st.error("요청사항의 제목, 요청, 파일을 모두 입력해야 합니다!")
@@ -362,7 +367,6 @@ with col2:
             file_data_list = [row['데이터'] for row in st.session_state['rows']]
 
             responses = run_llm_with_file_and_prompt(
-                st.session_state["api_key"], 
                 titles, 
                 requests, 
                 file_data_list
