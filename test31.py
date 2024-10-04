@@ -15,12 +15,44 @@ import urllib.parse  # URL 인코딩을 위해 추가
 from openai.error import RateLimitError
 from langchain.chat_models import ChatOpenAI
 import time
+import json
 
 # 전역변수로 프롬프트 저장
 global_generated_prompt = []
 
 # 페이지 너비를 전체 화면으로 설정
 st.set_page_config(layout="wide")
+
+# GitHub 정보 자동 설정
+def load_github_info():
+    json_data = '''
+    {
+        "github_repo": "soryhon/hanachatbot",
+        "github_branch": "main"
+    }
+    '''
+    
+    # JSON 데이터에서 정보 추출
+    github_info = json.loads(json_data)
+    github_repo = github_info['github_repo']
+    github_branch = github_info['github_branch']
+    
+    # 서버 환경 변수에서 GitHub Token 가져오기
+    github_token = os.getenv("GITHUB_TOKEN")
+    
+    if not github_token:
+        st.error("GITHUB_TOKEN 환경 변수가 설정되지 않았습니다!")
+        return None
+    
+    # 세션 상태에 GitHub 정보 저장
+    st.session_state["github_repo"] = github_repo
+    st.session_state["github_branch"] = github_branch
+    st.session_state["github_token"] = github_token
+    
+    st.success("GitHub 정보가 자동으로 설정되었습니다!")
+
+# 페이지가 로드될 때 GitHub 정보를 자동으로 불러옴
+load_github_info()
 
 # GitHub API 요청을 처리하는 함수 (파일 목록을 가져옴)
 def get_github_files(repo, branch, token):
@@ -179,7 +211,7 @@ def run_llm_with_file_and_prompt(api_key, titles, requests, file_data_list):
         )
 
         # LLM 모델 생성
-        llm = ChatOpenAI(model_name="gpt-4o")
+        llm = ChatOpenAI(model_name="gpt-4")
         chain = LLMChain(llm=llm, prompt=prompt_template)
 
         success = False
@@ -195,42 +227,10 @@ def run_llm_with_file_and_prompt(api_key, titles, requests, file_data_list):
             except RateLimitError:
                 retry_count += 1
                 st.warning(f"API 요청 한도를 초과했습니다. 10초 후 다시 시도합니다. 재시도 횟수: {retry_count}/{max_retries}")
-                time.sleep(10)
-
+            
             time.sleep(10)
 
     return responses
-
-# 1 프레임: GitHub 정보 저장 및 OpenAI API 키 저장
-st.subheader("1. GitHub 정보 저장 및 OpenAI API 키 저장")
-
-col1, col2 = st.columns(2)
-
-with col1:
-    st.subheader("GitHub 정보 입력")
-    repo_input = st.text_input("GitHub 저장소 (owner/repo 형식)", value="geunilbae/project5")
-    branch_input = st.text_input("GitHub 브랜치", value="main")
-    token_input = st.text_input("GitHub Token", type="password")
-
-    if st.button("GitHub 정보 저장"):
-        if repo_input and branch_input and token_input:
-            st.session_state["github_repo"] = repo_input
-            st.session_state["github_branch"] = branch_input
-            st.session_state["github_token"] = token_input
-            st.success("GitHub 정보가 성공적으로 저장되었습니다!")
-        else:
-            st.error("모든 GitHub 정보를 입력해야 합니다!")
-
-with col2:
-    st.subheader("OpenAI API 키 저장")
-    api_key_input = st.text_input("OpenAI API 키를 입력하세요", type="password")
-    if st.button("API 키 저장"):
-        if api_key_input:
-            st.session_state["api_key"] = api_key_input
-            os.environ["OPENAI_API_KEY"] = api_key_input
-            st.success("API 키가 성공적으로 저장되었습니다!")
-        else:
-            st.error("API 키를 입력해야 합니다!")
 
 # 2 프레임: 파일 업로드
 if not st.session_state.get("github_token") or not st.session_state.get("github_repo"):
