@@ -366,7 +366,8 @@ with col1:
 with col2:
     st.write(" ")
     st.write(" ")
-    if st.button("실행"):
+    # [실행] 버튼을 [보고서 작성]으로 변경하고, 가로 길이를 80%로 설정
+    if st.button("보고서 작성", key="generate_report", use_container_width=True):
         if not st.session_state.get("openai_api_key"):
             st.error("먼저 OpenAI API 키를 입력하고 저장하세요!")
         elif not st.session_state['rows'] or all(not row["제목"] or not row["요청"] or not row["데이터"] for row in st.session_state['rows']):
