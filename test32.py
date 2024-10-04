@@ -67,10 +67,6 @@ def load_env_info():
     st.session_state["github_repo"] = github_repo
     st.session_state["github_branch"] = github_branch
 
-    # 두 가지 정보가 모두 자동으로 설정된 경우 메시지 표시
-    if github_set and openai_set:
-        st.success("GitHub 정보 및 OpenAI API 키가 자동으로 설정되었습니다!")
-
 # 페이지가 로드될 때 GitHub 정보와 OpenAI API 키를 자동으로 불러옴
 load_env_info()
 
