@@ -259,11 +259,20 @@ def convert_data_to_html(file_data, title, idx):
 
     for i, row in file_data.iterrows():
         html_content += "<tr>"
-        for col in row:
+        for j, col in enumerate(row):
             # 줄바꿈을 <br>로 변환
             col = str(col).replace("\n", "<br>")
-            # NaN이 아닌 값이 있을 때만 테두리 스타일 추가
-            if col.strip() != "":
+            
+            # NaN이나 공백일 경우 앞뒤 셀에 값이 있을 때만 테두리 적용
+            if col.strip() == "" and j > 0 and j < len(row) - 1:
+                prev_col = str(row[j - 1]).strip()
+                next_col = str(row[j + 1]).strip()
+                if prev_col and next_col:
+                    html_content += f"<td style='border: 1px solid black;'>{col}</td>"
+                else:
+                    html_content += f"<td>{col}</td>"
+            elif col.strip() != "":
+                # NaN이 아닌 값이 있을 때는 테두리 스타일 추가
                 html_content += f"<td style='border: 1px solid black;'>{col}</td>"
             else:
                 html_content += f"<td>{col}</td>"
