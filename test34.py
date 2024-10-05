@@ -179,28 +179,28 @@ def extract_sheets_from_excel(file_content, selected_sheets):
         return None
 
 # 시트 선택 로직 추가 (엑셀 파일 선택 시 기본적으로 1번 시트 데이터를 바로 가져오도록 설정)
-def handle_sheet_selection(file_content, sheet_count):
+def handle_sheet_selection(file_content, sheet_count, idx):
     # 시트 관련 UI를 표시
     col1, col2, col3, col4 = st.columns([0.25, 0.25, 0.25, 0.25])
     
     with col1:
-        st.text_input("시트 갯수", value=f"{sheet_count}개", disabled=True)  # 시트 갯수 표시 (비활성화)
+        st.text_input(f"시트 갯수 ({idx})", value=f"{sheet_count}개", disabled=True)  # 시트 갯수 표시 (비활성화)
     
     with col2:
-        all_sheets_checkbox = st.checkbox('전체', value=False, key="all_sheets")
+        all_sheets_checkbox = st.checkbox(f'전체 ({idx})', value=False, key=f"all_sheets_{idx}")
 
     with col3:
         # 시트 선택 텍스트 입력창 (전체 선택 시 비활성화, 기본값 1)
-        sheet_selection = st.text_input("시트 선택(예: 1-3, 5)", value="1", disabled=all_sheets_checkbox)
+        sheet_selection = st.text_input(f"시트 선택(예: 1-3, 5) ({idx})", value="1", disabled=all_sheets_checkbox, key=f"sheet_selection_{idx}")
 
     # 전체 체크박스 체크 시 시트 선택 입력창에 1-총 시트 개수 값 입력
     if all_sheets_checkbox:
         sheet_selection = f"1-{sheet_count}"
-        st.session_state['sheet_selection'] = sheet_selection
+        st.session_state[f'sheet_selection_{idx}'] = sheet_selection
 
     with col4:
         # 시트 선택 버튼
-        select_button = st.button("선택")
+        select_button = st.button(f"선택 ({idx})")
 
     # 시트 선택 버튼이 눌렸거나 기본 값이 있을 경우 바로 데이터 가져오기
     if select_button or sheet_selection == "1":
@@ -209,7 +209,7 @@ def handle_sheet_selection(file_content, sheet_count):
             file_data = extract_sheets_from_excel(file_content, selected_sheets)
             return file_data
         else:
-            st.error("선택한 시트가 잘못되었습니다.")
+            st.error(f"선택한 시트가 잘못되었습니다. ({idx})")
     return None
 
 # 시트 선택 입력값을 분석하는 함수
@@ -232,13 +232,13 @@ def parse_sheet_selection(selection, sheet_count):
     return selected_sheets
 
 # 파일에서 데이터를 추출하고 요청사항 리스트에서 선택한 엑셀 파일의 시트를 보여주는 로직
-def handle_file_selection(file_path, file_content, file_type):
+def handle_file_selection(file_path, file_content, file_type, idx):
     if file_type == 'xlsx':
         excel_data = pd.ExcelFile(file_content)
         sheet_count = len(excel_data.sheet_names)
         
         # 엑셀 파일 선택 시 바로 1번 시트 데이터를 가져오도록 설정
-        file_data = handle_sheet_selection(file_content, sheet_count)
+        file_data = handle_sheet_selection(file_content, sheet_count, idx)
         
         # DataFrame의 empty 속성을 사용하여 데이터가 있는지 확인
         if file_data is not None and not file_data.empty:
@@ -390,7 +390,7 @@ if github_info_loaded:
                         
                         # 엑셀 파일 선택 시 기본적으로 1번 시트 데이터를 가져오도록 함
                         if file_type == 'xlsx':
-                            handle_file_selection(file_name, file_content, file_type)
+                            handle_file_selection(file_name, file_content, file_type, 0)
                         uploaded_files = None
 else:
     st.warning("GitHub 정보가 저장되기 전에는 파일 업로드를 할 수 없습니다. 먼저 GitHub 정보를 입력해 주세요.")
@@ -436,7 +436,7 @@ with st.expander("요청사항 리스트", expanded=True):
                         row['데이터'] = ""
                     else:
                         # 엑셀 파일인 경우 기본적으로 1번 시트 데이터를 가져오도록 설정
-                        file_data = handle_file_selection(file_path, file_content, file_type)
+                        file_data = handle_file_selection(file_path, file_content, file_type, idx)
                         
                         if file_data is not None and not file_data.empty:  # 수정된 부분
                             row['파일'] = f"/{st.session_state['github_repo']}/{st.session_state['github_branch']}/{selected_file}"
