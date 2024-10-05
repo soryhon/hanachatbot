@@ -249,6 +249,114 @@ if github_info_loaded:
 else:
     st.warning("GitHub 정보가 저장되기 전에는 파일 업로드를 할 수 없습니다. 먼저 GitHub 정보를 입력해 주세요.")
 
+# 3 프레임: 작성 보고서 요청사항 및 실행 버튼
+st.subheader("3. 작성 보고서 요청사항 및 실행 버튼")
+
+# 요청사항 리스트
+with st.expander("요청사항 리스트", expanded=True):
+    if 'rows' not in st.session_state:
+        st.session_state['rows'] = [{"제목": "", "요청": "", "파일": "", "데이터": "", "checked": False}]
+
+    rows = st.session_state['rows']
+    checked_rows = []
+
+    for idx, row in enumerate(rows):
+        with st.container():
+            col1, col2 = st.columns([0.05, 0.95])  # 체크박스와 제목 부분을 가로로 나눔
+            with col1:
+                row_checked = st.checkbox("", key=f"row_checked_{idx}", value=row.get("checked", False))  # 체크박스만 추가
+            with col2:
+                st.markdown(f"#### 요청사항 {idx+1}")  # 요청사항 타이틀과 나머지 UI 요소들 배치
+
+            row['제목'] = st.text_input(f"제목 (요청사항 {idx+1})", row['제목'], key=f"title_{idx}")
+            row['요청'] = st.text_area(f"요청 (요청사항 {idx+1})", row['요청'], key=f"request_{idx}")
+
+            file_list = ['파일을 선택하세요.']
+            if st.session_state.get('github_token') and st.session_state.get('github_repo'):
+                file_list += get_github_files(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
+
+            selected_file = st.selectbox(f"파일 선택 (요청사항 {idx+1})", options=file_list, key=f"file_select_{idx}")
+
+            if selected_file != '파일을 선택하세요.':
+                file_path = selected_file
+                file_content = get_file_from_github(st.session_state["github_repo"], st.session_state["github_branch"], file_path, st.session_state["github_token"])
+                
+                if file_content:
+                    file_type = file_path.split('.')[-1].lower()
+
+                    # 파일 형식 검증 (지원되는 파일만 처리)
+                    if file_type not in supported_file_types:
+                        st.error(f"지원하지 않는 파일입니다: {file_path}")
+                        row['데이터'] = ""
+                    else:
+                        # 엑셀 파일인 경우 기본적으로 1번 시트 데이터를 가져오도록 설정
+                        file_data = handle_file_selection(file_path, file_content, file_type, idx)
+                        
+                        if file_data is not None and not file_data.empty:  # 수정된 부분
+                            row['파일'] = f"/{st.session_state['github_repo']}/{st.session_state['github_branch']}/{selected_file}"
+                            row['데이터'] = file_data
+                        else:
+                            st.error(f"{selected_file} 파일의 데이터를 처리하지 못했습니다.")
+                else:
+                    st.error(f"{selected_file} 파일을 GitHub에서 불러오지 못했습니다.")
+                
+            st.text_input(f"파일 경로 (요청사항 {idx+1})", row['파일'], disabled=True, key=f"file_{idx}")
+
+        if row_checked:
+            checked_rows.append(idx)
+
+    # 행 추가 및 삭제 버튼을 가로로 배치하고 가로 길이를 100px로 설정
+    col1, col2 = st.columns([1, 1])
+
+    with col1:
+        if st.button("행 추가", key="add_row", help="새 행을 추가합니다.", use_container_width=True):
+            new_row = {"제목": "", "요청": "", "파일": "", "데이터": "", "checked": False}
+            st.session_state['rows'].append(new_row)
+            # 행추가 후 새로고침 호출
+            st.experimental_rerun()
+
+    with col2:
+        if st.button("행 삭제", key="delete_row", help="선택된 행을 삭제합니다.", use_container_width=True):
+            if checked_rows:
+                st.session_state['rows'] = [row for idx, row in enumerate(rows) if idx not in checked_rows]
+                st.success(f"체크된 {len(checked_rows)}개의 요청사항이 삭제되었습니다.")
+            else:
+                st.warning("삭제할 요청사항을 선택해주세요.")
+
+# 보고서 작성 버튼을 따로 위에 위치
+if st.button("보고서 작성", key="generate_report"):
+    if not st.session_state.get("openai_api_key"):
+        st.error("먼저 OpenAI API 키를 입력하고 저장하세요!")
+    elif not st.session_state['rows'] or all(not row["제목"] or not row["요청"] or not row["데이터"] for row in st.session_state['rows']):
+        st.error("요청사항의 제목, 요청, 파일을 모두 입력해야 합니다!")
+    else:
+        titles = [row['제목'] for row in st.session_state['rows']]
+        requests = [row['요청'] for row in st.session_state['rows']]
+        file_data_list = [row['데이터'] for row in st.session_state['rows']]
+
+        responses = run_llm_with_file_and_prompt(
+            st.session_state["openai_api_key"], 
+            titles, 
+            requests, 
+            file_data_list
+        )
+        st.session_state["response"] = responses
+
+# 양식 저장, 양식 불러오기, 새로고침 버튼을 같은 행에 배치
+col1, col2, col3 = st.columns([1, 1, 1])
+
+with col1:
+    if st.button("양식 저장", key="save_template"):
+        st.success("양식이 저장되었습니다.")
+
+with col2:
+    if st.button("양식 불러오기", key="load_template"):
+        st.success("양식이 불러와졌습니다.")
+
+with col3:
+    if st.button("새로고침", key="refresh_page"):
+        st.experimental_rerun()
+
 # 4 프레임: 결과 보고서
 st.subheader("4. 결과 보고서")
 
