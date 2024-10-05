@@ -235,60 +235,11 @@ with st.expander("요청사항 리스트", expanded=True):
                 st.warning("삭제할 요청사항을 선택해주세요.")
 
     with col3:
-        if st.button("새로고침", key="refresh_page"):
+        if st.button("새로고침", key="manual_refresh"):
             st.info("새로고침 하였습니다.")
             st.session_state['refresh_triggered'] = False
 
 # 새로고침 버튼이 자동으로 클릭되게 하는 로직
 if st.session_state.get('refresh_triggered'):
     st.session_state['refresh_triggered'] = False
-    st.button("새로고침", key="refresh_page")  # 새로고침 자동 클릭 로직
-
-# 보고서 작성 버튼을 따로 위에 위치
-if st.button("보고서 작성", key="generate_report"):
-    if not st.session_state.get("openai_api_key"):
-        st.error("먼저 OpenAI API 키를 입력하고 저장하세요!")
-    elif not st.session_state['rows'] or all(not row["제목"] or not row["요청"] or not row["데이터"] for row in st.session_state['rows']):
-        st.error("요청사항의 제목, 요청, 파일을 모두 입력해야 합니다!")
-    else:
-        titles = [row['제목'] for row in st.session_state['rows']]
-        requests = [row['요청'] for row in st.session_state['rows']]
-        file_data_list = [row['데이터'] for row in st.session_state['rows']]
-
-        responses = run_llm_with_file_and_prompt(
-            st.session_state["openai_api_key"], 
-            titles, 
-            requests, 
-            file_data_list
-        )
-        st.session_state["response"] = responses
-
-# 양식 저장, 양식 불러오기 버튼을 같은 행에 배치, 가로 길이 50%, 버튼 길이 100px로 설정
-col1, col2 = st.columns([0.5, 0.5])
-
-with col1:
-    if st.button("양식 저장", key="save_template", use_container_width=True):
-        st.success("양식이 저장되었습니다.")
-
-with col2:
-    if st.button("양식 불러오기", key="load_template", use_container_width=True):
-        st.success("양식이 불러와졌습니다.")
-
-# 4 프레임: 결과 보고서
-st.subheader("4. 결과 보고서")
-
-# HTML로 변환한 엑셀 시트 데이터를 화면에 출력
-html_report = generate_html_report(st.session_state['rows'])
-if html_report:
-    st.components.v1.html(html_report, height=1024, scrolling=True)
-
-# 전달된 프롬프트
-st.text_area("전달된 프롬프트:", value="\n\n".join(global_generated_prompt), height=150)
-
-# LLM 응답 보기
-st.write("LLM 응답 보기")
-if "response" in st.session_state:
-    for idx, response in enumerate(st.session_state["response"]):
-        st.text_area(f"응답 {idx+1}:", value=response, height=300)
-        
-        st.components.v1.html(response, height=600, scrolling=True)
+    st.info("새로고침 하였습니다.")  # 새로고침 메시지로 대체
