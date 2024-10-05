@@ -156,6 +156,28 @@ def get_file_from_github(repo, branch, filepath, token):
         st.error(f"{filepath} 파일을 가져오지 못했습니다. 상태 코드: {response.status_code}")
         return None
 
+# 다양한 파일 형식에서 데이터를 추출하는 함수
+def extract_data_from_file(file_content, file_type):
+    if file_content is None:
+        st.error("파일 내용을 가져오지 못했습니다.")
+        return None
+    
+    if file_type == 'pdf':
+        return extract_text_from_pdf(file_content)
+    elif file_type == 'xlsx':
+        return extract_text_from_excel(file_content)
+    elif file_type == 'csv':
+        return extract_text_from_csv(file_content)
+    elif file_type == 'docx':
+        return extract_text_from_word(file_content)
+    elif file_type == 'pptx':
+        return extract_text_from_ppt(file_content)
+    elif file_type in ['png', 'jpg', 'jpeg']:
+        return extract_text_from_image(file_content)
+    else:
+        st.error(f"{file_type} 형식은 지원되지 않습니다.")
+        return None
+
 # 2 프레임: 파일 업로드
 st.subheader("1. 파일 업로드")
 
@@ -237,26 +259,19 @@ with col1:
                     if selected_file != '파일을 선택하세요.':
                         file_path = selected_file
                         file_content = get_file_from_github(st.session_state["github_repo"], st.session_state["github_branch"], file_path, st.session_state["github_token"])
-                        file_type = file_path.split('.')[-1].lower()
-
-                        if file_type == 'xlsx':
-                            file_data = extract_text_from_excel(file_content)
-                        elif file_type == 'csv':
-                            file_data = extract_text_from_csv(file_content)
-                        elif file_type == 'docx':
-                            file_data = extract_text_from_word(file_content)
-                        elif file_type == 'pptx':
-                            file_data = extract_text_from_ppt(file_content)
-                        elif file_type == 'pdf':
-                            file_data = extract_text_from_pdf(file_content)
-                        elif file_type in ['png', 'jpg', 'jpeg']:
-                            file_data = extract_text_from_image(file_content)
+                        
+                        if file_content:
+                            file_type = file_path.split('.')[-1].lower()
+                            file_data = extract_data_from_file(file_content, file_type)
+                            
+                            if file_data is None:
+                                st.error(f"{file_type} 형식에서 파일을 처리할 수 없습니다.")
+                            else:
+                                row['파일'] = f"/{st.session_state['github_repo']}/{st.session_state['github_branch']}/{selected_file}"
+                                row['데이터'] = file_data
                         else:
-                            st.error(f"지원되지 않는 파일 형식입니다: {file_type}")
-
-                        row['파일'] = f"/{st.session_state['github_repo']}/{st.session_state['github_branch']}/{selected_file}"
-                        row['데이터'] = file_data
-
+                            st.error(f"{selected_file} 파일을 GitHub에서 불러오지 못했습니다.")
+                        
                     st.text_input(f"파일 경로 (요청사항 {idx+1})", row['파일'], disabled=True, key=f"file_{idx}")
 
                 if row_checked:
