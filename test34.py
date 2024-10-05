@@ -462,6 +462,8 @@ with st.expander("요청사항 리스트", expanded=True):
         if st.button("행 추가", key="add_row", help="새 행을 추가합니다.", use_container_width=True):
             new_row = {"제목": "", "요청": "", "파일": "", "데이터": "", "checked": False}
             st.session_state['rows'].append(new_row)
+            # 행추가 후 새로고침 호출
+            st.experimental_rerun()
 
     with col2:
         if st.button("행 삭제", key="delete_row", help="선택된 행을 삭제합니다.", use_container_width=True):
@@ -513,7 +515,7 @@ st.write("결과 보고서 보기")
 # HTML로 변환한 엑셀 시트 데이터를 화면에 출력 (프롬프트 아래에 위치)
 html_report = generate_html_report(st.session_state['rows'])
 if html_report:
-    st.components.v1.html(html_report, scrolling=True)  # height 제거하여 가변 크기로 설정
+    st.components.v1.html(html_report, height=1024, scrolling=True)
 
 # 전달된 프롬프트
 st.text_area("전달된 프롬프트:", value="\n\n".join(global_generated_prompt), height=150)
