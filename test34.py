@@ -132,6 +132,36 @@ def display_rows():
             row['제목'] = st.text_input(f"제목 (요청사항 {idx+1})", row['제목'], key=f"title_{idx}", placeholder="여기에 제목 입력", help="제목을 입력하세요")
             row['요청'] = st.text_area(f"요청 (요청사항 {idx+1})", row['요청'], key=f"request_{idx}")
 
+            # 파일 선택과 데이터 처리 관련
+            file_list = ['파일을 선택하세요.']
+            if st.session_state.get('github_token') and st.session_state.get('github_repo'):
+                file_list += get_github_files(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
+
+            selected_file = st.selectbox(f"파일 선택 (요청사항 {idx+1})", options=file_list, key=f"file_select_{idx}")
+
+            if selected_file != '파일을 선택하세요.':
+                file_path = selected_file
+                file_content = get_file_from_github(st.session_state["github_repo"], st.session_state["github_branch"], file_path, st.session_state["github_token"])
+                
+                if file_content:
+                    file_type = file_path.split('.')[-1].lower()
+
+                    if file_type not in ['xlsx', 'pptx', 'docx', 'csv', 'png', 'jpg', 'jpeg']:
+                        st.error(f"지원하지 않는 파일입니다: {file_path}")
+                        row['데이터'] = ""
+                    else:
+                        # 파일 데이터 처리
+                        file_data = handle_file_selection(file_path, file_content, file_type, idx)
+                        if file_data is not None and not file_data.empty:
+                            row['파일'] = f"/{st.session_state['github_repo']}/{st.session_state['github_branch']}/{selected_file}"
+                            row['데이터'] = file_data
+                        else:
+                            st.error(f"{selected_file} 파일의 데이터를 처리하지 못했습니다.")
+                else:
+                    st.error(f"{selected_file} 파일을 GitHub에서 불러오지 못했습니다.")
+                
+            st.text_input(f"파일 경로 (요청사항 {idx+1})", row['파일'], disabled=True, key=f"file_{idx}")
+
         if row_checked:
             checked_rows.append(idx)
 
@@ -233,7 +263,7 @@ with col2:
 
 with col3:
     if st.button("새로고침", key="refresh_page"):
-        st.experimental_rerun()
+        st.info("새로고침 하였습니다.")  # 단순 메시지 출력
 
 # HTML 변환 함수 (NaN 처리 포함)
 def convert_data_to_html(file_data, title, idx):
