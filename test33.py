@@ -189,13 +189,17 @@ def handle_sheet_selection(file_content, sheet_count):
     st.write(f"시트 : {sheet_count}개")
 
     # 전체 시트를 선택하는 체크박스
-    all_sheets_checkbox = st.checkbox('전체', value=False, key="all_sheets")
+    col1, col2, col3, col4 = st.columns([0.25, 0.25, 0.25, 0.25])
+    with col1:
+        all_sheets_checkbox = st.checkbox('전체', value=False, key="all_sheets")
 
-    # 시트 선택 텍스트 입력창 (전체 선택 시 비활성화)
-    sheet_selection = st.text_input("시트 선택:", placeholder=f"예: 1-3, 5", disabled=all_sheets_checkbox)
+    with col2:
+        # 시트 선택 텍스트 입력창 (전체 선택 시 비활성화)
+        sheet_selection = st.text_input("시트 선택:", placeholder=f"예: 1-3, 5", disabled=all_sheets_checkbox)
 
-    # 시트 선택 버튼
-    select_button = st.button("선택")
+    with col3:
+        # 시트 선택 버튼
+        select_button = st.button("선택")
 
     # 전체 시트 선택 시 처리
     if all_sheets_checkbox:
