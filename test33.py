@@ -188,22 +188,27 @@ def validate_sheet_input(input_value):
 def handle_sheet_selection(file_content, sheet_count):
     st.write(f"시트 : {sheet_count}개")
 
-    col1, col2, col3, col4 = st.columns([0.15, 0.15, 0.5, 0.2])
+    # 컬럼 레이아웃을 블록 외부에서 정의
+    all_sheets_checkbox = st.checkbox('전체', value=False, key="all_sheets")
+
+    # 컬럼 배치 안에서 입력창과 선택 버튼 배치
+    col1, col2 = st.columns([0.7, 0.3])  # 레이아웃을 간단하게 유지
 
     with col1:
-        all_sheets_checkbox = st.checkbox('전체', value=False, key="all_sheets")
-
-    with col2:
+        # 시트 선택 입력창, 체크박스 선택 시 비활성화
         sheet_selection = st.text_input("시트 선택:", placeholder=f"예: 1-3, 5", disabled=all_sheets_checkbox)
 
-    with col4:
+    with col2:
+        # 선택 버튼
         select_button = st.button("선택")
 
+    # 전체 시트 선택
     if all_sheets_checkbox:
         sheet_selection = f"1-{sheet_count}"
         st.session_state['sheet_selection'] = sheet_selection
         sheet_selection_valid = True
     else:
+        # 입력값 검증
         if sheet_selection and validate_sheet_input(sheet_selection):
             st.session_state['sheet_selection'] = sheet_selection
             sheet_selection_valid = True
@@ -211,6 +216,7 @@ def handle_sheet_selection(file_content, sheet_count):
             sheet_selection_valid = False
             st.error("잘못된 입력입니다. 숫자와 '-', ',' 만 입력할 수 있습니다.")
 
+    # 시트 선택 버튼이 눌렸을 때 시트 선택 처리
     if select_button and sheet_selection_valid:
         selected_sheets = parse_sheet_selection(sheet_selection, sheet_count)
         if selected_sheets:
