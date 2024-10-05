@@ -85,8 +85,7 @@ def create_github_folder_if_not_exists(repo, folder_name, token, branch='main'):
         }
         requests.put(create_folder_url, json=data, headers=headers)
         st.success(f"'{folder_name}' 폴더가 성공적으로 생성되었습니다.")
-    elif response.status_code == 200:
-        st.info(f"'{folder_name}' 폴더가 이미 존재합니다.")
+    # 폴더가 이미 존재할 경우 메시지를 표시하지 않음
 
 # GitHub API 요청을 처리하는 함수 (파일 목록을 가져옴)
 def get_github_files(repo, branch, token, folder_name='uploadFiles'):
@@ -163,38 +162,45 @@ st.subheader("1. 파일 업로드")
 # GitHub 정보가 있는지 확인하고 파일 업로드 객체를 출력
 github_info_loaded = load_env_info()
 
+# 업로드 가능한 파일 크기 제한 (100MB)
+MAX_FILE_SIZE_MB = 100
+MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
+
 if github_info_loaded:
     with st.expander("파일 업로드", expanded=True):
-        uploaded_files = st.file_uploader("파일을 여러 개 드래그 앤 드롭하여 업로드하세요.", accept_multiple_files=True)
+        uploaded_files = st.file_uploader("파일을 여러 개 드래그 앤 드롭하여 업로드하세요. (최대 100MB)", accept_multiple_files=True)
 
         if uploaded_files:
             for uploaded_file in uploaded_files:
-                file_content = uploaded_file.read()
-                file_name = uploaded_file.name
-                folder_name = 'uploadFiles'
-
-                sha = get_file_sha(st.session_state['github_repo'], f"{folder_name}/{file_name}", st.session_state['github_token'], branch=st.session_state['github_branch'])
-
-                if sha:
-                    st.warning(f"'{file_name}' 파일이 이미 존재합니다. 덮어쓰시겠습니까?")
-                    col1, col2 = st.columns(2)
-
-                    with col1:
-                        if st.button(f"'{file_name}' 덮어쓰기", key=f"overwrite_{file_name}"):
-                            upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
-                            st.success(f"'{file_name}' 파일이 성공적으로 덮어쓰기 되었습니다.")
-                            uploaded_files = None
-                            break
-
-                    with col2:
-                        if st.button("취소", key=f"cancel_{file_name}"):
-                            st.info("덮어쓰기가 취소되었습니다.")
-                            uploaded_files = None
-                            break
+                if uploaded_file.size > MAX_FILE_SIZE_BYTES:
+                    st.warning(f"'{uploaded_file.name}' 파일은 {MAX_FILE_SIZE_MB}MB 제한을 초과했습니다. 파일 크기를 줄이거나 GitHub에 직접 푸시하세요.")
                 else:
-                    upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'])
-                    st.success(f"'{file_name}' 파일이 성공적으로 업로드되었습니다.")
-                    uploaded_files = None
+                    file_content = uploaded_file.read()
+                    file_name = uploaded_file.name
+                    folder_name = 'uploadFiles'
+
+                    sha = get_file_sha(st.session_state['github_repo'], f"{folder_name}/{file_name}", st.session_state['github_token'], branch=st.session_state['github_branch'])
+
+                    if sha:
+                        st.warning(f"'{file_name}' 파일이 이미 존재합니다. 덮어쓰시겠습니까?")
+                        col1, col2 = st.columns(2)
+
+                        with col1:
+                            if st.button(f"'{file_name}' 덮어쓰기", key=f"overwrite_{file_name}"):
+                                upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
+                                st.success(f"'{file_name}' 파일이 성공적으로 덮어쓰기 되었습니다.")
+                                uploaded_files = None
+                                break
+
+                        with col2:
+                            if st.button("취소", key=f"cancel_{file_name}"):
+                                st.info("덮어쓰기가 취소되었습니다.")
+                                uploaded_files = None
+                                break
+                    else:
+                        upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'])
+                        st.success(f"'{file_name}' 파일이 성공적으로 업로드되었습니다.")
+                        uploaded_files = None
 else:
     st.warning("GitHub 정보가 저장되기 전에는 파일 업로드를 할 수 없습니다. 먼저 GitHub 정보를 입력해 주세요.")
 
