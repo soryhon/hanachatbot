@@ -504,9 +504,20 @@ with col3:
 # 4 프레임: 결과 보고서
 st.subheader("4. 결과 보고서")
 
-st.text_area("전달된 프롬프트:", value="\n\n".join(global_generated_prompt), height=150)
-
-# HTML로 변환한 엑셀 시트 데이터를 화면에 출력
+# 결과 보고서 데이터를 HTML으로 변환
+st.write("결과 보고서 보기")
+# HTML로 변환한 엑셀 시트 데이터를 화면에 출력 (프롬프트 아래에 위치)
 html_report = generate_html_report(st.session_state['rows'])
 if html_report:
     st.components.v1.html(html_report, height=600, scrolling=True)
+
+# 전달된 프롬프트
+st.text_area("전달된 프롬프트:", value="\n\n".join(global_generated_prompt), height=150)
+
+# LLM 응답 보기
+st.write("LLM 응답 보기")
+if "response" in st.session_state:
+    for idx, response in enumerate(st.session_state["response"]):
+        st.text_area(f"응답 {idx+1}:", value=response, height=300)
+        
+        st.components.v1.html(response, height=600, scrolling=True)
