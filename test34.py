@@ -215,8 +215,8 @@ with st.expander("요청사항 리스트", expanded=True):
     # 요청사항 리스트를 보여줌
     checked_rows = display_rows()
 
-    # 행 추가 및 삭제 버튼을 가로로 배치, 가로길이 40%로 설정
-    col1, col2 = st.columns([0.4, 0.4])
+    # 행 추가, 행 삭제, 새로고침 버튼을 가로로 배치, 가로길이 30%로 설정, 버튼 길이 60px로 설정
+    col1, col2, col3 = st.columns([0.3, 0.3, 0.3])
 
     with col1:
         if st.button("행 추가", key="add_row"):
@@ -230,6 +230,10 @@ with st.expander("요청사항 리스트", expanded=True):
                 st.success(f"체크된 {len(checked_rows)}개의 요청사항이 삭제되었습니다.")
             else:
                 st.warning("삭제할 요청사항을 선택해주세요.")
+
+    with col3:
+        if st.button("새로고침", key="refresh_page"):
+            st.info("새로고침 하였습니다.")
 
 # 보고서 작성 버튼을 따로 위에 위치
 if st.button("보고서 작성", key="generate_report"):
@@ -250,20 +254,16 @@ if st.button("보고서 작성", key="generate_report"):
         )
         st.session_state["response"] = responses
 
-# 양식 저장, 양식 불러오기, 새로고침 버튼을 같은 행에 배치
-col1, col2, col3 = st.columns([1, 1, 1])
+# 양식 저장, 양식 불러오기 버튼을 같은 행에 배치, 가로 길이 50%, 버튼 길이 100px로 설정
+col1, col2 = st.columns([0.5, 0.5])
 
 with col1:
-    if st.button("양식 저장", key="save_template"):
+    if st.button("양식 저장", key="save_template", use_container_width=True):
         st.success("양식이 저장되었습니다.")
 
 with col2:
-    if st.button("양식 불러오기", key="load_template"):
+    if st.button("양식 불러오기", key="load_template", use_container_width=True):
         st.success("양식이 불러와졌습니다.")
-
-with col3:
-    if st.button("새로고침", key="refresh_page"):
-        st.info("새로고침 하였습니다.")  # 단순 메시지 출력
 
 # HTML 변환 함수 (NaN 처리 포함)
 def convert_data_to_html(file_data, title, idx):
