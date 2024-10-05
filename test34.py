@@ -471,7 +471,6 @@ with st.expander("요청사항 리스트", expanded=True):
         if st.button("행 추가", key="add_row", help="새 행을 추가합니다.", use_container_width=True):
             new_row = {"제목": "", "요청": "", "파일": "", "데이터": "", "checked": False}
             st.session_state['rows'].append(new_row)
-            # 행추가 후 상태 업데이트만 진행 (새로고침 제거)
 
     with col2:
         if st.button("행 삭제", key="delete_row", help="선택된 행을 삭제합니다.", use_container_width=True):
