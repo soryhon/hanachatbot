@@ -185,8 +185,8 @@ with st.expander("요청사항 리스트", expanded=True):
     # 요청사항 리스트를 보여줌
     checked_rows = display_rows()
 
-    # 행 추가 및 삭제 버튼을 가로로 배치
-    col1, col2 = st.columns([1, 1])
+    # 행 추가 및 삭제 버튼을 가로로 배치, 가로길이 40%로 설정
+    col1, col2 = st.columns([0.4, 0.4])
 
     with col1:
         if st.button("행 추가", key="add_row"):
@@ -234,6 +234,33 @@ with col2:
 with col3:
     if st.button("새로고침", key="refresh_page"):
         st.experimental_rerun()
+
+# HTML 변환 함수 (NaN 처리 포함)
+def convert_data_to_html(file_data, title, idx):
+    # NaN을 공백으로 대체
+    file_data = file_data.fillna("")
+
+    html_content = f"<h3>{idx + 1}. {title}</h3>"
+    html_content += "<table style='border-collapse: collapse;'>"
+
+    for i, row in file_data.iterrows():
+        html_content += "<tr>"
+        for j, col in enumerate(row):
+            # 줄바꿈을 <br>로 변환
+            col = str(col).replace("\n", "<br>")
+            html_content += f"<td style='border: 1px solid black;'>{col}</td>"
+        html_content += "</tr>"
+
+    html_content += "</table>"
+    return html_content
+
+# HTML 데이터로 여러 요청사항 리스트 병합
+def generate_html_report(rows):
+    html_report = ""
+    for idx, row in enumerate(rows):
+        if row["데이터"] is not None and isinstance(row["데이터"], pd.DataFrame):
+            html_report += convert_data_to_html(row["데이터"], row["제목"], idx)
+    return html_report
 
 # 4 프레임: 결과 보고서
 st.subheader("4. 결과 보고서")
