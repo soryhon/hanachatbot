@@ -473,13 +473,14 @@ with st.expander("요청사항 리스트", expanded=True):
             new_row = {"제목": "", "요청": "", "파일": "", "데이터": "", "checked": False}
             st.session_state['rows'].append(new_row)
             # 포커스를 마지막 추가된 행에 설정
-            st.experimental_set_query_params(focus=f"title_{len(st.session_state['rows']) - 1}")
+            st.experimental_rerun()
 
     with col2:
         if st.button("행 삭제", key="delete_row", help="선택된 행을 삭제합니다.", use_container_width=True):
             if checked_rows:
                 st.session_state['rows'] = [row for idx, row in enumerate(rows) if idx not in checked_rows]
                 st.success(f"체크된 {len(checked_rows)}개의 요청사항이 삭제되었습니다.")
+                st.experimental_rerun()
             else:
                 st.warning("삭제할 요청사항을 선택해주세요.")
 
