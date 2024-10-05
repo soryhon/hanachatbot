@@ -254,15 +254,15 @@ def run_llm_with_file_and_prompt(api_key, titles, requests, file_data_list):
         st.error(f"LLM 실행 중 오류가 발생했습니다: {str(e)}")
     return responses
 
-# 2 프레임: 파일 업로드
-st.subheader("1. 파일 업로드")
-
 # GitHub 정보가 있는지 확인하고 파일 업로드 객체를 출력
 github_info_loaded = load_env_info()
 
 # 업로드 가능한 파일 크기 제한 (100MB)
 MAX_FILE_SIZE_MB = 100
 MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
+
+# 2 프레임: 파일 업로드
+st.subheader("1. 파일 업로드")
 
 if github_info_loaded:
     with st.expander("파일 업로드", expanded=True):
