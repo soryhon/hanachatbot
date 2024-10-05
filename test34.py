@@ -239,9 +239,36 @@ with st.expander("요청사항 리스트", expanded=True):
 # 4 프레임: 결과 보고서
 st.subheader("4. 결과 보고서")
 
+# HTML 변환
+def convert_data_to_html(file_data, title, idx):
+    file_data = file_data.fillna("")
+
+    html_content = f"<h3>{idx + 1}. {title}</h3>"
+    html_content += "<table style='border-collapse: collapse;'>"
+
+    for i, row in file_data.iterrows():
+        html_content += "<tr>"
+        for j, col in enumerate(row):
+            col = str(col).replace("\n", "<br>")
+            if col.strip():
+                html_content += f"<td style='border: 1px solid black;'>{col}</td>"
+            else:
+                html_content += f"<td>{col}</td>"
+        html_content += "</tr>"
+
+    html_content += "</table>"
+    return html_content
+
+# HTML 데이터로 여러 요청사항 리스트 병합
+def generate_html_report(rows):
+    html_report = ""
+    for idx, row in enumerate(rows):
+        if row["데이터"] is not None and isinstance(row["데이터"], pd.DataFrame):
+            html_report += convert_data_to_html(row["데이터"], row["제목"], idx)
+    return html_report
+
 # 결과 보고서 데이터를 HTML으로 변환
 st.write("결과 보고서 보기")
-# HTML로 변환한 엑셀 시트 데이터를 화면에 출력 (프롬프트 아래에 위치)
 html_report = generate_html_report(st.session_state['rows'])
 if html_report:
     st.components.v1.html(html_report, height=1024, scrolling=True)
@@ -254,5 +281,4 @@ st.write("LLM 응답 보기")
 if "response" in st.session_state:
     for idx, response in enumerate(st.session_state["response"]):
         st.text_area(f"응답 {idx+1}:", value=response, height=300)
-        
         st.components.v1.html(response, height=600, scrolling=True)
