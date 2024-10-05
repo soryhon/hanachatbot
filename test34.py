@@ -67,7 +67,6 @@ def load_env_info():
     # GitHub 정보가 설정되었는지 확인하고 세션 상태 반영
     return github_set
 
-
 # GitHub에 폴더가 존재하는지 확인하고 없으면 생성하는 함수
 def create_github_folder_if_not_exists(repo, folder_name, token, branch='main'):
     url = f"https://api.github.com/repos/{repo}/contents/{folder_name}?ref={branch}"
@@ -419,6 +418,7 @@ with st.expander("요청사항 리스트", expanded=True):
     rows = st.session_state['rows']
     checked_rows = []
 
+    # 마지막에 추가된 행에 포커스를 설정할 수 있도록 key를 동적으로 할당
     for idx, row in enumerate(rows):
         with st.container():
             col1, col2 = st.columns([0.05, 0.95])  # 체크박스와 제목 부분을 가로로 나눔
@@ -427,7 +427,8 @@ with st.expander("요청사항 리스트", expanded=True):
             with col2:
                 st.markdown(f"#### 요청사항 {idx+1}")  # 요청사항 타이틀과 나머지 UI 요소들 배치
 
-            row['제목'] = st.text_input(f"제목 (요청사항 {idx+1})", row['제목'], key=f"title_{idx}")
+            # 제목 입력창에 포커스를 설정하기 위한 key 사용
+            row['제목'] = st.text_input(f"제목 (요청사항 {idx+1})", row['제목'], key=f"title_{idx}", placeholder="여기에 제목 입력", help="제목을 입력하세요")
             row['요청'] = st.text_area(f"요청 (요청사항 {idx+1})", row['요청'], key=f"request_{idx}")
 
             file_list = ['파일을 선택하세요.']
@@ -471,6 +472,8 @@ with st.expander("요청사항 리스트", expanded=True):
         if st.button("행 추가", key="add_row", help="새 행을 추가합니다.", use_container_width=True):
             new_row = {"제목": "", "요청": "", "파일": "", "데이터": "", "checked": False}
             st.session_state['rows'].append(new_row)
+            # 포커스를 마지막 추가된 행에 설정
+            st.experimental_set_query_params(focus=f"title_{len(st.session_state['rows']) - 1}")
 
     with col2:
         if st.button("행 삭제", key="delete_row", help="선택된 행을 삭제합니다.", use_container_width=True):
