@@ -257,10 +257,23 @@ def handle_file_selection(file_path, file_content, file_type):
     else:
         return extract_data_from_file(file_content, file_type)
 
-# 엑셀 데이터를 HTML로 변환하는 함수
+# NaN 값 처리, 셀 병합 및 줄바꿈 변환을 포함한 HTML 변환
 def convert_data_to_html(file_data, title, idx):
+    # NaN을 공백으로 대체
+    file_data = file_data.fillna("")
+
     html_content = f"<h3>{idx + 1}. {title}</h3>"
-    html_content += f"<div style='margin-left: 20px;'>{file_data.to_html(index=False)}</div>"
+    html_content += "<table border='1' style='border-collapse: collapse;'>"
+
+    for i, row in file_data.iterrows():
+        html_content += "<tr>"
+        for col in row:
+            # 줄바꿈을 <br>로 변환
+            col = str(col).replace("\n", "<br>")
+            html_content += f"<td>{col}</td>"
+        html_content += "</tr>"
+
+    html_content += "</table>"
     return html_content
 
 # HTML 데이터로 여러 요청사항 리스트 병합
