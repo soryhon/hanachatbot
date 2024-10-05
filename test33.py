@@ -254,10 +254,7 @@ def handle_file_selection(file_path, file_content, file_type):
         
         # 시트 선택 로직 처리
         file_data = handle_sheet_selection(file_content, sheet_count)
-        if file_data:
-            return file_data
-        else:
-            st.error("시트 데이터를 가져오지 못했습니다.")
+        return file_data  # 수정: 버튼 클릭시만 반환
     else:
         return extract_data_from_file(file_content, file_type)
 
