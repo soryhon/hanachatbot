@@ -199,32 +199,26 @@ def handle_sheet_selection(file_content, sheet_count):
         # 시트 선택 텍스트 입력창 (전체 선택 시 비활성화)
         sheet_selection = st.text_input("시트 선택(예: 1-3, 5)", value="1", disabled=all_sheets_checkbox)
 
+    # 전체 체크박스 체크 시 시트 선택 입력창에만 값 입력
+    if all_sheets_checkbox:
+        sheet_selection = f"1-{sheet_count}"
+        st.session_state['sheet_selection'] = sheet_selection
+
     with col4:
         # 시트 선택 버튼
         select_button = st.button("선택")
 
-    # 전체 시트 선택 시 처리
-    if all_sheets_checkbox:
-        sheet_selection = f"1-{sheet_count}"
-        st.session_state['sheet_selection'] = sheet_selection
-        sheet_selection_valid = True
-    else:
-        # 입력값 검증
-        if sheet_selection and validate_sheet_input(sheet_selection):
-            st.session_state['sheet_selection'] = sheet_selection
-            sheet_selection_valid = True
+    # 시트 선택 버튼이 눌렸을 때만 파일 데이터를 가져옴
+    if select_button:
+        if validate_sheet_input(sheet_selection):
+            selected_sheets = parse_sheet_selection(sheet_selection, sheet_count)
+            if selected_sheets:
+                file_data = extract_sheets_from_excel(file_content, selected_sheets)
+                return file_data
+            else:
+                st.error("선택한 시트가 잘못되었습니다.")
         else:
-            sheet_selection_valid = False
             st.error("잘못된 입력입니다. 숫자와 '-', ',' 만 입력할 수 있습니다.")
-
-    # 시트 선택 버튼이 눌렸을 때 시트 선택 처리
-    if select_button and sheet_selection_valid:
-        selected_sheets = parse_sheet_selection(sheet_selection, sheet_count)
-        if selected_sheets:
-            file_data = extract_sheets_from_excel(file_content, selected_sheets)
-            return file_data
-        else:
-            st.error("선택한 시트가 잘못되었습니다.")
     return None
 
 # 시트 선택 입력값을 분석하는 함수
