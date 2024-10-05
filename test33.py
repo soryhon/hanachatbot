@@ -389,7 +389,11 @@ with st.expander("요청사항 리스트", expanded=True):
 
     for idx, row in enumerate(rows):
         with st.container():
-            st.markdown(f"#### 요청사항 {idx+1}")
+            col1, col2 = st.columns([0.05, 0.95])  # 체크박스와 제목 부분을 가로로 나눔
+            with col1:
+                row_checked = st.checkbox("", key=f"row_checked_{idx}", value=row.get("checked", False))  # 체크박스만 추가
+            with col2:
+                st.markdown(f"#### 요청사항 {idx+1}")  # 요청사항 타이틀과 나머지 UI 요소들 배치
 
             row['제목'] = st.text_input(f"제목 (요청사항 {idx+1})", row['제목'], key=f"title_{idx}")
             row['요청'] = st.text_area(f"요청 (요청사항 {idx+1})", row['요청'], key=f"request_{idx}")
@@ -423,8 +427,6 @@ with st.expander("요청사항 리스트", expanded=True):
                 
             st.text_input(f"파일 경로 (요청사항 {idx+1})", row['파일'], disabled=True, key=f"file_{idx}")
 
-        # 행 삭제 체크박스
-        row_checked = st.checkbox(f"요청사항 삭제", key=f"row_checked_{idx}", value=row.get("checked", False))
         if row_checked:
             checked_rows.append(idx)
 
