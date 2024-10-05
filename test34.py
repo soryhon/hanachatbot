@@ -67,6 +67,7 @@ def load_env_info():
     # GitHub 정보가 설정되었는지 확인하고 세션 상태 반영
     return github_set
 
+
 # GitHub에 폴더가 존재하는지 확인하고 없으면 생성하는 함수
 def create_github_folder_if_not_exists(repo, folder_name, token, branch='main'):
     url = f"https://api.github.com/repos/{repo}/contents/{folder_name}?ref={branch}"
@@ -84,7 +85,6 @@ def create_github_folder_if_not_exists(repo, folder_name, token, branch='main'):
         }
         requests.put(create_folder_url, json=data, headers=headers)
         st.success(f"'{folder_name}' 폴더가 성공적으로 생성되었습니다.")
-    # 폴더가 이미 존재할 경우 메시지를 표시하지 않음
 
 # GitHub API 요청을 처리하는 함수 (파일 목록을 가져옴)
 def get_github_files(repo, branch, token, folder_name='uploadFiles'):
