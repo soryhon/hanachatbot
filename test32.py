@@ -11,7 +11,7 @@ import pptx
 from PIL import Image
 from io import BytesIO
 import base64
-import urllib.parse  # URL 인코딩을 위해 추가
+import urllib.parse
 from openai.error import RateLimitError
 from langchain.chat_models import ChatOpenAI
 import time
@@ -20,12 +20,8 @@ import json
 # 전역변수로 프롬프트 저장
 global_generated_prompt = []
 
-# 페이지 너비를 전체 화면으로 설정
-#st.set_page_config(layout="wide")
-
 # GitHub 정보 및 OpenAI API 키 자동 설정 또는 입력창을 통해 설정
 def load_env_info():
-    # JSON 데이터에서 정보 추출
     json_data = '''
     {
         "github_repo": "soryhon/hanachatbot",
@@ -33,6 +29,7 @@ def load_env_info():
     }
     '''
     
+    # JSON 데이터에서 정보 추출
     github_info = json.loads(json_data)
     github_repo = github_info['github_repo']
     github_branch = github_info['github_branch']
@@ -67,16 +64,34 @@ def load_env_info():
     st.session_state["github_repo"] = github_repo
     st.session_state["github_branch"] = github_branch
 
-# 페이지가 로드될 때 GitHub 정보와 OpenAI API 키를 자동으로 불러옴
-load_env_info()
+# GitHub에 폴더가 존재하는지 확인하고 없으면 생성하는 함수
+def create_github_folder_if_not_exists(repo, folder_name, token, branch='main'):
+    url = f"https://api.github.com/repos/{repo}/contents/{folder_name}?ref={branch}"
+    headers = {"Authorization": f"token {token}"}
+    response = requests.get(url, headers=headers)
+    
+    if response.status_code == 404:
+        # 폴더가 존재하지 않으므로 생성
+        st.warning(f"'{folder_name}' 폴더가 존재하지 않아 생성 중입니다.")
+        create_folder_url = f"https://api.github.com/repos/{repo}/contents/{folder_name}"
+        data = {
+            "message": f"Create {folder_name} folder",
+            "content": base64.b64encode(b'').decode('utf-8'),  # 빈 파일로 폴더 생성
+            "branch": branch
+        }
+        requests.put(create_folder_url, json=data, headers=headers)
+        st.success(f"'{folder_name}' 폴더가 성공적으로 생성되었습니다.")
+    elif response.status_code == 200:
+        st.info(f"'{folder_name}' 폴더가 이미 존재합니다.")
 
 # GitHub API 요청을 처리하는 함수 (파일 목록을 가져옴)
-def get_github_files(repo, branch, token):
+def get_github_files(repo, branch, token, folder_name='uploadFiles'):
+    create_github_folder_if_not_exists(repo, folder_name, token, branch)  # 폴더가 없으면 생성
     url = f"https://api.github.com/repos/{repo}/git/trees/{branch}?recursive=1"
     headers = {"Authorization": f"token {token}"}
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
-        files = [item['path'] for item in response.json().get('tree', []) if item['type'] == 'blob']
+        files = [item['path'] for item in response.json().get('tree', []) if item['type'] == 'blob' and item['path'].startswith(folder_name)]
         return files
     else:
         st.error("GitHub 파일 목록을 가져오지 못했습니다. 저장소 정보나 토큰을 확인하세요.")
@@ -96,6 +111,7 @@ def get_file_sha(repo, file_path, token, branch='main'):
 
 # GitHub에 파일 업로드 함수
 def upload_file_to_github(repo, folder_name, file_name, file_content, token, branch='main', sha=None):
+    create_github_folder_if_not_exists(repo, folder_name, token, branch)  # 업로드 전 폴더가 없으면 생성
     encoded_file_name = urllib.parse.quote(file_name)
     url = f"https://api.github.com/repos/{repo}/contents/{folder_name}/{encoded_file_name}"
     headers = {
@@ -137,117 +153,8 @@ def get_file_from_github(repo, branch, filepath, token):
         st.error(f"{filepath} 파일을 가져오지 못했습니다. 상태 코드: {response.status_code}")
         return None
 
-# 다양한 파일 형식에서 데이터를 추출하는 함수
-def extract_data_from_file(file_content, file_type):
-    if file_type == 'pdf':
-        return extract_text_from_pdf(file_content)
-    elif file_type == 'xlsx':
-        return extract_text_from_excel(file_content)
-    elif file_type == 'csv':
-        return extract_text_from_csv(file_content)
-    elif file_type == 'docx':
-        return extract_text_from_word(file_content)
-    elif file_type == 'pptx':
-        return extract_text_from_ppt(file_content)
-    elif file_type in ['png', 'jpg', 'jpeg']:
-        return extract_text_from_image(file_content)
-    else:
-        st.error(f"{file_type} 형식은 지원되지 않습니다.")
-        return None
-
-# PDF 파일에서 텍스트 추출
-def extract_text_from_pdf(file_content):
-    reader = PyPDF2.PdfReader(file_content)
-    text = ''
-    for page in range(len(reader.pages)):
-        text += reader.pages[page].extract_text()
-    return text
-
-# 엑셀 파일에서 텍스트 추출
-def extract_text_from_excel(file_content):
-    excel_data = pd.read_excel(file_content)
-    return excel_data.to_string()
-
-# CSV 파일에서 텍스트 추출
-def extract_text_from_csv(file_content):
-    csv_data = pd.read_csv(file_content)
-    return csv_data
-
-# 워드 파일에서 텍스트 추출
-def extract_text_from_word(file_content):
-    doc = docx.Document(file_content)
-    return '\n'.join([para.text for para in doc.paragraphs])
-
-# PPT 파일에서 텍스트 추출
-def extract_text_from_ppt(file_content):
-    presentation = pptx.Presentation(file_content)
-    text = ''
-    for slide in presentation.slides:
-        for shape in slide.shapes:
-            if hasattr(shape, "text"):
-                text += shape.text + '\n'
-    return text
-
-# 이미지에서 텍스트 추출 (OCR)
-def extract_text_from_image(file_content):
-    image = Image.open(file_content)
-    return "이미지에서 텍스트를 추출하는 기능은 구현되지 않았습니다."
-
-# LLM을 통해 프롬프트와 파일을 전달하고 응답을 받는 함수
-def run_llm_with_file_and_prompt(titles, requests, file_data_list):
-    global global_generated_prompt
-    openai.api_key = st.session_state["openai_api_key"]
-
-    responses = []
-    global_generated_prompt = []  # 프롬프트들을 담을 리스트 초기화
-
-    for i, (title, request, file_data) in enumerate(zip(titles, requests, file_data_list)):
-        if isinstance(file_data, pd.DataFrame):
-            file_data_str = file_data.to_string()
-        elif isinstance(file_data, dict):
-            file_data_str = "\n".join([f"시트 이름: {sheet_name}\n{data.to_string()}" for sheet_name, data in file_data.items()])
-        else:
-            file_data_str = str(file_data)
-
-        # 프롬프트 생성
-        generated_prompt = f"""
-        보고서 제목은 '{title}'로 하고, 아래의 파일 데이터를 분석하여 '{request}'를 요구 사항을 만족할 수 있도록 최적화된 보고서를 완성해.
-        표로 표현 할 때는 table 태그 형식으로 구현해야 한다. th과 td 태그는 border는 사이즈 1이고 색상은 검정색으로 구성한다.
-        표의 첫번째 행은 타이틀이 이므로 th태그로 구현하고 가운데 정렬, bold처리 해야 한다. 바탕색은 '#E7E6E6' 이어야 한다.
-        예시와 같은 구조로 구성한다. 보고서 제목은 앞에 순번을 표시하고 바로 아래 요구 사항에 맞는 내용을 이어서 보여줘야 한다.
-        예시 : '\r\n {i+1}. 보고서 제목\r\n보고서 내용'
-        파일 데이터: {file_data_str}
-        """
-
-        global_generated_prompt.append(generated_prompt)
-
-        prompt_template = PromptTemplate(
-            template=generated_prompt,
-            input_variables=[]
-        )
-
-        # LLM 모델 생성
-        llm = ChatOpenAI(model_name="gpt-4")
-        chain = LLMChain(llm=llm, prompt=prompt_template)
-
-        success = False
-        retry_count = 0
-        max_retries = 5  # 최대 재시도 횟수
-
-        # 응답을 받을 때까지 재시도
-        while not success and retry_count < max_retries:
-            try:
-                response = chain.run({})
-                responses.append(response)
-                success = True
-            except RateLimitError:
-                retry_count += 1
-                st.warning(f"API 요청 한도를 초과했습니다. 10초 후 다시 시도합니다. 재시도 횟수: {retry_count}/{max_retries}")
-                time.sleep(10)
-
-    return responses
-
 # 2 프레임: 파일 업로드
+st.subheader("1. 파일 업로드")
 if not st.session_state.get("github_token") or not st.session_state.get("github_repo"):
     st.warning("GitHub 정보가 저장되기 전에는 파일 업로드를 할 수 없습니다. 먼저 GitHub 정보를 입력해 주세요.")
 else:
@@ -359,12 +266,6 @@ with col1:
                 else:
                     st.warning("삭제할 요청사항을 선택해주세요.")
 
-        with col1_3:
-            if st.button("새로고침"):
-                st.session_state['rows'] = st.session_state['rows']
-
-
-
 with col2:
     st.write(" ")
     st.write(" ")
@@ -390,12 +291,14 @@ with col2:
     # [양식 저장] 버튼
     if st.button("양식 저장", key="save_template", use_container_width=True):
         st.success("양식이 저장되었습니다.")
-        # 양식 저장 기능 추가 가능
 
     # [양식 불러오기] 버튼
     if st.button("양식 불러오기", key="load_template", use_container_width=True):
         st.success("양식이 불러와졌습니다.")
-        # 양식 불러오기 기능 추가 가능
+
+    # [새로고침] 버튼
+    if st.button("새로고침", key="refresh_page", use_container_width=True):
+        st.experimental_rerun()
 
 # 4 프레임: 결과 보고서
 st.subheader("4. 결과 보고서")
