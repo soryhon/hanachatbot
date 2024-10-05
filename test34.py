@@ -222,25 +222,52 @@ with st.expander("요청사항 리스트", expanded=True):
         if st.button("행 추가", key="add_row"):
             new_row = {"제목": "", "요청": "", "파일": "", "데이터": "", "checked": False}
             st.session_state['rows'].append(new_row)
-            st.info("요청사항 리스트 추가 하였습니다.")  # 메시지 추가
 
     with col2:
         if st.button("행 삭제", key="delete_row"):
             if checked_rows:
                 st.session_state['rows'] = [row for idx, row in enumerate(st.session_state['rows']) if idx not in checked_rows]
-                st.info("요청사항 리스트 삭제 하였습니다.")  # 메시지 추가
+                st.success(f"체크된 {len(checked_rows)}개의 요청사항이 삭제되었습니다.")
             else:
                 st.warning("삭제할 요청사항을 선택해주세요.")
 
     with col3:
-        if st.button("새로고침", key="manual_refresh"):
+        if st.button("새로고침", key="refresh_page"):
             st.info("새로고침 하였습니다.")
 
-# 4 프레임: 결과 보고서
-st.subheader("4. 결과 보고서")
+# 보고서 작성 버튼을 따로 위에 위치
+if st.button("보고서 작성", key="generate_report"):
+    if not st.session_state.get("openai_api_key"):
+        st.error("먼저 OpenAI API 키를 입력하고 저장하세요!")
+    elif not st.session_state['rows'] or all(not row["제목"] or not row["요청"] or not row["데이터"] for row in st.session_state['rows']):
+        st.error("요청사항의 제목, 요청, 파일을 모두 입력해야 합니다!")
+    else:
+        titles = [row['제목'] for row in st.session_state['rows']]
+        requests = [row['요청'] for row in st.session_state['rows']]
+        file_data_list = [row['데이터'] for row in st.session_state['rows']]
 
-# HTML 변환
+        responses = run_llm_with_file_and_prompt(
+            st.session_state["openai_api_key"], 
+            titles, 
+            requests, 
+            file_data_list
+        )
+        st.session_state["response"] = responses
+
+# 양식 저장, 양식 불러오기 버튼을 같은 행에 배치, 가로 길이 50%, 버튼 길이 100px로 설정
+col1, col2 = st.columns([0.5, 0.5])
+
+with col1:
+    if st.button("양식 저장", key="save_template", use_container_width=True):
+        st.success("양식이 저장되었습니다.")
+
+with col2:
+    if st.button("양식 불러오기", key="load_template", use_container_width=True):
+        st.success("양식이 불러와졌습니다.")
+
+# HTML 변환 함수 (NaN 처리 포함)
 def convert_data_to_html(file_data, title, idx):
+    # NaN을 공백으로 대체
     file_data = file_data.fillna("")
 
     html_content = f"<h3>{idx + 1}. {title}</h3>"
@@ -249,11 +276,9 @@ def convert_data_to_html(file_data, title, idx):
     for i, row in file_data.iterrows():
         html_content += "<tr>"
         for j, col in enumerate(row):
+            # 줄바꿈을 <br>로 변환
             col = str(col).replace("\n", "<br>")
-            if col.strip():
-                html_content += f"<td style='border: 1px solid black;'>{col}</td>"
-            else:
-                html_content += f"<td>{col}</td>"
+            html_content += f"<td style='border: 1px solid black;'>{col}</td>"
         html_content += "</tr>"
 
     html_content += "</table>"
@@ -267,8 +292,12 @@ def generate_html_report(rows):
             html_report += convert_data_to_html(row["데이터"], row["제목"], idx)
     return html_report
 
+# 4 프레임: 결과 보고서
+st.subheader("4. 결과 보고서")
+
 # 결과 보고서 데이터를 HTML으로 변환
 st.write("결과 보고서 보기")
+# HTML로 변환한 엑셀 시트 데이터를 화면에 출력 (프롬프트 아래에 위치)
 html_report = generate_html_report(st.session_state['rows'])
 if html_report:
     st.components.v1.html(html_report, height=1024, scrolling=True)
@@ -281,4 +310,5 @@ st.write("LLM 응답 보기")
 if "response" in st.session_state:
     for idx, response in enumerate(st.session_state["response"]):
         st.text_area(f"응답 {idx+1}:", value=response, height=300)
+        
         st.components.v1.html(response, height=600, scrolling=True)
