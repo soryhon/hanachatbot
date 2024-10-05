@@ -429,9 +429,11 @@ with st.expander("요청사항 리스트", expanded=True):
                         # 엑셀 파일인 경우 시트 선택 로직을 추가
                         file_data = handle_file_selection(file_path, file_content, file_type)
                         
-                        if file_data:
+                        if file_data is not None and not file_data.empty:  # 수정된 부분
                             row['파일'] = f"/{st.session_state['github_repo']}/{st.session_state['github_branch']}/{selected_file}"
                             row['데이터'] = file_data
+                        else:
+                            st.error(f"{selected_file} 파일의 데이터를 처리하지 못했습니다.")
                 else:
                     st.error(f"{selected_file} 파일을 GitHub에서 불러오지 못했습니다.")
                 
