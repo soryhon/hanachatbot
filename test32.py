@@ -156,12 +156,30 @@ def get_file_from_github(repo, branch, filepath, token):
         st.error(f"{filepath} 파일을 가져오지 못했습니다. 상태 코드: {response.status_code}")
         return None
 
+# 엑셀 파일에서 텍스트 추출
+def extract_text_from_excel(file_content):
+    try:
+        # 파일 내용이 제대로 되어 있는지 확인
+        if file_content is None:
+            st.error("파일 내용을 가져오지 못했습니다.")
+            return None
+        
+        # 파일이 BytesIO 형태로 전달되었다고 가정하고 처리
+        excel_data = pd.read_excel(file_content)
+        st.write("Excel data loaded successfully:", excel_data)  # 디버깅 로그 출력
+        return excel_data.to_string()
+    except Exception as e:
+        st.error(f"Excel 파일을 처리하는 중에 오류가 발생했습니다: {str(e)}")
+        return None
+
 # 다양한 파일 형식에서 데이터를 추출하는 함수
 def extract_data_from_file(file_content, file_type):
+    # 파일 내용이 없는 경우
     if file_content is None:
         st.error("파일 내용을 가져오지 못했습니다.")
         return None
     
+    # 파일 형식에 따른 처리
     if file_type == 'pdf':
         return extract_text_from_pdf(file_content)
     elif file_type == 'xlsx':
@@ -320,6 +338,10 @@ with col1:
                         
                         if file_content:
                             file_type = file_path.split('.')[-1].lower()
+
+                            # 디버깅을 위해 파일 타입 출력
+                            st.write(f"선택한 파일 타입: {file_type}")
+
                             file_data = extract_data_from_file(file_content, file_type)
                             
                             if file_data is None:
