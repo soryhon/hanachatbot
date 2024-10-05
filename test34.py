@@ -223,16 +223,14 @@ with st.expander("요청사항 리스트", expanded=True):
         if st.button("행 추가", key="add_row"):
             new_row = {"제목": "", "요청": "", "파일": "", "데이터": "", "checked": False}
             st.session_state['rows'].append(new_row)
-            # 행추가 후 새로고침 버튼 자동 클릭
-            st.session_state['refresh_triggered'] = True
+            st.session_state['refresh_triggered'] = False
 
     with col2:
         if st.button("행 삭제", key="delete_row"):
             if checked_rows:
                 st.session_state['rows'] = [row for idx, row in enumerate(st.session_state['rows']) if idx not in checked_rows]
                 st.success(f"체크된 {len(checked_rows)}개의 요청사항이 삭제되었습니다.")
-                # 행삭제 후 새로고침 버튼 자동 클릭
-                st.session_state['refresh_triggered'] = True
+                st.session_state['refresh_triggered'] = False
             else:
                 st.warning("삭제할 요청사항을 선택해주세요.")
 
@@ -244,7 +242,6 @@ with st.expander("요청사항 리스트", expanded=True):
 # 새로고침 버튼이 자동으로 클릭되게 하는 로직
 if st.session_state.get('refresh_triggered'):
     st.session_state['refresh_triggered'] = False
-    st.experimental_rerun()
 
 # 보고서 작성 버튼을 따로 위에 위치
 if st.button("보고서 작성", key="generate_report"):
@@ -276,39 +273,10 @@ with col2:
     if st.button("양식 불러오기", key="load_template", use_container_width=True):
         st.success("양식이 불러와졌습니다.")
 
-# HTML 변환 함수 (NaN 처리 포함)
-def convert_data_to_html(file_data, title, idx):
-    # NaN을 공백으로 대체
-    file_data = file_data.fillna("")
-
-    html_content = f"<h3>{idx + 1}. {title}</h3>"
-    html_content += "<table style='border-collapse: collapse;'>"
-
-    for i, row in file_data.iterrows():
-        html_content += "<tr>"
-        for j, col in enumerate(row):
-            # 줄바꿈을 <br>로 변환
-            col = str(col).replace("\n", "<br>")
-            html_content += f"<td style='border: 1px solid black;'>{col}</td>"
-        html_content += "</tr>"
-
-    html_content += "</table>"
-    return html_content
-
-# HTML 데이터로 여러 요청사항 리스트 병합
-def generate_html_report(rows):
-    html_report = ""
-    for idx, row in enumerate(rows):
-        if row["데이터"] is not None and isinstance(row["데이터"], pd.DataFrame):
-            html_report += convert_data_to_html(row["데이터"], row["제목"], idx)
-    return html_report
-
 # 4 프레임: 결과 보고서
 st.subheader("4. 결과 보고서")
 
-# 결과 보고서 데이터를 HTML으로 변환
-st.write("결과 보고서 보기")
-# HTML로 변환한 엑셀 시트 데이터를 화면에 출력 (프롬프트 아래에 위치)
+# HTML로 변환한 엑셀 시트 데이터를 화면에 출력
 html_report = generate_html_report(st.session_state['rows'])
 if html_report:
     st.components.v1.html(html_report, height=1024, scrolling=True)
