@@ -178,15 +178,9 @@ def extract_sheets_from_excel(file_content, selected_sheets):
         st.error(f"엑셀 파일의 시트 데이터를 추출하는 중에 오류가 발생했습니다: {str(e)}")
         return None
 
-# 숫자, ',' 및 '-'만 허용하는 함수
-def validate_sheet_input(input_value):
-    if all(c.isdigit() or c in ['-', ','] for c in input_value):
-        return True
-    return False
-
-# 시트 선택 로직 추가
+# 시트 선택 로직 추가 (엑셀 파일 선택 시 기본적으로 1번 시트 데이터를 바로 가져오도록 설정)
 def handle_sheet_selection(file_content, sheet_count):
-    # 4개의 객체를 가로로 배치
+    # 시트 관련 UI를 표시
     col1, col2, col3, col4 = st.columns([0.25, 0.25, 0.25, 0.25])
     
     with col1:
@@ -196,10 +190,10 @@ def handle_sheet_selection(file_content, sheet_count):
         all_sheets_checkbox = st.checkbox('전체', value=False, key="all_sheets")
 
     with col3:
-        # 시트 선택 텍스트 입력창 (전체 선택 시 비활성화)
+        # 시트 선택 텍스트 입력창 (전체 선택 시 비활성화, 기본값 1)
         sheet_selection = st.text_input("시트 선택(예: 1-3, 5)", value="1", disabled=all_sheets_checkbox)
 
-    # 전체 체크박스 체크 시 시트 선택 입력창에만 값 입력
+    # 전체 체크박스 체크 시 시트 선택 입력창에 1-총 시트 개수 값 입력
     if all_sheets_checkbox:
         sheet_selection = f"1-{sheet_count}"
         st.session_state['sheet_selection'] = sheet_selection
@@ -208,17 +202,14 @@ def handle_sheet_selection(file_content, sheet_count):
         # 시트 선택 버튼
         select_button = st.button("선택")
 
-    # 시트 선택 버튼이 눌렸을 때만 파일 데이터를 가져옴
-    if select_button:
-        if validate_sheet_input(sheet_selection):
-            selected_sheets = parse_sheet_selection(sheet_selection, sheet_count)
-            if selected_sheets:
-                file_data = extract_sheets_from_excel(file_content, selected_sheets)
-                return file_data
-            else:
-                st.error("선택한 시트가 잘못되었습니다.")
+    # 시트 선택 버튼이 눌렸거나 기본 값이 있을 경우 바로 데이터 가져오기
+    if select_button or sheet_selection == "1":
+        selected_sheets = parse_sheet_selection(sheet_selection, sheet_count)
+        if selected_sheets:
+            file_data = extract_sheets_from_excel(file_content, selected_sheets)
+            return file_data
         else:
-            st.error("잘못된 입력입니다. 숫자와 '-', ',' 만 입력할 수 있습니다.")
+            st.error("선택한 시트가 잘못되었습니다.")
     return None
 
 # 시트 선택 입력값을 분석하는 함수
@@ -246,13 +237,14 @@ def handle_file_selection(file_path, file_content, file_type):
         excel_data = pd.ExcelFile(file_content)
         sheet_count = len(excel_data.sheet_names)
         
-        # 시트 선택 UI 표시
+        # 엑셀 파일 선택 시 바로 1번 시트 데이터를 가져오도록 설정
         file_data = handle_sheet_selection(file_content, sheet_count)
         
-        # 수정: DataFrame의 empty 속성을 사용하여 데이터가 있는지 확인
+        # DataFrame의 empty 속성을 사용하여 데이터가 있는지 확인
         if file_data is not None and not file_data.empty:
             return file_data
         else:
+            st.error("선택한 시트에 데이터가 없습니다.")
             return None
     else:
         return extract_data_from_file(file_content, file_type)
@@ -395,7 +387,8 @@ if github_info_loaded:
                     else:
                         upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'])
                         st.success(f"'{file_name}' 파일이 성공적으로 업로드되었습니다.")
-                        # 엑셀 파일 선택 시 시트 관련 UI 표시
+                        
+                        # 엑셀 파일 선택 시 기본적으로 1번 시트 데이터를 가져오도록 함
                         if file_type == 'xlsx':
                             handle_file_selection(file_name, file_content, file_type)
                         uploaded_files = None
@@ -442,7 +435,7 @@ with st.expander("요청사항 리스트", expanded=True):
                         st.error(f"지원하지 않는 파일입니다: {file_path}")
                         row['데이터'] = ""
                     else:
-                        # 엑셀 파일인 경우 시트 선택 로직을 추가
+                        # 엑셀 파일인 경우 기본적으로 1번 시트 데이터를 가져오도록 설정
                         file_data = handle_file_selection(file_path, file_content, file_type)
                         
                         if file_data is not None and not file_data.empty:  # 수정된 부분
@@ -474,37 +467,37 @@ with st.expander("요청사항 리스트", expanded=True):
             else:
                 st.warning("삭제할 요청사항을 선택해주세요.")
 
-# 보고서 작성, 양식 저장, 양식 불러오기, 새로고침 버튼을 같은 행에 가로로 배치
-col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
+# 보고서 작성 버튼을 따로 위에 위치
+if st.button("보고서 작성", key="generate_report"):
+    if not st.session_state.get("openai_api_key"):
+        st.error("먼저 OpenAI API 키를 입력하고 저장하세요!")
+    elif not st.session_state['rows'] or all(not row["제목"] or not row["요청"] or not row["데이터"] for row in st.session_state['rows']):
+        st.error("요청사항의 제목, 요청, 파일을 모두 입력해야 합니다!")
+    else:
+        titles = [row['제목'] for row in st.session_state['rows']]
+        requests = [row['요청'] for row in st.session_state['rows']]
+        file_data_list = [row['데이터'] for row in st.session_state['rows']]
+
+        responses = run_llm_with_file_and_prompt(
+            st.session_state["openai_api_key"], 
+            titles, 
+            requests, 
+            file_data_list
+        )
+        st.session_state["response"] = responses
+
+# 양식 저장, 양식 불러오기, 새로고침 버튼을 같은 행에 배치
+col1, col2, col3 = st.columns([1, 1, 1])
 
 with col1:
-    if st.button("보고서 작성", key="generate_report"):
-        if not st.session_state.get("openai_api_key"):
-            st.error("먼저 OpenAI API 키를 입력하고 저장하세요!")
-        elif not st.session_state['rows'] or all(not row["제목"] or not row["요청"] or not row["데이터"] for row in st.session_state['rows']):
-            st.error("요청사항의 제목, 요청, 파일을 모두 입력해야 합니다!")
-        else:
-            titles = [row['제목'] for row in st.session_state['rows']]
-            requests = [row['요청'] for row in st.session_state['rows']]
-            file_data_list = [row['데이터'] for row in st.session_state['rows']]
-
-            responses = run_llm_with_file_and_prompt(
-                st.session_state["openai_api_key"], 
-                titles, 
-                requests, 
-                file_data_list
-            )
-            st.session_state["response"] = responses
-
-with col2:
     if st.button("양식 저장", key="save_template"):
         st.success("양식이 저장되었습니다.")
 
-with col3:
+with col2:
     if st.button("양식 불러오기", key="load_template"):
         st.success("양식이 불러와졌습니다.")
 
-with col4:
+with col3:
     if st.button("새로고침", key="refresh_page"):
         st.experimental_rerun()
 
