@@ -246,13 +246,13 @@ def handle_file_selection(file_path, file_content, file_type):
         excel_data = pd.ExcelFile(file_content)
         sheet_count = len(excel_data.sheet_names)
         
-        # 시트 선택 로직 처리
+        # 시트 선택 UI 표시
         file_data = handle_sheet_selection(file_content, sheet_count)
+        
         # 수정: DataFrame의 empty 속성을 사용하여 데이터가 있는지 확인
         if file_data is not None and not file_data.empty:
             return file_data
         else:
-            st.error("선택한 시트에 데이터가 없습니다.")
             return None
     else:
         return extract_data_from_file(file_content, file_type)
@@ -395,6 +395,9 @@ if github_info_loaded:
                     else:
                         upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'])
                         st.success(f"'{file_name}' 파일이 성공적으로 업로드되었습니다.")
+                        # 엑셀 파일 선택 시 시트 관련 UI 표시
+                        if file_type == 'xlsx':
+                            handle_file_selection(file_name, file_content, file_type)
                         uploaded_files = None
 else:
     st.warning("GitHub 정보가 저장되기 전에는 파일 업로드를 할 수 없습니다. 먼저 GitHub 정보를 입력해 주세요.")
@@ -440,9 +443,13 @@ with st.expander("요청사항 리스트", expanded=True):
                         row['데이터'] = ""
                     else:
                         # 엑셀 파일인 경우 시트 선택 로직을 추가
-                        # 시트 선택 후에만 데이터를 처리하게 수정
-                        row['파일'] = f"/{st.session_state['github_repo']}/{st.session_state['github_branch']}/{selected_file}"
-                        row['데이터'] = None  # 시트 선택 후에 데이터를 가져오도록 함
+                        file_data = handle_file_selection(file_path, file_content, file_type)
+                        
+                        if file_data is not None and not file_data.empty:  # 수정된 부분
+                            row['파일'] = f"/{st.session_state['github_repo']}/{st.session_state['github_branch']}/{selected_file}"
+                            row['데이터'] = file_data
+                        else:
+                            st.error(f"{selected_file} 파일의 데이터를 처리하지 못했습니다.")
                 else:
                     st.error(f"{selected_file} 파일을 GitHub에서 불러오지 못했습니다.")
                 
