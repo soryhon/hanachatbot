@@ -64,6 +64,10 @@ def load_env_info():
     st.session_state["github_repo"] = github_repo
     st.session_state["github_branch"] = github_branch
 
+    # GitHub 정보가 설정되었는지 확인하고 세션 상태 반영
+    return github_set
+
+
 # GitHub에 폴더가 존재하는지 확인하고 없으면 생성하는 함수
 def create_github_folder_if_not_exists(repo, folder_name, token, branch='main'):
     url = f"https://api.github.com/repos/{repo}/contents/{folder_name}?ref={branch}"
@@ -155,9 +159,11 @@ def get_file_from_github(repo, branch, filepath, token):
 
 # 2 프레임: 파일 업로드
 st.subheader("1. 파일 업로드")
-if not st.session_state.get("github_token") or not st.session_state.get("github_repo"):
-    st.warning("GitHub 정보가 저장되기 전에는 파일 업로드를 할 수 없습니다. 먼저 GitHub 정보를 입력해 주세요.")
-else:
+
+# GitHub 정보가 있는지 확인하고 파일 업로드 객체를 출력
+github_info_loaded = load_env_info()
+
+if github_info_loaded:
     with st.expander("파일 업로드", expanded=True):
         uploaded_files = st.file_uploader("파일을 여러 개 드래그 앤 드롭하여 업로드하세요.", accept_multiple_files=True)
 
@@ -189,6 +195,8 @@ else:
                     upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'])
                     st.success(f"'{file_name}' 파일이 성공적으로 업로드되었습니다.")
                     uploaded_files = None
+else:
+    st.warning("GitHub 정보가 저장되기 전에는 파일 업로드를 할 수 없습니다. 먼저 GitHub 정보를 입력해 주세요.")
 
 # 3 프레임: 작성 보고서 요청사항 테이블
 st.subheader("3. 작성 보고서 요청사항 및 실행 버튼")
