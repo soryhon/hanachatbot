@@ -21,7 +21,7 @@ import json
 global_generated_prompt = []
 
 # 페이지 너비를 전체 화면으로 설정
-st.set_page_config(layout="wide")
+#st.set_page_config(layout="wide")
 
 # GitHub 정보 및 OpenAI API 키 자동 설정 또는 입력창을 통해 설정
 def load_env_info():
