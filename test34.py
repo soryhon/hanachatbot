@@ -223,23 +223,36 @@ with st.expander("요청사항 리스트", expanded=True):
             new_row = {"제목": "", "요청": "", "파일": "", "데이터": "", "checked": False}
             st.session_state['rows'].append(new_row)
             st.info("요청사항 리스트 추가 하였습니다.")  # 메시지 추가
-            st.session_state['refresh_triggered'] = True
 
     with col2:
         if st.button("행 삭제", key="delete_row"):
             if checked_rows:
                 st.session_state['rows'] = [row for idx, row in enumerate(st.session_state['rows']) if idx not in checked_rows]
                 st.info("요청사항 리스트 삭제 하였습니다.")  # 메시지 추가
-                st.session_state['refresh_triggered'] = True
             else:
                 st.warning("삭제할 요청사항을 선택해주세요.")
 
     with col3:
         if st.button("새로고침", key="manual_refresh"):
             st.info("새로고침 하였습니다.")
-            st.session_state['refresh_triggered'] = False
 
-# 새로고침 버튼이 자동으로 클릭되게 하는 로직
-if st.session_state.get('refresh_triggered'):
-    st.session_state['refresh_triggered'] = False
-    st.info("새로고침 하였습니다.")  # 새로고침 메시지로 대체
+# 4 프레임: 결과 보고서
+st.subheader("4. 결과 보고서")
+
+# 결과 보고서 데이터를 HTML으로 변환
+st.write("결과 보고서 보기")
+# HTML로 변환한 엑셀 시트 데이터를 화면에 출력 (프롬프트 아래에 위치)
+html_report = generate_html_report(st.session_state['rows'])
+if html_report:
+    st.components.v1.html(html_report, height=1024, scrolling=True)
+
+# 전달된 프롬프트
+st.text_area("전달된 프롬프트:", value="\n\n".join(global_generated_prompt), height=150)
+
+# LLM 응답 보기
+st.write("LLM 응답 보기")
+if "response" in st.session_state:
+    for idx, response in enumerate(st.session_state["response"]):
+        st.text_area(f"응답 {idx+1}:", value=response, height=300)
+        
+        st.components.v1.html(response, height=600, scrolling=True)
