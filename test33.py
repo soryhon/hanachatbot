@@ -197,7 +197,7 @@ def handle_sheet_selection(file_content, sheet_count):
 
     with col3:
         # 시트 선택 텍스트 입력창 (전체 선택 시 비활성화)
-        sheet_selection = st.text_input("시트 선택:", placeholder=f"예: 1-3, 5", disabled=all_sheets_checkbox)
+        sheet_selection = st.text_input("시트 선택(예: 1-3, 5)", value="1", disabled=all_sheets_checkbox)
 
     with col4:
         # 시트 선택 버튼
@@ -329,12 +329,21 @@ MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
 # 2 프레임: 파일 업로드
 st.subheader("1. 파일 업로드")
 
+# 지원되는 파일 형식 리스트
+supported_file_types = ['xlsx', 'pptx', 'docx', 'csv', 'png', 'jpg', 'jpeg']
+
 if github_info_loaded:
     with st.expander("파일 업로드", expanded=True):
         uploaded_files = st.file_uploader("파일을 여러 개 드래그 앤 드롭하여 업로드하세요. (최대 100MB)", accept_multiple_files=True)
 
         if uploaded_files:
             for uploaded_file in uploaded_files:
+                file_type = uploaded_file.name.split('.')[-1].lower()
+
+                if file_type not in supported_file_types:
+                    st.error(f"지원하지 않는 파일입니다: {uploaded_file.name}")
+                    continue
+
                 if uploaded_file.size > MAX_FILE_SIZE_BYTES:
                     st.warning(f"'{uploaded_file.name}' 파일은 {MAX_FILE_SIZE_MB}MB 제한을 초과했습니다. 파일 크기를 줄이거나 GitHub에 직접 푸시하세요.")
                 else:
@@ -398,12 +407,17 @@ with st.expander("요청사항 리스트", expanded=True):
                 if file_content:
                     file_type = file_path.split('.')[-1].lower()
 
-                    # 엑셀 파일인 경우 시트 선택 로직을 추가
-                    file_data = handle_file_selection(file_path, file_content, file_type)
-                    
-                    if file_data:
-                        row['파일'] = f"/{st.session_state['github_repo']}/{st.session_state['github_branch']}/{selected_file}"
-                        row['데이터'] = file_data
+                    # 파일 형식 검증 (지원되는 파일만 처리)
+                    if file_type not in supported_file_types:
+                        st.error(f"지원하지 않는 파일입니다: {file_path}")
+                        row['데이터'] = ""
+                    else:
+                        # 엑셀 파일인 경우 시트 선택 로직을 추가
+                        file_data = handle_file_selection(file_path, file_content, file_type)
+                        
+                        if file_data:
+                            row['파일'] = f"/{st.session_state['github_repo']}/{st.session_state['github_branch']}/{selected_file}"
+                            row['데이터'] = file_data
                 else:
                     st.error(f"{selected_file} 파일을 GitHub에서 불러오지 못했습니다.")
                 
