@@ -156,16 +156,6 @@ def get_file_from_github(repo, branch, filepath, token):
         st.error(f"{filepath} 파일을 가져오지 못했습니다. 상태 코드: {response.status_code}")
         return None
 
-# 엑셀 파일에서 텍스트 추출
-def extract_text_from_excel(file_content):
-    try:
-        excel_data = pd.read_excel(file_content)
-        st.write("Excel data loaded successfully:", excel_data)  # 로그 출력
-        return excel_data.to_string()
-    except Exception as e:
-        st.error(f"Excel 파일을 처리하는 중에 오류가 발생했습니다: {str(e)}")
-        return None
-
 # 다양한 파일 형식에서 데이터를 추출하는 함수
 def extract_data_from_file(file_content, file_type):
     if file_content is None:
@@ -187,6 +177,64 @@ def extract_data_from_file(file_content, file_type):
     else:
         st.error(f"{file_type} 형식은 지원되지 않습니다.")
         return None
+
+# LLM을 통해 프롬프트와 파일을 전달하고 응답을 받는 함수
+def run_llm_with_file_and_prompt(api_key, titles, requests, file_data_list):
+    global global_generated_prompt
+    openai.api_key = api_key
+
+    responses = []
+    global_generated_prompt = []  # 프롬프트들을 담을 리스트 초기화
+
+    try:
+        for i, (title, request, file_data) in enumerate(zip(titles, requests, file_data_list)):
+            if isinstance(file_data, pd.DataFrame):
+                file_data_str = file_data.to_string()
+            elif isinstance(file_data, dict):
+                file_data_str = "\n".join([f"시트 이름: {sheet_name}\n{data.to_string()}" for sheet_name, data in file_data.items()])
+            else:
+                file_data_str = str(file_data)
+
+            # 프롬프트 생성
+            generated_prompt = f"""
+            보고서 제목은 '{title}'로 하고, 아래의 파일 데이터를 분석하여 '{request}'를 요구 사항을 만족할 수 있도록 최적화된 보고서를 완성해.
+            표로 표현 할 때는 table 태그 형식으로 구현해야 한다. th과 td 태그는 border는 사이즈 1이고 색상은 검정색으로 구성한다.
+            표의 첫번째 행은 타이틀이 이므로 th태그로 구현하고 가운데 정렬, bold처리 해야 한다. 바탕색은 '#E7E6E6' 이어야 한다.
+            예시와 같은 구조로 구성한다. 보고서 제목은 앞에 순번을 표시하고 바로 아래 요구 사항에 맞는 내용을 이어서 보여줘야 한다.
+            예시 : '\r\n {i+1}. 보고서 제목\r\n보고서 내용'
+            파일 데이터: {file_data_str}
+            """
+
+            global_generated_prompt.append(generated_prompt)
+
+            prompt_template = PromptTemplate(
+                template=generated_prompt,
+                input_variables=[]
+            )
+
+            # LLM 모델 생성
+            llm = ChatOpenAI(model_name="gpt-4")
+            chain = LLMChain(llm=llm, prompt=prompt_template)
+
+            success = False
+            retry_count = 0
+            max_retries = 5  # 최대 재시도 횟수
+
+            # 응답을 받을 때까지 재시도
+            while not success and retry_count < max_retries:
+                try:
+                    response = chain.run({})
+                    responses.append(response)
+                    success = True
+                except RateLimitError:
+                    retry_count += 1
+                    st.warning(f"API 요청 한도를 초과했습니다. 10초 후 다시 시도합니다. 재시도 횟수: {retry_count}/{max_retries}")
+                    time.sleep(10)
+
+                time.sleep(10)
+    except Exception as e:
+        st.error(f"LLM 실행 중 오류가 발생했습니다: {str(e)}")
+    return responses
 
 # 2 프레임: 파일 업로드
 st.subheader("1. 파일 업로드")
@@ -321,6 +369,7 @@ with col2:
             file_data_list = [row['데이터'] for row in st.session_state['rows']]
 
             responses = run_llm_with_file_and_prompt(
+                st.session_state["openai_api_key"], 
                 titles, 
                 requests, 
                 file_data_list
