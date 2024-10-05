@@ -255,14 +255,18 @@ def convert_data_to_html(file_data, title, idx):
     file_data = file_data.fillna("")
 
     html_content = f"<h3>{idx + 1}. {title}</h3>"
-    html_content += "<table border='1' style='border-collapse: collapse;'>"
+    html_content += "<table style='border-collapse: collapse;'>"
 
     for i, row in file_data.iterrows():
         html_content += "<tr>"
         for col in row:
             # 줄바꿈을 <br>로 변환
             col = str(col).replace("\n", "<br>")
-            html_content += f"<td>{col}</td>"
+            # NaN이 아닌 값이 있을 때만 테두리 스타일 추가
+            if col.strip() != "":
+                html_content += f"<td style='border: 1px solid black;'>{col}</td>"
+            else:
+                html_content += f"<td>{col}</td>"
         html_content += "</tr>"
 
     html_content += "</table>"
@@ -509,7 +513,7 @@ st.write("결과 보고서 보기")
 # HTML로 변환한 엑셀 시트 데이터를 화면에 출력 (프롬프트 아래에 위치)
 html_report = generate_html_report(st.session_state['rows'])
 if html_report:
-    st.components.v1.html(html_report, height=600, scrolling=True)
+    st.components.v1.html(html_report, scrolling=True)  # height 제거하여 가변 크기로 설정
 
 # 전달된 프롬프트
 st.text_area("전달된 프롬프트:", value="\n\n".join(global_generated_prompt), height=150)
