@@ -242,7 +242,9 @@ if github_info_loaded:
                         
                         # 엑셀 파일 선택 시 기본적으로 1번 시트 데이터를 가져오도록 함
                         if file_type == 'xlsx':
-                            handle_sheet_selection_with_formatting(file_content, 1, 0)
+                            # 세션에 파일 데이터 저장
+                            st.session_state['file_content'] = file_content
+                            st.session_state['sheet_count'] = 1  # 기본값 설정
                         uploaded_files = None
 else:
     st.warning("GitHub 정보가 저장되기 전에는 파일 업로드를 할 수 없습니다. 먼저 GitHub 정보를 입력해 주세요.")
@@ -250,12 +252,13 @@ else:
 # 4 프레임: 결과 보고서
 st.subheader("4. 결과 보고서")
 
-# 결과 보고서 데이터를 HTML으로 변환
-st.write("결과 보고서 보기")
-# HTML로 변환한 엑셀 시트 데이터를 화면에 출력 (프롬프트 아래에 위치)
-html_report = handle_sheet_selection_with_formatting(st.session_state['file_content'], st.session_state['sheet_count'], 0)
-if html_report:
-    st.components.v1.html(html_report, height=1024, scrolling=True)
+# 세션에서 파일 데이터와 시트 개수를 가져옴
+if 'file_content' in st.session_state and 'sheet_count' in st.session_state:
+    html_report = handle_sheet_selection_with_formatting(st.session_state['file_content'], st.session_state['sheet_count'], 0)
+    if html_report:
+        st.components.v1.html(html_report, height=1024, scrolling=True)
+else:
+    st.error("파일 데이터 또는 시트 정보가 없습니다. 파일을 업로드하고 시트를 선택하세요.")
 
 # 전달된 프롬프트
 st.text_area("전달된 프롬프트:", value="\n\n".join(global_generated_prompt), height=150)
