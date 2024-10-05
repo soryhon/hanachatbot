@@ -536,3 +536,4 @@ if "response" in st.session_state:
         st.text_area(f"응답 {idx+1}:", value=response, height=300)
         
         st.components.v1.html(response, height=600, scrolling=True)
+
