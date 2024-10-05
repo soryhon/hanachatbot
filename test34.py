@@ -67,7 +67,6 @@ def load_env_info():
     # GitHub 정보가 설정되었는지 확인하고 세션 상태 반영
     return github_set
 
-
 # GitHub에 폴더가 존재하는지 확인하고 없으면 생성하는 함수
 def create_github_folder_if_not_exists(repo, folder_name, token, branch='main'):
     url = f"https://api.github.com/repos/{repo}/contents/{folder_name}?ref={branch}"
@@ -223,25 +222,27 @@ with st.expander("요청사항 리스트", expanded=True):
         if st.button("행 추가", key="add_row"):
             new_row = {"제목": "", "요청": "", "파일": "", "데이터": "", "checked": False}
             st.session_state['rows'].append(new_row)
-            st.session_state['refresh_triggered'] = False
+            st.info("요청사항 리스트 추가 하였습니다.")  # 메시지 추가
+            st.session_state['refresh_triggered'] = True
 
     with col2:
         if st.button("행 삭제", key="delete_row"):
             if checked_rows:
                 st.session_state['rows'] = [row for idx, row in enumerate(st.session_state['rows']) if idx not in checked_rows]
-                st.success(f"체크된 {len(checked_rows)}개의 요청사항이 삭제되었습니다.")
-                st.session_state['refresh_triggered'] = False
+                st.info("요청사항 리스트 삭제 하였습니다.")  # 메시지 추가
+                st.session_state['refresh_triggered'] = True
             else:
                 st.warning("삭제할 요청사항을 선택해주세요.")
 
     with col3:
         if st.button("새로고침", key="refresh_page"):
-            st.session_state['refresh_triggered'] = False
             st.info("새로고침 하였습니다.")
+            st.session_state['refresh_triggered'] = False
 
 # 새로고침 버튼이 자동으로 클릭되게 하는 로직
 if st.session_state.get('refresh_triggered'):
     st.session_state['refresh_triggered'] = False
+    st.button("새로고침", key="refresh_page")  # 새로고침 자동 클릭 로직
 
 # 보고서 작성 버튼을 따로 위에 위치
 if st.button("보고서 작성", key="generate_report"):
