@@ -515,7 +515,7 @@ with col2:
 
 with col3:
     if st.button("새로고침", key="refresh_page"):
-        st.experimental_rerun()
+        st.success("새로고침 하였습니다.")  # 페이지 리로드 없이 메시지만 출력
 
 # 4 프레임: 결과 보고서
 st.subheader("4. 결과 보고서")
