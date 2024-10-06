@@ -83,6 +83,19 @@ def extract_sheets_with_styles_from_excel(file_content):
         st.error(f"엑셀 파일의 시트 데이터를 추출하는 중에 오류가 발생했습니다: {str(e)}")
         return None
 
+# GitHub에서 파일을 다운로드하는 함수
+def get_file_from_github(repo, branch, filepath, token):
+    encoded_filepath = urllib.parse.quote(filepath)  # URL 인코딩 추가
+    url = f"https://api.github.com/repos/{repo}/contents/{encoded_filepath}?ref={branch}"
+    headers = {"Authorization": f"token {token}"}
+    response = requests.get(url, headers=headers)
+    
+    if response.status_code == 200:
+        return BytesIO(requests.get(response.json()['download_url']).content)
+    else:
+        st.error(f"{filepath} 파일을 가져오지 못했습니다. 상태 코드: {response.status_code}")
+        return None
+
 # GitHub 정보 및 OpenAI API 키 자동 설정 또는 입력창을 통해 설정
 def load_env_info():
     json_data = '''
