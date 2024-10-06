@@ -166,14 +166,16 @@ def get_file_from_github(repo, branch, filepath, token):
 # 엑셀 파일에서 시트를 HTML 테이블로 변환하는 함수
 def convert_excel_to_html_with_styles(file_content, selected_sheets):
     try:
+        # 엑셀 파일을 읽어들임
         excel_data = pd.ExcelFile(file_content)
         sheet_names = excel_data.sheet_names
-        
+
         # 선택한 시트들만 가져옴
         data = pd.DataFrame()
         for sheet in selected_sheets:
             data = pd.concat([data, pd.read_excel(file_content, sheet_name=sheet)], ignore_index=True)
 
+        # 데이터를 HTML 테이블 형식으로 변환
         html_content = "<table style='border-collapse: collapse;'>"
         for _, row in data.iterrows():
             html_content += "<tr>"
