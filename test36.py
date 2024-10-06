@@ -263,6 +263,12 @@ def generate_html_report_with_title(titles, data_dicts):
     
     return report_html
 
+# 숫자, ',' 및 '-'만 허용하는 함수
+def validate_sheet_input(input_value):
+    if all(c.isdigit() or c in ['-', ','] for c in input_value):
+        return True
+    return False
+
 # 엑셀 시트 선택 및 데이터 처리 로직
 def handle_sheet_selection(file_content, sheet_count):
     # 시트 선택 로직 구현
