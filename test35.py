@@ -32,13 +32,15 @@ def convert_excel_style_to_css(cell):
         css_styles.append("font-style: italic;")
     if cell.font.underline:
         css_styles.append("text-decoration: underline;")
-    if cell.font.color and cell.font.color.rgb:
+    if cell.font.color and hasattr(cell.font.color, 'rgb') and cell.font.color.rgb:
         css_styles.append(f"color: #{cell.font.color.rgb[2:]};")
     
-    # 배경색
-    if cell.fill and cell.fill.start_color and cell.fill.start_color.rgb:
+    # 배경색 (색상 정보가 RGB로 제공되는지 확인 후 처리)
+    if cell.fill and hasattr(cell.fill.start_color, 'rgb') and cell.fill.start_color.rgb:
         css_styles.append(f"background-color: #{cell.fill.start_color.rgb[2:]};")
-    
+    elif cell.fill and hasattr(cell.fill.start_color, 'indexed'):
+        css_styles.append(f"background-color: #{cell.fill.start_color.indexed};")  # Indexed 색상 처리
+
     # 정렬
     if cell.alignment.horizontal:
         css_styles.append(f"text-align: {cell.alignment.horizontal};")
