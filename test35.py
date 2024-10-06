@@ -130,13 +130,7 @@ def load_env_info():
     # GitHub 정보가 설정되었는지 확인하고 세션 상태 반영
     return github_set
 
-# 파일 업로드 및 엑셀 시트 처리
-st.subheader("1. 파일 업로드")
 
-uploaded_file = st.file_uploader("엑셀 파일을 업로드하세요.", type="xlsx")
-if uploaded_file:
-    # 파일이 업로드되면 처리할 내용 추가
-    st.success(f"'{uploaded_file.name}' 파일이 업로드되었습니다.")
 
 # GitHub에 폴더가 존재하는지 확인하고 없으면 생성하는 함수
 def create_github_folder_if_not_exists(repo, folder_name, token, branch='main'):
@@ -240,6 +234,14 @@ def convert_data_to_html(file_data, title, idx):
 # GitHub 정보와 OpenAI API 키를 자동 설정하는 함수 호출
 github_info_loaded = load_env_info()
 
+# 파일 업로드 및 엑셀 시트 처리
+st.subheader("1. 파일 업로드")
+
+uploaded_file = st.file_uploader("엑셀 파일을 업로드하세요.", type="xlsx")
+if uploaded_file:
+    # 파일이 업로드되면 처리할 내용 추가
+    st.success(f"'{uploaded_file.name}' 파일이 업로드되었습니다.")
+    
 # GitHub 정보가 로드되었는지 확인한 후 파일 업로드 처리
 if github_info_loaded:
     # 파일 업로드 처리 및 요청사항 리스트 생성
