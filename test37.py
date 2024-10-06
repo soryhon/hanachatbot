@@ -254,19 +254,19 @@ def validate_sheet_input(input_value):
         return True
     return False
 
-# 시트 선택 로직 추가
-def handle_sheet_selection(file_content, sheet_count):
+# 시트 선택 로직 수정
+def handle_sheet_selection(file_content, sheet_count, idx):
     # 3개의 객체를 가로로 배치
     col1, col2, col3 = st.columns([0.33, 0.33, 0.33])
     
     with col1:
-        st.text_input("시트 갯수", value=f"{sheet_count}개", disabled=True)  # 시트 갯수 표시 (비활성화)
+        st.text_input(f"시트 갯수_{idx}", value=f"{sheet_count}개", disabled=True)  # 시트 갯수 표시 (비활성화)
     
     with col2:
-        sheet_selection = st.text_input("시트 선택(예: 1-3, 5)", value="1")
+        sheet_selection = st.text_input(f"시트 선택_{idx}(예: 1-3, 5)", value="1", key=f"sheet_selection_{idx}")
 
     with col3:
-        select_button = st.button("선택")
+        select_button = st.button("선택", key=f"select_button_{idx}")
 
     # 시트 선택 버튼이 눌렸을 때만 파일 데이터를 가져옴
     if select_button:
@@ -281,33 +281,14 @@ def handle_sheet_selection(file_content, sheet_count):
             st.error("잘못된 입력입니다. 숫자와 '-', ',' 만 입력할 수 있습니다.")
     return None
 
-# 시트 선택 입력값을 분석하는 함수
-def parse_sheet_selection(selection, sheet_count):
-    selected_sheets = []
-
-    try:
-        if '-' in selection:
-            start, end = map(int, selection.split('-'))
-            if start <= end <= sheet_count:
-                selected_sheets.extend(list(range(start, end+1)))
-        elif ',' in selection:
-            selected_sheets = [int(i) for i in selection.split(',') if 1 <= int(i) <= sheet_count]
-        else:
-            selected_sheets = [int(selection)] if 1 <= int(selection) <= sheet_count else []
-    except ValueError:
-        st.error("잘못된 시트 선택 입력입니다.")
-        return None
-
-    return selected_sheets
-
-# 파일에서 데이터를 추출하고 요청사항 리스트에서 선택한 엑셀 파일의 시트를 보여주는 로직
-def handle_file_selection(file_path, file_content, file_type):
+# 파일에서 데이터를 추출하고 요청사항 리스트에서 선택한 엑셀 파일의 시트를 보여주는 로직 수정
+def handle_file_selection(file_path, file_content, file_type, idx):
     if file_type == 'xlsx':
         wb = openpyxl.load_workbook(file_content)
         sheet_count = len(wb.sheetnames)
 
         # 시트 선택 로직 처리
-        file_data_dict = handle_sheet_selection(file_content, sheet_count)
+        file_data_dict = handle_sheet_selection(file_content, sheet_count, idx)
         return file_data_dict
     else:
         return extract_data_from_file(file_content, file_type)
@@ -466,16 +447,16 @@ with st.expander("요청사항 리스트", expanded=True):
             with col1:
                 row_checked = st.checkbox("", key=f"row_checked_{idx}", value=row.get("checked", False))  # 체크박스만 추가
             with col2:
-                st.markdown(f"#### 요청사항 {idx+1}")  # 요청사항 타이틀과 나머지 UI 요소들 배치
-
-            row['제목'] = st.text_input(f"제목 (요청사항 {idx+1})", row['제목'], key=f"title_{idx}")
-            row['요청'] = st.text_area(f"요청 (요청사항 {idx+1})", row['요청'], key=f"request_{idx}")
+                st.markdown(f"#### 요청사항 {idx+1}")
+        
+            row['제목'] = st.text_input(f"제목_{idx} (요청사항 {idx+1})", row['제목'], key=f"title_{idx}")
+            row['요청'] = st.text_area(f"요청_{idx} (요청사항 {idx+1})", row['요청'], key=f"request_{idx}")
 
             file_list = ['파일을 선택하세요.']
             if st.session_state.get('github_token') and st.session_state.get('github_repo'):
                 file_list += get_github_files(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
 
-            selected_file = st.selectbox(f"파일 선택 (요청사항 {idx+1})", options=file_list, key=f"file_select_{idx}")
+            selected_file = st.selectbox(f"파일 선택_{idx} (요청사항 {idx+1})", options=file_list, key=f"file_select_{idx}")
 
             if selected_file != '파일을 선택하세요.':
                 file_path = selected_file
@@ -490,7 +471,7 @@ with st.expander("요청사항 리스트", expanded=True):
                         row['데이터'] = ""
                     else:
                         # 엑셀 파일인 경우 시트 선택 로직을 추가
-                        file_data_dict = handle_file_selection(file_path, file_content, file_type)
+                        file_data_dict = handle_file_selection(file_path, file_content, file_type, idx)
                         
                         if file_data_dict is not None:
                             row['파일'] = f"/{st.session_state['github_repo']}/{st.session_state['github_branch']}/{selected_file}"
@@ -505,7 +486,7 @@ with st.expander("요청사항 리스트", expanded=True):
                 else:
                     st.error(f"{selected_file} 파일을 GitHub에서 불러오지 못했습니다.")
                 
-            st.text_input(f"파일 경로 (요청사항 {idx+1})", row['파일'], disabled=True, key=f"file_{idx}")
+            st.text_input(f"파일 경로_{idx} (요청사항 {idx+1})", row['파일'], disabled=True, key=f"file_{idx}")
 
         if row_checked:
             checked_rows.append(idx)
