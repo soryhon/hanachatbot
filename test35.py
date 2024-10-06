@@ -343,17 +343,18 @@ if github_info_loaded:
             st.success("양식이 불러와졌습니다.")
 
     # 4 프레임: 결과 보고서
-    st.subheader("4. 결과 보고서")
-    html_report = generate_html_report(st.session_state['rows'])
-    if html_report:
-        st.components.v1.html(html_report, height=1024, scrolling=True)
+    if any(row['파일'] for row in rows):
+        st.subheader("4. 결과 보고서")
+        html_report = generate_html_report(st.session_state['rows'])
+        if html_report:
+            st.components.v1.html(html_report, height=1024, scrolling=True)
 
-    # 전달된 프롬프트
-    st.text_area("전달된 프롬프트:", value="\n\n".join(global_generated_prompt), height=150)
+        # 전달된 프롬프트
+        st.text_area("전달된 프롬프트:", value="\n\n".join(global_generated_prompt), height=150)
 
-    # LLM 응답 보기
-    st.write("LLM 응답 보기")
-    if "response" in st.session_state:
-        for idx, response in enumerate(st.session_state["response"]):
-            st.text_area(f"응답 {idx+1}:", value=response, height=300)
-            st.components.v1.html(response, height=600, scrolling=True)
+        # LLM 응답 보기
+        st.write("LLM 응답 보기")
+        if "response" in st.session_state:
+            for idx, response in enumerate(st.session_state["response"]):
+                st.text_area(f"응답 {idx+1}:", value=response, height=300)
+                st.components.v1.html(response, height=600, scrolling=True)
