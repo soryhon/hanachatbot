@@ -96,3 +96,4 @@ docx2txt
 openpyxl
 SpeechRecognition
 pydub
+boto3
