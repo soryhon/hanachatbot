@@ -189,6 +189,14 @@ def convert_df_to_html_with_styles_and_merging(ws, df):
         html += f"<th style='text-align:center; font-weight:bold; background-color:#E7E6E6; border: 1px solid black; border-spacing: 0;'>{col}</th>\n"
     html += "</tr>\n</thead>\n"
 
+    # 병합 셀 정보 저장
+    merged_cells_dict = {}
+    for merged in merged_cells:
+        min_row, min_col, max_row, max_col = merged.min_row, merged.min_col, merged.max_row, merged.max_col
+        for row in range(min_row, max_row + 1):
+            for col in range(min_col, max_col + 1):
+                merged_cells_dict[(row, col)] = (min_row, min_col, max_row, max_col)
+
     # 데이터 부분
     html += "<tbody>\n"
     for row_idx, row in df.iterrows():
@@ -199,11 +207,15 @@ def convert_df_to_html_with_styles_and_merging(ws, df):
             alignment = style.get("alignment", "left")
             font_weight = "bold" if style.get("font_bold", False) else "normal"
             border = "1px solid black" if style.get("border", False) else "none"
-            merged = any([cell_ref in str(range_) for range_ in merged_cells])
-            
-            if merged:
-                html += f"<td colspan='{range_.size}' style='text-align:{alignment}; font-weight:{font_weight}; border:{border};'>{value}</td>\n"
-            else:
+            cell_coordinates = (row_idx + 2, col_idx + 1)
+
+            if cell_coordinates in merged_cells_dict:
+                min_row, min_col, max_row, max_col = merged_cells_dict[cell_coordinates]
+                rowspan = max_row - min_row + 1
+                colspan = max_col - min_col + 1
+                if (row_idx + 2, col_idx + 1) == (min_row, min_col):
+                    html += f"<td rowspan='{rowspan}' colspan='{colspan}' style='text-align:{alignment}; font-weight:{font_weight}; border:{border};'>{value}</td>\n"
+            elif cell_coordinates not in merged_cells_dict:
                 html += f"<td style='text-align:{alignment}; font-weight:{font_weight}; border:{border};'>{value}</td>\n"
         html += "</tr>\n"
     html += "</tbody>\n</table>"
