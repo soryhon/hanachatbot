@@ -303,8 +303,7 @@ def parse_sheet_selection(selection, sheet_count):
 # 파일에서 데이터를 추출하고 요청사항 리스트에서 선택한 엑셀 파일의 시트를 보여주는 로직
 def handle_file_selection(file_path, file_content, file_type):
     if file_type == 'xlsx':
-        # 엑셀 파일을 직접 처리 (BytesIO 불필요)
-        wb = openpyxl.load_workbook(filename=file_content)  # 수정: BytesIO 제거
+        wb = openpyxl.load_workbook(file_content)
         sheet_count = len(wb.sheetnames)
 
         # 시트 선택 로직 처리
