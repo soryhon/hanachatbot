@@ -194,12 +194,12 @@ def convert_excel_to_html_with_styles(file_content, sheet_name=None):
 def get_cell_style(cell):
     styles = []
 
-    # 배경색
-    if cell.fill and isinstance(cell.fill, PatternFill) and cell.fill.fgColor and cell.fill.fgColor.rgb:
-        bg_color = cell.fill.fgColor.rgb
-        if bg_color is not None and len(bg_color) == 8:  # Check for valid RGBA
-            bg_color = bg_color[2:]  # 'FF' 제거
-            styles.append(f"background-color: #{bg_color};")
+    # 배경색 부분 주석 처리
+    # if cell.fill and isinstance(cell.fill, PatternFill) and cell.fill.fgColor and cell.fill.fgColor.rgb:
+    #     bg_color = cell.fill.fgColor.rgb
+    #     if bg_color is not None and len(bg_color) == 8:  # Check for valid RGBA
+    #         bg_color = bg_color[2:]  # 'FF' 제거
+    #         styles.append(f"background-color: #{bg_color};")
 
     # 글꼴 스타일
     if cell.font:
