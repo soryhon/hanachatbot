@@ -314,11 +314,17 @@ def handle_file_selection(file_path, file_content, file_type, idx):
 
 # HTML 보고서 생성 함수 (배열에서 데이터 가져옴)
 def generate_html_report_from_array():
-    report_html = ""
+    if "html_report" in st.session_state:
+        report_html = st.session_state['html_report']
+    else:
+        report_html = ""
+
     for idx, file_data in enumerate(file_data_array):
         if file_data:
             report_html += f"<h3>{idx + 1}. 요청사항 제목</h3>\n"
             report_html += f"<div style='text-indent: 20px;'>\n{file_data}\n</div>\n"
+            report_html += f"<p/>"  # 줄바꿈 추가
+
     st.session_state['html_report'] = report_html
 
 # 엑셀 데이터 및 제목을 HTML로 변환하여 하나의 세트로 출력하는 함수
