@@ -20,6 +20,9 @@ import asyncio
 import openpyxl
 from openpyxl.styles import PatternFill, Font, Border, Side
 
+# 지원되는 파일 형식 정의
+supported_file_types = ['xlsx', 'csv', 'png', 'jpg', 'jpeg', 'pdf']
+
 # 전역변수로 프롬프트 저장
 global_generated_prompt = []
 
