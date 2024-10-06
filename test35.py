@@ -271,21 +271,23 @@ if github_info_loaded:
 
                 if selected_file != '파일을 선택하세요.':
                     file_path = selected_file
-                    file_content = get_file_from_github(st.session_state["github_repo"], st.session_state["github_branch"], file_path, st.session_state["github_token"])
-                    
-                    if file_content:
-                        file_type = file_path.split('.')[-1].lower()
+                    # 방어적 코드를 추가하여 값이 없을 경우 파일 가져오기 중단
+                    if st.session_state.get("github_repo") and st.session_state.get("github_branch") and st.session_state.get("github_token"):
+                        file_content = get_file_from_github(st.session_state["github_repo"], st.session_state["github_branch"], file_path, st.session_state["github_token"])
+                        
+                        if file_content:
+                            file_type = file_path.split('.')[-1].lower()
 
-                        if file_type not in ['xlsx', 'pptx', 'docx', 'csv', 'png', 'jpg', 'jpeg']:
-                            st.error(f"지원하지 않는 파일입니다: {file_path}")
-                            row['데이터'] = ""
-                        else:
-                            # 엑셀 파일인 경우 기본적으로 1번 시트 데이터를 가져오도록 설정
-                            if file_type == 'xlsx':
-                                row['데이터'] = extract_sheets_with_styles_from_excel(file_content)
+                            if file_type not in ['xlsx', 'pptx', 'docx', 'csv', 'png', 'jpg', 'jpeg']:
+                                st.error(f"지원하지 않는 파일입니다: {file_path}")
+                                row['데이터'] = ""
                             else:
-                                row['데이터'] = file_content
-                            row['파일'] = f"/{st.session_state['github_repo']}/{st.session_state['github_branch']}/{selected_file}"
+                                # 엑셀 파일인 경우 기본적으로 1번 시트 데이터를 가져오도록 설정
+                                if file_type == 'xlsx':
+                                    row['데이터'] = extract_sheets_with_styles_from_excel(file_content)
+                                else:
+                                    row['데이터'] = file_content
+                                row['파일'] = f"/{st.session_state['github_repo']}/{st.session_state['github_branch']}/{selected_file}"
 
                 st.text_input(f"파일 경로 (요청사항 {idx+1})", row['파일'], disabled=True, key=f"file_{idx}")
 
@@ -312,49 +314,19 @@ if github_info_loaded:
             if st.button("새로고침"):
                 st.success("새로고침 하였습니다.")
 
-    # 보고서 작성 버튼
-    if st.button("보고서 작성"):
-        if not st.session_state.get("openai_api_key"):
-            st.error("먼저 OpenAI API 키를 입력하고 저장하세요!")
-        elif not st.session_state['rows'] or all(not row["제목"] or not row["요청"] or not row["데이터"] for row in st.session_state['rows']):
-            st.error("요청사항의 제목, 요청, 파일을 모두 입력해야 합니다!")
-        else:
-            titles = [row['제목'] for row in st.session_state['rows']]
-            requests = [row['요청'] for row in st.session_state['rows']]
-            file_data_list = [row['데이터'] for row in st.session_state['rows']]
+# 4 프레임: 결과 보고서
+st.subheader("4. 결과 보고서")
+if any(row['파일'] for row in rows):
+    html_report = generate_html_report(st.session_state['rows'])
+    if html_report:
+        st.components.v1.html(html_report, height=1024, scrolling=True)
 
-            responses = run_llm_with_file_and_prompt(
-                st.session_state["openai_api_key"], 
-                titles, 
-                requests, 
-                file_data_list
-            )
-            st.session_state["response"] = responses
+    # 전달된 프롬프트
+    st.text_area("전달된 프롬프트:", value="\n\n".join(global_generated_prompt), height=150)
 
-    # [양식 저장], [양식 불러오기] 버튼 가로로 배치
-    col1, col2 = st.columns([0.5, 0.5])
-
-    with col1:
-        if st.button("양식 저장"):
-            st.success("양식이 저장되었습니다.")
-
-    with col2:
-        if st.button("양식 불러오기"):
-            st.success("양식이 불러와졌습니다.")
-
-    # 4 프레임: 결과 보고서
-    if any(row['파일'] for row in rows):
-        st.subheader("4. 결과 보고서")
-        html_report = generate_html_report(st.session_state['rows'])
-        if html_report:
-            st.components.v1.html(html_report, height=1024, scrolling=True)
-
-        # 전달된 프롬프트
-        st.text_area("전달된 프롬프트:", value="\n\n".join(global_generated_prompt), height=150)
-
-        # LLM 응답 보기
-        st.write("LLM 응답 보기")
-        if "response" in st.session_state:
-            for idx, response in enumerate(st.session_state["response"]):
-                st.text_area(f"응답 {idx+1}:", value=response, height=300)
-                st.components.v1.html(response, height=600, scrolling=True)
+    # LLM 응답 보기
+    st.write("LLM 응답 보기")
+    if "response" in st.session_state:
+        for idx, response in enumerate(st.session_state["response"]):
+            st.text_area(f"응답 {idx+1}:", value=response, height=300)
+            st.components.v1.html(response, height=600, scrolling=True)
