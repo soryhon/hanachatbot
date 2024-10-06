@@ -33,11 +33,11 @@ def convert_excel_style_to_css(cell):
     if cell.font.underline:
         css_styles.append("text-decoration: underline;")
     if cell.font.color and cell.font.color.rgb:
-        css_styles.append(f"color: #{cell.font.color.rgb[2:]};")  # Remove "FF" prefix from color
+        css_styles.append(f"color: #{cell.font.color.rgb[2:]};")
     
     # 배경색
     if cell.fill and cell.fill.start_color and cell.fill.start_color.rgb:
-        css_styles.append(f"background-color: #{cell.fill.start_color.rgb[2:]};")  # Remove "FF" prefix from color
+        css_styles.append(f"background-color: #{cell.fill.start_color.rgb[2:]};")
     
     # 정렬
     if cell.alignment.horizontal:
@@ -217,22 +217,6 @@ def get_file_from_github(repo, branch, filepath, token):
         st.error(f"{filepath} 파일을 가져오지 못했습니다. 상태 코드: {response.status_code}")
         return None
 
-# 엑셀 파일에서 데이터를 추출하고 요청사항 리스트에서 선택한 엑셀 파일의 시트를 보여주는 로직
-def handle_file_selection(file_path, file_content, file_type, idx):
-    if file_type == 'xlsx':
-        excel_data = pd.ExcelFile(file_content)
-        sheet_count = len(excel_data.sheet_names)
-        
-        file_data = handle_sheet_selection(file_content, sheet_count, idx)
-        
-        if file_data is not None and not file_data.empty:
-            return file_data
-        else:
-            st.error("선택한 시트에 데이터가 없습니다.")
-            return None
-    else:
-        return extract_data_from_file(file_content, file_type)
-
 # 보고서 요청사항 리스트
 st.subheader("3. 작성 보고서 요청사항 및 실행 버튼")
 
@@ -271,15 +255,13 @@ with st.expander("요청사항 리스트", expanded=True):
                         st.error(f"지원하지 않는 파일입니다: {file_path}")
                         row['데이터'] = ""
                     else:
-                        file_data = handle_file_selection(file_path, file_content, file_type, idx)
-                        if file_data is not None and not file_data.empty:
-                            row['파일'] = f"/{st.session_state['github_repo']}/{st.session_state['github_branch']}/{selected_file}"
-                            row['데이터'] = file_data
+                        # 엑셀 파일인 경우 기본적으로 1번 시트 데이터를 가져오도록 설정
+                        if file_type == 'xlsx':
+                            row['데이터'] = extract_sheets_with_styles_from_excel(file_content)
                         else:
-                            st.error(f"{selected_file} 파일의 데이터를 처리하지 못했습니다.")
-                else:
-                    st.error(f"{selected_file} 파일을 GitHub에서 불러오지 못했습니다.")
-                
+                            row['데이터'] = file_content
+                        row['파일'] = f"/{st.session_state['github_repo']}/{st.session_state['github_branch']}/{selected_file}"
+
             st.text_input(f"파일 경로 (요청사항 {idx+1})", row['파일'], disabled=True, key=f"file_{idx}")
 
         if row_checked:
