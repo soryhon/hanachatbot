@@ -168,26 +168,36 @@ def extract_text_from_image(file_content):
 
 # 음성 파일에서 텍스트를 추출하는 함수
 def extract_text_from_audio(file_content, file_type):
-    try:
+   try:
+        if file_type != 'wav':
+            st.error("이 함수는 wav 파일만 처리할 수 있습니다.")
+            return None
+
         recognizer = sr.Recognizer()
-        
-        if file_type == 'wav':
-            # 음성 파일을 AudioFile 객체로 읽어오기
-            with sr.AudioFile(file_content) as audio_file:
-                audio_data = recognizer.record(audio_file)
-                # Google Web Speech API를 사용해 음성을 텍스트로 변환
-                return recognizer.recognize_google(audio_data, language="ko-KR")
-        elif file_type == 'mp3':
-            st.error("현재 mp3 파일은 지원되지 않으며, wav 파일만 지원됩니다.")
-            return None
+
+        # BytesIO 객체를 지원하기 위한 처리
+        if isinstance(file_content, BytesIO):
+            file_content.seek(0)  # BytesIO 포인터를 파일의 시작으로 이동
+            audio_data = sr.AudioFile(file_content)
         else:
-            st.error("지원되지 않는 음성 파일 형식입니다.")
+            st.error("파일 형식이 잘못되었습니다.")
             return None
+
+        # AudioFile 객체에서 음성 데이터를 읽음
+        with audio_data as source:
+            audio = recognizer.record(source)
+
+        # Google Web Speech API를 사용해 음성을 텍스트로 변환
+        return recognizer.recognize_google(audio, language="ko-KR")
+
     except sr.UnknownValueError:
         st.error("음성 파일을 인식할 수 없습니다.")
         return None
     except sr.RequestError as e:
         st.error(f"음성 인식 서비스에 요청 중 오류가 발생했습니다: {str(e)}")
+        return None
+    except Exception as e:
+        st.error(f"음성 파일에서 텍스트를 추출하는 중 오류가 발생했습니다: {str(e)}")
         return None
 
 # GitHub에 폴더가 존재하는지 확인하고 없으면 생성하는 함수
