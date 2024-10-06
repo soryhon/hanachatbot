@@ -18,7 +18,6 @@ import time
 import json
 import asyncio
 import openpyxl
-from openpyxl.styles import PatternFill, Font, Border, Side
 
 # 지원되는 파일 형식 정의
 supported_file_types = ['xlsx', 'csv', 'png', 'jpg', 'jpeg', 'pdf']
@@ -164,7 +163,7 @@ def get_file_from_github(repo, branch, filepath, token):
         st.error(f"{filepath} 파일을 가져오지 못했습니다. 상태 코드: {response.status_code}")
         return None
 
-# 엑셀 파일에서 시트를 HTML로 변환하는 함수 (스타일 정보 포함)
+# 엑셀 파일에서 시트를 HTML 테이블로 변환하는 함수
 def convert_excel_to_html_with_styles(file_content, sheet_name=None):
     try:
         wb = openpyxl.load_workbook(file_content, data_only=True)
@@ -176,11 +175,7 @@ def convert_excel_to_html_with_styles(file_content, sheet_name=None):
             html_content += "<tr>"
             for cell in row:
                 cell_value = cell.value if cell.value is not None else ""
-                
-                # 셀의 스타일을 CSS로 변환
-                style = get_cell_style(cell)
-                
-                html_content += f"<td style='{style}'>{cell_value}</td>"
+                html_content += f"<td>{cell_value}</td>"
             html_content += "</tr>"
 
         html_content += "</table>"
@@ -189,65 +184,6 @@ def convert_excel_to_html_with_styles(file_content, sheet_name=None):
     except Exception as e:
         st.error(f"엑셀 파일 변환 중 오류가 발생했습니다: {str(e)}")
         return None
-
-# 셀 스타일을 CSS로 변환하는 함수
-def get_cell_style(cell):
-    styles = []
-
-    # 배경색 부분 주석 처리
-    # if cell.fill and isinstance(cell.fill, PatternFill) and cell.fill.fgColor and cell.fill.fgColor.rgb:
-    #     bg_color = cell.fill.fgColor.rgb
-    #     if bg_color is not None and len(bg_color) == 8:  # Check for valid RGBA
-    #         bg_color = bg_color[2:]  # 'FF' 제거
-    #         styles.append(f"background-color: #{bg_color};")
-
-    # 글꼴 스타일
-    if cell.font:
-        if cell.font.bold:
-            styles.append("font-weight: bold;")
-        if cell.font.italic:
-            styles.append("font-style: italic;")
-        if cell.font.color and cell.font.color.rgb:
-            font_color = cell.font.color.rgb[2:]  # 'FF' 제거
-            styles.append(f"color: #{font_color};")
-        if cell.font.size:
-            styles.append(f"font-size: {cell.font.size}pt;")
-        if cell.font.name:
-            styles.append(f"font-family: '{cell.font.name}';")
-
-    # 테두리 스타일
-    if cell.border:
-        border_styles = get_border_styles(cell.border)
-        if border_styles:
-            styles.append(border_styles)
-
-    # 정렬
-    if cell.alignment:
-        if cell.alignment.horizontal:
-            styles.append(f"text-align: {cell.alignment.horizontal};")
-        if cell.alignment.vertical:
-            styles.append(f"vertical-align: {cell.alignment.vertical};")
-
-    return " ".join(styles)
-
-# 테두리 스타일을 CSS로 변환하는 함수
-def get_border_styles(border):
-    border_css = []
-    
-    sides = {
-        'top': border.top,
-        'right': border.right,
-        'bottom': border.bottom,
-        'left': border.left
-    }
-
-    for side_name, side in sides.items():
-        if side and side.style:
-            style = "solid" if side.style else "none"
-            color = side.color.rgb[2:] if side.color and side.color.rgb else "000000"  # 기본값 검정색
-            border_css.append(f"border-{side_name}: 1px {style} #{color};")
-
-    return " ".join(border_css)
 
 # 파일을 업로드하고 엑셀 파일을 HTML로 변환하는 부분
 github_info_loaded = load_env_info()
@@ -293,7 +229,7 @@ if github_info_loaded:
                         upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'])
                         st.success(f"'{file_name}' 파일이 성공적으로 업로드되었습니다.")
                         if file_type == 'xlsx':
-                            # 엑셀 파일을 HTML로 변환하여 스타일 적용
+                            # 엑셀 파일을 HTML로 변환하여 테이블로 출력
                             sheet_name = st.text_input("시트 이름을 입력하세요:")
                             html_output = convert_excel_to_html_with_styles(BytesIO(file_content), sheet_name)
                             st.session_state['결과 보고서 보기'] = html_output
