@@ -308,7 +308,10 @@ if 'rows' in st.session_state:
         if st.session_state.get('github_token') and st.session_state.get('github_repo'):
             file_list += get_github_files(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
         
-        selected_file = st.selectbox(f"파일 선택 (요청사항 {idx+1})", options=file_list, key=f"file_select_{idx}")
+        # 고유한 key 값을 설정하기 위해 idx와 row에 포함된 고유 정보(제목)를 추가하여 중복 방지
+        unique_key = f"file_select_{idx}_{row['제목']}_{idx}"
+        
+        selected_file = st.selectbox(f"파일 선택 (요청사항 {idx+1})", options=file_list, key=unique_key)
         
         if selected_file and selected_file != '파일을 선택하세요.':
             file_path = selected_file
@@ -415,7 +418,10 @@ with st.expander("요청사항 리스트", expanded=True):
             if st.session_state.get('github_token') and st.session_state.get('github_repo'):
                 file_list += get_github_files(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
 
-            selected_file = st.selectbox(f"파일 선택 (요청사항 {idx+1})", options=file_list, key=f"file_select_{idx}")
+            # 고유한 key 값을 설정하여 중복 방지
+            unique_key = f"file_select_{idx}_{row['제목']}_{idx}"
+
+            selected_file = st.selectbox(f"파일 선택 (요청사항 {idx+1})", options=file_list, key=unique_key)
 
             if selected_file != '파일을 선택하세요.':
                 file_path = selected_file
