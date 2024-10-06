@@ -130,6 +130,16 @@ def load_env_info():
     # GitHub 정보가 설정되었는지 확인하고 세션 상태 반영
     return github_set
 
+# 파일 업로드 및 엑셀 시트 처리
+st.subheader("1. 파일 업로드")
+
+uploaded_file = st.file_uploader("엑셀 파일을 업로드하세요.", type="xlsx")
+if uploaded_file:
+    st.subheader("업로드된 엑셀 파일을 HTML로 변환:")
+    html_output = extract_sheets_with_styles_from_excel(uploaded_file)
+    if html_output:
+        st.components.v1.html(html_output, height=600, scrolling=True)
+
 # GitHub에 폴더가 존재하는지 확인하고 없으면 생성하는 함수
 def create_github_folder_if_not_exists(repo, folder_name, token, branch='main'):
     url = f"https://api.github.com/repos/{repo}/contents/{folder_name}?ref={branch}"
@@ -204,18 +214,30 @@ def upload_file_to_github(repo, folder_name, file_name, file_content, token, bra
         st.error(f"파일 업로드에 실패했습니다: {response.status_code}")
         st.error(response.json())
 
-# GitHub에서 파일을 다운로드하는 함수
-def get_file_from_github(repo, branch, filepath, token):
-    encoded_filepath = urllib.parse.quote(filepath)  # URL 인코딩 추가
-    url = f"https://api.github.com/repos/{repo}/contents/{encoded_filepath}?ref={branch}"
-    headers = {"Authorization": f"token {token}"}
-    response = requests.get(url, headers=headers)
-    
-    if response.status_code == 200:
-        return BytesIO(requests.get(response.json()['download_url']).content)
-    else:
-        st.error(f"{filepath} 파일을 가져오지 못했습니다. 상태 코드: {response.status_code}")
-        return None
+# HTML로 변환하는 함수
+def generate_html_report(rows):
+    html_report = ""
+    for idx, row in enumerate(rows):
+        if row["데이터"] is not None and isinstance(row["데이터"], pd.DataFrame):
+            html_report += convert_data_to_html(row["데이터"], row["제목"], idx)
+    return html_report
+
+# NaN 값 처리, 셀 병합 및 줄바꿈 변환을 포함한 HTML 변환
+def convert_data_to_html(file_data, title, idx):
+    file_data = file_data.fillna("")  # NaN 값을 빈 값으로 대체
+
+    html_content = f"<h3>{idx + 1}. {title}</h3>"
+    html_content += "<table style='border-collapse: collapse;'>"
+
+    for i, row in file_data.iterrows():
+        html_content += "<tr>"
+        for j, col in enumerate(row):
+            col = str(col).replace("\n", "<br>")  # 줄바꿈을 <br>로 변환
+            html_content += f"<td style='border: 1px solid black;'>{col}</td>"
+        html_content += "</tr>"
+
+    html_content += "</table>"
+    return html_content
 
 # 보고서 요청사항 리스트
 st.subheader("3. 작성 보고서 요청사항 및 실행 버튼")
