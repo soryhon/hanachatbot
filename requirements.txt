@@ -94,3 +94,4 @@ requests
 python-pptx
 docx2txt
 openpyxl
+SpeechRecognition
