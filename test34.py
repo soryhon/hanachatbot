@@ -196,8 +196,10 @@ def get_cell_style(cell):
 
     # 배경색
     if cell.fill and isinstance(cell.fill, PatternFill) and cell.fill.fgColor and cell.fill.fgColor.rgb:
-        bg_color = cell.fill.fgColor.rgb[2:]  # 'FF'를 제거한 RGB 값
-        styles.append(f"background-color: #{bg_color};")
+        bg_color = cell.fill.fgColor.rgb
+        if bg_color is not None and len(bg_color) == 8:  # Check for valid RGBA
+            bg_color = bg_color[2:]  # 'FF' 제거
+            styles.append(f"background-color: #{bg_color};")
 
     # 글꼴 스타일
     if cell.font:
@@ -206,7 +208,7 @@ def get_cell_style(cell):
         if cell.font.italic:
             styles.append("font-style: italic;")
         if cell.font.color and cell.font.color.rgb:
-            font_color = cell.font.color.rgb[2:]  # 'FF'를 제거한 RGB 값
+            font_color = cell.font.color.rgb[2:]  # 'FF' 제거
             styles.append(f"color: #{font_color};")
         if cell.font.size:
             styles.append(f"font-size: {cell.font.size}pt;")
