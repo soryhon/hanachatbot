@@ -168,7 +168,7 @@ def extract_text_from_image(file_content):
 
 # 음성 파일에서 텍스트를 추출하는 함수
 def extract_text_from_audio(file_content, file_type):
-   try:
+    try:
         if file_type != 'wav':
             st.error("이 함수는 wav 파일만 처리할 수 있습니다.")
             return None
