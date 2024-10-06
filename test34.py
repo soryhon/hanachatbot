@@ -143,7 +143,7 @@ def upload_file_to_github(repo, folder_name, file_name, file_content, token, bra
 
 # GitHub에서 파일을 다운로드하는 함수
 def get_file_from_github(repo, branch, filepath, token):
-    encoded_filepath = urllib.parse.quote(filepath)  # URL 인코딩 추가
+    encoded_filepath = urllib.parse.quote(filepath)
     url = f"https://api.github.com/repos/{repo}/contents/{encoded_filepath}?ref={branch}"
     headers = {"Authorization": f"token {token}"}
     response = requests.get(url, headers=headers)
@@ -301,26 +301,37 @@ def handle_file_selection(file_name, file_content, file_type, idx):
         return None
 
 # GitHub 파일 목록에서 엑셀 파일을 선택할 때 handle_file_selection을 호출하는 부분
-if selected_file != '파일을 선택하세요.':
-    file_path = selected_file
-    file_content = get_file_from_github(st.session_state["github_repo"], st.session_state["github_branch"], file_path, st.session_state["github_token"])
-    
-    if file_content:
-        file_type = file_path.split('.')[-1].lower()
+if 'rows' in st.session_state:
+    rows = st.session_state['rows']
+    for idx, row in enumerate(rows):
+        file_list = ['파일을 선택하세요.']  # 기본 파일 리스트 초기화
+        if st.session_state.get('github_token') and st.session_state.get('github_repo'):
+            file_list += get_github_files(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
+        
+        selected_file = st.selectbox(f"파일 선택 (요청사항 {idx+1})", options=file_list, key=f"file_select_{idx}")
+        
+        if selected_file and selected_file != '파일을 선택하세요.':
+            file_path = selected_file
+            file_content = get_file_from_github(st.session_state["github_repo"], st.session_state["github_branch"], file_path, st.session_state["github_token"])
 
-        if file_type not in supported_file_types:
-            st.error(f"지원하지 않는 파일 형식입니다: {file_path}")
-            row['데이터'] = ""
-        else:
-            file_data = handle_file_selection(file_path, file_content, file_type, idx)
-            
-            if file_data is not None:
-                row['파일'] = f"/{st.session_state['github_repo']}/{st.session_state['github_branch']}/{selected_file}"
-                row['데이터'] = file_data
+            if file_content:
+                file_type = file_path.split('.')[-1].lower()
+
+                if file_type not in supported_file_types:
+                    st.error(f"지원하지 않는 파일 형식입니다: {file_path}")
+                    row['데이터'] = ""
+                else:
+                    file_data = handle_file_selection(file_path, file_content, file_type, idx)
+                    
+                    if file_data is not None and not file_data.empty:
+                        row['파일'] = f"/{st.session_state['github_repo']}/{st.session_state['github_branch']}/{selected_file}"
+                        row['데이터'] = file_data
+                    else:
+                        st.error(f"{selected_file} 파일의 데이터를 처리하지 못했습니다.")
             else:
-                st.error(f"{selected_file} 파일의 데이터를 처리하지 못했습니다.")
-    else:
-        st.error(f"{selected_file} 파일을 GitHub에서 불러오지 못했습니다.")
+                st.error(f"{selected_file} 파일을 GitHub에서 불러오지 못했습니다.")
+        else:
+            st.info("파일을 선택하세요.")
 
 # GitHub 정보가 있는지 확인하고 파일 업로드 객체를 출력
 github_info_loaded = load_env_info()
