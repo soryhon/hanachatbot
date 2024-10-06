@@ -18,6 +18,7 @@ import time
 import json
 import openpyxl
 from openpyxl.utils import get_column_letter
+import re  # 정규 표현식을 사용하기 위한 모듈 추가
 
 # Backend 기능 구현 시작
 
@@ -179,6 +180,9 @@ def extract_cell_style_and_merged(ws):
 
 # 엑셀 시트 데이터를 HTML로 변환하고 스타일 및 병합 적용
 def convert_df_to_html_with_styles_and_merging(ws, df):
+    # 1행의 'Unnamed: 숫자' 형식 값은 공백으로 처리
+    df.columns = [re.sub(r'Unnamed: \d+', '', str(col)).strip() for col in df.columns]
+    
     style_dict, merged_cells = extract_cell_style_and_merged(ws)
     df = df.fillna('')  # NaN 값을 공백으로 처리
     html = "<table class='table table-bordered'>\n"
