@@ -128,11 +128,14 @@ def extract_text_from_ppt(file_content):
 # 텍스트 파일에서 텍스트 추출
 def extract_text_from_txt(file_content):
     try:
-        # file_content가 이미 문자열일 수 있으므로 이를 확인
-        if isinstance(file_content, str):
+        # BytesIO 객체의 내용을 문자열로 변환
+        if isinstance(file_content, BytesIO):
+            return file_content.read().decode("utf-8")
+        elif isinstance(file_content, str):
             return file_content
         else:
-            return file_content.decode("utf-8")
+            st.error("알 수 없는 파일 형식입니다.")
+            return None
     except Exception as e:
         st.error(f"txt 파일에서 텍스트를 추출하는 중 오류가 발생했습니다: {str(e)}")
         return None
@@ -140,14 +143,18 @@ def extract_text_from_txt(file_content):
 # 로그 파일에서 텍스트 추출
 def extract_text_from_log(file_content):
     try:
-        # file_content가 이미 문자열일 수 있으므로 이를 확인
-        if isinstance(file_content, str):
+        # BytesIO 객체의 내용을 문자열로 변환
+        if isinstance(file_content, BytesIO):
+            return file_content.read().decode("utf-8")
+        elif isinstance(file_content, str):
             return file_content
         else:
-            return file_content.decode("utf-8")
+            st.error("알 수 없는 파일 형식입니다.")
+            return None
     except Exception as e:
         st.error(f"log 파일에서 텍스트를 추출하는 중 오류가 발생했습니다: {str(e)}")
         return None
+
     
 # 이미지에서 텍스트 추출 (OCR)
 def extract_text_from_image(file_content):
