@@ -164,26 +164,64 @@ def get_file_from_github(repo, branch, filepath, token):
         return None
 
 # 엑셀 파일에서 시트를 HTML 테이블로 변환하는 함수
-def convert_excel_to_html_with_styles(file_content, sheet_name=None):
+def convert_excel_to_html_with_styles(file_content, selected_sheets):
     try:
-        wb = openpyxl.load_workbook(file_content, data_only=True)
-        sheet = wb[sheet_name] if sheet_name else wb.active
+        excel_data = pd.ExcelFile(file_content)
+        sheet_names = excel_data.sheet_names
+        
+        # 선택한 시트들만 가져옴
+        data = pd.DataFrame()
+        for sheet in selected_sheets:
+            data = pd.concat([data, pd.read_excel(file_content, sheet_name=sheet)], ignore_index=True)
 
         html_content = "<table style='border-collapse: collapse;'>"
-
-        for row in sheet.iter_rows():
+        for _, row in data.iterrows():
             html_content += "<tr>"
             for cell in row:
-                cell_value = cell.value if cell.value is not None else ""
+                cell_value = str(cell) if pd.notna(cell) else ""
                 html_content += f"<td>{cell_value}</td>"
             html_content += "</tr>"
-
         html_content += "</table>"
+
         return html_content
 
     except Exception as e:
         st.error(f"엑셀 파일 변환 중 오류가 발생했습니다: {str(e)}")
         return None
+
+# 시트 선택 로직 추가
+def handle_sheet_selection(file_content, sheet_count, idx):
+    col1, col2, col3 = st.columns([0.25, 0.5, 0.25])
+    
+    with col1:
+        st.text_input(f"시트 갯수 ({idx})", value=f"예) 시트: {sheet_count}개", disabled=True)
+    
+    with col2:
+        sheet_selection = st.text_input(f"시트 선택(예: 1-3, 5) ({idx})", value="1", key=f"sheet_selection_{idx}")
+
+    with col3:
+        select_button = st.button(f"선택 ({idx})")
+
+    return sheet_selection if select_button else None
+
+# 엑셀 파일 시트 데이터를 파싱하는 함수
+def parse_sheet_selection(selection, sheet_count):
+    selected_sheets = []
+
+    try:
+        if '-' in selection:
+            start, end = map(int, selection.split('-'))
+            if start <= end <= sheet_count:
+                selected_sheets.extend(list(range(start, end+1)))
+        elif ',' in selection:
+            selected_sheets = [int(i) for i in selection.split(',') if 1 <= int(i) <= sheet_count]
+        else:
+            selected_sheets = [int(selection)] if 1 <= int(selection) <= sheet_count else []
+    except ValueError:
+        st.error("잘못된 시트 선택 입력입니다.")
+        return None
+
+    return selected_sheets
 
 # 파일을 업로드하고 엑셀 파일을 HTML로 변환하는 부분
 github_info_loaded = load_env_info()
@@ -209,29 +247,16 @@ if github_info_loaded:
 
                     sha = get_file_sha(st.session_state['github_repo'], f"{folder_name}/{file_name}", st.session_state['github_token'], branch=st.session_state['github_branch'])
 
-                    if sha:
-                        st.warning(f"'{file_name}' 파일이 이미 존재합니다. 덮어쓰시겠습니까?")
-                        col1, col2 = st.columns(2)
+                    # 엑셀 파일 업로드 및 시트 정보 확인
+                    excel_data = pd.ExcelFile(BytesIO(file_content))
+                    sheet_count = len(excel_data.sheet_names)
 
-                        with col1:
-                            if st.button(f"'{file_name}' 덮어쓰기"):
-                                upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
-                                st.success(f"'{file_name}' 파일이 성공적으로 덮어쓰기 되었습니다.")
-                                uploaded_files = None
-                                break
-
-                        with col2:
-                            if st.button("취소"):
-                                st.info("덮어쓰기가 취소되었습니다.")
-                                uploaded_files = None
-                                break
-                    else:
-                        upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'])
-                        st.success(f"'{file_name}' 파일이 성공적으로 업로드되었습니다.")
-                        if file_type == 'xlsx':
-                            # 엑셀 파일을 HTML로 변환하여 테이블로 출력
-                            sheet_name = st.text_input("시트 이름을 입력하세요:")
-                            html_output = convert_excel_to_html_with_styles(BytesIO(file_content), sheet_name)
+                    sheet_selection = handle_sheet_selection(BytesIO(file_content), sheet_count, 0)
+                    
+                    if sheet_selection:
+                        selected_sheets = parse_sheet_selection(sheet_selection, sheet_count)
+                        if selected_sheets:
+                            html_output = convert_excel_to_html_with_styles(BytesIO(file_content), selected_sheets)
                             st.session_state['결과 보고서 보기'] = html_output
 
 else:
