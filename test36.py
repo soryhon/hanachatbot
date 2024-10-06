@@ -177,7 +177,6 @@ def extract_cell_style_and_merged(ws):
 
 # 엑셀 시트 데이터를 HTML로 변환하고 스타일 및 병합 적용
 def convert_df_to_html_with_styles_and_merging(ws, df):
-    # 1행의 'Unnamed: 숫자' 형식 값은 공백으로 처리
     df.columns = [re.sub(r'Unnamed: \d+', '', str(col)).strip() for col in df.columns]
     
     style_dict, merged_cells = extract_cell_style_and_merged(ws)
@@ -193,7 +192,7 @@ def convert_df_to_html_with_styles_and_merging(ws, df):
     # 병합 셀 정보 저장
     merged_cells_dict = {}
     for merged in merged_cells:
-        min_row, min_col, max_row, max_col = merged.min_row, merged.min_col, merged.max_row, merged.max_col
+        min_row, min_col, max_row, max_col = merged.min_row, merged.min_col, merged.max_row, max_col
         for row in range(min_row, max_row + 1):
             for col in range(min_col, max_col + 1):
                 merged_cells_dict[(row, col)] = (min_row, min_col, max_row, max_col)
@@ -247,72 +246,7 @@ def extract_sheets_from_excel(file_content, selected_sheets):
         st.error(f"엑셀 파일의 시트 데이터를 추출하는 중에 오류가 발생했습니다: {str(e)}")
         return None
 
-# 숫자, ',' 및 '-'만 허용하는 함수
-def validate_sheet_input(input_value):
-    if all(c.isdigit() or c in ['-', ','] for c in input_value):
-        return True
-    return False
-
-# 시트 선택 로직 추가
-def handle_sheet_selection(file_content, sheet_count):
-    # 3개의 객체를 가로로 배치
-    col1, col2, col3 = st.columns([0.33, 0.33, 0.33])
-    
-    with col1:
-        st.text_input("시트 갯수", value=f"{sheet_count}개", disabled=True)  # 시트 갯수 표시 (비활성화)
-    
-    with col2:
-        sheet_selection = st.text_input("시트 선택(예: 1-3, 5)", value="1")
-
-    with col3:
-        select_button = st.button("선택")
-
-    # 시트 선택 버튼이 눌렸을 때만 파일 데이터를 가져옴
-    if select_button:
-        if validate_sheet_input(sheet_selection):
-            selected_sheets = parse_sheet_selection(sheet_selection, sheet_count)
-            if selected_sheets:
-                file_data = extract_sheets_from_excel(file_content, selected_sheets)
-                return file_data
-            else:
-                st.error("선택한 시트가 잘못되었습니다.")
-        else:
-            st.error("잘못된 입력입니다. 숫자와 '-', ',' 만 입력할 수 있습니다.")
-    return None
-
-# 시트 선택 입력값을 분석하는 함수
-def parse_sheet_selection(selection, sheet_count):
-    selected_sheets = []
-
-    try:
-        if '-' in selection:
-            start, end = map(int, selection.split('-'))
-            if start <= end <= sheet_count:
-                selected_sheets.extend(list(range(start, end+1)))
-        elif ',' in selection:
-            selected_sheets = [int(i) for i in selection.split(',') if 1 <= int(i) <= sheet_count]
-        else:
-            selected_sheets = [int(selection)] if 1 <= int(selection) <= sheet_count else []
-    except ValueError:
-        st.error("잘못된 시트 선택 입력입니다.")
-        return None
-
-    return selected_sheets
-
-# 파일에서 데이터를 추출하고 요청사항 리스트에서 선택한 엑셀 파일의 시트를 보여주는 로직
-def handle_file_selection(file_path, file_content, file_type):
-    if file_type == 'xlsx':
-        # 엑셀 파일을 직접 처리 (BytesIO 불필요)
-        wb = openpyxl.load_workbook(filename=file_content)  # 수정: BytesIO 제거
-        sheet_count = len(wb.sheetnames)
-
-        # 시트 선택 로직 처리
-        file_data_dict = handle_sheet_selection(file_content, sheet_count)
-        return file_data_dict
-    else:
-        return extract_data_from_file(file_content, file_type)
-
-# 엑셀 데이터 및 제목을 HTML로 변환하여 하나의 세트로 출력하는 함수
+# 엑셀 데이터와 제목을 하나의 HTML 세트로 변환하여 저장
 def generate_html_report_with_title(titles, data_dicts):
     report_html = ""
     
@@ -328,6 +262,24 @@ def generate_html_report_with_title(titles, data_dicts):
         report_html += "</div>\n"
     
     return report_html
+
+# 파일에서 데이터를 추출하고 요청사항 리스트에서 선택한 엑셀 파일의 시트를 보여주는 로직
+def handle_file_selection(file_path, file_content, file_type, idx):
+    if file_type == 'xlsx':
+        # 엑셀 파일을 직접 처리 (BytesIO 불필요)
+        wb = openpyxl.load_workbook(filename=file_content)  # 수정: BytesIO 제거
+        sheet_count = len(wb.sheetnames)
+
+        # 시트 선택 로직 처리
+        file_data_dict = handle_sheet_selection(file_content, sheet_count)
+        
+        if file_data_dict is not None:
+            titles = [st.session_state['rows'][idx]['제목']]
+            html_report = generate_html_report_with_title(titles, [file_data_dict])
+            st.session_state['html_report'] = html_report  # HTML 세트를 세션 상태에 저장
+        return file_data_dict
+    else:
+        return extract_data_from_file(file_content, file_type)
 
 # LLM을 통해 프롬프트와 파일을 전달하고 응답을 받는 함수
 def run_llm_with_file_and_prompt(api_key, titles, requests, file_data_list):
@@ -490,15 +442,10 @@ with st.expander("요청사항 리스트", expanded=True):
                         row['데이터'] = ""
                     else:
                         # 엑셀 파일인 경우 시트 선택 로직을 추가
-                        file_data_dict = handle_file_selection(file_path, file_content, file_type)
+                        file_data_dict = handle_file_selection(file_path, file_content, file_type, idx)
                         
                         if file_data_dict is not None:
                             row['파일'] = f"/{st.session_state['github_repo']}/{st.session_state['github_branch']}/{selected_file}"
-                            for sheet_name, df in file_data_dict.items():
-                                wb = openpyxl.load_workbook(file_content)
-                                ws = wb[sheet_name]
-                                html_data = convert_df_to_html_with_styles_and_merging(ws, df)
-                                st.session_state['html_report'] = html_data
 
                 else:
                     st.error(f"{selected_file} 파일을 GitHub에서 불러오지 못했습니다.")
