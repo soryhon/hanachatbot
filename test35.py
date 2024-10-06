@@ -32,15 +32,21 @@ def convert_excel_style_to_css(cell):
         css_styles.append("font-style: italic;")
     if cell.font.underline:
         css_styles.append("text-decoration: underline;")
-    if cell.font.color and hasattr(cell.font.color, 'rgb') and cell.font.color.rgb:
-        css_styles.append(f"color: #{cell.font.color.rgb[2:]};")
     
-    # 배경색 (색상 정보가 RGB로 제공되는지 확인 후 처리)
-    if cell.fill and hasattr(cell.fill.start_color, 'rgb') and cell.fill.start_color.rgb:
-        css_styles.append(f"background-color: #{cell.fill.start_color.rgb[2:]};")
-    elif cell.fill and hasattr(cell.fill.start_color, 'indexed'):
-        css_styles.append(f"background-color: #{cell.fill.start_color.indexed};")  # Indexed 색상 처리
-
+    # 폰트 색상 처리 (RGB 또는 자동 색상)
+    if cell.font.color:
+        if hasattr(cell.font.color, 'rgb') and cell.font.color.rgb:
+            css_styles.append(f"color: #{cell.font.color.rgb[2:]};")
+        elif cell.font.color.type == 'theme':
+            css_styles.append("color: #000000;")  # 테마 색상일 경우 기본적으로 검은색으로 설정
+    
+    # 배경색 (RGB 값이 없을 경우 안전하게 처리)
+    if cell.fill and cell.fill.start_color:
+        if hasattr(cell.fill.start_color, 'rgb') and cell.fill.start_color.rgb:
+            css_styles.append(f"background-color: #{cell.fill.start_color.rgb[2:]};")
+        elif cell.fill.start_color.type == 'theme':
+            css_styles.append("background-color: #FFFFFF;")  # 테마 색상일 경우 흰색으로 설정
+    
     # 정렬
     if cell.alignment.horizontal:
         css_styles.append(f"text-align: {cell.alignment.horizontal};")
