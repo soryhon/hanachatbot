@@ -166,44 +166,6 @@ def extract_text_from_image(file_content):
     image = Image.open(file_content)
     return "이미지에서 텍스트를 추출하는 기능은 구현되지 않았습니다."
 
-# 음성 파일에서 텍스트를 추출하는 함수
-def extract_text_from_audio(file_content, file_type):
-    try:
-        if file_type != 'wav':
-            st.error("이 함수는 wav 파일만 처리할 수 있습니다.")
-            return None
-
-        recognizer = sr.Recognizer()
-
-        # 임시 파일을 사용하여 BytesIO 객체를 처리
-        if isinstance(file_content, BytesIO):
-            file_content.seek(0)  # BytesIO 포인터를 파일의 시작으로 이동
-
-            # 임시 파일에 BytesIO 데이터를 쓰기
-            with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_wav_file:
-                temp_wav_file.write(file_content.read())  # BytesIO 데이터를 임시 파일로 작성
-                temp_wav_file_path = temp_wav_file.name  # 임시 파일 경로
-
-            # 임시 파일을 AudioFile 객체로 읽기
-            with sr.AudioFile(temp_wav_file_path) as audio_file:
-                audio = recognizer.record(audio_file)
-
-            # Google Web Speech API를 사용해 음성을 텍스트로 변환
-            return recognizer.recognize_google(audio, language="ko-KR")
-        
-        else:
-            st.error("파일 형식이 잘못되었습니다.")
-            return None
-
-    except sr.UnknownValueError:
-        st.error("음성 파일을 인식할 수 없습니다.")
-        return None
-    except sr.RequestError as e:
-        st.error(f"음성 인식 서비스에 요청 중 오류가 발생했습니다: {str(e)}")
-        return None
-    except Exception as e:
-        st.error(f"음성 파일에서 텍스트를 추출하는 중 오류가 발생했습니다: {str(e)}")
-        return None
 
 # GitHub에 폴더가 존재하는지 확인하고 없으면 생성하는 함수
 def create_github_folder_if_not_exists(repo, folder_name, token, branch='main'):
@@ -548,7 +510,7 @@ MAX_FILE_SIZE_BYTES = 100 * 1024 * 1024
 st.subheader("1. 파일 업로드")
 
 # 지원되는 파일 형식 리스트
-supported_file_types = ['xlsx', 'pptx', 'docx', 'csv', 'png', 'jpg', 'jpeg', 'pdf', 'txt', 'log', 'wav', 'mp3', 'm4a', 'amr']
+supported_file_types = ['xlsx', 'pptx', 'docx', 'csv', 'png', 'jpg', 'jpeg', 'pdf', 'txt', 'log']
 
 if github_info_loaded:
     with st.expander("파일 업로드", expanded=True):
