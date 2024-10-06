@@ -17,6 +17,8 @@ from langchain.chat_models import ChatOpenAI
 import time
 import json
 import asyncio
+import openpyxl
+from openpyxl.styles import PatternFill, Font, Border, Side
 
 # 전역변수로 프롬프트 저장
 global_generated_prompt = []
@@ -159,190 +161,90 @@ def get_file_from_github(repo, branch, filepath, token):
         st.error(f"{filepath} 파일을 가져오지 못했습니다. 상태 코드: {response.status_code}")
         return None
 
-# 엑셀 파일에서 시트 가져오기 및 데이터 추출
-def extract_sheets_from_excel(file_content, selected_sheets):
+# 엑셀 파일에서 시트를 HTML로 변환하는 함수 (스타일 정보 포함)
+def convert_excel_to_html_with_styles(file_content):
     try:
-        excel_data = pd.ExcelFile(file_content)
-        all_sheets = excel_data.sheet_names
-        
-        if selected_sheets == 'all':
-            selected_sheets = all_sheets
-        else:
-            selected_sheets = [all_sheets[int(i)-1] for i in selected_sheets if int(i) <= len(all_sheets)]
-        
-        data = pd.DataFrame()
-        for sheet in selected_sheets:
-            data = pd.concat([data, pd.read_excel(file_content, sheet_name=sheet)], ignore_index=True)
-        
-        return data
+        wb = openpyxl.load_workbook(file_content, data_only=True)
+        sheet = wb.active
+
+        html_content = "<table style='border-collapse: collapse;'>"
+
+        for row in sheet.iter_rows():
+            html_content += "<tr>"
+            for cell in row:
+                cell_value = cell.value if cell.value is not None else ""
+                
+                # 셀의 스타일을 CSS로 변환
+                style = get_cell_style(cell)
+                
+                html_content += f"<td style='{style}'>{cell_value}</td>"
+            html_content += "</tr>"
+
+        html_content += "</table>"
+        return html_content
+
     except Exception as e:
-        st.error(f"엑셀 파일의 시트 데이터를 추출하는 중에 오류가 발생했습니다: {str(e)}")
+        st.error(f"엑셀 파일 변환 중 오류가 발생했습니다: {str(e)}")
         return None
 
-# 시트 선택 로직 추가 (엑셀 파일 선택 시 기본적으로 1번 시트 데이터를 바로 가져오도록 설정)
-def handle_sheet_selection(file_content, sheet_count, idx):
-    col1, col2, col3, col4 = st.columns([0.25, 0.25, 0.25, 0.25])
+# 셀 스타일을 CSS로 변환하는 함수
+def get_cell_style(cell):
+    styles = []
+
+    # 배경색
+    if cell.fill and isinstance(cell.fill, PatternFill) and cell.fill.fgColor and cell.fill.fgColor.rgb:
+        bg_color = cell.fill.fgColor.rgb[2:]  # 'FF'를 제거한 RGB 값
+        styles.append(f"background-color: #{bg_color};")
+
+    # 글꼴 스타일
+    if cell.font:
+        if cell.font.bold:
+            styles.append("font-weight: bold;")
+        if cell.font.italic:
+            styles.append("font-style: italic;")
+        if cell.font.color and cell.font.color.rgb:
+            font_color = cell.font.color.rgb[2:]  # 'FF'를 제거한 RGB 값
+            styles.append(f"color: #{font_color};")
+        if cell.font.size:
+            styles.append(f"font-size: {cell.font.size}pt;")
+        if cell.font.name:
+            styles.append(f"font-family: '{cell.font.name}';")
+
+    # 테두리 스타일
+    if cell.border:
+        border_styles = get_border_styles(cell.border)
+        if border_styles:
+            styles.append(border_styles)
+
+    # 정렬
+    if cell.alignment:
+        if cell.alignment.horizontal:
+            styles.append(f"text-align: {cell.alignment.horizontal};")
+        if cell.alignment.vertical:
+            styles.append(f"vertical-align: {cell.alignment.vertical};")
+
+    return " ".join(styles)
+
+# 테두리 스타일을 CSS로 변환하는 함수
+def get_border_styles(border):
+    border_css = []
     
-    with col1:
-        st.text_input(f"시트 갯수 ({idx})", value=f"{sheet_count}개", disabled=True)
-    
-    with col2:
-        all_sheets_checkbox = st.checkbox(f'전체 ({idx})', value=False, key=f"all_sheets_{idx}")
+    sides = {
+        'top': border.top,
+        'right': border.right,
+        'bottom': border.bottom,
+        'left': border.left
+    }
 
-    with col3:
-        sheet_selection = st.text_input(f"시트 선택(예: 1-3, 5) ({idx})", value="1", disabled=all_sheets_checkbox, key=f"sheet_selection_{idx}")
+    for side_name, side in sides.items():
+        if side and side.style:
+            style = "solid" if side.style else "none"
+            color = side.color.rgb[2:] if side.color and side.color.rgb else "000000"  # 기본값 검정색
+            border_css.append(f"border-{side_name}: 1px {style} #{color};")
 
-    if all_sheets_checkbox:
-        sheet_selection = f"1-{sheet_count}"
-        st.session_state[f'sheet_selection_{idx}'] = sheet_selection
+    return " ".join(border_css)
 
-    with col4:
-        select_button = st.button(f"선택 ({idx})")
-
-    if select_button or sheet_selection == "1":
-        selected_sheets = parse_sheet_selection(sheet_selection, sheet_count)
-        if selected_sheets:
-            file_data = extract_sheets_from_excel(file_content, selected_sheets)
-            return file_data
-        else:
-            st.error(f"선택한 시트가 잘못되었습니다. ({idx})")
-    return None
-
-# 시트 선택 입력값을 분석하는 함수
-def parse_sheet_selection(selection, sheet_count):
-    selected_sheets = []
-
-    try:
-        if '-' in selection:
-            start, end = map(int, selection.split('-'))
-            if start <= end <= sheet_count:
-                selected_sheets.extend(list(range(start, end+1)))
-        elif ',' in selection:
-            selected_sheets = [int(i) for i in selection.split(',') if 1 <= int(i) <= sheet_count]
-        else:
-            selected_sheets = [int(selection)] if 1 <= int(selection) <= sheet_count else []
-    except ValueError:
-        st.error("잘못된 시트 선택 입력입니다.")
-        return None
-
-    return selected_sheets
-
-# 파일에서 데이터를 추출하고 요청사항 리스트에서 선택한 엑셀 파일의 시트를 보여주는 로직
-def handle_file_selection(file_path, file_content, file_type, idx):
-    if file_type == 'xlsx':
-        excel_data = pd.ExcelFile(file_content)
-        sheet_count = len(excel_data.sheet_names)
-        
-        file_data = handle_sheet_selection(file_content, sheet_count, idx)
-        
-        if file_data is not None and not file_data.empty:
-            return file_data
-        else:
-            st.error("선택한 시트에 데이터가 없습니다.")
-            return None
-    else:
-        return extract_data_from_file(file_content, file_type)
-
-# HTML로 데이터 변환
-def convert_data_to_html(file_data, title, idx):
-    file_data = file_data.fillna("")
-
-    html_content = f"<h3>{idx + 1}. {title}</h3>"
-    html_content += "<table style='border-collapse: collapse;'>"
-
-    for i, row in file_data.iterrows():
-        html_content += "<tr>"
-        for j, col in enumerate(row):
-            col = str(col).replace("\n", "<br>")
-
-            if col.strip() == "" and j > 0 and j < len(row) - 1:
-                prev_col = str(row[j - 1]).strip()
-                next_col = str(row[j + 1]).strip()
-                if prev_col and next_col:
-                    html_content += f"<td style='border: 1px solid black;'>{col}</td>"
-                else:
-                    html_content += f"<td>{col}</td>"
-            elif col.strip() != "":
-                html_content += f"<td style='border: 1px solid black;'>{col}</td>"
-            else:
-                html_content += f"<td>{col}</td>"
-        html_content += "</tr>"
-
-    html_content += "</table>"
-    return html_content
-
-# HTML 데이터로 여러 요청사항 리스트 병합
-def generate_html_report(rows):
-    html_report = ""
-    for idx, row in enumerate(rows):
-        if row["데이터"] is not None and isinstance(row["데이터"], pd.DataFrame):
-            html_report += convert_data_to_html(row["데이터"], row["제목"], idx)
-    return html_report
-
-# LLM을 통해 프롬프트와 파일을 전달하고 응답을 받는 함수
-async def async_sleep(seconds):
-    await asyncio.sleep(seconds)
-
-def run_llm_with_file_and_prompt(api_key, titles, requests, file_data_list):
-    global global_generated_prompt
-    openai.api_key = api_key
-
-    responses = []
-    global_generated_prompt = []
-
-    try:
-        for i, (title, request, file_data) in enumerate(zip(titles, requests, file_data_list)):
-            if isinstance(file_data, pd.DataFrame):
-                file_data_str = file_data.to_string()
-            elif isinstance(file_data, dict):
-                file_data_str = "\n".join([f"시트 이름: {sheet_name}\n{data.to_string()}" for sheet_name, data in file_data.items()])
-            else:
-                file_data_str = str(file_data)
-
-            generated_prompt = f"""
-            보고서 제목은 '{title}'로 하고, 아래의 파일 데이터를 분석하여 '{request}'를 요구 사항을 만족할 수 있도록 최적화된 보고서를 완성해.
-            """
-            global_generated_prompt.append(generated_prompt)
-
-            prompt_template = PromptTemplate(
-                template=generated_prompt,
-                input_variables=[]
-            )
-
-            llm = ChatOpenAI(model_name="gpt-4")
-            chain = LLMChain(llm=llm, prompt=prompt_template)
-
-            success = False
-            retry_count = 0
-            max_retries = 5  
-
-            while not success and retry_count < max_retries:
-                try:
-                    response = chain.run({})
-                    responses.append(response)
-                    success = True
-                except RateLimitError:
-                    retry_count += 1
-                    st.warning(f"API 요청 한도를 초과했습니다. 10초 후 다시 시도합니다. 재시도 횟수: {retry_count}/{max_retries}")
-                    asyncio.run(async_sleep(10))
-
-                asyncio.run(async_sleep(10))
-    except Exception as e:
-        st.error(f"LLM 실행 중 오류가 발생했습니다: {str(e)}")
-    return responses
-
-# GitHub 정보가 있는지 확인하고 파일 업로드 객체를 출력
-github_info_loaded = load_env_info()
-
-# 업로드 가능한 파일 크기 제한 (100MB)
-MAX_FILE_SIZE_MB = 100
-MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
-
-# 2 프레임: 파일 업로드
-st.subheader("1. 파일 업로드")
-
-supported_file_types = ['xlsx', 'pptx', 'docx', 'csv', 'png', 'jpg', 'jpeg']
-
+# 파일을 업로드하고 엑셀 파일을 HTML로 변환하는 부분
 if github_info_loaded:
     with st.expander("파일 업로드", expanded=True):
         uploaded_files = st.file_uploader("파일을 여러 개 드래그 앤 드롭하여 업로드하세요. (최대 100MB)", accept_multiple_files=True)
@@ -384,12 +286,11 @@ if github_info_loaded:
                         upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'])
                         st.success(f"'{file_name}' 파일이 성공적으로 업로드되었습니다.")
                         if file_type == 'xlsx':
-                            handle_file_selection(file_name, file_content, file_type, 0)
-                        uploaded_files = None
-else:
-    st.warning("GitHub 정보가 저장되기 전에는 파일 업로드를 할 수 없습니다.")
+                            # 엑셀 파일을 HTML로 변환하여 스타일 적용
+                            html_output = convert_excel_to_html_with_styles(BytesIO(file_content))
+                            st.components.v1.html(html_output, height=600, scrolling=True)
 
-# 3 프레임: 작성 보고서 요청사항 및 실행 버튼
+# 요청사항 리스트 처리 및 보고서 생성
 st.subheader("3. 작성 보고서 요청사항 및 실행 버튼")
 
 with st.expander("요청사항 리스트", expanded=True):
