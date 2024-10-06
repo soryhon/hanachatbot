@@ -16,6 +16,9 @@ from openai.error import RateLimitError
 from langchain.chat_models import ChatOpenAI
 import time
 import json
+import asyncio
+import openpyxl
+from openpyxl.styles import PatternFill, Font, Border, Side
 
 # 전역변수로 프롬프트 저장
 global_generated_prompt = []
@@ -67,7 +70,6 @@ def load_env_info():
     # GitHub 정보가 설정되었는지 확인하고 세션 상태 반영
     return github_set
 
-
 # GitHub에 폴더가 존재하는지 확인하고 없으면 생성하는 함수
 def create_github_folder_if_not_exists(repo, folder_name, token, branch='main'):
     url = f"https://api.github.com/repos/{repo}/contents/{folder_name}?ref={branch}"
@@ -75,7 +77,6 @@ def create_github_folder_if_not_exists(repo, folder_name, token, branch='main'):
     response = requests.get(url, headers=headers)
     
     if response.status_code == 404:
-        # 폴더가 존재하지 않으므로 생성
         st.warning(f"'{folder_name}' 폴더가 존재하지 않아 생성 중입니다.")
         create_folder_url = f"https://api.github.com/repos/{repo}/contents/{folder_name}"
         data = {
@@ -83,13 +84,17 @@ def create_github_folder_if_not_exists(repo, folder_name, token, branch='main'):
             "content": base64.b64encode(b'').decode('utf-8'),  # 빈 파일로 폴더 생성
             "branch": branch
         }
-        requests.put(create_folder_url, json=data, headers=headers)
-        st.success(f"'{folder_name}' 폴더가 성공적으로 생성되었습니다.")
-    # 폴더가 이미 존재할 경우 메시지를 표시하지 않음
+        put_response = requests.put(create_folder_url, json=data, headers=headers)
+        if put_response.status_code == 201:
+            st.success(f"'{folder_name}' 폴더가 성공적으로 생성되었습니다.")
+        else:
+            st.error(f"폴더 생성에 실패했습니다: {put_response.status_code}")
+    elif response.status_code != 200:
+        st.error(f"폴더 확인에 실패했습니다: {response.status_code}")
 
 # GitHub API 요청을 처리하는 함수 (파일 목록을 가져옴)
 def get_github_files(repo, branch, token, folder_name='uploadFiles'):
-    create_github_folder_if_not_exists(repo, folder_name, token, branch)  # 폴더가 없으면 생성
+    create_github_folder_if_not_exists(repo, folder_name, token, branch)
     url = f"https://api.github.com/repos/{repo}/git/trees/{branch}?recursive=1"
     headers = {"Authorization": f"token {token}"}
     response = requests.get(url, headers=headers)
@@ -114,7 +119,7 @@ def get_file_sha(repo, file_path, token, branch='main'):
 
 # GitHub에 파일 업로드 함수
 def upload_file_to_github(repo, folder_name, file_name, file_content, token, branch='main', sha=None):
-    create_github_folder_if_not_exists(repo, folder_name, token, branch)  # 업로드 전 폴더가 없으면 생성
+    create_github_folder_if_not_exists(repo, folder_name, token, branch)
     encoded_file_name = urllib.parse.quote(file_name)
     url = f"https://api.github.com/repos/{repo}/contents/{folder_name}/{encoded_file_name}"
     headers = {
@@ -145,7 +150,7 @@ def upload_file_to_github(repo, folder_name, file_name, file_content, token, bra
 
 # GitHub에서 파일을 다운로드하는 함수
 def get_file_from_github(repo, branch, filepath, token):
-    encoded_filepath = urllib.parse.quote(filepath)  # URL 인코딩 추가
+    encoded_filepath = urllib.parse.quote(filepath)
     url = f"https://api.github.com/repos/{repo}/contents/{encoded_filepath}?ref={branch}"
     headers = {"Authorization": f"token {token}"}
     response = requests.get(url, headers=headers)
@@ -156,172 +161,91 @@ def get_file_from_github(repo, branch, filepath, token):
         st.error(f"{filepath} 파일을 가져오지 못했습니다. 상태 코드: {response.status_code}")
         return None
 
-# 엑셀 파일에서 시트 가져오기 및 데이터 추출
-def extract_sheets_from_excel(file_content, selected_sheets):
+# 엑셀 파일에서 시트를 HTML로 변환하는 함수 (스타일 정보 포함)
+def convert_excel_to_html_with_styles(file_content, sheet_name=None):
     try:
-        excel_data = pd.ExcelFile(file_content)
-        all_sheets = excel_data.sheet_names
-        
-        # 사용자가 선택한 시트를 가져옴
-        if selected_sheets == 'all':
-            selected_sheets = all_sheets
-        else:
-            selected_sheets = [all_sheets[int(i)-1] for i in selected_sheets if int(i) <= len(all_sheets)]
-        
-        # 선택한 시트의 데이터를 하나로 합침
-        data = pd.DataFrame()
-        for sheet in selected_sheets:
-            data = pd.concat([data, pd.read_excel(file_content, sheet_name=sheet)], ignore_index=True)
-        
-        return data.to_string()
+        wb = openpyxl.load_workbook(file_content, data_only=True)
+        sheet = wb[sheet_name] if sheet_name else wb.active
+
+        html_content = "<table style='border-collapse: collapse;'>"
+
+        for row in sheet.iter_rows():
+            html_content += "<tr>"
+            for cell in row:
+                cell_value = cell.value if cell.value is not None else ""
+                
+                # 셀의 스타일을 CSS로 변환
+                style = get_cell_style(cell)
+                
+                html_content += f"<td style='{style}'>{cell_value}</td>"
+            html_content += "</tr>"
+
+        html_content += "</table>"
+        return html_content
+
     except Exception as e:
-        st.error(f"엑셀 파일의 시트 데이터를 추출하는 중에 오류가 발생했습니다: {str(e)}")
+        st.error(f"엑셀 파일 변환 중 오류가 발생했습니다: {str(e)}")
         return None
 
-# 숫자, ',' 및 '-'만 허용하는 함수
-def validate_sheet_input(input_value):
-    if all(c.isdigit() or c in ['-', ','] for c in input_value):
-        return True
-    return False
+# 셀 스타일을 CSS로 변환하는 함수
+def get_cell_style(cell):
+    styles = []
 
-# 시트 선택 로직 추가
-def handle_sheet_selection(file_content, sheet_count):
-    # 4개의 객체를 가로로 배치
-    col1, col2, col3, col4 = st.columns([0.25, 0.25, 0.25, 0.25])
+    # 배경색
+    if cell.fill and isinstance(cell.fill, PatternFill) and cell.fill.fgColor and cell.fill.fgColor.rgb:
+        bg_color = cell.fill.fgColor.rgb[2:]  # 'FF'를 제거한 RGB 값
+        styles.append(f"background-color: #{bg_color};")
+
+    # 글꼴 스타일
+    if cell.font:
+        if cell.font.bold:
+            styles.append("font-weight: bold;")
+        if cell.font.italic:
+            styles.append("font-style: italic;")
+        if cell.font.color and cell.font.color.rgb:
+            font_color = cell.font.color.rgb[2:]  # 'FF'를 제거한 RGB 값
+            styles.append(f"color: #{font_color};")
+        if cell.font.size:
+            styles.append(f"font-size: {cell.font.size}pt;")
+        if cell.font.name:
+            styles.append(f"font-family: '{cell.font.name}';")
+
+    # 테두리 스타일
+    if cell.border:
+        border_styles = get_border_styles(cell.border)
+        if border_styles:
+            styles.append(border_styles)
+
+    # 정렬
+    if cell.alignment:
+        if cell.alignment.horizontal:
+            styles.append(f"text-align: {cell.alignment.horizontal};")
+        if cell.alignment.vertical:
+            styles.append(f"vertical-align: {cell.alignment.vertical};")
+
+    return " ".join(styles)
+
+# 테두리 스타일을 CSS로 변환하는 함수
+def get_border_styles(border):
+    border_css = []
     
-    with col1:
-        st.text_input("시트 갯수", value=f"{sheet_count}개", disabled=True)  # 시트 갯수 표시 (비활성화)
-    
-    with col2:
-        all_sheets_checkbox = st.checkbox('전체', value=False, key="all_sheets")
+    sides = {
+        'top': border.top,
+        'right': border.right,
+        'bottom': border.bottom,
+        'left': border.left
+    }
 
-    with col3:
-        # 시트 선택 텍스트 입력창 (전체 선택 시 비활성화)
-        sheet_selection = st.text_input("시트 선택(예: 1-3, 5)", value="1", disabled=all_sheets_checkbox)
+    for side_name, side in sides.items():
+        if side and side.style:
+            style = "solid" if side.style else "none"
+            color = side.color.rgb[2:] if side.color and side.color.rgb else "000000"  # 기본값 검정색
+            border_css.append(f"border-{side_name}: 1px {style} #{color};")
 
-    # 전체 체크박스 체크 시 시트 선택 입력창에만 값 입력
-    if all_sheets_checkbox:
-        sheet_selection = f"1-{sheet_count}"
-        st.session_state['sheet_selection'] = sheet_selection
+    return " ".join(border_css)
 
-    with col4:
-        # 시트 선택 버튼
-        select_button = st.button("선택")
-
-    # 시트 선택 버튼이 눌렸을 때만 파일 데이터를 가져옴
-    if select_button:
-        if validate_sheet_input(sheet_selection):
-            selected_sheets = parse_sheet_selection(sheet_selection, sheet_count)
-            if selected_sheets:
-                file_data = extract_sheets_from_excel(file_content, selected_sheets)
-                return file_data
-            else:
-                st.error("선택한 시트가 잘못되었습니다.")
-        else:
-            st.error("잘못된 입력입니다. 숫자와 '-', ',' 만 입력할 수 있습니다.")
-    return None
-
-# 시트 선택 입력값을 분석하는 함수
-def parse_sheet_selection(selection, sheet_count):
-    selected_sheets = []
-
-    try:
-        if '-' in selection:
-            start, end = map(int, selection.split('-'))
-            if start <= end <= sheet_count:
-                selected_sheets.extend(list(range(start, end+1)))
-        elif ',' in selection:
-            selected_sheets = [int(i) for i in selection.split(',') if 1 <= int(i) <= sheet_count]
-        else:
-            selected_sheets = [int(selection)] if 1 <= int(selection) <= sheet_count else []
-    except ValueError:
-        st.error("잘못된 시트 선택 입력입니다.")
-        return None
-
-    return selected_sheets
-
-# 파일에서 데이터를 추출하고 요청사항 리스트에서 선택한 엑셀 파일의 시트를 보여주는 로직
-def handle_file_selection(file_path, file_content, file_type):
-    if file_type == 'xlsx':
-        excel_data = pd.ExcelFile(file_content)
-        sheet_count = len(excel_data.sheet_names)
-        
-        # 시트 선택 로직 처리
-        file_data = handle_sheet_selection(file_content, sheet_count)
-        return file_data  # 수정: 버튼 클릭시만 반환
-    else:
-        return extract_data_from_file(file_content, file_type)
-
-# LLM을 통해 프롬프트와 파일을 전달하고 응답을 받는 함수
-def run_llm_with_file_and_prompt(api_key, titles, requests, file_data_list):
-    global global_generated_prompt
-    openai.api_key = api_key
-
-    responses = []
-    global_generated_prompt = []  # 프롬프트들을 담을 리스트 초기화
-
-    try:
-        for i, (title, request, file_data) in enumerate(zip(titles, requests, file_data_list)):
-            if isinstance(file_data, pd.DataFrame):
-                file_data_str = file_data.to_string()
-            elif isinstance(file_data, dict):
-                file_data_str = "\n".join([f"시트 이름: {sheet_name}\n{data.to_string()}" for sheet_name, data in file_data.items()])
-            else:
-                file_data_str = str(file_data)
-
-            # 프롬프트 생성
-            generated_prompt = f"""
-            보고서 제목은 '{title}'로 하고, 아래의 파일 데이터를 분석하여 '{request}'를 요구 사항을 만족할 수 있도록 최적화된 보고서를 완성해.
-            표로 표현 할 때는 table 태그 형식으로 구현해야 한다. th과 td 태그는 border는 사이즈 1이고 색상은 검정색으로 구성한다.
-            표의 첫번째 행은 타이틀이 이므로 th태그로 구현하고 가운데 정렬, bold처리 해야 한다. 바탕색은 '#E7E6E6' 이어야 한다.
-            예시와 같은 구조로 구성한다. 보고서 제목은 앞에 순번을 표시하고 바로 아래 요구 사항에 맞는 내용을 이어서 보여줘야 한다.
-            예시 : '\r\n {i+1}. 보고서 제목\r\n보고서 내용'
-            파일 데이터: {file_data_str}
-            """
-
-            global_generated_prompt.append(generated_prompt)
-
-            prompt_template = PromptTemplate(
-                template=generated_prompt,
-                input_variables=[]
-            )
-
-            # LLM 모델 생성
-            llm = ChatOpenAI(model_name="gpt-4")
-            chain = LLMChain(llm=llm, prompt=prompt_template)
-
-            success = False
-            retry_count = 0
-            max_retries = 5  # 최대 재시도 횟수
-
-            # 응답을 받을 때까지 재시도
-            while not success and retry_count < max_retries:
-                try:
-                    response = chain.run({})
-                    responses.append(response)
-                    success = True
-                except RateLimitError:
-                    retry_count += 1
-                    st.warning(f"API 요청 한도를 초과했습니다. 10초 후 다시 시도합니다. 재시도 횟수: {retry_count}/{max_retries}")
-                    time.sleep(10)
-
-                time.sleep(10)
-    except Exception as e:
-        st.error(f"LLM 실행 중 오류가 발생했습니다: {str(e)}")
-    return responses
-
-# GitHub 정보가 있는지 확인하고 파일 업로드 객체를 출력
+# 파일을 업로드하고 엑셀 파일을 HTML로 변환하는 부분
 github_info_loaded = load_env_info()
-
-# 업로드 가능한 파일 크기 제한 (100MB)
-MAX_FILE_SIZE_MB = 100
-MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
-
-# 2 프레임: 파일 업로드
-st.subheader("1. 파일 업로드")
-
-# 지원되는 파일 형식 리스트
-supported_file_types = ['xlsx', 'pptx', 'docx', 'csv', 'png', 'jpg', 'jpeg']
 
 if github_info_loaded:
     with st.expander("파일 업로드", expanded=True):
@@ -336,7 +260,7 @@ if github_info_loaded:
                     continue
 
                 if uploaded_file.size > MAX_FILE_SIZE_BYTES:
-                    st.warning(f"'{uploaded_file.name}' 파일은 {MAX_FILE_SIZE_MB}MB 제한을 초과했습니다. 파일 크기를 줄이거나 GitHub에 직접 푸시하세요.")
+                    st.warning(f"'{uploaded_file.name}' 파일은 {MAX_FILE_SIZE_MB}MB 제한을 초과했습니다.")
                 else:
                     file_content = uploaded_file.read()
                     file_name = uploaded_file.name
@@ -349,28 +273,32 @@ if github_info_loaded:
                         col1, col2 = st.columns(2)
 
                         with col1:
-                            if st.button(f"'{file_name}' 덮어쓰기", key=f"overwrite_{file_name}"):
+                            if st.button(f"'{file_name}' 덮어쓰기"):
                                 upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
                                 st.success(f"'{file_name}' 파일이 성공적으로 덮어쓰기 되었습니다.")
                                 uploaded_files = None
                                 break
 
                         with col2:
-                            if st.button("취소", key=f"cancel_{file_name}"):
+                            if st.button("취소"):
                                 st.info("덮어쓰기가 취소되었습니다.")
                                 uploaded_files = None
                                 break
                     else:
                         upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'])
                         st.success(f"'{file_name}' 파일이 성공적으로 업로드되었습니다.")
-                        uploaded_files = None
-else:
-    st.warning("GitHub 정보가 저장되기 전에는 파일 업로드를 할 수 없습니다. 먼저 GitHub 정보를 입력해 주세요.")
+                        if file_type == 'xlsx':
+                            # 엑셀 파일을 HTML로 변환하여 스타일 적용
+                            sheet_name = st.text_input("시트 이름을 입력하세요:")
+                            html_output = convert_excel_to_html_with_styles(BytesIO(file_content), sheet_name)
+                            st.session_state['결과 보고서 보기'] = html_output
 
-# 3 프레임: 작성 보고서 요청사항 및 실행 버튼
+else:
+    st.warning("GitHub 정보가 저장되기 전에는 파일 업로드를 할 수 없습니다.")
+
+# 요청사항 리스트 처리 및 보고서 생성
 st.subheader("3. 작성 보고서 요청사항 및 실행 버튼")
 
-# 요청사항 리스트
 with st.expander("요청사항 리스트", expanded=True):
     if 'rows' not in st.session_state:
         st.session_state['rows'] = [{"제목": "", "요청": "", "파일": "", "데이터": "", "checked": False}]
@@ -380,13 +308,13 @@ with st.expander("요청사항 리스트", expanded=True):
 
     for idx, row in enumerate(rows):
         with st.container():
-            col1, col2 = st.columns([0.05, 0.95])  # 체크박스와 제목 부분을 가로로 나눔
+            col1, col2 = st.columns([0.05, 0.95])
             with col1:
-                row_checked = st.checkbox("", key=f"row_checked_{idx}", value=row.get("checked", False))  # 체크박스만 추가
+                row_checked = st.checkbox("", key=f"row_checked_{idx}", value=row.get("checked", False))
             with col2:
-                st.markdown(f"#### 요청사항 {idx+1}")  # 요청사항 타이틀과 나머지 UI 요소들 배치
+                st.markdown(f"#### 요청사항 {idx+1}")
 
-            row['제목'] = st.text_input(f"제목 (요청사항 {idx+1})", row['제목'], key=f"title_{idx}")
+            row['제목'] = st.text_input(f"제목 (요청사항 {idx+1})", row['제목'], key=f"title_{idx}", placeholder="여기에 제목 입력")
             row['요청'] = st.text_area(f"요청 (요청사항 {idx+1})", row['요청'], key=f"request_{idx}")
 
             file_list = ['파일을 선택하세요.']
@@ -402,17 +330,13 @@ with st.expander("요청사항 리스트", expanded=True):
                 if file_content:
                     file_type = file_path.split('.')[-1].lower()
 
-                    # 파일 형식 검증 (지원되는 파일만 처리)
                     if file_type not in supported_file_types:
                         st.error(f"지원하지 않는 파일입니다: {file_path}")
                         row['데이터'] = ""
                     else:
-                        # 엑셀 파일인 경우 시트 선택 로직을 추가
-                        file_data = handle_file_selection(file_path, file_content, file_type)
-                        
-                        if file_data:
-                            row['파일'] = f"/{st.session_state['github_repo']}/{st.session_state['github_branch']}/{selected_file}"
-                            row['데이터'] = file_data
+                        row['데이터'] = convert_excel_to_html_with_styles(file_content)
+                        st.session_state['결과 보고서 보기'] = row['데이터']
+
                 else:
                     st.error(f"{selected_file} 파일을 GitHub에서 불러오지 못했습니다.")
                 
@@ -421,63 +345,67 @@ with st.expander("요청사항 리스트", expanded=True):
         if row_checked:
             checked_rows.append(idx)
 
-    # 행 추가 및 삭제 버튼을 가로로 배치하고 가로 길이를 100px로 설정
-    col1, col2 = st.columns([1, 1])
+    # 행 추가, 삭제, 새로고침 버튼 가로로 배치
+    col1, col2, col3 = st.columns([0.3, 0.3, 0.3])
 
     with col1:
-        if st.button("행 추가", key="add_row", help="새 행을 추가합니다.", use_container_width=True):
+        if st.button("행 추가"):
             new_row = {"제목": "", "요청": "", "파일": "", "데이터": "", "checked": False}
             st.session_state['rows'].append(new_row)
 
     with col2:
-        if st.button("행 삭제", key="delete_row", help="선택된 행을 삭제합니다.", use_container_width=True):
+        if st.button("행 삭제"):
             if checked_rows:
                 st.session_state['rows'] = [row for idx, row in enumerate(rows) if idx not in checked_rows]
                 st.success(f"체크된 {len(checked_rows)}개의 요청사항이 삭제되었습니다.")
             else:
                 st.warning("삭제할 요청사항을 선택해주세요.")
 
-# 보고서 작성, 양식 저장, 양식 불러오기, 새로고침 버튼을 같은 행에 가로로 배치
-col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
+    with col3:
+        if st.button("새로고침"):
+            st.success("새로고침 하였습니다.")
+
+# 보고서 작성 버튼
+if st.button("보고서 작성"):
+    if not st.session_state.get("openai_api_key"):
+        st.error("먼저 OpenAI API 키를 입력하고 저장하세요!")
+    elif not st.session_state['rows'] or all(not row["제목"] or not row["요청"] or not row["데이터"] for row in st.session_state['rows']):
+        st.error("요청사항의 제목, 요청, 파일을 모두 입력해야 합니다!")
+    else:
+        titles = [row['제목'] for row in st.session_state['rows']]
+        requests = [row['요청'] for row in st.session_state['rows']]
+        file_data_list = [row['데이터'] for row in st.session_state['rows']]
+
+        responses = run_llm_with_file_and_prompt(
+            st.session_state["openai_api_key"], 
+            titles, 
+            requests, 
+            file_data_list
+        )
+        st.session_state["response"] = responses
+
+# [양식 저장], [양식 불러오기] 버튼 가로로 배치
+col1, col2 = st.columns([0.5, 0.5])
 
 with col1:
-    if st.button("보고서 작성", key="generate_report"):
-        if not st.session_state.get("openai_api_key"):
-            st.error("먼저 OpenAI API 키를 입력하고 저장하세요!")
-        elif not st.session_state['rows'] or all(not row["제목"] or not row["요청"] or not row["데이터"] for row in st.session_state['rows']):
-            st.error("요청사항의 제목, 요청, 파일을 모두 입력해야 합니다!")
-        else:
-            titles = [row['제목'] for row in st.session_state['rows']]
-            requests = [row['요청'] for row in st.session_state['rows']]
-            file_data_list = [row['데이터'] for row in st.session_state['rows']]
-
-            responses = run_llm_with_file_and_prompt(
-                st.session_state["openai_api_key"], 
-                titles, 
-                requests, 
-                file_data_list
-            )
-            st.session_state["response"] = responses
-
-with col2:
-    if st.button("양식 저장", key="save_template"):
+    if st.button("양식 저장"):
         st.success("양식이 저장되었습니다.")
 
-with col3:
-    if st.button("양식 불러오기", key="load_template"):
+with col2:
+    if st.button("양식 불러오기"):
         st.success("양식이 불러와졌습니다.")
-
-with col4:
-    if st.button("새로고침", key="refresh_page"):
-        st.experimental_rerun()
 
 # 4 프레임: 결과 보고서
 st.subheader("4. 결과 보고서")
+if '결과 보고서 보기' in st.session_state:
+    st.components.v1.html(st.session_state['결과 보고서 보기'], height=1024, scrolling=True)
 
+# 전달된 프롬프트
 st.text_area("전달된 프롬프트:", value="\n\n".join(global_generated_prompt), height=150)
 
+# LLM 응답 보기
+st.write("LLM 응답 보기")
 if "response" in st.session_state:
     for idx, response in enumerate(st.session_state["response"]):
         st.text_area(f"응답 {idx+1}:", value=response, height=300)
-        
         st.components.v1.html(response, height=600, scrolling=True)
