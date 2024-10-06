@@ -437,7 +437,8 @@ with st.expander("요청사항 리스트", expanded=True):
         if row_checked:
             checked_rows.append(idx)
 
-    col1, col2 = st.columns([1, 1])
+    # 행 추가, 삭제, 새로고침 버튼 가로로 배치
+    col1, col2, col3 = st.columns([0.3, 0.3, 0.3])
 
     with col1:
         if st.button("행 추가"):
@@ -451,6 +452,10 @@ with st.expander("요청사항 리스트", expanded=True):
                 st.success(f"체크된 {len(checked_rows)}개의 요청사항이 삭제되었습니다.")
             else:
                 st.warning("삭제할 요청사항을 선택해주세요.")
+
+    with col3:
+        if st.button("새로고침"):
+            st.success("새로고침 하였습니다.")
 
 # 보고서 작성 버튼
 if st.button("보고서 작성"):
@@ -471,8 +476,8 @@ if st.button("보고서 작성"):
         )
         st.session_state["response"] = responses
 
-# [양식 저장], [양식 불러오기], [새로고침] 버튼 추가
-col1, col2, col3 = st.columns([1, 1, 1])
+# [양식 저장], [양식 불러오기] 버튼 가로로 배치
+col1, col2 = st.columns([0.5, 0.5])
 
 with col1:
     if st.button("양식 저장"):
@@ -481,10 +486,6 @@ with col1:
 with col2:
     if st.button("양식 불러오기"):
         st.success("양식이 불러와졌습니다.")
-
-with col3:
-    if st.button("새로고침"):
-        st.success("새로고침 하였습니다.")
 
 # 4 프레임: 결과 보고서
 st.subheader("4. 결과 보고서")
