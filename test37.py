@@ -281,6 +281,25 @@ def handle_sheet_selection(file_content, sheet_count, idx):
             st.error("잘못된 입력입니다. 숫자와 '-', ',' 만 입력할 수 있습니다.")
     return None
 
+# 누락된 parse_sheet_selection 함수 정의 추가
+def parse_sheet_selection(selection, sheet_count):
+    selected_sheets = []
+
+    try:
+        if '-' in selection:
+            start, end = map(int, selection.split('-'))
+            if start <= end <= sheet_count:
+                selected_sheets.extend(list(range(start, end+1)))
+        elif ',' in selection:
+            selected_sheets = [int(i) for i in selection.split(',') if 1 <= int(i) <= sheet_count]
+        else:
+            selected_sheets = [int(selection)] if 1 <= int(selection) <= sheet_count else []
+    except ValueError:
+        st.error("잘못된 시트 선택 입력입니다.")
+        return None
+
+    return selected_sheets
+
 # 파일에서 데이터를 추출하고 요청사항 리스트에서 선택한 엑셀 파일의 시트를 보여주는 로직 수정
 def handle_file_selection(file_path, file_content, file_type, idx):
     if file_type == 'xlsx':
