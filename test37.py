@@ -323,7 +323,8 @@ github_info_loaded = load_env_info()
 MAX_FILE_SIZE_MB = 100
 MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
 
-# 1 프레임: 파일 업로드
+# 1 프레임
+# 파일 업로드
 st.subheader("1. 파일 업로드")
 
 # 지원되는 파일 형식 리스트
@@ -373,8 +374,8 @@ if github_info_loaded:
 else:
     st.warning("GitHub 정보가 저장되기 전에는 파일 업로드를 할 수 없습니다. 먼저 GitHub 정보를 입력해 주세요.")
 
-# 2 프레임: 작성 보고서 요청사항 및 실행 버튼
-st.subheader("3. 작성 보고서 요청사항 및 실행 버튼")
+# 2 프레임: 작성 보고서 요청사항
+st.subheader("2. 작성 보고서 요청사항")
 
 # 요청사항 리스트
 with st.expander("요청사항 리스트", expanded=True):
@@ -431,26 +432,27 @@ with st.expander("요청사항 리스트", expanded=True):
     col1, col2, col3 = st.columns([1, 1, 1])
 
     with col1:
-        if st.button("행 추가", key="add_row", help="새 행을 추가합니다.", use_container_width=True):
+        if st.button("행 추가", key="add_row", help="새 요청사항 리스트를 추가합니다.", use_container_width=True):
             new_row = {"제목": "", "요청": "", "파일": "", "데이터": "", "checked": False}
             st.session_state['rows'].append(new_row)
 
     with col2:
-        if st.button("행 삭제", key="delete_row", help="선택된 행을 삭제합니다.", use_container_width=True):
+        if st.button("행 삭제", key="delete_row", help="선택된 요청사항 리스트를 삭제합니다.", use_container_width=True):
             if checked_rows:
                 st.session_state['rows'] = [row for idx, row in enumerate(rows) if idx not in checked_rows]
                 st.success(f"체크된 {len(checked_rows)}개의 요청사항이 삭제되었습니다.")
             else:
                 st.warning("삭제할 요청사항을 선택해주세요.")
     with col3:
-        if st.button("새로고침", key="refresh_page"):
+        if st.button("새로고침", key="refresh_page", help="요청사항 리스트를 새로고침 합니다.", use_container_width=True):
               st.success("새로고침 하였습니다.")
 	
 
 # 3 프레임
-
 #보고서 작성 실행 버튼
-if st.button("보고서 작성", key="generate_report"):
+st.subheader("3. 보고서 작성 실행")
+
+if st.button("보고서 작성", key="generate_report", use_container_width=True):
         if not st.session_state.get("openai_api_key"):
             st.error("먼저 OpenAI API 키를 입력하고 저장하세요!")
         elif not st.session_state['rows'] or all(not row["제목"] or not row["요청"] or not row["데이터"] for row in st.session_state['rows']):
@@ -471,11 +473,11 @@ if st.button("보고서 작성", key="generate_report"):
 # 양식 저장, 양식 불러오기 버튼을 같은 행에 가로로 배치
 col1, col2 = st.columns([1, 1])
 with col1:
-    if st.button("양식 저장", key="save_template"):
+    if st.button("양식 저장", key="save_template", use_container_width=True):
         st.success("양식이 저장되었습니다.")
 
 with col2:
-    if st.button("양식 불러오기", key="load_template"):
+    if st.button("양식 불러오기", key="load_template", use_container_width=True):
         st.success("양식이 불러와졌습니다.")
 
 
