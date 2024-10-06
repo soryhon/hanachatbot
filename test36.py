@@ -22,8 +22,9 @@ import re
 
 # Backend 기능 구현 시작
 
-# 전역변수로 프롬프트 저장
+# 전역변수로 프롬프트 및 파일 데이터 저장
 global_generated_prompt = []
+file_data_array = []  # 요청사항 리스트 파일 데이터를 저장할 배열
 
 # GitHub 정보 및 OpenAI API 키 자동 설정 또는 입력창을 통해 설정
 def load_env_info():
@@ -71,7 +72,6 @@ def load_env_info():
 
     # GitHub 정보가 설정되었는지 확인하고 세션 상태 반영
     return github_set
-
 
 # GitHub에 폴더가 존재하는지 확인하고 없으면 생성하는 함수
 def create_github_folder_if_not_exists(repo, folder_name, token, branch='main'):
@@ -254,7 +254,7 @@ def validate_sheet_input(input_value):
         return True
     return False
 
-# 시트 선택 로직 수정
+# 시트 선택 로직 추가
 def handle_sheet_selection(file_content, sheet_count, idx):
     # 3개의 객체를 가로로 배치
     col1, col2, col3 = st.columns([0.33, 0.33, 0.33])
@@ -281,7 +281,7 @@ def handle_sheet_selection(file_content, sheet_count, idx):
             st.error("잘못된 입력입니다. 숫자와 '-', ',' 만 입력할 수 있습니다.")
     return None
 
-# 누락된 parse_sheet_selection 함수 정의 추가
+# 시트 선택 입력값을 분석하는 함수
 def parse_sheet_selection(selection, sheet_count):
     selected_sheets = []
 
@@ -312,6 +312,20 @@ def handle_file_selection(file_path, file_content, file_type, idx):
     else:
         return extract_data_from_file(file_content, file_type)
 
+# HTML 보고서 생성 함수 (배열에서 데이터 가져옴)
+def generate_html_report_from_array():
+    if "html_report" in st.session_state:
+        report_html = st.session_state['html_report']
+    else:
+        report_html = ""
+
+    for idx, file_data in enumerate(file_data_array):
+        if file_data:
+            report_html += f"<div style='text-indent: 20px;'>\n{file_data}\n</div>\n"
+            report_html += f"<p/>"  # 줄바꿈 추가
+
+    st.session_state['html_report'] = report_html
+
 # 엑셀 데이터 및 제목을 HTML로 변환하여 하나의 세트로 출력하는 함수
 def generate_html_report_with_title(titles, data_dicts):
     report_html = ""
@@ -328,64 +342,6 @@ def generate_html_report_with_title(titles, data_dicts):
         report_html += "</div>\n"
     
     return report_html
-
-# LLM을 통해 프롬프트와 파일을 전달하고 응답을 받는 함수
-def run_llm_with_file_and_prompt(api_key, titles, requests, file_data_list):
-    global global_generated_prompt
-    openai.api_key = api_key
-
-    responses = []
-    global_generated_prompt = []  # 프롬프트들을 담을 리스트 초기화
-
-    try:
-        for i, (title, request, file_data) in enumerate(zip(titles, requests, file_data_list)):
-            if isinstance(file_data, pd.DataFrame):
-                file_data_str = file_data.to_string()
-            elif isinstance(file_data, dict):
-                file_data_str = "\n".join([f"시트 이름: {sheet_name}\n{data.to_string()}" for sheet_name, data in file_data.items()])
-            else:
-                file_data_str = str(file_data)
-
-            # 프롬프트 생성
-            generated_prompt = f"""
-            보고서 제목은 '{title}'로 하고, 아래의 파일 데이터를 분석하여 '{request}'를 요구 사항을 만족할 수 있도록 최적화된 보고서를 완성해.
-            표로 표현 할 때는 table 태그 형식으로 구현해야 한다. th과 td 태그는 border는 사이즈 1이고 색상은 검정색으로 구성한다.
-            표의 첫번째 행은 타이틀이 이므로 th태그로 구현하고 가운데 정렬, bold처리 해야 한다. 바탕색은 '#E7E6E6' 이어야 한다.
-            예시와 같은 구조로 구성한다. 보고서 제목은 앞에 순번을 표시하고 바로 아래 요구 사항에 맞는 내용을 이어서 보여줘야 한다.
-            예시 : '\r\n {i+1}. 보고서 제목\r\n보고서 내용'
-            파일 데이터: {file_data_str}
-            """
-
-            global_generated_prompt.append(generated_prompt)
-
-            prompt_template = PromptTemplate(
-                template=generated_prompt,
-                input_variables=[]
-            )
-
-            # LLM 모델 생성
-            llm = ChatOpenAI(model_name="gpt-4")
-            chain = LLMChain(llm=llm, prompt=prompt_template)
-
-            success = False
-            retry_count = 0
-            max_retries = 5  # 최대 재시도 횟수
-
-            # 응답을 받을 때까지 재시도
-            while not success and retry_count < max_retries:
-                try:
-                    response = chain.run({})
-                    responses.append(response)
-                    success = True
-                except RateLimitError:
-                    retry_count += 1
-                    st.warning(f"API 요청 한도를 초과했습니다. 10초 후 다시 시도합니다. 재시도 횟수: {retry_count}/{max_retries}")
-                    time.sleep(10)
-
-                time.sleep(10)
-    except Exception as e:
-        st.error(f"LLM 실행 중 오류가 발생했습니다: {str(e)}")
-    return responses
 
 # Backend 기능 구현 끝 
 
@@ -455,7 +411,7 @@ st.subheader("2. 작성 보고서 요청사항")
 # 요청사항 리스트
 with st.expander("요청사항 리스트", expanded=True):
     if 'rows' not in st.session_state:
-        st.session_state['rows'] = [{"제목": "", "요청": "", "파일": "", "데이터": "", "checked": False}]
+        st.session_state['rows'] = [{"제목": "", "요청": "", "파일": "", "데이터": "", "checked": False,"파일데이터":""}]
 
     rows = st.session_state['rows']
     checked_rows = []
@@ -494,13 +450,15 @@ with st.expander("요청사항 리스트", expanded=True):
                         
                         if file_data_dict is not None:
                             row['파일'] = f"/{st.session_state['github_repo']}/{st.session_state['github_branch']}/{selected_file}"
-                            html_report_set = f"<h3>{idx + 1}. {row['제목']}</h3>\n"  # 순번 추가
+                            html_report_set = f"<div style='text-indent: 20px;'>\n"  # 순번 추가 제외
                             for sheet_name, df in file_data_dict.items():
                                 wb = openpyxl.load_workbook(file_content)
                                 ws = wb[sheet_name]
                                 html_data = convert_df_to_html_with_styles_and_merging(ws, df)
                                 html_report_set += f"<div style='text-indent: 20px;'>{html_data}</div>\n"
-                            st.session_state['html_report'] = html_report_set
+                            row['파일데이터'] = html_report_set  # 새로운 key에 값 저장
+                            file_data_array.insert(idx, html_report_set)
+                            generate_html_report_from_array()
 
                 else:
                     st.error(f"{selected_file} 파일을 GitHub에서 불러오지 못했습니다.")
@@ -515,7 +473,7 @@ with st.expander("요청사항 리스트", expanded=True):
 
     with col1:
         if st.button("행 추가", key="add_row", use_container_width=True):
-            new_row = {"제목": "", "요청": "", "파일": "", "데이터": "", "checked": False}
+            new_row = {"제목": "", "요청": "", "파일": "", "데이터": "", "checked": False,"파일데이터":""}
             st.session_state['rows'].append(new_row)
 
     with col2:
