@@ -396,7 +396,7 @@ github_info_loaded = load_env_info()
 
 # 업로드 가능한 파일 크기 제한 (100MB)
 MAX_FILE_SIZE_MB = 100
-MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
+MAX_FILE_SIZE_BYTES = 100 * 1024 * 1024
 
 # 1 프레임
 # 파일 업로드
@@ -494,11 +494,13 @@ with st.expander("요청사항 리스트", expanded=True):
                         
                         if file_data_dict is not None:
                             row['파일'] = f"/{st.session_state['github_repo']}/{st.session_state['github_branch']}/{selected_file}"
+                            html_report_set = f"<h3>{row['제목']}</h3>\n"
                             for sheet_name, df in file_data_dict.items():
                                 wb = openpyxl.load_workbook(file_content)
                                 ws = wb[sheet_name]
                                 html_data = convert_df_to_html_with_styles_and_merging(ws, df)
-                                st.session_state['html_report'] = html_data
+                                html_report_set += f"<div style='text-indent: 20px;'>{html_data}</div>\n"
+                            st.session_state['html_report'] = html_report_set
 
                 else:
                     st.error(f"{selected_file} 파일을 GitHub에서 불러오지 못했습니다.")
