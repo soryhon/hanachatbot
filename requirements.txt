@@ -95,4 +95,4 @@ python-pptx
 docx2txt
 openpyxl
 SpeechRecognition
-SpeechRecognition pydub
+pydub
