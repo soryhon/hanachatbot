@@ -160,23 +160,26 @@ def get_file_from_github(repo, branch, filepath, token):
         st.error(f"{filepath} 파일을 가져오지 못했습니다. 상태 코드: {response.status_code}")
         return None
 
-# 엑셀 시트에서 셀 스타일 정보 추출
-def extract_cell_style(ws):
+# 엑셀 시트에서 셀 스타일 및 병합 정보 추출
+def extract_cell_style_and_merged(ws):
     style_dict = {}
+    merged_cells = ws.merged_cells.ranges  # 병합된 셀 범위 가져오기
     
     for row in ws.iter_rows():
         for cell in row:
             cell_style = {
                 "alignment": cell.alignment.horizontal if cell.alignment else 'left',
                 "font_bold": cell.font.bold if cell.font else False,
-                "border": bool(cell.border and (cell.border.left or cell.border.right or cell.border.top or cell.border.bottom))
+                "border": bool(cell.border and (cell.border.left or cell.border.right or cell.border.top or cell.border.bottom)),
+                "value": "" if str(cell.value).startswith("Unnamed") else cell.value
             }
             style_dict[cell.coordinate] = cell_style
-    return style_dict
+            
+    return style_dict, merged_cells
 
-# 엑셀 시트 데이터를 HTML로 변환하고 스타일 적용
-def convert_df_to_html_with_styles(ws, df):
-    style_dict = extract_cell_style(ws)
+# 엑셀 시트 데이터를 HTML로 변환하고 스타일 및 병합 적용
+def convert_df_to_html_with_styles_and_merging(ws, df):
+    style_dict, merged_cells = extract_cell_style_and_merged(ws)
     df = df.fillna('')  # NaN 값을 공백으로 처리
     html = "<table class='table table-bordered'>\n"
 
@@ -196,8 +199,12 @@ def convert_df_to_html_with_styles(ws, df):
             alignment = style.get("alignment", "left")
             font_weight = "bold" if style.get("font_bold", False) else "normal"
             border = "1px solid black" if style.get("border", False) else "none"
+            merged = any([cell_ref in str(range_) for range_ in merged_cells])
             
-            html += f"<td style='text-align:{alignment}; font-weight:{font_weight}; border:{border};'>{value}</td>\n"
+            if merged:
+                html += f"<td colspan='{range_.size}' style='text-align:{alignment}; font-weight:{font_weight}; border:{border};'>{value}</td>\n"
+            else:
+                html += f"<td style='text-align:{alignment}; font-weight:{font_weight}; border:{border};'>{value}</td>\n"
         html += "</tr>\n"
     html += "</tbody>\n</table>"
     
@@ -460,7 +467,7 @@ with st.expander("요청사항 리스트", expanded=True):
                             for sheet_name, df in file_data_dict.items():
                                 wb = openpyxl.load_workbook(file_content)
                                 ws = wb[sheet_name]
-                                html_data = convert_df_to_html_with_styles(ws, df)
+                                html_data = convert_df_to_html_with_styles_and_merging(ws, df)
                                 st.session_state['html_report'] = html_data
 
                 else:
