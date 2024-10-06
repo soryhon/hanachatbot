@@ -313,6 +313,23 @@ def handle_file_selection(file_path, file_content, file_type):
     else:
         return extract_data_from_file(file_content, file_type)
 
+# 엑셀 데이터 및 제목을 HTML로 변환하여 하나의 세트로 출력하는 함수
+def generate_html_report_with_title(titles, data_dicts):
+    report_html = ""
+    
+    for i, (title, data_dict) in enumerate(zip(titles, data_dicts), start=1):
+        report_html += f"<h3>{i}. {title}</h3>\n"
+        report_html += "<div style='text-indent: 20px;'>\n"
+        
+        for sheet_name, df in data_dict.items():
+            wb = openpyxl.load_workbook(BytesIO(df))
+            ws = wb[sheet_name]
+            report_html += convert_df_to_html_with_styles_and_merging(ws, df)
+        
+        report_html += "</div>\n"
+    
+    return report_html
+
 # LLM을 통해 프롬프트와 파일을 전달하고 응답을 받는 함수
 def run_llm_with_file_and_prompt(api_key, titles, requests, file_data_list):
     global global_generated_prompt
