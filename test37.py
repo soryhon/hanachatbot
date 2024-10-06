@@ -494,7 +494,7 @@ with st.expander("요청사항 리스트", expanded=True):
                         
                         if file_data_dict is not None:
                             row['파일'] = f"/{st.session_state['github_repo']}/{st.session_state['github_branch']}/{selected_file}"
-                            html_report_set = f"<h3>{row['제목']}</h3>\n"
+                            html_report_set = f"<h3>{idx + 1}. {row['제목']}</h3>\n"  # 순번 추가
                             for sheet_name, df in file_data_dict.items():
                                 wb = openpyxl.load_workbook(file_content)
                                 ws = wb[sheet_name]
@@ -514,12 +514,12 @@ with st.expander("요청사항 리스트", expanded=True):
     col1, col2, col3 = st.columns([0.3, 0.3, 0.3])
 
     with col1:
-        if st.button("행 추가", key="add_row", help="새 요청사항 리스트를 추가합니다.", use_container_width=True):
+        if st.button("행 추가", key="add_row", use_container_width=True):
             new_row = {"제목": "", "요청": "", "파일": "", "데이터": "", "checked": False}
             st.session_state['rows'].append(new_row)
 
     with col2:
-        if st.button("행 삭제", key="delete_row", help="선택된 요청사항 리스트를 삭제합니다.", use_container_width=True):
+        if st.button("행 삭제", key="delete_row", use_container_width=True):
             if checked_rows:
                 st.session_state['rows'] = [row for idx, row in enumerate(rows) if idx not in checked_rows]
                 st.success(f"체크된 {len(checked_rows)}개의 요청사항이 삭제되었습니다.")
@@ -527,7 +527,7 @@ with st.expander("요청사항 리스트", expanded=True):
                 st.warning("삭제할 요청사항을 선택해주세요.")
     
     with col3:
-        if st.button("새로고침", key="refresh_page", help="요청사항 리스트를 새로고침 합니다.", use_container_width=True):
+        if st.button("새로고침", key="refresh_page", use_container_width=True):
             st.success("새로고침 하였습니다.")
 
 # 3 프레임
