@@ -16,6 +16,7 @@ from openai.error import RateLimitError
 from langchain.chat_models import ChatOpenAI
 import time
 import json
+import asyncio
 
 # 전역변수로 프롬프트 저장
 global_generated_prompt = []
@@ -253,7 +254,7 @@ def convert_data_to_html(file_data, title, idx):
         html_content += "<tr>"
         for j, col in enumerate(row):
             col = str(col).replace("\n", "<br>")
-            
+
             if col.strip() == "" and j > 0 and j < len(row) - 1:
                 prev_col = str(row[j - 1]).strip()
                 next_col = str(row[j + 1]).strip()
@@ -279,6 +280,9 @@ def generate_html_report(rows):
     return html_report
 
 # LLM을 통해 프롬프트와 파일을 전달하고 응답을 받는 함수
+async def async_sleep(seconds):
+    await asyncio.sleep(seconds)
+
 def run_llm_with_file_and_prompt(api_key, titles, requests, file_data_list):
     global global_generated_prompt
     openai.api_key = api_key
@@ -320,9 +324,9 @@ def run_llm_with_file_and_prompt(api_key, titles, requests, file_data_list):
                 except RateLimitError:
                     retry_count += 1
                     st.warning(f"API 요청 한도를 초과했습니다. 10초 후 다시 시도합니다. 재시도 횟수: {retry_count}/{max_retries}")
-                    time.sleep(10)
+                    asyncio.run(async_sleep(10))
 
-                time.sleep(10)
+                asyncio.run(async_sleep(10))
     except Exception as e:
         st.error(f"LLM 실행 중 오류가 발생했습니다: {str(e)}")
     return responses
