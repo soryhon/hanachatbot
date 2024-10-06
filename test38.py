@@ -19,6 +19,7 @@ import json
 import openpyxl
 from openpyxl.utils import get_column_letter
 import re
+import speech_recognition as sr
 
 # Backend 기능 구현 시작
 
@@ -93,6 +94,8 @@ def extract_data_from_file(file_content, file_type):
         return extract_text_from_txt(file_content)
     elif file_type == 'log':
         return extract_text_from_log(file_content)
+    elif file_type == 'wav':  # 음성 파일 추가
+        return extract_text_from_audio(file_content, file_type)    
     else:
         st.error(f"{file_type} 형식은 지원되지 않습니다.")
         return None
@@ -160,6 +163,30 @@ def extract_text_from_log(file_content):
 def extract_text_from_image(file_content):
     image = Image.open(file_content)
     return "이미지에서 텍스트를 추출하는 기능은 구현되지 않았습니다."
+
+# 음성 파일에서 텍스트를 추출하는 함수
+def extract_text_from_audio(file_content, file_type):
+    try:
+        recognizer = sr.Recognizer()
+        
+        if file_type == 'wav':
+            # 음성 파일을 AudioFile 객체로 읽어오기
+            with sr.AudioFile(file_content) as audio_file:
+                audio_data = recognizer.record(audio_file)
+                # Google Web Speech API를 사용해 음성을 텍스트로 변환
+                return recognizer.recognize_google(audio_data, language="ko-KR")
+        elif file_type == 'mp3':
+            st.error("현재 mp3 파일은 지원되지 않으며, wav 파일만 지원됩니다.")
+            return None
+        else:
+            st.error("지원되지 않는 음성 파일 형식입니다.")
+            return None
+    except sr.UnknownValueError:
+        st.error("음성 파일을 인식할 수 없습니다.")
+        return None
+    except sr.RequestError as e:
+        st.error(f"음성 인식 서비스에 요청 중 오류가 발생했습니다: {str(e)}")
+        return None
 
 # GitHub에 폴더가 존재하는지 확인하고 없으면 생성하는 함수
 def create_github_folder_if_not_exists(repo, folder_name, token, branch='main'):
@@ -504,7 +531,7 @@ MAX_FILE_SIZE_BYTES = 100 * 1024 * 1024
 st.subheader("1. 파일 업로드")
 
 # 지원되는 파일 형식 리스트
-supported_file_types = ['xlsx', 'pptx', 'docx', 'csv', 'png', 'jpg', 'jpeg', 'pdf', 'txt', 'log']
+supported_file_types = ['xlsx', 'pptx', 'docx', 'csv', 'png', 'jpg', 'jpeg', 'pdf', 'txt', 'log', 'wav', 'mp3']
 
 if github_info_loaded:
     with st.expander("파일 업로드", expanded=True):
