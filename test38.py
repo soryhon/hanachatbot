@@ -73,6 +73,59 @@ def load_env_info():
     # GitHub 정보가 설정되었는지 확인하고 세션 상태 반영
     return github_set
 
+# 다양한 파일 형식에서 데이터를 추출하는 함수
+def extract_data_from_file(file_content, file_type):
+    if file_content is None:
+        st.error("파일 내용을 가져오지 못했습니다.")
+        return None
+
+    if file_type == 'pdf':
+        return extract_text_from_pdf(file_content)
+    elif file_type == 'csv':
+        return extract_text_from_csv(file_content)
+    elif file_type == 'docx':
+        return extract_text_from_word(file_content)
+    elif file_type == 'pptx':
+        return extract_text_from_ppt(file_content)
+    elif file_type in ['png', 'jpg', 'jpeg']:
+        return extract_text_from_image(file_content)
+    else:
+        st.error(f"{file_type} 형식은 지원되지 않습니다.")
+        return None
+
+# PDF 파일에서 텍스트 추출
+def extract_text_from_pdf(file_content):
+    reader = PyPDF2.PdfReader(file_content)
+    text = ''
+    for page in range(len(reader.pages)):
+        text += reader.pages[page].extract_text()
+    return text
+
+# CSV 파일에서 텍스트 추출
+def extract_text_from_csv(file_content):
+    csv_data = pd.read_csv(file_content)
+    return csv_data
+
+# 워드 파일에서 텍스트 추출
+def extract_text_from_word(file_content):
+    doc = docx.Document(file_content)
+    return '\n'.join([para.text for para in doc.paragraphs])
+
+# PPT 파일에서 텍스트 추출
+def extract_text_from_ppt(file_content):
+    presentation = pptx.Presentation(file_content)
+    text = ''
+    for slide in presentation.slides:
+        for shape in slide.shapes:
+            if hasattr(shape, "text"):
+                text += shape.text + '\n'
+    return text
+
+# 이미지에서 텍스트 추출 (OCR)
+def extract_text_from_image(file_content):
+    image = Image.open(file_content)
+    return "이미지에서 텍스트를 추출하는 기능은 구현되지 않았습니다."
+
 # GitHub에 폴더가 존재하는지 확인하고 없으면 생성하는 함수
 def create_github_folder_if_not_exists(repo, folder_name, token, branch='main'):
     url = f"https://api.github.com/repos/{repo}/contents/{folder_name}?ref={branch}"
@@ -80,7 +133,6 @@ def create_github_folder_if_not_exists(repo, folder_name, token, branch='main'):
     response = requests.get(url, headers=headers)
     
     if response.status_code == 404:
-        # 폴더가 존재하지 않으므로 생성
         st.warning(f"'{folder_name}' 폴더가 존재하지 않아 생성 중입니다.")
         create_folder_url = f"https://api.github.com/repos/{repo}/contents/{folder_name}"
         data = {
@@ -94,7 +146,7 @@ def create_github_folder_if_not_exists(repo, folder_name, token, branch='main'):
 
 # GitHub API 요청을 처리하는 함수 (파일 목록을 가져옴)
 def get_github_files(repo, branch, token, folder_name='uploadFiles'):
-    create_github_folder_if_not_exists(repo, folder_name, token, branch)  # 폴더가 없으면 생성
+    create_github_folder_if_not_exists(repo, folder_name, token, branch)
     url = f"https://api.github.com/repos/{repo}/git/trees/{branch}?recursive=1"
     headers = {"Authorization": f"token {token}"}
     response = requests.get(url, headers=headers)
@@ -119,7 +171,7 @@ def get_file_sha(repo, file_path, token, branch='main'):
 
 # GitHub에 파일 업로드 함수 (덮어쓰기 포함)
 def upload_file_to_github(repo, folder_name, file_name, file_content, token, branch='main', sha=None):
-    create_github_folder_if_not_exists(repo, folder_name, token, branch)  # 업로드 전 폴더가 없으면 생성
+    create_github_folder_if_not_exists(repo, folder_name, token, branch)
     encoded_file_name = urllib.parse.quote(file_name)
     url = f"https://api.github.com/repos/{repo}/contents/{folder_name}/{encoded_file_name}"
     headers = {
@@ -140,7 +192,7 @@ def upload_file_to_github(repo, folder_name, file_name, file_content, token, bra
 
     response = requests.put(url, json=data, headers=headers)
 
-    if response.status_code in [200, 201]:  # 상태 코드 200은 덮어쓰기, 201은 새로운 파일 생성
+    if response.status_code in [200, 201]:
         st.success(f"{file_name} 파일이 성공적으로 업로드(덮어쓰기) 되었습니다.")
     else:
         st.error(f"파일 업로드에 실패했습니다: {response.status_code}")
@@ -148,7 +200,7 @@ def upload_file_to_github(repo, folder_name, file_name, file_content, token, bra
 
 # GitHub에서 파일을 다운로드하는 함수
 def get_file_from_github(repo, branch, filepath, token):
-    encoded_filepath = urllib.parse.quote(filepath)  # URL 인코딩 추가
+    encoded_filepath = urllib.parse.quote(filepath)
     url = f"https://api.github.com/repos/{repo}/contents/{encoded_filepath}?ref={branch}"
     headers = {"Authorization": f"token {token}"}
     response = requests.get(url, headers=headers)
@@ -162,7 +214,7 @@ def get_file_from_github(repo, branch, filepath, token):
 # 엑셀 시트에서 셀 스타일 및 병합 정보 추출
 def extract_cell_style_and_merged(ws):
     style_dict = {}
-    merged_cells = ws.merged_cells.ranges  # 병합된 셀 범위 가져오기
+    merged_cells = ws.merged_cells.ranges
     
     for row in ws.iter_rows():
         for cell in row:
