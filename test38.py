@@ -79,7 +79,7 @@ def extract_data_from_file(file_content, file_type):
         st.error("파일 내용을 가져오지 못했습니다.")
         return None
 
-    if file_type == 'pdf':
+   if file_type == 'pdf':
         return extract_text_from_pdf(file_content)
     elif file_type == 'csv':
         return extract_text_from_csv(file_content)
@@ -89,6 +89,10 @@ def extract_data_from_file(file_content, file_type):
         return extract_text_from_ppt(file_content)
     elif file_type in ['png', 'jpg', 'jpeg']:
         return extract_text_from_image(file_content)
+    elif file_type == 'txt':
+        return extract_text_from_txt(file_content)
+    elif file_type == 'log':
+        return extract_text_from_log(file_content)
     else:
         st.error(f"{file_type} 형식은 지원되지 않습니다.")
         return None
@@ -121,6 +125,14 @@ def extract_text_from_ppt(file_content):
                 text += shape.text + '\n'
     return text
 
+# 텍스트 파일에서 텍스트 추출
+def extract_text_from_txt(file_content):
+    return file_content.decode("utf-8")
+
+# 로그 파일에서 텍스트 추출
+def extract_text_from_log(file_content):
+    return file_content.decode("utf-8")
+    
 # 이미지에서 텍스트 추출 (OCR)
 def extract_text_from_image(file_content):
     image = Image.open(file_content)
@@ -469,7 +481,7 @@ MAX_FILE_SIZE_BYTES = 100 * 1024 * 1024
 st.subheader("1. 파일 업로드")
 
 # 지원되는 파일 형식 리스트
-supported_file_types = ['xlsx', 'pptx', 'docx', 'csv', 'png', 'jpg', 'jpeg']
+supported_file_types = ['xlsx', 'pptx', 'docx', 'csv', 'png', 'jpg', 'jpeg', 'pdf', 'txt', 'log']
 
 if github_info_loaded:
     with st.expander("파일 업로드", expanded=True):
@@ -556,19 +568,25 @@ with st.expander("요청사항 리스트", expanded=True):
                         row['데이터'] = ""
                     else:
                         # 엑셀 파일인 경우 시트 선택 로직을 추가
-                        file_data_dict = handle_file_selection(file_path, file_content, file_type, idx)
+                        if file_type == 'xlsx':
+                            file_data_dict = handle_file_selection(file_path, file_content, file_type, idx)
+                            if file_data_dict is not None:
+                                row['파일'] = f"/{st.session_state['github_repo']}/{st.session_state['github_branch']}/{selected_file}"
+                                html_report_set = f"<div style='text-indent: 20px;'>\n"
+                                for sheet_name, df in file_data_dict.items():
+                                    wb = openpyxl.load_workbook(file_content)
+                                    ws = wb[sheet_name]
+                                    html_data = convert_df_to_html_with_styles_and_merging(ws, df)
+                                    html_report_set += f"<div style='text-indent: 20px;'>{html_data}</div>\n"
+                                row['파일데이터'] = html_report_set
+                                file_data_array.insert(idx, html_report_set)
+                        else:
+                            file_data = extract_data_from_file(file_content, file_type)
+                            if file_data:
+                                row['파일데이터'] = f"<p>{file_data}</p>"
+                                file_data_array.insert(idx, row['파일데이터'])
                         
-                        if file_data_dict is not None:
-                            row['파일'] = f"/{st.session_state['github_repo']}/{st.session_state['github_branch']}/{selected_file}"
-                            html_report_set = f"<div style='text-indent: 20px;'>\n"  # 순번 추가 제외
-                            for sheet_name, df in file_data_dict.items():
-                                wb = openpyxl.load_workbook(file_content)
-                                ws = wb[sheet_name]
-                                html_data = convert_df_to_html_with_styles_and_merging(ws, df)
-                                html_report_set += f"<div style='text-indent: 20px;'>{html_data}</div>\n"
-                            row['파일데이터'] = html_report_set  # 새로운 key에 값 저장
-                            file_data_array.insert(idx, html_report_set)
-                            generate_html_report_from_array()
+                        generate_html_report_from_array()
 
                 else:
                     st.error(f"{selected_file} 파일을 GitHub에서 불러오지 못했습니다.")
