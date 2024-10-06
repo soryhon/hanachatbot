@@ -135,10 +135,8 @@ st.subheader("1. 파일 업로드")
 
 uploaded_file = st.file_uploader("엑셀 파일을 업로드하세요.", type="xlsx")
 if uploaded_file:
-    st.subheader("업로드된 엑셀 파일을 HTML로 변환:")
-    html_output = extract_sheets_with_styles_from_excel(uploaded_file)
-    if html_output:
-        st.components.v1.html(html_output, height=600, scrolling=True)
+    # 파일이 업로드되면 처리할 내용 추가
+    st.success(f"'{uploaded_file.name}' 파일이 업로드되었습니다.")
 
 # GitHub에 폴더가 존재하는지 확인하고 없으면 생성하는 함수
 def create_github_folder_if_not_exists(repo, folder_name, token, branch='main'):
