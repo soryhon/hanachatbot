@@ -266,7 +266,8 @@ for idx, row in enumerate(rows):
         row['요청'] = st.text_area(f"요청 (요청사항 {idx+1})", row['요청'], key=f"request_{idx}")
 
         file_list = ['파일을 선택하세요.']
-        if st.session_state.get('github_token') and st.session_state.get('github_repo'):
+        # GitHub 파일 목록 불러오기 전에 GitHub 정보가 설정되었는지 확인
+        if st.session_state.get('github_token') and st.session_state.get('github_repo') and st.session_state.get('github_branch'):
             file_list += get_github_files(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
 
         selected_file = st.selectbox(f"파일 선택 (요청사항 {idx+1})", options=file_list, key=f"file_select_{idx}")
