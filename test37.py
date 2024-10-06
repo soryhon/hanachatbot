@@ -17,6 +17,8 @@ from langchain.chat_models import ChatOpenAI
 import time
 import json
 
+#Backend 기능 구현 시작
+
 # 전역변수로 프롬프트 저장
 global_generated_prompt = []
 
@@ -310,6 +312,10 @@ def run_llm_with_file_and_prompt(api_key, titles, requests, file_data_list):
         st.error(f"LLM 실행 중 오류가 발생했습니다: {str(e)}")
     return responses
 
+#Backend 기능 구현 끝 
+
+#Front 기능 구현 시작
+
 # GitHub 정보가 있는지 확인하고 파일 업로드 객체를 출력
 github_info_loaded = load_env_info()
 
@@ -317,7 +323,7 @@ github_info_loaded = load_env_info()
 MAX_FILE_SIZE_MB = 100
 MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
 
-# 2 프레임: 파일 업로드
+# 1 프레임: 파일 업로드
 st.subheader("1. 파일 업로드")
 
 # 지원되는 파일 형식 리스트
@@ -367,7 +373,7 @@ if github_info_loaded:
 else:
     st.warning("GitHub 정보가 저장되기 전에는 파일 업로드를 할 수 없습니다. 먼저 GitHub 정보를 입력해 주세요.")
 
-# 3 프레임: 작성 보고서 요청사항 및 실행 버튼
+# 2 프레임: 작성 보고서 요청사항 및 실행 버튼
 st.subheader("3. 작성 보고서 요청사항 및 실행 버튼")
 
 # 요청사항 리스트
@@ -422,7 +428,7 @@ with st.expander("요청사항 리스트", expanded=True):
             checked_rows.append(idx)
 
     # 행 추가 및 삭제 버튼을 가로로 배치하고 가로 길이를 100px로 설정
-    col1, col2 = st.columns([1, 1])
+    col1, col2, col3 = st.columns([1, 1, 1])
 
     with col1:
         if st.button("행 추가", key="add_row", help="새 행을 추가합니다.", use_container_width=True):
@@ -436,12 +442,15 @@ with st.expander("요청사항 리스트", expanded=True):
                 st.success(f"체크된 {len(checked_rows)}개의 요청사항이 삭제되었습니다.")
             else:
                 st.warning("삭제할 요청사항을 선택해주세요.")
+    with col3:
+        if st.button("새로고침", key="refresh_page"):
+              st.success("새로고침 하였습니다.")
+	
 
-# 보고서 작성, 양식 저장, 양식 불러오기, 새로고침 버튼을 같은 행에 가로로 배치
-col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
+# 3 프레임
 
-with col1:
-    if st.button("보고서 작성", key="generate_report"):
+#보고서 작성 실행 버튼
+if st.button("보고서 작성", key="generate_report"):
         if not st.session_state.get("openai_api_key"):
             st.error("먼저 OpenAI API 키를 입력하고 저장하세요!")
         elif not st.session_state['rows'] or all(not row["제목"] or not row["요청"] or not row["데이터"] for row in st.session_state['rows']):
@@ -459,25 +468,35 @@ with col1:
             )
             st.session_state["response"] = responses
 
-with col2:
+# 양식 저장, 양식 불러오기 버튼을 같은 행에 가로로 배치
+col1, col2 = st.columns([1, 1])
+with col1:
     if st.button("양식 저장", key="save_template"):
         st.success("양식이 저장되었습니다.")
 
-with col3:
+with col2:
     if st.button("양식 불러오기", key="load_template"):
         st.success("양식이 불러와졌습니다.")
 
-with col4:
-    if st.button("새로고침", key="refresh_page"):
-        st.experimental_rerun()
+
 
 # 4 프레임: 결과 보고서
 st.subheader("4. 결과 보고서")
 
+# 결과 보고서 HTML 보기
+if any(row['파일'] for row in rows):
+    html_report = generate_html_report(st.session_state['rows'])
+    if html_report:
+        st.components.v1.html(html_report, height=1024, scrolling=True)
+
+# 전달된 프롬프트
 st.text_area("전달된 프롬프트:", value="\n\n".join(global_generated_prompt), height=150)
 
+# LLM 응답 보기
 if "response" in st.session_state:
     for idx, response in enumerate(st.session_state["response"]):
         st.text_area(f"응답 {idx+1}:", value=response, height=300)
         
         st.components.v1.html(response, height=600, scrolling=True)
+
+#Front 기능 구현 끝
