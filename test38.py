@@ -79,7 +79,7 @@ def extract_data_from_file(file_content, file_type):
         st.error("파일 내용을 가져오지 못했습니다.")
         return None
 
-   if file_type == 'pdf':
+    if file_type == 'pdf':
         return extract_text_from_pdf(file_content)
     elif file_type == 'csv':
         return extract_text_from_csv(file_content)
