@@ -20,6 +20,8 @@ import openpyxl
 from openpyxl.utils import get_column_letter
 import re
 import speech_recognition as sr
+from pydub import AudioSegment
+import boto3
 
 # Backend 기능 구현 시작
 
@@ -531,7 +533,7 @@ MAX_FILE_SIZE_BYTES = 100 * 1024 * 1024
 st.subheader("1. 파일 업로드")
 
 # 지원되는 파일 형식 리스트
-supported_file_types = ['xlsx', 'pptx', 'docx', 'csv', 'png', 'jpg', 'jpeg', 'pdf', 'txt', 'log', 'wav', 'mp3']
+supported_file_types = ['xlsx', 'pptx', 'docx', 'csv', 'png', 'jpg', 'jpeg', 'pdf', 'txt', 'log', 'wav', 'mp3', 'm4a', 'amr']
 
 if github_info_loaded:
     with st.expander("파일 업로드", expanded=True):
@@ -623,6 +625,7 @@ with st.expander("요청사항 리스트", expanded=True):
                             if file_data_dict is not None:
                                 row['파일'] = f"/{st.session_state['github_repo']}/{st.session_state['github_branch']}/{selected_file}"
                                 html_report_set = f"<div style='text-indent: 20px;'>\n"
+                                html_report_set +=  f"<h3>{idx + 1}. {row['제목']}</h3>\n"
                                 for sheet_name, df in file_data_dict.items():
                                     wb = openpyxl.load_workbook(file_content)
                                     ws = wb[sheet_name]
@@ -633,7 +636,8 @@ with st.expander("요청사항 리스트", expanded=True):
                         else:
                             file_data = extract_data_from_file(file_content, file_type)
                             if file_data:
-                                row['파일데이터'] = f"<p>{file_data}</p>"
+                                row['파일데이터'] = f"<h3>{idx + 1}. {row['제목']}</h3>\n"
+                                row['파일데이터'] += f"<p>{file_data}</p>"
                                 file_data_array.insert(idx, row['파일데이터'])
                         
                         generate_html_report_from_array()
