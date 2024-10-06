@@ -292,43 +292,27 @@ def parse_sheet_selection(selection, sheet_count):
 # 파일에서 데이터를 추출하고 요청사항 리스트에서 선택한 엑셀 파일의 시트를 보여주는 로직
 def handle_file_selection(file_path, file_content, file_type):
     if file_type == 'xlsx':
-        excel_data = pd.ExcelFile(file_content)
-        sheet_count = len(excel_data.sheet_names)
+        # 엑셀 데이터를 직접 읽음 (BytesIO 불필요)
+        wb = openpyxl.load_workbook(filename=BytesIO(file_content))  
+        sheet_count = len(wb.sheetnames)
         
         # 시트 선택 로직 처리
-        file_data = handle_sheet_selection(file_content, sheet_count)
-        return file_data  # 수정: 버튼 클릭시만 반환
+        file_data_dict = handle_sheet_selection(file_content, sheet_count)
+        return file_data_dict
     else:
         return extract_data_from_file(file_content, file_type)
 
-# 엑셀 데이터를 HTML로 변환하는 함수
-def convert_df_to_html_with_styles(ws, df):
-    style_dict = extract_cell_style(ws)
-    df = df.fillna('')  # NaN 값을 공백으로 처리
-    html = "<table class='table table-bordered'>\n"
-
-    # 헤더 부분
-    html += "<thead>\n<tr>\n"
-    for col in df.columns:
-        html += f"<th style='text-align:center; font-weight:bold; background-color:#E7E6E6; border: 1px solid black;'>{col}</th>\n"
-    html += "</tr>\n</thead>\n"
-
-    # 데이터 부분
-    html += "<tbody>\n"
-    for row_idx, row in df.iterrows():
-        html += "<tr>\n"
-        for col_idx, value in enumerate(row):
-            cell_ref = f"{get_column_letter(col_idx+1)}{row_idx+2}"  # 셀 참조 계산
-            style = style_dict.get(cell_ref, {})
-            alignment = style.get("alignment", "left")
-            font_weight = "bold" if style.get("font_bold", False) else "normal"
-            border = "1px solid black" if style.get("border", False) else "none"
-            
-            html += f"<td style='text-align:{alignment}; font-weight:{font_weight}; border:{border};'>{value}</td>\n"
-        html += "</tr>\n"
-    html += "</tbody>\n</table>"
-    
-    return html
+# 엑셀 데이터를 HTML로 변환하는 함수에서 파일 처리
+def handle_file_selection(file_path, file_content, file_type):
+    if file_type == 'xlsx':
+        wb = openpyxl.load_workbook(filename=BytesIO(file_content))  # BytesIO 불필요
+        sheet_count = len(wb.sheetnames)
+        
+        # 시트 선택 로직 처리
+        file_data_dict = handle_sheet_selection(file_content, sheet_count)
+        return file_data_dict
+    else:
+        return extract_data_from_file(file_content, file_type)
 
 # LLM을 통해 프롬프트와 파일을 전달하고 응답을 받는 함수
 def run_llm_with_file_and_prompt(api_key, titles, requests, file_data_list):
