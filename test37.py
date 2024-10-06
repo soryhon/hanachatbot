@@ -18,7 +18,7 @@ import time
 import json
 import openpyxl
 from openpyxl.utils import get_column_letter
-import re  # 정규 표현식을 사용하기 위한 모듈 추가
+import re
 
 # Backend 기능 구현 시작
 
@@ -117,7 +117,7 @@ def get_file_sha(repo, file_path, token, branch='main'):
     else:
         return None
 
-# GitHub에 파일 업로드 함수
+# GitHub에 파일 업로드 함수 (덮어쓰기 포함)
 def upload_file_to_github(repo, folder_name, file_name, file_content, token, branch='main', sha=None):
     create_github_folder_if_not_exists(repo, folder_name, token, branch)  # 업로드 전 폴더가 없으면 생성
     encoded_file_name = urllib.parse.quote(file_name)
@@ -140,10 +140,8 @@ def upload_file_to_github(repo, folder_name, file_name, file_content, token, bra
 
     response = requests.put(url, json=data, headers=headers)
 
-    if response.status_code == 201:
-        st.success(f"{file_name} 파일이 성공적으로 업로드되었습니다.")
-    elif response.status_code == 200:
-        st.success(f"{file_name} 파일이 성공적으로 덮어쓰기 되었습니다.")
+    if response.status_code in [200, 201]:  # 상태 코드 200은 덮어쓰기, 201은 새로운 파일 생성
+        st.success(f"{file_name} 파일이 성공적으로 업로드(덮어쓰기) 되었습니다.")
     else:
         st.error(f"파일 업로드에 실패했습니다: {response.status_code}")
         st.error(response.json())
@@ -185,12 +183,12 @@ def convert_df_to_html_with_styles_and_merging(ws, df):
     
     style_dict, merged_cells = extract_cell_style_and_merged(ws)
     df = df.fillna('')  # NaN 값을 공백으로 처리
-    html = "<table class='table table-bordered'>\n"
+    html = "<table class='table table-bordered' style='border-spacing: 0; border-collapse: collapse;'>\n"
 
     # 헤더 부분 (border 간격 없게 설정)
     html += "<thead>\n<tr>\n"
     for col in df.columns:
-        html += f"<th style='text-align:center; font-weight:bold; background-color:#E7E6E6; border: 1px solid black; border-spacing: 0;'>{col}</th>\n"
+        html += f"<th style='text-align:center; font-weight:bold; background-color:#E7E6E6; border: 1px solid black;'>{col}</th>\n"
     html += "</tr>\n</thead>\n"
 
     # 병합 셀 정보 저장
