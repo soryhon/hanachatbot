@@ -22,9 +22,8 @@ import re
 
 # Backend 기능 구현 시작
 
-# 전역변수로 프롬프트 및 파일 데이터 저장
+# 전역변수로 프롬프트 저장
 global_generated_prompt = []
-file_data_array = []  # 요청사항 리스트 파일 데이터를 저장할 배열
 
 # GitHub 정보 및 OpenAI API 키 자동 설정 또는 입력창을 통해 설정
 def load_env_info():
@@ -178,7 +177,6 @@ def extract_cell_style_and_merged(ws):
 
 # 엑셀 시트 데이터를 HTML로 변환하고 스타일 및 병합 적용
 def convert_df_to_html_with_styles_and_merging(ws, df):
-    # 1행의 'Unnamed: 숫자' 형식 값은 공백으로 처리
     df.columns = [re.sub(r'Unnamed: \d+', '', str(col)).strip() for col in df.columns]
     
     style_dict, merged_cells = extract_cell_style_and_merged(ws)
@@ -248,100 +246,119 @@ def extract_sheets_from_excel(file_content, selected_sheets):
         st.error(f"엑셀 파일의 시트 데이터를 추출하는 중에 오류가 발생했습니다: {str(e)}")
         return None
 
-# 숫자, ',' 및 '-'만 허용하는 함수
+# 숫자, ',' 및 '-'만 허용하는 함수 (추가된 부분)
 def validate_sheet_input(input_value):
-    if all(c.isdigit() or c in ['-', ','] for c in input_value):
-        return True
-    return False
+    return bool(re.match(r'^[0-9,\-]+$', input_value))
 
-# 시트 선택 로직 추가
-def handle_sheet_selection(file_content, sheet_count, idx):
-    # 3개의 객체를 가로로 배치
-    col1, col2, col3 = st.columns([0.33, 0.33, 0.33])
+# 엑셀 시트 선택 및 데이터 처리 로직
+def handle_sheet_selection(file_content, sheet_count):
+    # 시트 선택 로직 구현
+    col1, col2 = st.columns([0.7, 0.3])
     
     with col1:
-        st.text_input(f"시트 갯수_{idx}", value=f"{sheet_count}개", disabled=True)  # 시트 갯수 표시 (비활성화)
+        st.text_input("시트 갯수", value=f"{sheet_count}개", disabled=True)
     
     with col2:
-        sheet_selection = st.text_input(f"시트 선택_{idx}(예: 1-3, 5)", value="1", key=f"sheet_selection_{idx}")
-
-    with col3:
-        select_button = st.button("선택", key=f"select_button_{idx}")
-
-    # 시트 선택 버튼이 눌렸을 때만 파일 데이터를 가져옴
-    if select_button:
-        if validate_sheet_input(sheet_selection):
-            selected_sheets = parse_sheet_selection(sheet_selection, sheet_count)
-            if selected_sheets:
-                file_data = extract_sheets_from_excel(file_content, selected_sheets)
-                return file_data
+        selected_sheets = st.text_input("시트 선택 (예: 1-3, 5)", value="1")
+    
+    # 선택 버튼을 눌렀을 때만 처리
+    if st.button("선택"):
+        if validate_sheet_input(selected_sheets):
+            parsed_sheets = parse_sheet_selection(selected_sheets, sheet_count)
+            if parsed_sheets:
+                file_data = extract_sheets_from_excel(file_content, parsed_sheets)
+                if file_data:
+                    return file_data
+                else:
+                    st.error(f"선택한 시트에서 데이터를 추출하지 못했습니다.")
+                    return None
             else:
-                st.error("선택한 시트가 잘못되었습니다.")
+                st.error(f"잘못된 시트 선택입니다: {selected_sheets}")
+                return None
         else:
-            st.error("잘못된 입력입니다. 숫자와 '-', ',' 만 입력할 수 있습니다.")
-    return None
+            st.error(f"잘못된 입력 형식입니다. 숫자와 '-', ','만 입력할 수 있습니다.")
+            return None
 
-# 시트 선택 입력값을 분석하는 함수
-def parse_sheet_selection(selection, sheet_count):
-    selected_sheets = []
-
-    try:
-        if '-' in selection:
-            start, end = map(int, selection.split('-'))
-            if start <= end <= sheet_count:
-                selected_sheets.extend(list(range(start, end+1)))
-        elif ',' in selection:
-            selected_sheets = [int(i) for i in selection.split(',') if 1 <= int(i) <= sheet_count]
-        else:
-            selected_sheets = [int(selection)] if 1 <= int(selection) <= sheet_count else []
-    except ValueError:
-        st.error("잘못된 시트 선택 입력입니다.")
-        return None
-
-    return selected_sheets
-
-# 파일에서 데이터를 추출하고 요청사항 리스트에서 선택한 엑셀 파일의 시트를 보여주는 로직 수정
+# 파일에서 데이터를 추출하고 요청사항 리스트에서 선택한 엑셀 파일의 시트를 보여주는 로직
 def handle_file_selection(file_path, file_content, file_type, idx):
     if file_type == 'xlsx':
+        # 엑셀 파일을 로드하고 시트 개수를 확인
         wb = openpyxl.load_workbook(file_content)
         sheet_count = len(wb.sheetnames)
 
         # 시트 선택 로직 처리
-        file_data_dict = handle_sheet_selection(file_content, sheet_count, idx)
-        return file_data_dict
+        if sheet_count > 0:
+            file_data_dict = handle_sheet_selection(file_content, sheet_count)  # 시트 선택
+
+            if file_data_dict:
+                titles = [st.session_state['rows'][idx]['제목']]
+                html_report = generate_html_report_with_title(titles, [file_data_dict])
+                st.session_state['html_report'] = html_report  # HTML 세트를 세션 상태에 저장
+                return file_data_dict
+            else:
+                st.error(f"선택한 시트에서 데이터를 찾을 수 없습니다.")
+        else:
+            st.error("엑셀 파일에서 시트를 찾을 수 없습니다.")
     else:
-        return extract_data_from_file(file_content, file_type)
+        return extract_data_from file_content, file_type)
 
-# HTML 보고서 생성 함수 (배열에서 데이터 가져옴)
-def generate_html_report_from_array():
-    if "html_report" in st.session_state:
-        report_html = st.session_state['html_report']
-    else:
-        report_html = ""
+# LLM을 통해 프롬프트와 파일을 전달하고 응답을 받는 함수
+def run_llm_with_file_and_prompt(api_key, titles, requests, file_data_list):
+    global global_generated_prompt
+    openai.api_key = api_key
 
-    for idx, file_data in enumerate(file_data_array):
-        if file_data:
-            report_html += f"<div style='text-indent: 20px;'>\n{file_data}\n</div>\n"
-            report_html += f"<p/>"  # 줄바꿈 추가
+    responses = []
+    global_generated_prompt = []  # 프롬프트들을 담을 리스트 초기화
 
-    st.session_state['html_report'] = report_html
+    try:
+        for i, (title, request, file_data) in enumerate(zip(titles, requests, file_data_list)):
+            if isinstance(file_data, pd.DataFrame):
+                file_data_str = file_data.to_string()
+            elif isinstance(file_data, dict):
+                file_data_str = "\n".join([f"시트 이름: {sheet_name}\n{data.to_string()}" for sheet_name, data in file_data.items()])
+            else:
+                file_data_str = str(file_data)
 
-# 엑셀 데이터 및 제목을 HTML로 변환하여 하나의 세트로 출력하는 함수
-def generate_html_report_with_title(titles, data_dicts):
-    report_html = ""
-    
-    for i, (title, data_dict) in enumerate(zip(titles, data_dicts), start=1):
-        report_html += f"<h3>{i}. {title}</h3>\n"
-        report_html += "<div style='text-indent: 20px;'>\n"
-        
-        for sheet_name, df in data_dict.items():
-            wb = openpyxl.load_workbook(BytesIO(df))
-            ws = wb[sheet_name]
-            report_html += convert_df_to_html_with_styles_and_merging(ws, df)
-        
-        report_html += "</div>\n"
-    
-    return report_html
+            # 프롬프트 생성
+            generated_prompt = f"""
+            보고서 제목은 '{title}'로 하고, 아래의 파일 데이터를 분석하여 '{request}'를 요구 사항을 만족할 수 있도록 최적화된 보고서를 완성해.
+            표로 표현 할 때는 table 태그 형식으로 구현해야 한다. th과 td 태그는 border는 사이즈 1이고 색상은 검정색으로 구성한다.
+            표의 첫번째 행은 타이틀이 이므로 th태그로 구현하고 가운데 정렬, bold처리 해야 한다. 바탕색은 '#E7E6E6' 이어야 한다.
+            예시와 같은 구조로 구성한다. 보고서 제목은 앞에 순번을 표시하고 바로 아래 요구 사항에 맞는 내용을 이어서 보여줘야 한다.
+            예시 : '\r\n {i+1}. 보고서 제목\r\n보고서 내용'
+            파일 데이터: {file_data_str}
+            """
+
+            global_generated_prompt.append(generated_prompt)
+
+            prompt_template = PromptTemplate(
+                template=generated_prompt,
+                input_variables=[]
+            )
+
+            # LLM 모델 생성
+            llm = ChatOpenAI(model_name="gpt-4")
+            chain = LLMChain(llm=llm, prompt=prompt_template)
+
+            success = False
+            retry_count = 0
+            max_retries = 5  # 최대 재시도 횟수
+
+            # 응답을 받을 때까지 재시도
+            while not success and retry_count < max_retries:
+                try:
+                    response = chain.run({})
+                    responses.append(response)
+                    success = True
+                except RateLimitError:
+                    retry_count += 1
+                    st.warning(f"API 요청 한도를 초과했습니다. 10초 후 다시 시도합니다. 재시도 횟수: {retry_count}/{max_retries}")
+                    time.sleep(10)
+
+                time.sleep(10)
+    except Exception as e:
+        st.error(f"LLM 실행 중 오류가 발생했습니다: {str(e)}")
+    return responses
 
 # Backend 기능 구현 끝 
 
@@ -352,7 +369,7 @@ github_info_loaded = load_env_info()
 
 # 업로드 가능한 파일 크기 제한 (100MB)
 MAX_FILE_SIZE_MB = 100
-MAX_FILE_SIZE_BYTES = 100 * 1024 * 1024
+MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
 
 # 1 프레임
 # 파일 업로드
@@ -411,7 +428,7 @@ st.subheader("2. 작성 보고서 요청사항")
 # 요청사항 리스트
 with st.expander("요청사항 리스트", expanded=True):
     if 'rows' not in st.session_state:
-        st.session_state['rows'] = [{"제목": "", "요청": "", "파일": "", "데이터": "", "checked": False,"파일데이터":""}]
+        st.session_state['rows'] = [{"제목": "", "요청": "", "파일": "", "데이터": "", "checked": False}]
 
     rows = st.session_state['rows']
     checked_rows = []
@@ -422,16 +439,16 @@ with st.expander("요청사항 리스트", expanded=True):
             with col1:
                 row_checked = st.checkbox("", key=f"row_checked_{idx}", value=row.get("checked", False))  # 체크박스만 추가
             with col2:
-                st.markdown(f"#### 요청사항 {idx+1}")
-        
-            row['제목'] = st.text_input(f"제목_{idx} (요청사항 {idx+1})", row['제목'], key=f"title_{idx}")
-            row['요청'] = st.text_area(f"요청_{idx} (요청사항 {idx+1})", row['요청'], key=f"request_{idx}")
+                st.markdown(f"#### 요청사항 {idx+1}")  # 요청사항 타이틀과 나머지 UI 요소들 배치
+
+            row['제목'] = st.text_input(f"제목 (요청사항 {idx+1})", row['제목'], key=f"title_{idx}")
+            row['요청'] = st.text_area(f"요청 (요청사항 {idx+1})", row['요청'], key=f"request_{idx}")
 
             file_list = ['파일을 선택하세요.']
             if st.session_state.get('github_token') and st.session_state.get('github_repo'):
                 file_list += get_github_files(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
 
-            selected_file = st.selectbox(f"파일 선택_{idx} (요청사항 {idx+1})", options=file_list, key=f"file_select_{idx}")
+            selected_file = st.selectbox(f"파일 선택 (요청사항 {idx+1})", options=file_list, key=f"file_select_{idx}")
 
             if selected_file != '파일을 선택하세요.':
                 file_path = selected_file
@@ -450,20 +467,11 @@ with st.expander("요청사항 리스트", expanded=True):
                         
                         if file_data_dict is not None:
                             row['파일'] = f"/{st.session_state['github_repo']}/{st.session_state['github_branch']}/{selected_file}"
-                            html_report_set = f"<div style='text-indent: 20px;'>\n"  # 순번 추가 제외
-                            for sheet_name, df in file_data_dict.items():
-                                wb = openpyxl.load_workbook(file_content)
-                                ws = wb[sheet_name]
-                                html_data = convert_df_to_html_with_styles_and_merging(ws, df)
-                                html_report_set += f"<div style='text-indent: 20px;'>{html_data}</div>\n"
-                            row['파일데이터'] = html_report_set  # 새로운 key에 값 저장
-                            file_data_array.insert(idx, html_report_set)
-                            generate_html_report_from_array()
 
                 else:
                     st.error(f"{selected_file} 파일을 GitHub에서 불러오지 못했습니다.")
                 
-            st.text_input(f"파일 경로_{idx} (요청사항 {idx+1})", row['파일'], disabled=True, key=f"file_{idx}")
+            st.text_input(f"파일 경로 (요청사항 {idx+1})", row['파일'], disabled=True, key=f"file_{idx}")
 
         if row_checked:
             checked_rows.append(idx)
@@ -472,12 +480,12 @@ with st.expander("요청사항 리스트", expanded=True):
     col1, col2, col3 = st.columns([0.3, 0.3, 0.3])
 
     with col1:
-        if st.button("행 추가", key="add_row", use_container_width=True):
-            new_row = {"제목": "", "요청": "", "파일": "", "데이터": "", "checked": False,"파일데이터":""}
+        if st.button("행 추가", key="add_row", help="새 요청사항 리스트를 추가합니다.", use_container_width=True):
+            new_row = {"제목": "", "요청": "", "파일": "", "데이터": "", "checked": False}
             st.session_state['rows'].append(new_row)
 
     with col2:
-        if st.button("행 삭제", key="delete_row", use_container_width=True):
+        if st.button("행 삭제", key="delete_row", help="선택된 요청사항 리스트를 삭제합니다.", use_container_width=True):
             if checked_rows:
                 st.session_state['rows'] = [row for idx, row in enumerate(rows) if idx not in checked_rows]
                 st.success(f"체크된 {len(checked_rows)}개의 요청사항이 삭제되었습니다.")
@@ -485,7 +493,7 @@ with st.expander("요청사항 리스트", expanded=True):
                 st.warning("삭제할 요청사항을 선택해주세요.")
     
     with col3:
-        if st.button("새로고침", key="refresh_page", use_container_width=True):
+        if st.button("새로고침", key="refresh_page", help="요청사항 리스트를 새로고침 합니다.", use_container_width=True):
             st.success("새로고침 하였습니다.")
 
 # 3 프레임
