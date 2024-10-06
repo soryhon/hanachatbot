@@ -16,6 +16,8 @@ from openai.error import RateLimitError
 from langchain.chat_models import ChatOpenAI
 import time
 import json
+import openpyxl
+from openpyxl.utils import get_column_letter
 
 # Backend 기능 구현 시작
 
@@ -158,6 +160,49 @@ def get_file_from_github(repo, branch, filepath, token):
         st.error(f"{filepath} 파일을 가져오지 못했습니다. 상태 코드: {response.status_code}")
         return None
 
+# 엑셀 시트에서 셀 스타일 정보 추출
+def extract_cell_style(ws):
+    style_dict = {}
+    
+    for row in ws.iter_rows():
+        for cell in row:
+            cell_style = {
+                "alignment": cell.alignment.horizontal if cell.alignment else 'left',
+                "font_bold": cell.font.bold if cell.font else False,
+                "border": bool(cell.border and (cell.border.left or cell.border.right or cell.border.top or cell.border.bottom))
+            }
+            style_dict[cell.coordinate] = cell_style
+    return style_dict
+
+# 엑셀 시트 데이터를 HTML로 변환하고 스타일 적용
+def convert_df_to_html_with_styles(ws, df):
+    style_dict = extract_cell_style(ws)
+    df = df.fillna('')  # NaN 값을 공백으로 처리
+    html = "<table class='table table-bordered'>\n"
+
+    # 헤더 부분
+    html += "<thead>\n<tr>\n"
+    for col in df.columns:
+        html += f"<th style='text-align:center; font-weight:bold; background-color:#E7E6E6; border: 1px solid black;'>{col}</th>\n"
+    html += "</tr>\n</thead>\n"
+
+    # 데이터 부분
+    html += "<tbody>\n"
+    for row_idx, row in df.iterrows():
+        html += "<tr>\n"
+        for col_idx, value in enumerate(row):
+            cell_ref = f"{get_column_letter(col_idx+1)}{row_idx+2}"  # 셀 참조 계산
+            style = style_dict.get(cell_ref, {})
+            alignment = style.get("alignment", "left")
+            font_weight = "bold" if style.get("font_bold", False) else "normal"
+            border = "1px solid black" if style.get("border", False) else "none"
+            
+            html += f"<td style='text-align:{alignment}; font-weight:{font_weight}; border:{border};'>{value}</td>\n"
+        html += "</tr>\n"
+    html += "</tbody>\n</table>"
+    
+    return html
+
 # 엑셀 파일에서 시트 가져오기 및 데이터 추출
 def extract_sheets_from_excel(file_content, selected_sheets):
     try:
@@ -171,11 +216,13 @@ def extract_sheets_from_excel(file_content, selected_sheets):
             selected_sheets = [all_sheets[int(i)-1] for i in selected_sheets if int(i) <= len(all_sheets)]
         
         # 선택한 시트의 데이터를 하나로 합침
-        data = pd.DataFrame()
-        for sheet in selected_sheets:
-            data = pd.concat([data, pd.read_excel(file_content, sheet_name=sheet)], ignore_index=True)
-        
-        return data
+        data_dict = {}
+        with pd.ExcelFile(file_content) as xls:
+            for sheet in selected_sheets:
+                df = pd.read_excel(xls, sheet_name=sheet)
+                data_dict[sheet] = df
+                
+        return data_dict
     except Exception as e:
         st.error(f"엑셀 파일의 시트 데이터를 추출하는 중에 오류가 발생했습니다: {str(e)}")
         return None
@@ -254,9 +301,34 @@ def handle_file_selection(file_path, file_content, file_type):
     else:
         return extract_data_from_file(file_content, file_type)
 
-# 엑셀 데이터 HTML로 변환하는 함수
-def convert_df_to_html(df):
-    return df.to_html(classes='table table-bordered', index=False)
+# 엑셀 데이터를 HTML로 변환하는 함수
+def convert_df_to_html_with_styles(ws, df):
+    style_dict = extract_cell_style(ws)
+    df = df.fillna('')  # NaN 값을 공백으로 처리
+    html = "<table class='table table-bordered'>\n"
+
+    # 헤더 부분
+    html += "<thead>\n<tr>\n"
+    for col in df.columns:
+        html += f"<th style='text-align:center; font-weight:bold; background-color:#E7E6E6; border: 1px solid black;'>{col}</th>\n"
+    html += "</tr>\n</thead>\n"
+
+    # 데이터 부분
+    html += "<tbody>\n"
+    for row_idx, row in df.iterrows():
+        html += "<tr>\n"
+        for col_idx, value in enumerate(row):
+            cell_ref = f"{get_column_letter(col_idx+1)}{row_idx+2}"  # 셀 참조 계산
+            style = style_dict.get(cell_ref, {})
+            alignment = style.get("alignment", "left")
+            font_weight = "bold" if style.get("font_bold", False) else "normal"
+            border = "1px solid black" if style.get("border", False) else "none"
+            
+            html += f"<td style='text-align:{alignment}; font-weight:{font_weight}; border:{border};'>{value}</td>\n"
+        html += "</tr>\n"
+    html += "</tbody>\n</table>"
+    
+    return html
 
 # LLM을 통해 프롬프트와 파일을 전달하고 응답을 받는 함수
 def run_llm_with_file_and_prompt(api_key, titles, requests, file_data_list):
@@ -419,14 +491,15 @@ with st.expander("요청사항 리스트", expanded=True):
                         row['데이터'] = ""
                     else:
                         # 엑셀 파일인 경우 시트 선택 로직을 추가
-                        file_data = handle_file_selection(file_path, file_content, file_type)
+                        file_data_dict = handle_file_selection(file_path, file_content, file_type)
                         
-                        if file_data is not None:
+                        if file_data_dict is not None:
                             row['파일'] = f"/{st.session_state['github_repo']}/{st.session_state['github_branch']}/{selected_file}"
-                            row['데이터'] = file_data
-                            # 엑셀 데이터를 HTML로 변환하고 결과 보고서에 표시
-                            html_data = convert_df_to_html(file_data)
-                            st.session_state['html_report'] = html_data
+                            for sheet_name, df in file_data_dict.items():
+                                wb = openpyxl.load_workbook(BytesIO(file_content))
+                                ws = wb[sheet_name]
+                                html_data = convert_df_to_html_with_styles(ws, df)
+                                st.session_state['html_report'] = html_data
 
                 else:
                     st.error(f"{selected_file} 파일을 GitHub에서 불러오지 못했습니다.")
