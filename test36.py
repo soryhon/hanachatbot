@@ -245,77 +245,73 @@ if github_info_loaded:
                             html_output = convert_excel_to_html_with_styles(file_content, selected_sheets)
                             st.session_state['결과 보고서 보기'] = html_output
 
-else:
-    st.warning("GitHub 정보가 저장되기 전에는 파일 업로드를 할 수 없습니다.")
-
 # 요청사항 리스트 처리 및 보고서 생성
 st.subheader("3. 작성 보고서 요청사항 및 실행 버튼")
 
-with st.expander("요청사항 리스트", expanded=True):
-    if 'rows' not in st.session_state:
-        st.session_state['rows'] = [{"제목": "", "요청": "", "파일": "", "데이터": "", "checked": False}]
+if 'rows' not in st.session_state:
+    st.session_state['rows'] = [{"제목": "", "요청": "", "파일": "", "데이터": "", "checked": False}]
 
-    rows = st.session_state['rows']
-    checked_rows = []
+rows = st.session_state['rows']
+checked_rows = []
 
-    for idx, row in enumerate(rows):
-        with st.container():
-            col1, col2 = st.columns([0.05, 0.95])
-            with col1:
-                row_checked = st.checkbox("", key=f"row_checked_{idx}", value=row.get("checked", False))
-            with col2:
-                st.markdown(f"#### 요청사항 {idx+1}")
+for idx, row in enumerate(rows):
+    with st.container():
+        col1, col2 = st.columns([0.05, 0.95])
+        with col1:
+            row_checked = st.checkbox("", key=f"row_checked_{idx}", value=row.get("checked", False))
+        with col2:
+            st.markdown(f"#### 요청사항 {idx+1}")
 
-            row['제목'] = st.text_input(f"제목 (요청사항 {idx+1})", row['제목'], key=f"title_{idx}", placeholder="여기에 제목 입력")
-            row['요청'] = st.text_area(f"요청 (요청사항 {idx+1})", row['요청'], key=f"request_{idx}")
+        row['제목'] = st.text_input(f"제목 (요청사항 {idx+1})", row['제목'], key=f"title_{idx}", placeholder="여기에 제목 입력")
+        row['요청'] = st.text_area(f"요청 (요청사항 {idx+1})", row['요청'], key=f"request_{idx}")
 
-            file_list = ['파일을 선택하세요.']
-            if st.session_state.get('github_token') and st.session_state.get('github_repo'):
-                file_list += get_github_files(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
+        file_list = ['파일을 선택하세요.']
+        if st.session_state.get('github_token') and st.session_state.get('github_repo'):
+            file_list += get_github_files(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
 
-            selected_file = st.selectbox(f"파일 선택 (요청사항 {idx+1})", options=file_list, key=f"file_select_{idx}")
+        selected_file = st.selectbox(f"파일 선택 (요청사항 {idx+1})", options=file_list, key=f"file_select_{idx}")
 
-            if selected_file != '파일을 선택하세요.':
-                file_path = selected_file
-                file_content = get_file_from_github(st.session_state["github_repo"], st.session_state["github_branch"], file_path, st.session_state["github_token"])
-                
-                if file_content:
-                    file_type = file_path.split('.')[-1].lower()
+        if selected_file != '파일을 선택하세요.':
+            file_path = selected_file
+            file_content = get_file_from_github(st.session_state["github_repo"], st.session_state["github_branch"], file_path, st.session_state["github_token"])
+            
+            if file_content:
+                file_type = file_path.split('.')[-1].lower()
 
-                    if file_type not in supported_file_types:
-                        st.error(f"지원하지 않는 파일입니다: {file_path}")
-                        row['데이터'] = ""
-                    else:
-                        row['데이터'] = convert_excel_to_html_with_styles(file_content)
-                        st.session_state['결과 보고서 보기'] = row['데이터']
-
+                if file_type not in supported_file_types:
+                    st.error(f"지원하지 않는 파일입니다: {file_path}")
+                    row['데이터'] = ""
                 else:
-                    st.error(f"{selected_file} 파일을 GitHub에서 불러오지 못했습니다.")
-                
-            st.text_input(f"파일 경로 (요청사항 {idx+1})", row['파일'], disabled=True, key=f"file_{idx}")
+                    row['데이터'] = convert_excel_to_html_with_styles(file_content)
+                    st.session_state['결과 보고서 보기'] = row['데이터']
 
-        if row_checked:
-            checked_rows.append(idx)
-
-    # 행 추가, 삭제, 새로고침 버튼 가로로 배치
-    col1, col2, col3 = st.columns([0.3, 0.3, 0.3])
-
-    with col1:
-        if st.button("행 추가"):
-            new_row = {"제목": "", "요청": "", "파일": "", "데이터": "", "checked": False}
-            st.session_state['rows'].append(new_row)
-
-    with col2:
-        if st.button("행 삭제"):
-            if checked_rows:
-                st.session_state['rows'] = [row for idx, row in enumerate(rows) if idx not in checked_rows]
-                st.success(f"체크된 {len(checked_rows)}개의 요청사항이 삭제되었습니다.")
             else:
-                st.warning("삭제할 요청사항을 선택해주세요.")
+                st.error(f"{selected_file} 파일을 GitHub에서 불러오지 못했습니다.")
+            
+        st.text_input(f"파일 경로 (요청사항 {idx+1})", row['파일'], disabled=True, key=f"file_{idx}")
 
-    with col3:
-        if st.button("새로고침"):
-            st.success("새로고침 하였습니다.")
+    if row_checked:
+        checked_rows.append(idx)
+
+# 행 추가, 삭제, 새로고침 버튼 가로로 배치
+col1, col2, col3 = st.columns([0.3, 0.3, 0.3])
+
+with col1:
+    if st.button("행 추가"):
+        new_row = {"제목": "", "요청": "", "파일": "", "데이터": "", "checked": False}
+        st.session_state['rows'].append(new_row)
+
+with col2:
+    if st.button("행 삭제"):
+        if checked_rows:
+            st.session_state['rows'] = [row for idx, row in enumerate(rows) if idx not in checked_rows]
+            st.success(f"체크된 {len(checked_rows)}개의 요청사항이 삭제되었습니다.")
+        else:
+            st.warning("삭제할 요청사항을 선택해주세요.")
+
+with col3:
+    if st.button("새로고침"):
+        st.success("새로고침 하였습니다.")
 
 # 보고서 작성 버튼
 if st.button("보고서 작성"):
