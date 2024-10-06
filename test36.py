@@ -265,21 +265,17 @@ def generate_html_report_with_title(titles, data_dicts):
 
 # 파일에서 데이터를 추출하고 요청사항 리스트에서 선택한 엑셀 파일의 시트를 보여주는 로직
 def handle_file_selection(file_path, file_content, file_type, idx):
-    if file_type == 'xlsx':
-        # 엑셀 파일을 직접 처리 (BytesIO 불필요)
-        wb = openpyxl.load_workbook(filename=file_content)  # 수정: BytesIO 제거
-        sheet_count = len(wb.sheetnames)
+    wb = openpyxl.load_workbook(file_content)  # 수정: 엑셀 파일 불러오기 (445행)
+    sheet_count = len(wb.sheetnames)  # 시트 개수 확인 (446행)
 
-        # 시트 선택 로직 처리
-        file_data_dict = handle_sheet_selection(file_content, sheet_count)
-        
-        if file_data_dict is not None:
-            titles = [st.session_state['rows'][idx]['제목']]
-            html_report = generate_html_report_with_title(titles, [file_data_dict])
-            st.session_state['html_report'] = html_report  # HTML 세트를 세션 상태에 저장
-        return file_data_dict
-    else:
-        return extract_data_from_file(file_content, file_type)
+    # 시트 선택 로직 처리
+    file_data_dict = handle_sheet_selection(file_content, sheet_count)  # 수정: 시트 선택 로직 적용 (447행)
+    
+    if file_data_dict is not None:
+        titles = [st.session_state['rows'][idx]['제목']]
+        html_report = generate_html_report_with_title(titles, [file_data_dict])
+        st.session_state['html_report'] = html_report  # HTML 세트를 세션 상태에 저장
+    return file_data_dict
 
 # LLM을 통해 프롬프트와 파일을 전달하고 응답을 받는 함수
 def run_llm_with_file_and_prompt(api_key, titles, requests, file_data_list):
