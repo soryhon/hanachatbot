@@ -175,20 +175,25 @@ def extract_text_from_audio(file_content, file_type):
 
         recognizer = sr.Recognizer()
 
-        # BytesIO 객체를 지원하기 위한 처리
+        # 임시 파일을 사용하여 BytesIO 객체를 처리
         if isinstance(file_content, BytesIO):
             file_content.seek(0)  # BytesIO 포인터를 파일의 시작으로 이동
-            audio_data = sr.AudioFile(file_content)
+
+            # 임시 파일에 BytesIO 데이터를 쓰기
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_wav_file:
+                temp_wav_file.write(file_content.read())  # BytesIO 데이터를 임시 파일로 작성
+                temp_wav_file_path = temp_wav_file.name  # 임시 파일 경로
+
+            # 임시 파일을 AudioFile 객체로 읽기
+            with sr.AudioFile(temp_wav_file_path) as audio_file:
+                audio = recognizer.record(audio_file)
+
+            # Google Web Speech API를 사용해 음성을 텍스트로 변환
+            return recognizer.recognize_google(audio, language="ko-KR")
+        
         else:
             st.error("파일 형식이 잘못되었습니다.")
             return None
-
-        # AudioFile 객체에서 음성 데이터를 읽음
-        with audio_data as source:
-            audio = recognizer.record(source)
-
-        # Google Web Speech API를 사용해 음성을 텍스트로 변환
-        return recognizer.recognize_google(audio, language="ko-KR")
 
     except sr.UnknownValueError:
         st.error("음성 파일을 인식할 수 없습니다.")
