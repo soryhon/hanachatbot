@@ -277,7 +277,7 @@ if github_info_loaded:
             with st.container():
                 col1, col2 = st.columns([0.05, 0.95])
                 with col1:
-                    row_checked = st.checkbox("", key=f"row_checked_{idx}", value=row.get("checked", False))
+                    row_checked = st.checkbox("", key=f"row_checked_{idx}", value=row.get("checked", False), label_visibility="hidden")
                 with col2:
                     st.markdown(f"#### 요청사항 {idx+1}")
 
