@@ -245,6 +245,8 @@ def get_border_styles(border):
     return " ".join(border_css)
 
 # 파일을 업로드하고 엑셀 파일을 HTML로 변환하는 부분
+github_info_loaded = load_env_info()  # 이 부분을 추가하여 github_info_loaded 변수 초기화
+
 if github_info_loaded:
     with st.expander("파일 업로드", expanded=True):
         uploaded_files = st.file_uploader("파일을 여러 개 드래그 앤 드롭하여 업로드하세요. (최대 100MB)", accept_multiple_files=True)
@@ -289,6 +291,9 @@ if github_info_loaded:
                             # 엑셀 파일을 HTML로 변환하여 스타일 적용
                             html_output = convert_excel_to_html_with_styles(BytesIO(file_content))
                             st.components.v1.html(html_output, height=600, scrolling=True)
+
+else:
+    st.warning("GitHub 정보가 저장되기 전에는 파일 업로드를 할 수 없습니다.")
 
 # 요청사항 리스트 처리 및 보고서 생성
 st.subheader("3. 작성 보고서 요청사항 및 실행 버튼")
