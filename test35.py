@@ -471,18 +471,32 @@ if st.button("보고서 작성"):
         )
         st.session_state["response"] = responses
 
-# [새로고침] 버튼을 유지하고 기능만 제거
-if st.button("새로고침"):
-    st.success("새로고침 하였습니다.")
+# [양식 저장], [양식 불러오기], [새로고침] 버튼 추가
+col1, col2, col3 = st.columns([1, 1, 1])
 
-# 결과 보고서
+with col1:
+    if st.button("양식 저장"):
+        st.success("양식이 저장되었습니다.")
+
+with col2:
+    if st.button("양식 불러오기"):
+        st.success("양식이 불러와졌습니다.")
+
+with col3:
+    if st.button("새로고침"):
+        st.success("새로고침 하였습니다.")
+
+# 4 프레임: 결과 보고서
 st.subheader("4. 결과 보고서")
 html_report = generate_html_report(st.session_state['rows'])
 if html_report:
     st.components.v1.html(html_report, height=1024, scrolling=True)
 
+# 전달된 프롬프트
 st.text_area("전달된 프롬프트:", value="\n\n".join(global_generated_prompt), height=150)
 
+# LLM 응답 보기
+st.write("LLM 응답 보기")
 if "response" in st.session_state:
     for idx, response in enumerate(st.session_state["response"]):
         st.text_area(f"응답 {idx+1}:", value=response, height=300)
