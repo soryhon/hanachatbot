@@ -21,7 +21,7 @@ from openpyxl.utils import get_column_letter
 import re
 import speech_recognition as sr
 from pydub import AudioSegment
-import boto3
+import tempfile
 
 # Backend 기능 구현 시작
 
