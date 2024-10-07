@@ -408,16 +408,15 @@ def handle_file_selection(file_path, file_content, file_type, idx):
 # HTML 보고서 생성 함수 (배열에서 데이터 가져옴)
 def generate_final_html_report():
     report_html = ""
-    if global_report_map and len(global_report_map) > 0:  # map 변수가 null이 아니고 사이즈가 1 이상일 때
-        
-
+    if global_report_map :
+    #and len(global_report_map) > 0:  # map 변수가 null이 아니고 사이즈가 1 이상일 때
         for idx, file_data in global_report_map.items():  # map의 데이터를 가져옴
             if file_data:
-                #report_html += f"<div style='text-indent: 1px;'>\n{file_data}\n</div>\n"
-                report_html += f"{file_data}\n"
+                report_html += f"<div style='text-indent: 1px;'>\n{file_data}\n</div>\n"
+                #report_html += f"{file_data}\n"
                 report_html += f"{idx}--<p/>"  # 줄바꿈 추가
 
-    st.session_state['html_report'] = report_html  # 최종 값을 세션 상태에 저장
+        st.session_state['html_report'] = report_html  # 최종 값을 세션 상태에 저장
 
 # 엑셀 데이터 및 제목을 HTML로 변환하여 하나의 세트로 출력하는 함수
 def generate_html_report_with_title(titles, data_dicts):
