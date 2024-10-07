@@ -688,7 +688,7 @@ st.subheader("4. 결과 보고서")
 
 # 결과 보고서 HTML 보기
 if "html_report" in st.session_state:
-   #generate_final_html_report()
+   generate_final_html_report()
     st.components.v1.html(st.session_state['html_report'], height=1280, scrolling=True)
 
 # 전달된 프롬프트
