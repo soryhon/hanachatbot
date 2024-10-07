@@ -405,15 +405,16 @@ def handle_file_selection(file_path, file_content, file_type, idx):
         return extract_data_from_file(file_content, file_type)
 
 # HTML 보고서 생성 함수 (배열에서 데이터 가져옴)
-def generate_html_report_from_array(file_list):
-    if len(file_list) > 0:  # 배열 갯수가 1 이상일 때만 처리
+def generate_final_html_report():
+    if global_report_map and len(global_report_map) > 0:  # map 변수가 null이 아니고 사이즈가 1 이상일 때
         report_html = ""
-        for idx, file_data in enumerate(file_list):
+
+        for idx, file_data in global_report_map.items():  # map의 데이터를 가져옴
             if file_data:
-                report_html += f"<div style='text-indent: 1px;'>\n{file_data}\n</div>\n"
+                report_html += f"<div style='text-indent: 10px;'>\n{file_data}\n</div>\n"
                 report_html += f"<p/>"  # 줄바꿈 추가
 
-        st.session_state['html_report'] = report_html  # 최종 값을 전달
+        st.session_state['html_report'] = report_html  # 최종 값을 세션 상태에 저장
 
 # 엑셀 데이터 및 제목을 HTML로 변환하여 하나의 세트로 출력하는 함수
 def generate_html_report_with_title(titles, data_dicts):
@@ -612,8 +613,12 @@ with st.expander("요청사항 리스트", expanded=True):
                             if file_data:                          
                                 html_report_set += f"<p>{file_data}</p>"
                                 
-                        row['파일데이터'] = html_report_set                   
-                        generate_html_report_from_array([row["파일데이터"] for row in st.session_state['rows']])
+                        row['파일데이터'] = html_report_set
+                        
+                        # map 변수에 idx가 키, html_report_set 값으로 저장
+                        global_report_map[idx] = html_report_set
+                        
+                        generate_final_html_report()
 
                 else:
                     st.error(f"{selected_file} 파일을 GitHub에서 불러오지 못했습니다.")
