@@ -27,7 +27,6 @@ import tempfile
 
 # 전역변수로 프롬프트 및 파일 데이터 저장
 global_generated_prompt = []
-file_data_array = []  # 요청사항 리스트 파일 데이터를 저장할 배열
 
 # GitHub 정보 및 OpenAI API 키 자동 설정 또는 입력창을 통해 설정
 def load_env_info():
@@ -406,18 +405,15 @@ def handle_file_selection(file_path, file_content, file_type, idx):
         return extract_data_from_file(file_content, file_type)
 
 # HTML 보고서 생성 함수 (배열에서 데이터 가져옴)
-def generate_html_report_from_array():
-    if "html_report" in st.session_state:
-        report_html = st.session_state['html_report']
-    else:
+def generate_html_report_from_array(file_list):
+    if len(file_list) > 0:  # 배열 갯수가 1 이상일 때만 처리
         report_html = ""
+        for idx, file_data in enumerate(file_list):
+            if file_data:
+                report_html += f"<div style='text-indent: 1px;'>\n{file_data}\n</div>\n"
+                report_html += f"<p/>"  # 줄바꿈 추가
 
-    for idx, file_data in enumerate(file_data_array):
-        if file_data:
-            report_html += f"<div style='text-indent: 20px;'>\n{file_data}\n</div>\n"
-            report_html += f"<p/>"  # 줄바꿈 추가
-
-    st.session_state['html_report'] = report_html
+        st.session_state['html_report'] = report_html  # 최종 값을 전달
 
 # 엑셀 데이터 및 제목을 HTML로 변환하여 하나의 세트로 출력하는 함수
 def generate_html_report_with_title(titles, data_dicts):
@@ -596,28 +592,28 @@ with st.expander("요청사항 리스트", expanded=True):
                         st.error(f"지원하지 않는 파일입니다: {file_path}")
                         row['데이터'] = ""
                     else:
+                        html_report_set = f"<div style='text-indent: 5px;'>\n"
+                        # 제목 입력 값 가져오기
+                        html_report_set +=  f"<h3>{idx + 1}. {row['제목']}</h3>\n"
+                        
                         # 엑셀 파일인 경우 시트 선택 로직을 추가
                         if file_type == 'xlsx':
                             file_data_dict = handle_file_selection(file_path, file_content, file_type, idx)
                             if file_data_dict is not None:
                                 row['파일'] = f"/{st.session_state['github_repo']}/{st.session_state['github_branch']}/{selected_file}"
-                                html_report_set = f"<div style='text-indent: 20px;'>\n"
-                                html_report_set +=  f"<h3>{idx + 1}. {row['제목']}</h3>\n"
                                 for sheet_name, df in file_data_dict.items():
                                     wb = openpyxl.load_workbook(file_content)
                                     ws = wb[sheet_name]
                                     html_data = convert_df_to_html_with_styles_and_merging(ws, df)
                                     html_report_set += f"<div style='text-indent: 20px;'>{html_data}</div>\n"
-                                row['파일데이터'] = html_report_set
-                                file_data_array.insert(idx, html_report_set)
+
                         else:
                             file_data = extract_data_from_file(file_content, file_type)
-                            if file_data:
-                                row['파일데이터'] = f"<h3>{idx + 1}. {row['제목']}</h3>\n"
-                                row['파일데이터'] += f"<p>{file_data}</p>"
-                                file_data_array.insert(idx, row['파일데이터'])
-                        
-                        generate_html_report_from_array()
+                            if file_data:                          
+                                html_report_set += f"<p>{file_data}</p>"
+                                
+                        row['파일데이터'] = html_report_set                   
+                        generate_html_report_from_array([row["파일데이터"] for row in st.session_state['rows']])
 
                 else:
                     st.error(f"{selected_file} 파일을 GitHub에서 불러오지 못했습니다.")
