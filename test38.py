@@ -615,7 +615,7 @@ with st.expander("요청사항 리스트", expanded=True):
                                 #html_report_set += "</div>\n"       
                             #row['파일데이터'] = html_report_set
                             # map 변수에 idx가 키, html_report_set 값으로 저장
-                            # global_report_map[idx] = html_report_set
+                            #global_report_map[idx] = html_report_set
                             #st.session_state['html_report'] += html_report_set
                                 
                         else:                           
@@ -627,14 +627,15 @@ with st.expander("요청사항 리스트", expanded=True):
                                 html_report_set += f"<p>{file_data}</p>"                        
                         html_report_set += "</div>\n"       
                         row['파일데이터'] = html_report_set
-                        report_html = ""
-                        if "html_report" in st.session_state:
-                             report_html = st.session_state['html_report']   
+                        global_report_map[idx] = html_report_set
+                        #report_html = ""
+                        #if "html_report" in st.session_state:
+                             #report_html = st.session_state['html_report']   
                         # map 변수에 idx가 키, html_report_set 값으로 저장
-                        #global_report_map[idx] = html_report_set
-                        st.session_state['html_report'] = report_html + html_report_set
                         
-                        #generate_final_html_report()
+                        #st.session_state['html_report'] = report_html + html_report_set
+                        
+                        generate_final_html_report()
 
                 else:
                     st.error(f"{selected_file} 파일을 GitHub에서 불러오지 못했습니다.")
