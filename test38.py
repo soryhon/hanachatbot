@@ -407,7 +407,6 @@ def handle_file_selection(file_path, file_content, file_type, idx):
 
 # HTML 보고서 생성 함수 (배열에서 데이터 가져옴)
 def generate_final_html_report():
-    report_html = ""
     if global_report_map and len(global_report_map) > 0:  # map 변수가 null이 아니고 사이즈가 1 이상일 때
         report_html = ""
 
@@ -417,7 +416,7 @@ def generate_final_html_report():
                 report_html += f"{file_data}\n"
                 report_html += f"{idx}--<p/>"  # 줄바꿈 추가
 
-    st.session_state['html_report'] = report_html  # 최종 값을 세션 상태에 저장
+        st.session_state['html_report'] = report_html  # 최종 값을 세션 상태에 저장
 
 # 엑셀 데이터 및 제목을 HTML로 변환하여 하나의 세트로 출력하는 함수
 def generate_html_report_with_title(titles, data_dicts):
@@ -596,8 +595,6 @@ with st.expander("요청사항 리스트", expanded=True):
                         st.error(f"지원하지 않는 파일입니다: {file_path}")
                         row['데이터'] = ""
                     else:
-                        
-                        
                         # 엑셀 파일인 경우 시트 선택 로직을 추가
                         if file_type == 'xlsx':
                             html_report_set = f"<div style='text-indent: 5px;'>\n"
@@ -612,12 +609,6 @@ with st.expander("요청사항 리스트", expanded=True):
                                     ws = wb[sheet_name]
                                     html_data = convert_df_to_html_with_styles_and_merging(ws, df)
                                     html_report_set += f"<div style='text-indent: 20px;'>{html_data}</div>\n"
-                                #html_report_set += "</div>\n"       
-                            #row['파일데이터'] = html_report_set
-                            # map 변수에 idx가 키, html_report_set 값으로 저장
-                            #global_report_map[idx] = html_report_set
-                            #st.session_state['html_report'] += html_report_set
-                                
                         else:                           
                             file_data = extract_data_from_file(file_content, file_type)
                             if file_data:     
@@ -628,12 +619,6 @@ with st.expander("요청사항 리스트", expanded=True):
                         html_report_set += "</div>\n"       
                         row['파일데이터'] = html_report_set
                         global_report_map[idx] = html_report_set
-                        #report_html = ""
-                        #if "html_report" in st.session_state:
-                             #report_html = st.session_state['html_report']   
-                        # map 변수에 idx가 키, html_report_set 값으로 저장
-                        
-                        #st.session_state['html_report'] = report_html + html_report_set
                         
                         generate_final_html_report()
 
@@ -704,7 +689,7 @@ st.subheader("4. 결과 보고서")
 # 결과 보고서 HTML 보기
 if "html_report" in st.session_state:
    #generate_final_html_report()
-    st.components.v1.html(st.session_state['html_report'], height=1024, scrolling=True)
+    st.components.v1.html(st.session_state['html_report'], height=1280, scrolling=True)
 
 # 전달된 프롬프트
 st.text_area("전달된 프롬프트:", value="\n\n".join(global_generated_prompt), height=150)
