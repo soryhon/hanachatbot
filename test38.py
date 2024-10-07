@@ -27,6 +27,7 @@ import tempfile
 
 # 전역변수로 프롬프트 및 파일 데이터 저장
 global_generated_prompt = []
+global_report_map = {}  # 전역 변수로 map 선언
 
 # GitHub 정보 및 OpenAI API 키 자동 설정 또는 입력창을 통해 설정
 def load_env_info():
