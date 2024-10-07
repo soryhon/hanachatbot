@@ -407,6 +407,7 @@ def handle_file_selection(file_path, file_content, file_type, idx):
 
 # HTML 보고서 생성 함수 (배열에서 데이터 가져옴)
 def generate_final_html_report():
+     global_report_map = st.session_state['html_report']
     report_html = ""
     if len(global_report_map) > 0:  # map 변수가 null이 아니고 사이즈가 1 이상일 때
         for idx, file_data in global_report_map.items():  # map의 데이터를 가져옴
@@ -617,10 +618,14 @@ with st.expander("요청사항 리스트", expanded=True):
                                 html_report_set += f"<p>{file_data}</p>"                        
                         html_report_set += "</div>\n"       
                         row['파일데이터'] = html_report_set
-                        global_report_map[idx] = html_report_set
+                        
 
-                        #if "html_report" in st.session_state:
-                        generate_final_html_report()
+                        if "html_report" in st.session_state:
+                            global_report_map = st.session_state['html_report'] 
+        
+                        global_report_map[idx] = html_report_set
+                        st.session_state['html_report'] = global_report_map
+                        #generate_final_html_report()
 
                 else:
                     st.error(f"{selected_file} 파일을 GitHub에서 불러오지 못했습니다.")
@@ -687,8 +692,7 @@ with col2:
 st.subheader("4. 결과 보고서")
 
 # 결과 보고서 HTML 보기
-#if "html_report" in st.session_state:
-if len(global_report_map) > 0:
+if "html_report" in st.session_state:
     report_html = generate_final_html_report()
     #st.components.v1.html(st.session_state['html_report'], height=1280, scrolling=True)
     st.components.v1.html(report_html, height=1280, scrolling=True)
