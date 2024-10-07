@@ -619,12 +619,12 @@ with st.expander("요청사항 리스트", expanded=True):
                         html_report_set += "</div>\n"       
                         row['파일데이터'] = html_report_set
                         
-
+                        report_map = {}
                         if "html_report" in st.session_state:
-                            global_report_map = st.session_state['html_report'] 
+                            report_map = st.session_state['html_report'] 
         
-                        global_report_map[idx] = html_report_set
-                        st.session_state['html_report'] = global_report_map
+                        report_map[idx] = html_report_set
+                        st.session_state['html_report'] = report_map
                         #generate_final_html_report()
 
                 else:
