@@ -618,9 +618,9 @@ with st.expander("요청사항 리스트", expanded=True):
                             #st.session_state['html_report'] += html_report_set
                                 
                         else:
-                            3html_report_set = f"<div style='text-indent: 5px;'>\n"
+                            #html_report_set = f"<div style='text-indent: 5px;'>\n"
                             # 제목 입력 값 가져오기
-                            3html_report_set +=  f"<h3>{idx + 1}. {row['제목']}</h3>\n"
+                            #html_report_set +=  f"<h3>{idx + 1}. {row['제목']}</h3>\n"
                             file_data = extract_data_from_file(file_content, file_type)
                             if file_data:                          
                                 html_report_set += f"<p>{file_data}</p>"
@@ -632,7 +632,7 @@ with st.expander("요청사항 리스트", expanded=True):
                              report_html = st.session_state['html_report']   
                         # map 변수에 idx가 키, html_report_set 값으로 저장
                         #global_report_map[idx] = html_report_set
-                            st.session_state['html_report'] = report_html + html_report_set
+                        st.session_state['html_report'] = report_html + html_report_set
                         
                         #generate_final_html_report()
 
