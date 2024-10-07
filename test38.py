@@ -414,8 +414,8 @@ def generate_final_html_report():
                 report_html += f"<div style='text-indent: 1px;'>\n{file_data}\n</div>\n"
                 #report_html += f"{file_data}\n"
                 report_html += f"{idx}--<p/>"  # 줄바꿈 추가
-
-        st.session_state['html_report'] = report_html  # 최종 값을 세션 상태에 저장
+    return report_html
+        #st.session_state['html_report'] = report_html  # 최종 값을 세션 상태에 저장
 
 # 엑셀 데이터 및 제목을 HTML로 변환하여 하나의 세트로 출력하는 함수
 def generate_html_report_with_title(titles, data_dicts):
@@ -687,9 +687,11 @@ with col2:
 st.subheader("4. 결과 보고서")
 
 # 결과 보고서 HTML 보기
-if "html_report" in st.session_state:
-    generate_final_html_report()
-    st.components.v1.html(st.session_state['html_report'], height=1280, scrolling=True)
+#if "html_report" in st.session_state:
+if len(global_report_map) > 0:
+    report_html = generate_final_html_report()
+    #st.components.v1.html(st.session_state['html_report'], height=1280, scrolling=True)
+    st.components.v1.html(report_html, height=1280, scrolling=True)
 
 # 전달된 프롬프트
 st.text_area("전달된 프롬프트:", value="\n\n".join(global_generated_prompt), height=150)
