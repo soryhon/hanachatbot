@@ -407,7 +407,7 @@ def handle_file_selection(file_path, file_content, file_type, idx):
 
 # HTML 보고서 생성 함수 (배열에서 데이터 가져옴)
 def generate_final_html_report():
-     global_report_map = st.session_state['html_report']
+    global_report_map = st.session_state['html_report']
     report_html = ""
     if len(global_report_map) > 0:  # map 변수가 null이 아니고 사이즈가 1 이상일 때
         for idx, file_data in global_report_map.items():  # map의 데이터를 가져옴
