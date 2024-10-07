@@ -616,8 +616,8 @@ with st.expander("요청사항 리스트", expanded=True):
                                 
                         row['파일데이터'] = html_report_set
                         
-                        # map 변수에 {idx+1}가 키, html_report_set 값으로 저장
-                        global_report_map[{idx+1}] = html_report_set
+                        # map 변수에 {idx}가 키, html_report_set 값으로 저장
+                        global_report_map[{idx}] = html_report_set
                         
                         generate_final_html_report()
 
