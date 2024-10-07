@@ -611,10 +611,11 @@ with st.expander("요청사항 리스트", expanded=True):
                                     ws = wb[sheet_name]
                                     html_data = convert_df_to_html_with_styles_and_merging(ws, df)
                                     html_report_set += f"<div style='text-indent: 20px;'>{html_data}</div>\n"
-                            html_report_set += "</div>\n"       
-                            row['파일데이터'] = html_report_set
-                            # map 변수에 idx가 키, html_report_set 값으로 저장
-                            global_report_map[idx] = html_report_set
+                                html_report_set += "</div>\n"       
+                                row['파일데이터'] = html_report_set
+                                # map 변수에 idx가 키, html_report_set 값으로 저장
+                                global_report_map[idx] = html_report_set
+                                
                         else:
                             html_report_set = f"<div style='text-indent: 5px;'>\n"
                             # 제목 입력 값 가져오기
@@ -623,11 +624,11 @@ with st.expander("요청사항 리스트", expanded=True):
                             if file_data:                          
                                 html_report_set += f"<p>{file_data}</p>"
                         
-                            html_report_set += "</div>\n"       
-                            row['파일데이터'] = html_report_set
+                                html_report_set += "</div>\n"       
+                                row['파일데이터'] = html_report_set
                         
-                            # map 변수에 idx가 키, html_report_set 값으로 저장
-                            global_report_map[idx] = html_report_set
+                                # map 변수에 idx가 키, html_report_set 값으로 저장
+                                global_report_map[idx] = html_report_set
                         
                         generate_final_html_report()
 
