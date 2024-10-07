@@ -613,11 +613,12 @@ with st.expander("요청사항 리스트", expanded=True):
                             file_data = extract_data_from_file(file_content, file_type)
                             if file_data:                          
                                 html_report_set += f"<p>{file_data}</p>"
-                                
+                        
+                        html_report_set += "</div>\n"       
                         row['파일데이터'] = html_report_set
                         
-                        # map 변수에 {idx}가 키, html_report_set 값으로 저장
-                        global_report_map[{idx}] = html_report_set
+                        # map 변수에 idx가 키, html_report_set 값으로 저장
+                        global_report_map[idx] = html_report_set
                         
                         generate_final_html_report()
 
