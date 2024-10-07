@@ -410,8 +410,13 @@ def generate_final_html_report():
     report_map = {}
     report_map = st.session_state['html_report']
     report_html = ""
-    if len(report_map) > 0:  # map 변수가 null이 아니고 사이즈가 1 이상일 때
-        for idx, file_data in report_map.items():  # map의 데이터를 가져옴
+    file_list = [row["파일데이터"] for row in st.session_state['rows']]
+    #if len(report_map) > 0:  # map 변수가 null이 아니고 사이즈가 1 이상일 때
+    if len(file_list) > 0:
+        for idx, file_data in enumerate(file_list):
+        #st.session_state['rows']
+        #for idx, file_data in report_map.items():  # map의 데이터를 가져옴
+            #file_date = rost.session_state['rows'][idx]["파일데이터"]
             if file_data:
                 report_html += f"<div style='text-indent: 1px;'>\n{file_data}\n</div>\n"
                 #report_html += f"{file_data}\n"
