@@ -596,13 +596,13 @@ with st.expander("요청사항 리스트", expanded=True):
                         st.error(f"지원하지 않는 파일입니다: {file_path}")
                         row['데이터'] = ""
                     else:
-                        html_report_set = f"<div style='text-indent: 5px;'>\n"
-                        # 제목 입력 값 가져오기
-                        html_report_set +=  f"<h3>{idx + 1}. {row['제목']}</h3>\n"
+                        
                         
                         # 엑셀 파일인 경우 시트 선택 로직을 추가
                         if file_type == 'xlsx':
-                            
+                            html_report_set = f"<div style='text-indent: 5px;'>\n"
+                            # 제목 입력 값 가져오기
+                            html_report_set +=  f"<h3>{idx + 1}. {row['제목']}</h3>\n"
                             file_data_dict = handle_file_selection(file_path, file_content, file_type, idx)
                             if file_data_dict is not None:
                                 row['파일'] = f"/{st.session_state['github_repo']}/{st.session_state['github_branch']}/{selected_file}"
@@ -611,21 +611,21 @@ with st.expander("요청사항 리스트", expanded=True):
                                     ws = wb[sheet_name]
                                     html_data = convert_df_to_html_with_styles_and_merging(ws, df)
                                     html_report_set += f"<div style='text-indent: 20px;'>{html_data}</div>\n"
-                            #html_report_set += "</div>\n"       
+                            html_report_set += "</div>\n"       
                             #row['파일데이터'] = html_report_set
                             # map 변수에 idx가 키, html_report_set 값으로 저장
                             # global_report_map[idx] = html_report_set
                             #st.session_state['html_report'] += html_report_set
                                 
                         else:
-                            #html_report_set = f"<div style='text-indent: 5px;'>\n"
+                            html_report_set = f"<div style='text-indent: 5px;'>\n"
                             # 제목 입력 값 가져오기
-                            #html_report_set +=  f"<h3>{idx + 1}. {row['제목']}</h3>\n"
+                            html_report_set +=  f"<h3>{idx + 1}. {row['제목']}</h3>\n"
                             file_data = extract_data_from_file(file_content, file_type)
                             if file_data:                          
                                 html_report_set += f"<p>{file_data}</p>"
                         
-                        html_report_set += "</div>\n"       
+                            html_report_set += "</div>\n"       
                         row['파일데이터'] = html_report_set
                         report_html = ""
                         if "html_report" in st.session_state:
