@@ -542,8 +542,8 @@ if github_info_loaded:
     col1, col2, col3 = st.columns([0.2, 0.6, 0.2])
     
     with col1:
-        st.text("보고서 주제")
-
+        #st.text("보고서 주제")
+        st.markdown(f"보고서 주제 선택")
     with col2:
         folder_list = get_folder_list_from_github(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
         selected_folder = st.selectbox("보고서 주제 리스트", options=["주제를 선택하세요."] + folder_list, key="selected_folder")
