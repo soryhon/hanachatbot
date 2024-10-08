@@ -648,7 +648,7 @@ with col3:
 # 보고서 실행 버튼
 st.subheader("3. 보고서 실행")
 
-if st.button("보고서 실행행", key="generate_report", use_container_width=True):
+if st.button("보고서 실행", key="generate_report", use_container_width=True):
     if not st.session_state.get("openai_api_key"):
         st.error("먼저 OpenAI API 키를 입력하고 저장하세요!")
     elif not st.session_state['rows'] or all(not row["제목"] or not row["요청"] or not row["데이터"] for row in st.session_state['rows']):
@@ -683,9 +683,7 @@ st.subheader("4. 결과 보고서")
 
 # 결과 보고서 HTML 보기
 if "html_report" in st.session_state:
-    #report_html = generate_final_html_report()
     st.components.v1.html(st.session_state['html_report'], height=1280, scrolling=True)
-    #st.components.v1.html(report_html, height=1280, scrolling=True)
 
 # 전달된 프롬프트
 st.text_area("전달된 프롬프트:", value="\n\n".join(global_generated_prompt), height=150)
