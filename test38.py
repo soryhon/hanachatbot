@@ -350,7 +350,7 @@ def handle_sheet_selection(file_content, sheet_count, idx):
     col1, col2, col3 = st.columns([0.33, 0.33, 0.33])
     
     with col1:
-        st.text_input(f"시트 갯수_{idx}", value=f"{sheet_count}개", disabled=True)  # 시트 갯수 표시 (비활성화)
+        st.text_input(f"시트 갯수_{idx}", value=f"{sheet_count}개", key=f"sheet_count_{idx}", disabled=True)  # 시트 갯수 표시 (비활성화)
     
     with col2:
         sheet_selection = st.text_input(f"시트 선택_{idx}(예: 1-3, 5)", value="1", key=f"sheet_selection_{idx}")
