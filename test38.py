@@ -19,15 +19,12 @@ import json
 import openpyxl
 from openpyxl.utils import get_column_letter
 import re
-import speech_recognition as sr
-from pydub import AudioSegment
 import tempfile
 
-# Backend 기능 구현 시작
+# Backend 기능 구현 시작 ---
 
 # 전역변수로 프롬프트 및 파일 데이터 저장
 global_generated_prompt = []
-global_report_map = {}  # 전역 변수로 map 선언
 
 # GitHub 정보 및 OpenAI API 키 자동 설정 또는 입력창을 통해 설정
 def load_env_info():
@@ -359,7 +356,7 @@ def handle_sheet_selection(file_content, sheet_count, idx):
         sheet_selection = st.text_input(f"시트 선택_{idx}(예: 1-3, 5)", value="1", key=f"sheet_selection_{idx}")
 
     with col3:
-        select_button = st.button("선택", key=f"select_button_{idx}")
+        select_button = st.button("선택", key=f"select_button_{idx}", use_container_width=True)
 
     # 시트 선택 버튼이 눌렸을 때만 파일 데이터를 가져옴
     if select_button:
@@ -489,9 +486,9 @@ def run_llm_with_file_and_prompt(api_key, titles, requests, file_data_list):
         st.error(f"LLM 실행 중 오류가 발생했습니다: {str(e)}")
     return responses
 
-# Backend 기능 구현 끝 
+# Backend 기능 구현 끝 ---
 
-# Front 기능 구현 시작
+# Frontend 기능 구현 시작 ---
 
 # GitHub 정보가 있는지 확인하고 파일 업로드 객체를 출력
 github_info_loaded = load_env_info()
@@ -551,7 +548,8 @@ if github_info_loaded:
 else:
     st.warning("GitHub 정보가 저장되기 전에는 파일 업로드를 할 수 없습니다. 먼저 GitHub 정보를 입력해 주세요.")
 
-# 2 프레임: 작성 보고서 요청사항
+# 2 프레임
+# 작성 보고서 요청사항
 st.subheader("2. 작성 보고서 요청사항")
 
 # 요청사항 리스트
@@ -625,27 +623,28 @@ with st.expander("요청사항 리스트", expanded=True):
         if row_checked:
             checked_rows.append(idx)
 
-    # 행 추가 및 삭제 버튼을 가로로 배치하고 각 버튼의 너비를 30%로 설정
-    col1, col2, col3 = st.columns([0.3, 0.3, 0.3])
-
-    with col1:
-        if st.button("행 추가", key="add_row", use_container_width=True):
-            new_row = {"제목": "", "요청": "", "파일": "", "데이터": "", "checked": False,"파일데이터":""}
-            st.session_state['rows'].append(new_row)
-
-    with col2:
-        if st.button("행 삭제", key="delete_row", use_container_width=True):
-            if checked_rows:
-                st.session_state['rows'] = [row for idx, row in enumerate(rows) if idx not in checked_rows]
-                st.success(f"체크된 {len(checked_rows)}개의 요청사항이 삭제되었습니다.")
-            else:
-                st.warning("삭제할 요청사항을 선택해주세요.")
-    
-    with col3:
-        if st.button("새로고침", key="refresh_page", use_container_width=True):
-            st.success("새로고침 하였습니다.")
-
 # 3 프레임
+# 행 추가 및 삭제 버튼을 가로로 배치하고 각 버튼의 너비를 30%로 설정
+col1, col2, col3 = st.columns([0.3, 0.3, 0.3])
+
+with col1:
+    if st.button("행 추가", key="add_row", use_container_width=True):
+        new_row = {"제목": "", "요청": "", "파일": "", "데이터": "", "checked": False,"파일데이터":""}
+        st.session_state['rows'].append(new_row)
+
+with col2:
+    if st.button("행 삭제", key="delete_row", use_container_width=True):
+        if checked_rows:
+            st.session_state['rows'] = [row for idx, row in enumerate(rows) if idx not in checked_rows]
+            st.success(f"체크된 {len(checked_rows)}개의 요청사항이 삭제되었습니다.")
+        else:
+            st.warning("삭제할 요청사항을 선택해주세요.")
+    
+with col3:
+    if st.button("새로고침", key="refresh_page", use_container_width=True):
+        st.success("새로고침 하였습니다.")
+
+# 4 프레임
 # 보고서 작성 실행 버튼
 st.subheader("3. 보고서 작성 실행")
 
@@ -678,7 +677,8 @@ with col2:
         st.success("양식이 불러와졌습니다.")
 
 
-# 4 프레임: 결과 보고서
+# 5 프레임
+# 결과 보고서
 st.subheader("4. 결과 보고서")
 
 # 결과 보고서 HTML 보기
@@ -696,4 +696,4 @@ if "response" in st.session_state:
         st.text_area(f"응답 {idx+1}:", value=response, height=300)
         st.components.v1.html(response, height=600, scrolling=True)
 
-# Front 기능 구현 끝
+# Frontend 기능 구현 끝 ---
