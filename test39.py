@@ -551,6 +551,7 @@ if github_info_loaded:
     
     with col2:        
         new_folder_name = st.text_input("새 폴더명 입력", max_chars=20, key="new_folder_name")
+   
     with col3:    
         if st.button("새로만들기", key="new_folder"):
             if not new_folder_name:
@@ -563,14 +564,13 @@ if github_info_loaded:
                 if folder_created:
                     folder_list.append(new_folder_name)  # 새 폴더를 리스트에 추가
                     
-                    # st.session_state['selected_folder'] 키 초기화
-                    if 'selected_folder' not in st.session_state:
-                        st.session_state['selected_folder'] = None
+                    # 세션 상태 업데이트는 콜백 함수로 안전하게 처리
+                    def update_session_state():
+                        st.session_state['selected_folder'] = new_folder_name
     
-                    # 새 폴더로 값 설정
-                    st.session_state['selected_folder'] = new_folder_name
-                    
-                    st.success(f"'{new_folder_name}' 폴더가 성공적으로 생성되었습니다.")
+                    # Streamlit이 세션 상태를 업데이트할 때 안전하게 처리하도록 callback 처리
+                    st.experimental_rerun()  # 실행을 다시 시작해 새 폴더 리스트와 세션 상태를 안전하게 업데이트
+
 
     # 파일 업로드와 요청사항 리스트의 기본 폴더 설정
     if selected_folder != "주제를 선택하세요.":
