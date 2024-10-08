@@ -555,6 +555,7 @@ if github_info_loaded:
         # 파일 업로드와 요청사항 리스트의 기본 폴더 설정
         if selected_folder != "주제를 선택하세요.":
             st.session_state['upload_folder'] = f"uploadFiles/{selected_folder}"
+            st.session_state['selected_folder'] = f"{selected_folder}"
             
     with col2:        
         new_folder_name = st.text_input("새 폴더명 입력", max_chars=20, key="new_folder_name")
@@ -573,7 +574,7 @@ if github_info_loaded:
                     
                     # st.session_state에 'selected_folder' 키가 있는지 확인 후 설정
                     #if 'selected_folder' not in st.session_state:
-                    st.session_state['selected_folder'] = new_folder_name
+                    #st.session_state['selected_folder'] = new_folder_name
                     #else:
                         #st.session_state['selected_folder'] = new_folder_name
                     
