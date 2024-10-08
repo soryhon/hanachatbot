@@ -552,11 +552,18 @@ if github_info_loaded:
         folder_list = get_folder_list_from_github(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
         # st.selectbox 위젯 생성 (이제 session_state['selected_folder'] 사용 가능)
         #selected_folder = st.selectbox("보고서 주제 리스트", options=["주제를 선택하세요."] + folder_list, key="selected_folder")
+
+        # 'selected_folder'가 folder_list에 있을 때만 index 설정
+        if st.session_state['selected_folder'] in folder_list:
+            selected_index = folder_list.index(st.session_state['selected_folder']) + 1
+        else:
+            selected_index = 0  # 기본값으로 '주제를 선택하세요.' 선택
+    
         # 폴더 선택 selectbox 생성 (새 폴더 추가 후, 선택값으로 설정)
         selected_folder = st.selectbox(
             "보고서 주제 리스트",
             options=["주제를 선택하세요."] + folder_list,  # 옵션 리스트에 새 폴더 반영
-            index=folder_list.index(st.session_state['selected_folder']),  # 새로 선택된 폴더를 기본값으로 선택
+            index=selected_index,,  # 새로 선택된 폴더를 기본값으로 선택
             key="selected_folder"
         )
         # 파일 업로드와 요청사항 리스트의 기본 폴더 설정
