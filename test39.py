@@ -546,7 +546,7 @@ if github_info_loaded:
     col1, col2, col3 = st.columns([0.5, 0.3, 0.2])
     # 세션 상태에 selected_folder가 없다면 초기화
     if 'selected_folder' not in st.session_state:
-        st.session_state['selected_folder'] = "주제를 선택하세요.
+        st.session_state['selected_folder'] = "주제를 선택하세요."
         
     with col1:
         folder_list = get_folder_list_from_github(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
