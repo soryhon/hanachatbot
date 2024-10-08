@@ -88,19 +88,23 @@ def get_folder_list_from_github(repo, branch, token, base_folder='uploadFiles'):
 # GitHub에 새로운 폴더를 생성하는 함수
 def create_new_folder_in_github(repo, folder_name, token, branch='main'):
     base_folder = "uploadFiles"
-    url = f"https://api.github.com/repos/{repo}/contents/{base_folder}/{folder_name}"
+    folder_path = f"{base_folder}/{folder_name}/.gitkeep"  # Git에서 빈 폴더를 유지하는 방법 중 하나인 .gitkeep 파일 사용
+    url = f"https://api.github.com/repos/{repo}/contents/{folder_path}"
     headers = {"Authorization": f"token {token}"}
+    
     data = {
-        "message": f"Create {folder_name} folder",
+        "message": f"Create folder {folder_name}",
         "content": base64.b64encode(b'').decode('utf-8'),  # 빈 파일로 폴더 생성
         "branch": branch
     }
+    
     response = requests.put(url, json=data, headers=headers)
+    
     if response.status_code in [200, 201]:
         st.success(f"'{folder_name}' 폴더가 성공적으로 생성되었습니다.")
         return True
     elif response.status_code == 422:
-        st.warning("이미 존재하는 폴더명입니다.")
+        st.warning("이미 존재하는 폴더입니다.")
         return False
     else:
         st.error(f"폴더 생성 실패: {response.status_code}")
