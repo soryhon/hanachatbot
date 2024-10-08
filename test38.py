@@ -406,23 +406,14 @@ def handle_file_selection(file_path, file_content, file_type, idx):
         return extract_data_from_file(file_content, file_type)
 
 # HTML 보고서 생성 함수 (배열에서 데이터 가져옴)
-def generate_final_html_report():
-    report_map = {}
-    report_map = st.session_state['html_report']
+def generate_final_html_report(file_data):
     report_html = ""
-    file_list = [row["파일데이터"] for row in st.session_state['rows']]
-    #if len(report_map) > 0:  # map 변수가 null이 아니고 사이즈가 1 이상일 때
-    if len(file_list) > 0:
-        for idx, file_data in enumerate(file_list):
-        #st.session_state['rows']
-        #for idx, file_data in report_map.items():  # map의 데이터를 가져옴
-            #file_date = rost.session_state['rows'][idx]["파일데이터"]
-            if file_data:
-                report_html += f"<div style='text-indent: 1px;'>\n{file_data}\n</div>\n"
-                #report_html += f"{file_data}\n"
-                report_html += f"{idx}--<p/>"  # 줄바꿈 추가
-    return report_html
-        #st.session_state['html_report'] = report_html  # 최종 값을 세션 상태에 저장
+    if "html_report" in st.session_state:
+        report_html = st.session_state['html_report']
+    if file_data:
+        report_html += f"<div style='text-indent: 1px;'>\n{file_data}\n</div>\n"
+        report_html += f"{idx}--<p/>"  # 줄바꿈 추가
+    st.session_state['html_report'] = report_html  # 최종 값을 세션 상태에 저장
 
 # 엑셀 데이터 및 제목을 HTML로 변환하여 하나의 세트로 출력하는 함수
 def generate_html_report_with_title(titles, data_dicts):
@@ -625,13 +616,7 @@ with st.expander("요청사항 리스트", expanded=True):
                         html_report_set += "</div>\n"       
                         row['파일데이터'] = html_report_set
                         
-                        report_map = {}
-                        if "html_report" in st.session_state:
-                            report_map = st.session_state['html_report'] 
-        
-                        report_map[idx] = html_report_set
-                        st.session_state['html_report'] = report_map
-                        #generate_final_html_report()
+                        generate_final_html_report(html_report_set)
 
                 else:
                     st.error(f"{selected_file} 파일을 GitHub에서 불러오지 못했습니다.")
@@ -699,9 +684,9 @@ st.subheader("4. 결과 보고서")
 
 # 결과 보고서 HTML 보기
 if "html_report" in st.session_state:
-    report_html = generate_final_html_report()
-    #st.components.v1.html(st.session_state['html_report'], height=1280, scrolling=True)
-    st.components.v1.html(report_html, height=1280, scrolling=True)
+    #report_html = generate_final_html_report()
+    st.components.v1.html(st.session_state['html_report'], height=1280, scrolling=True)
+    #st.components.v1.html(report_html, height=1280, scrolling=True)
 
 # 전달된 프롬프트
 st.text_area("전달된 프롬프트:", value="\n\n".join(global_generated_prompt), height=150)
