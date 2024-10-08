@@ -558,7 +558,13 @@ if github_info_loaded:
                 folder_created = create_new_folder_in_github(st.session_state['github_repo'], new_folder_name, st.session_state['github_token'], st.session_state['github_branch'])
                 if folder_created:
                     folder_list.append(new_folder_name)  # 새 폴더를 리스트에 추가
-                    st.session_state['selected_folder'] = new_folder_name  # 새 폴더 선택
+                    
+                    # st.session_state에 'selected_folder' 키가 있는지 확인 후 설정
+                    if 'selected_folder' not in st.session_state:
+                        st.session_state['selected_folder'] = new_folder_name
+                    else:
+                        st.session_state['selected_folder'] = new_folder_name
+                    
                     st.success(f"'{new_folder_name}' 폴더가 성공적으로 생성되었습니다.")
 
     # 파일 업로드와 요청사항 리스트의 기본 폴더 설정
