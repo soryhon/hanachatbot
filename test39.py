@@ -556,7 +556,7 @@ if github_info_loaded:
         selected_folder = st.selectbox(
             "보고서 주제 리스트",
             options=["주제를 선택하세요."] + folder_list,  # 옵션 리스트에 새 폴더 반영
-            index=folder_list.index(st.session_state['selected_folder']) + 1,  # 새로 선택된 폴더를 기본값으로 선택
+            index=folder_list.index(st.session_state['selected_folder']),  # 새로 선택된 폴더를 기본값으로 선택
             key="selected_folder"
         )
         # 파일 업로드와 요청사항 리스트의 기본 폴더 설정
