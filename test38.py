@@ -645,10 +645,10 @@ with col3:
         st.success("새로고침 하였습니다.")
 
 # 4 프레임
-# 보고서 작성 실행 버튼
-st.subheader("3. 보고서 작성 실행")
+# 보고서 실행 버튼
+st.subheader("3. 보고서 실행")
 
-if st.button("보고서 작성", key="generate_report", use_container_width=True):
+if st.button("보고서 실행행", key="generate_report", use_container_width=True):
     if not st.session_state.get("openai_api_key"):
         st.error("먼저 OpenAI API 키를 입력하고 저장하세요!")
     elif not st.session_state['rows'] or all(not row["제목"] or not row["요청"] or not row["데이터"] for row in st.session_state['rows']):
@@ -666,14 +666,14 @@ if st.button("보고서 작성", key="generate_report", use_container_width=True
         )
         st.session_state["response"] = responses
 
-# 양식 저장, 양식 불러오기 버튼을 같은 행에 가로로 배치하고 각 버튼의 너비를 50%로 설정
+# 보고서 저장, 보고서 불러오기 버튼을 같은 행에 가로로 배치하고 각 버튼의 너비를 50%로 설정
 col1, col2 = st.columns([0.5, 0.5])
 with col1:
-    if st.button("양식 저장", key="save_template", use_container_width=True):
+    if st.button("보고서 저장", key="save_template", use_container_width=True):
         st.success("양식이 저장되었습니다.")
 
 with col2:
-    if st.button("양식 불러오기", key="load_template", use_container_width=True):
+    if st.button("보고서 불러오기", key="load_template", use_container_width=True):
         st.success("양식이 불러와졌습니다.")
 
 
