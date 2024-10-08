@@ -411,9 +411,8 @@ def generate_final_html_report(file_data):
     if "html_report" in st.session_state:
         report_html = st.session_state['html_report']
     if file_data:
-        report_html += f"<div style='text-indent: 1px;'>\n{file_data}\n</div>\n"
-        report_html += f"{idx}--<p/>"  # 줄바꿈 추가
-    st.session_state['html_report'] = report_html  # 최종 값을 세션 상태에 저장
+        report_html += f"<div style='text-indent: 1px;'>\n{file_data}\n</div><p/.\n"
+        st.session_state['html_report'] = report_html  # 최종 값을 세션 상태에 저장
 
 # 엑셀 데이터 및 제목을 HTML로 변환하여 하나의 세트로 출력하는 함수
 def generate_html_report_with_title(titles, data_dicts):
