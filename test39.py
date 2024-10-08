@@ -552,7 +552,10 @@ if github_info_loaded:
         folder_list = get_folder_list_from_github(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
         # st.selectbox 위젯 생성 (이제 session_state['selected_folder'] 사용 가능)
         selected_folder = st.selectbox("보고서 주제 리스트", options=["주제를 선택하세요."] + folder_list, key="selected_folder")
-     
+        # 파일 업로드와 요청사항 리스트의 기본 폴더 설정
+        if selected_folder != "주제를 선택하세요.":
+            st.session_state['upload_folder'] = f"uploadFiles/{selected_folder}"
+            
     with col2:        
         new_folder_name = st.text_input("새 폴더명 입력", max_chars=20, key="new_folder_name")
    
@@ -577,9 +580,7 @@ if github_info_loaded:
                     st.success(f"'{new_folder_name}' 폴더가 성공적으로 생성되었습니다.")
 
     
-    # 파일 업로드와 요청사항 리스트의 기본 폴더 설정
-    if selected_folder != "주제를 선택하세요.":
-        st.session_state['upload_folder'] = f"uploadFiles/{selected_folder}"
+    
 else:
     st.warning("GitHub 정보가 설정되지 않았습니다. 먼저 GitHub Token을 입력해 주세요.")
   
