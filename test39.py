@@ -570,7 +570,7 @@ else:
   
 # 2 프레임
 # 파일 업로드
-st.subheader("1. 파일 업로드")
+st.subheader("2. 파일 업로드")
 
 # 지원되는 파일 형식 리스트
 supported_file_types = ['xlsx', 'pptx', 'docx', 'csv', 'png', 'jpg', 'jpeg', 'pdf', 'txt', 'log']
@@ -620,9 +620,9 @@ if github_info_loaded:
 else:
     st.warning("GitHub 정보가 저장되기 전에는 파일 업로드를 할 수 없습니다. 먼저 GitHub 정보를 입력해 주세요.")
 
-# 2 프레임
+# 3 프레임
 # 작성 보고서 요청사항
-st.subheader("2. 작성 보고서 요청사항")
+st.subheader("3. 작성 보고서 요청사항")
 
 # 요청사항 리스트
 with st.expander("요청사항 리스트", expanded=True):
@@ -695,7 +695,7 @@ with st.expander("요청사항 리스트", expanded=True):
         if row_checked:
             checked_rows.append(idx)
 
-# 3 프레임
+# 4 프레임
 # 행 추가 및 삭제 버튼을 가로로 배치하고 각 버튼의 너비를 30%로 설정
 col1, col2, col3 = st.columns([0.3, 0.3, 0.3])
 
@@ -716,9 +716,9 @@ with col3:
     if st.button("새로고침", key="refresh_page", use_container_width=True):
         st.success("새로고침 하였습니다.")
 
-# 4 프레임
+# 5 프레임
 # 보고서 실행 버튼
-st.subheader("3. 보고서 실행")
+st.subheader("4. 보고서 실행")
 
 if st.button("보고서 실행", key="generate_report", use_container_width=True):
     if not st.session_state.get("openai_api_key"):
@@ -749,9 +749,9 @@ with col2:
         st.success("양식이 불러와졌습니다.")
 
 
-# 5 프레임
+# 6 프레임
 # 결과 보고서
-st.subheader("4. 결과 보고서")
+st.subheader("5. 결과 보고서")
 
 # 결과 보고서 HTML 보기
 if "html_report" in st.session_state:
