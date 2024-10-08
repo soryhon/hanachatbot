@@ -544,13 +544,14 @@ st.subheader("1. 보고서 주제")
 
 if github_info_loaded:
     col1, col2, col3 = st.columns([0.5, 0.3, 0.2])
-
+    # 세션 상태에 selected_folder가 없다면 초기화
+    if 'selected_folder' not in st.session_state:
+        st.session_state['selected_folder'] = "주제를 선택하세요.
+        
     with col1:
         folder_list = get_folder_list_from_github(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
         selected_folder = st.selectbox("보고서 주제 리스트", options=["주제를 선택하세요."] + folder_list, key="selected_folder")
-        # 세션 상태에 selected_folder가 없다면 초기화
-        if 'selected_folder' not in st.session_state:
-            st.session_state['selected_folder'] = "주제를 선택하세요.
+ 
     with col2:        
         new_folder_name = st.text_input("새 폴더명 입력", max_chars=20, key="new_folder_name")
    
