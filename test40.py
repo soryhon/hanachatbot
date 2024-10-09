@@ -842,45 +842,15 @@ with st.expander("요청사항 리스트", expanded=True):
             selected_file = st.selectbox(f"파일 선택_{idx} (요청사항 {idx+1})", options=file_list, key=f"file_select_{idx}")
 
             if selected_file != '파일을 선택하세요.':
+                st.session_state['rows'][idx]['파일'] = selected_file
                 file_path = selected_file
-                file_content = get_file_from_github(st.session_state["github_repo"], st.session_state["github_branch"], file_path, st.session_state["github_token"])
-                
-                if file_content:
-                    file_type = file_path.split('.')[-1].lower()
+                file_content = get_file_from_github(
+                    st.session_state["github_repo"], 
+                    st.session_state["github_branch"], 
+                    file_path, 
+                    st.session_state["github_token"]
+                )
 
-                    # 파일 형식 검증 (지원되는 파일만 처리)
-                    if file_type not in supported_file_types:
-                        st.error(f"지원하지 않는 파일입니다: {file_path}")
-                        row['데이터'] = ""
-                    else:
-                        # 엑셀 파일인 경우 시트 선택 로직을 추가
-                        if file_type == 'xlsx':
-                            html_report_set = f"<div style='text-indent: 5px;'>\n"
-                            file_data_dict = handle_file_selection(file_path, file_content, file_type, idx)
-                            if file_data_dict is not None:
-                                
-                                # 제목 입력 값 가져오기
-                                html_report_set +=  f"<h3>{idx + 1}. {row['제목']}</h3>\n"
-                                row['파일'] = f"/{st.session_state['github_repo']}/{st.session_state['github_branch']}/{selected_file}"
-                                for sheet_name, df in file_data_dict.items():
-                                    wb = openpyxl.load_workbook(file_content)
-                                    ws = wb[sheet_name]
-                                    html_data = convert_df_to_html_with_styles_and_merging(ws, df)
-                                    html_report_set += f"<div style='text-indent: 20px;'>{html_data}</div>\n"
-                        else:                           
-                            file_data = extract_data_from_file(file_content, file_type)
-                            if file_data:     
-                                html_report_set = f"<div style='text-indent: 5px;'>\n"
-                                # 제목 입력 값 가져오기
-                                html_report_set +=  f"<h3>{idx + 1}. {row['제목']}</h3>\n"
-                                html_report_set += f"<p>{file_data}</p>"                        
-                        html_report_set += "</div>\n"       
-                        row['데이터'] = html_report_set
-                        
-                        generate_final_html_report(html_report_set)
-
-                else:
-                    st.error(f"{selected_file} 파일을 GitHub에서 불러오지 못했습니다.")
                 
             st.text_input(f"파일 경로_{idx} (요청사항 {idx+1})", row['파일'], disabled=True, key=f"file_{idx}")
 
@@ -914,23 +884,27 @@ with col2:
             st.error("요청사항의 제목, 요청, 파일을 모두 입력해야 합니다!")
         else:
             # 파일 데이터 가져와서 HTML 보고서 생성
-            file_data_list = []
+            #file_data_list = []
+            html_viewer_data = ""
             for idx, row in enumerate(st.session_state['rows']):
                 file_path = row['파일']
-                file_content = get_file_from_github(st.session_state["github_repo"], st.session_state["github_branch"], file_path, st.session_state["github_token"])
+                file_corun_llm_with_file_and_promptntent = get_file_from_github(st.session_state["github_repo"], st.session_state["github_branch"], file_path, st.session_state["github_token"])
                 file_type = file_path.split('.')[-1].lower()
-    
+                report_html = ""
                 if file_content:
                     if file_type == 'xlsx':
                         selected_sheets = parse_sheet_selection(row['파일정보'], len(openpyxl.load_workbook(file_content).sheetnames))
                         file_data_dict = extract_sheets_from_excel(file_content, selected_sheets)
-                        row['파일데이터'] = generate_html_report_with_title([row['제목']], [file_data_dict])
+                        report_html += generate_html_report_with_title([row['제목']], [file_data_dict])
                     else:
                         file_data = extract_data_from_file(file_content, file_type)
-                        row['파일데이터'] = f"<h3>{idx + 1}. {row['제목']}</h3>\n<p>{file_data}</p>"
-    
-                    file_data_list.append(row['파일데이터'])
-    
+                        report_html += f"<h3>{idx + 1}. {row['제목']}</h3>\n<p>{file_data}</p>"
+                    if idx > 0 :
+                        report_html += "<p/>"
+                    html_viewer_data += report_html    
+                    #file_data_list.append(row['데이터'])
+                st.session_state['html_report'] = html_viewer_data
+            
             # LLM 함수 호출
             titles = [row['제목'] for row in st.session_state['rows']]
             requests = [row['요청'] for row in st.session_state['rows']]
@@ -939,7 +913,7 @@ with col2:
                 st.session_state["openai_api_key"], 
                 titles, 
                 requests, 
-                file_data_list
+                st.session_state['html_report']
             )
             st.session_state["response"] = responses
 
