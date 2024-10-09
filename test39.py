@@ -627,6 +627,8 @@ else:
     st.warning("GitHub 정보가 설정되지 않았습니다. 먼저 GitHub Token을 입력해 주세요.")
   
 # 2 프레임
+st.subheader("작성 보고서 요청사항")
+
 # 파일 업로드
 #st.subheader("2. 파일 업로드")
 
@@ -634,7 +636,7 @@ else:
 supported_file_types = ['xlsx', 'pptx', 'docx', 'csv', 'png', 'jpg', 'jpeg', 'pdf', 'txt', 'log']
 
 if github_info_loaded:
-    with st.expander("파일 업로드", expanded=True):
+    with st.expander("보고서 데이터 파일 업로드", expanded=True):
         uploaded_files = st.file_uploader("파일을 여러 개 드래그 앤 드롭하여 업로드하세요. (최대 100MB)", accept_multiple_files=True)
 
         if uploaded_files:
@@ -679,7 +681,6 @@ else:
     st.warning("GitHub 정보가 저장되기 전에는 파일 업로드를 할 수 없습니다. 먼저 GitHub 정보를 입력해 주세요.")
 
 # 3 프레임
-st.subheader("작성 보고서 요청사항")
 # 요청사항 설정
 #st.subheader("3. 요청사항 설정")
 
