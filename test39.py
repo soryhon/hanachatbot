@@ -565,14 +565,15 @@ refresh_page()
      
     
 # 1 프레임
-# 보고서 주제 및 폴더 선택, 새 폴더 만들기
-#st.subheader("1. 보고서 주제")
+# 보고서 타이틀틀
 report_title = "보고서 자동 완성"
 if 'selected_folder_name' in st.session_state:
     if st.session_state['selected_folder_name'] != folderlist_init_value:
         report_title = " [" + st.session_state['selected_folder_name'] + "] 보고서"
 st.subheader("척척하나 - " +report_title)
 
+# 2 프레임
+# 보고서 주제 및 폴더 선택, 새 폴더 만들기
 if github_info_loaded:
     col1, col2, col3 = st.columns([0.5, 0.3, 0.2])
   
@@ -626,15 +627,15 @@ if github_info_loaded:
 else:
     st.warning("GitHub 정보가 설정되지 않았습니다. 먼저 GitHub Token을 입력해 주세요.")
   
-# 2 프레임
-#st.subheader("작성 보고서 요청사항")
+# 3 프레임
+st.subheader("")
 st.markdown(
     "<p style='font-size:18px; font-weight:bold; color:#007BFF;'>작성 보고서 요청사항</p>",
     unsafe_allow_html=True
 )
-# 파일 업로드
-#st.subheader("2. 파일 업로드")
 
+# 4 프레임
+# 파일 업로드
 # 지원되는 파일 형식 리스트
 supported_file_types = ['xlsx', 'pptx', 'docx', 'csv', 'png', 'jpg', 'jpeg', 'pdf', 'txt', 'log']
 
@@ -683,10 +684,7 @@ if github_info_loaded:
 else:
     st.warning("GitHub 정보가 저장되기 전에는 파일 업로드를 할 수 없습니다. 먼저 GitHub 정보를 입력해 주세요.")
 
-# 3 프레임
-# 요청사항 설정
-#st.subheader("3. 요청사항 설정")
-
+# 5 프레임
 # 요청사항 갯수 설정 입력 및 버튼
 col1, col2, col3, col4 = st.columns([0.2, 0.4, 0.2, 0.2])
 
@@ -723,10 +721,7 @@ with col4:
         ]
         st.success("요청사항 리스트가 초기화되었습니다.")
 
-# 4 프레임
-# 작성 보고서 요청사항
-#st.subheader("4. 작성 보고서 요청사항")
-
+# 6 프레임
 # 요청사항 리스트
 with st.expander("요청사항 리스트", expanded=True):
     if 'rows' not in st.session_state:
@@ -817,6 +812,8 @@ with st.expander("요청사항 리스트", expanded=True):
 #with col3:
     #if st.button("새로고침", key="refresh_page", use_container_width=True):
         #st.success("새로고침 하였습니다.")
+
+# 7 프레임
 # 보고서 저장, 보고서 불러오기 버튼을 같은 행에 가로로 배치하고 각 버튼의 너비를 50%로 설정
 col1, col2 = st.columns([0.5, 0.5])
 with col1:
@@ -827,10 +824,9 @@ with col2:
     if st.button("보고서 불러오기", key="load_template", use_container_width=True):
         st.success("양식이 불러와졌습니다.")
         
-# 5 프레임
+# 8 프레임
+st.subheader("")
 # 보고서 실행 버튼
-#st.subheader("5. 보고서 실행")
-
 if st.button("보고서 실행", key="generate_report", use_container_width=True):
     if not st.session_state.get("openai_api_key"):
         st.error("먼저 OpenAI API 키를 입력하고 저장하세요!")
@@ -852,17 +848,23 @@ if st.button("보고서 실행", key="generate_report", use_container_width=True
 
 
 
-# 6 프레임
+# 9 프레임
 # 결과 보고서
-st.subheader("결과 보고서")
+st.markdown(
+    "<p style='font-size:18px; font-weight:bold; color:#007BFF;'>결과 보고서</p>",
+    unsafe_allow_html=True
+)
 
+# 10 프레임
 # 결과 보고서 HTML 보기
 if "html_report" in st.session_state:
     st.components.v1.html(st.session_state['html_report'], height=1280, scrolling=True)
 
+# 11 프레임
 # 전달된 프롬프트
 st.text_area("전달된 프롬프트:", value="\n\n".join(global_generated_prompt), height=150)
 
+# 12 프레임
 # LLM 응답 보기
 if "response" in st.session_state:
     for idx, response in enumerate(st.session_state["response"]):
