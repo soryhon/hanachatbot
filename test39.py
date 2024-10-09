@@ -933,7 +933,7 @@ st.markdown(
 # 10 프레임
 # 결과 보고서 HTML 보기
 if "html_report" in st.session_state:
-    st.components.v1.html(st.session_state['html_report'], height=1280, scrolling=True)
+    st.components.v1.html(st.session_state['html_report'], height=1024, scrolling=True)
 
 # 11 프레임
 # 전달된 프롬프트
