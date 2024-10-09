@@ -528,7 +528,8 @@ def run_llm_with_file_and_prompt(api_key, titles, requests, file_data_list):
         st.error(f"LLM 실행 중 오류가 발생했습니다: {str(e)}")
     return responses
 
-def refresh_page()
+#st.session_state를 새로고침하는 함수
+def refresh_page():
     if 'is_updating' not in st.session_state:
         st.session_state['is_updating'] = False
     elif st.session_state['is_updating']:
