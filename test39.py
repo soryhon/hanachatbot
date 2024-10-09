@@ -575,12 +575,12 @@ if github_info_loaded:
             "보고서 주제 리스트",
             options=st.session_state['folder_list_option'],  # 옵션 리스트에 새 폴더 반영
             index=st.session_state['selected_folder_index'],  # 새로 선택된 폴더를 기본값으로 선택
-            key="selected_folder_value"
+            key="selected_folder"
         )
         # 파일 업로드와 요청사항 리스트의 기본 폴더 설정
         if selected_folder != "주제를 선택하세요.":
-            st.session_state['upload_folder'] = f"uploadFiles/{selected_folder_value}"
-            st.session_state['selected_folder_name'] = f"{selected_folder_value}"
+            st.session_state['upload_folder'] = f"uploadFiles/{selected_folder}"
+            st.session_state['selected_folder_name'] = f"{selected_folder}"
             
     with col2:        
         new_folder_name = st.text_input("새 폴더명 입력", max_chars=20, key="new_folder_name")
