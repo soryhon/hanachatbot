@@ -565,8 +565,8 @@ def run_llm_with_file_and_prompt(api_key, titles, requests, file_data_str):
         ]
         """
         
-        # 텍스트 길이 제한 확인 (예: 100000자로 제한)
-        if len(generated_prompt) > 100000:
+        # 텍스트 길이 제한 확인 (예: 1000000자로 제한)
+        if len(generated_prompt) > 1000000:
             st.error("프롬프트 글자 수 초과로 LLM 연동에 실패했습니다.")
         else:
             global_generated_prompt.append(generated_prompt)
@@ -613,7 +613,7 @@ def refresh_page():
 def init_session_state(check_value):
     if(check_value):
             st.session_state['rows'] = [
-                {"제목": "", "요청": "", "파일": "", "데이터": "","파일정보":'0' }
+                {"제목": "", "요청": "", "파일": "", "데이터": "","파일정보":'1' }
                 for _ in range(st.session_state['num_requests'])
             ]    
             st.session_state['html_report'] = ""
@@ -793,7 +793,7 @@ with col3:
     if st.button("설정", key="set_requests", use_container_width=True):
         # 설정 버튼 클릭 시 요청사항 리스트 초기화 및 새로운 요청사항 갯수 설정
         st.session_state['rows'] = [
-            {"제목": "", "요청": "", "파일": "", "데이터": "", "파일정보": '0'}
+            {"제목": "", "요청": "", "파일": "", "데이터": "", "파일정보": '1'}
             for _ in range(st.session_state['num_requests'])
         ]
         st.success(f"{st.session_state['num_requests']}개의 요청사항이 설정되었습니다.")
@@ -811,7 +811,7 @@ with col4:
 # 요청사항 리스트
 with st.expander("요청사항 리스트", expanded=True):
     if 'rows' not in st.session_state:
-        st.session_state['rows'] = [{"제목": "", "요청": "", "파일": "", "데이터": "", "파일정보":0}]
+        st.session_state['rows'] = [{"제목": "", "요청": "", "파일": "", "데이터": "", "파일정보":'1'}]
 
     rows = st.session_state['rows']
     checked_rows = []
