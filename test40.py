@@ -538,7 +538,7 @@ def run_llm_with_file_and_prompt(api_key, titles, requests, file_data_str):
     try:
         # 요청사항 리스트 문자열 생성
         request_list_str = "\n".join([
-            f"{i+1}.{title}의 항목 데이터에 대해 '{request}' 요청 사항을 만족하게 구성한다. 항목 데이터의 데이터 값은 중략하거나 누락되어서 안된다."
+            f"{i+1}.{title}의 항목 데이터에 대해 '{request}' 요청 사항을 만족하게 구성한다. 항목 데이터의 데이터 값은 중략하거나 누락되어서 안된다.\n"
             for i, (title, request) in enumerate(zip(titles, requests))
         ])
 
@@ -546,7 +546,7 @@ def run_llm_with_file_and_prompt(api_key, titles, requests, file_data_str):
         generated_prompt = f"""
         보고서 데이터를 간결하고 깔끔하게 업데이트하고 보고서 내용에 대해서 알기 쉽게 내용 요약하고 설명해야 한다.
         아래의 항목 데이터를 분석하여 각 항목마다의 '요청사항' 리스트와 요구 사항에 대해 모두 만족할 수 있도록 최적화된 보고서를 완성해.
-        항목데이터 중 table 태그가 포함된 데이터는 엑셀에서 추출한 데이터로 표 형식으로 유지해야 한다
+        항목데이터 중 table 태그가 포함된 데이터는 엑셀에서 추출한 데이터로 표 형식으로 유지해야 한다. table태그 데이터의 데이터 값은 중략하거나 누락되어서 안된다.
         이 경우에는 반드시 항목 데이터는 보고서에 꼭 필요하니 최대한 그대로 구조와 데이터는 출력되게 하고 내용만 업데이트한다. 
         th과 td 태그는 border는 사이즈 1이고 색상은 검정색으로 구성한다. table 태그 가로길이는 전체를 차지해야 한다.
         표 형식으로 답변할 때는 반드시 모든 항목 데이터의 수정한 데이터 내용과 HTML 태그를 보완한 모든 데이터를 업그레이드한 데이터로 보여줘야 한다.
