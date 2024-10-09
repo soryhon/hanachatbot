@@ -826,29 +826,33 @@ with col2:
         
 # 8 프레임
 st.subheader("")
+col1, col2 = st.columns([0.2, 0.6, 0.2])
+with col1:
+    st.write("")
+with col2:   
 # 보고서 실행 버튼
-if st.button("보고서 실행", key="generate_report", use_container_width=True):
-    if not st.session_state.get("openai_api_key"):
-        st.error("먼저 OpenAI API 키를 입력하고 저장하세요!")
-    elif not st.session_state['rows'] or all(not row["제목"] or not row["요청"] or not row["데이터"] for row in st.session_state['rows']):
-        st.error("요청사항의 제목, 요청, 파일을 모두 입력해야 합니다!")
-    else:
-        titles = [row['제목'] for row in st.session_state['rows']]
-        requests = [row['요청'] for row in st.session_state['rows']]
-        file_data_list = [row['데이터'] for row in st.session_state['rows']]
-
-        responses = run_llm_with_file_and_prompt(
-            st.session_state["openai_api_key"], 
-            titles, 
-            requests, 
-            file_data_list
-        )
-        st.session_state["response"] = responses
-
-
-
+    if st.button("보고서 실행", key="generate_report", use_container_width=True):
+        if not st.session_state.get("openai_api_key"):
+            st.error("먼저 OpenAI API 키를 입력하고 저장하세요!")
+        elif not st.session_state['rows'] or all(not row["제목"] or not row["요청"] or not row["데이터"] for row in st.session_state['rows']):
+            st.error("요청사항의 제목, 요청, 파일을 모두 입력해야 합니다!")
+        else:
+            titles = [row['제목'] for row in st.session_state['rows']]
+            requests = [row['요청'] for row in st.session_state['rows']]
+            file_data_list = [row['데이터'] for row in st.session_state['rows']]
+    
+            responses = run_llm_with_file_and_prompt(
+                st.session_state["openai_api_key"], 
+                titles, 
+                requests, 
+                file_data_list
+            )
+            st.session_state["response"] = responses
+ with col3:
+    st.write("")           
 
 # 9 프레임
+st.subheader("")
 # 결과 보고서
 st.markdown(
     "<p style='font-size:18px; font-weight:bold; color:#007BFF;'>결과 보고서</p>",
