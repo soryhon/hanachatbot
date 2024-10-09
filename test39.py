@@ -628,7 +628,7 @@ else:
   
 # 2 프레임
 # 파일 업로드
-st.subheader("2. 파일 업로드")
+#st.subheader("2. 파일 업로드")
 
 # 지원되는 파일 형식 리스트
 supported_file_types = ['xlsx', 'pptx', 'docx', 'csv', 'png', 'jpg', 'jpeg', 'pdf', 'txt', 'log']
@@ -679,8 +679,9 @@ else:
     st.warning("GitHub 정보가 저장되기 전에는 파일 업로드를 할 수 없습니다. 먼저 GitHub 정보를 입력해 주세요.")
 
 # 3 프레임
+st.subheader("작성 보고서서 요청사항")
 # 요청사항 설정
-st.subheader("3. 요청사항 설정")
+#st.subheader("3. 요청사항 설정")
 
 # 요청사항 갯수 설정 입력 및 버튼
 col1, col2, col3, col4 = st.columns([0.2, 0.4, 0.2, 0.2])
@@ -720,7 +721,7 @@ with col4:
 
 # 4 프레임
 # 작성 보고서 요청사항
-st.subheader("4. 작성 보고서 요청사항")
+#st.subheader("4. 작성 보고서 요청사항")
 
 # 요청사항 리스트
 with st.expander("요청사항 리스트", expanded=True):
@@ -824,7 +825,7 @@ with col2:
         
 # 5 프레임
 # 보고서 실행 버튼
-st.subheader("5. 보고서 실행")
+#st.subheader("5. 보고서 실행")
 
 if st.button("보고서 실행", key="generate_report", use_container_width=True):
     if not st.session_state.get("openai_api_key"):
@@ -849,7 +850,7 @@ if st.button("보고서 실행", key="generate_report", use_container_width=True
 
 # 6 프레임
 # 결과 보고서
-st.subheader("6. 결과 보고서")
+st.subheader("결과 보고서")
 
 # 결과 보고서 HTML 보기
 if "html_report" in st.session_state:
