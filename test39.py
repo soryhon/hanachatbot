@@ -583,7 +583,7 @@ if github_info_loaded:
         if selected_folder != "주제를 선택하세요.":
             st.session_state['upload_folder'] = f"uploadFiles/{selected_folder}"
             st.session_state['selected_folder_name'] = f"{selected_folder}"
-            st.session_state['is_updating'] = true
+            st.session_state['is_updating'] = True
             
     with col2:        
         new_folder_name = st.text_input("새 폴더명 입력", max_chars=20, key="new_folder_name")
