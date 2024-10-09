@@ -550,7 +550,9 @@ if 'upload_folder' not in st.session_state:
     st.session_state['upload_folder'] = "uploadFiles"
 if 'selected_folder_index' not in st.session_state:        
     st.session_state['selected_folder_index'] = 0
-     
+if 'is_updating' not in st.session_state:
+    st.session_state['is_updating'] = False     
+    
 # 1 프레임: 보고서 주제 및 폴더 선택, 새 폴더 만들기
 st.subheader("1. 보고서 주제")
 
@@ -581,10 +583,7 @@ if github_info_loaded:
         if selected_folder != "주제를 선택하세요.":
             st.session_state['upload_folder'] = f"uploadFiles/{selected_folder}"
             st.session_state['selected_folder_name'] = f"{selected_folder}"
-            try:
-                st.experimental_rerun()
-            except Exception as e:
-                st.error(f"페이지를 새로고침하는 동안 오류가 발생했습니다: {str(e)}")
+            st.session_state['is_updating'] = true
             
     with col2:        
         new_folder_name = st.text_input("새 폴더명 입력", max_chars=20, key="new_folder_name")
