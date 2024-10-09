@@ -690,7 +690,7 @@ col1, col2, col3, col4 = st.columns([0.2, 0.4, 0.2, 0.2])
 
 with col1:
     st.markdown(
-        "<p style='font-size:16px; font-weight:bold; color:#000000; margin-top:10px;'>요청사항 갯수</p>",
+        "<p style='font-size:16px; font-weight:bold; color:#000000; margin-top:20px;'>요청사항 갯수</p>",
         unsafe_allow_html=True
     )
     
@@ -706,7 +706,7 @@ with col2:
     )
 
 with col3:
-    if st.button("설정", key="set_requests"):
+    if st.button("설정", key="set_requests", use_container_width=True):
         # 설정 버튼 클릭 시 요청사항 리스트 초기화 및 새로운 요청사항 갯수 설정
         st.session_state['rows'] = [
             {"제목": "", "요청": "", "파일": "", "데이터": "", "checked": False, "파일데이터": ""}
@@ -716,7 +716,7 @@ with col3:
         refresh_page()
 
 with col4:
-    if st.button("새로고침", key="refresh_requests"):
+    if st.button("새로고침", key="refresh_requests", use_container_width=True):
         # 새로고침 버튼 클릭 시 요청사항 리스트 초기화
         st.session_state['rows'] = [
             {"제목": "", "요청": "", "파일": "", "데이터": "", "checked": False, "파일데이터": ""}
