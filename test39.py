@@ -853,7 +853,7 @@ with col2:
     if st.button("보고서 실행", key="generate_report", use_container_width=True):
         if not st.session_state.get("openai_api_key"):
             st.error("먼저 OpenAI API 키를 입력하고 저장하세요!")
-        elif not st.session_state['rows'] or all(not row["제목"] or not row["요청"] or not row["데이터"] for row in st.session_state['rows']):
+        elif not st.session_state['rows'] or all(not row["제목"] or not row["요청"] or not row["파일데이터"] for row in st.session_state['rows']):
             st.error("요청사항의 제목, 요청, 파일을 모두 입력해야 합니다!")
         else:
             # 전달할 변수 정의
