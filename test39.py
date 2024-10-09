@@ -563,8 +563,8 @@ if github_info_loaded:
         #selected_folder = st.selectbox("보고서 주제 리스트", options=["주제를 선택하세요."] + folder_list, key="selected_folder")
 
         # 'selected_folder'가 folder_list에 있을 때만 index 설정
-        if st.session_state['selected_folder'] in folder_list:
-            selected_index = folder_list.index(st.session_state['selected_folder']) + 1
+        if st.session_state['selected_folder_name'] in folder_list:
+            selected_index = folder_list.index(st.session_state['selected_folder_name']) + 1
         #else:
             #selected_index = 0  # 기본값으로 '주제를 선택하세요.' 선택
         st.session_state['selected_folder_index'] = selected_index
