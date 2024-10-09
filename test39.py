@@ -567,7 +567,7 @@ refresh_page()
 # 1 프레임
 # 보고서 주제 및 폴더 선택, 새 폴더 만들기
 #st.subheader("1. 보고서 주제")
-report_title = "척척하나-보고서 자동 완성 "
+report_title = "보고서 자동 완성 "
 if 'selected_folder_name' in st.session_state:
     if st.session_state['selected_folder_name'] != folderlist_init_value:
         report_title = " [" + st.session_state['selected_folder_name'] + "] 보고서"
