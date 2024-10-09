@@ -586,6 +586,7 @@ if github_info_loaded:
         new_folder_name = st.text_input("새 폴더명 입력", max_chars=20, key="new_folder_name")
    
     with col3:    
+        st..write("새로만들기")
         if st.button("새로만들기", key="new_folder"):
             if not new_folder_name:
                 st.error("새로운 보고서 주제를 입력하세요.")
