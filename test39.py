@@ -689,8 +689,10 @@ else:
 col1, col2, col3, col4 = st.columns([0.2, 0.4, 0.2, 0.2])
 
 with col1:
-    st.write("요청사항 설정")
-    
+    st.markdown(
+        "<p style='font-size:16px; font-weight:bold; color:#FaFaFa;'>요청사항 갯수 설정</p>",
+        unsafe_allow_html=True
+    )
 with col2:
     # 요청사항 갯수 입력 (1-9)
     num_requests = st.number_input(
