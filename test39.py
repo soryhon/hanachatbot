@@ -806,7 +806,7 @@ with st.expander("요청사항 리스트", expanded=True):
 
     for idx, row in enumerate(rows):
         with st.container():
-            col1, col2 = st.columns([0.05, 0.95])  # 체크박스와 제목 부분을 가로로 나눔
+            col1, col2 = st.columns([0.01, 0.99])  # 체크박스와 제목 부분을 가로로 나눔
             with col1:
                 #row_checked = st.checkbox("", key=f"row_checked_{idx}", value=row.get("checked", False))  # 체크박스만 추가
                 st.write("")
@@ -869,8 +869,8 @@ with st.expander("요청사항 리스트", expanded=True):
                 
             st.text_input(f"파일 경로_{idx} (요청사항 {idx+1})", row['파일'], disabled=True, key=f"file_{idx}")
 
-        if row_checked:
-            checked_rows.append(idx)
+        #if row_checked:
+            #checked_rows.append(idx)
 
 # 행 추가 및 삭제 버튼을 가로로 배치하고 각 버튼의 너비를 30%로 설정
 #col1, col2, col3 = st.columns([0.3, 0.3, 0.3])
