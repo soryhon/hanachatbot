@@ -567,11 +567,11 @@ refresh_page()
 # 1 프레임
 # 보고서 주제 및 폴더 선택, 새 폴더 만들기
 #st.subheader("1. 보고서 주제")
-report_title = "보고서"
+report_title = "척척하나-보고서 자동 완성 "
 if 'selected_folder_name' in st.session_state:
     if st.session_state['selected_folder_name'] != folderlist_init_value:
         report_title = " [" + st.session_state['selected_folder_name'] + "] 보고서"
-st.subheader(report_title)
+st.subheader("척척하나 - " +report_title)
 
 if github_info_loaded:
     col1, col2, col3 = st.columns([0.5, 0.3, 0.2])
@@ -679,7 +679,7 @@ else:
     st.warning("GitHub 정보가 저장되기 전에는 파일 업로드를 할 수 없습니다. 먼저 GitHub 정보를 입력해 주세요.")
 
 # 3 프레임
-st.subheader("작성 보고서서 요청사항")
+st.subheader("작성 보고서 요청사항")
 # 요청사항 설정
 #st.subheader("3. 요청사항 설정")
 
