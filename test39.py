@@ -539,15 +539,24 @@ github_info_loaded = load_env_info()
 MAX_FILE_SIZE_MB = 100
 MAX_FILE_SIZE_BYTES = 100 * 1024 * 1024
 
+#Session_state 변수 초기화
+folderlist_init_value = "주제를 선택하세요."
+# 세션 상태에 selected_folder가 없다면 초기화
+if 'selected_folder' not in st.session_state:
+    st.session_state['selected_folder'] = folderlist_init_value
+if 'folder_list_option' not in st.session_state:       
+    st.session_state['folder_list_option'] = folderlist_init_value
+if 'upload_folder' not in st.session_state:        
+    st.session_state['upload_folder'] = "uploadFiles"
+if 'selected_folder_index' not in st.session_state:        
+    st.session_state['selected_folder_index'] = 0
+     
 # 1 프레임: 보고서 주제 및 폴더 선택, 새 폴더 만들기
 st.subheader("1. 보고서 주제")
 
 if github_info_loaded:
     col1, col2, col3 = st.columns([0.5, 0.3, 0.2])
-    # 세션 상태에 selected_folder가 없다면 초기화
-    if 'selected_folder' not in st.session_state:
-        st.session_state['selected_folder'] = "주제를 선택하세요."
-        
+  
     with col1:
         folder_list = get_folder_list_from_github(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
         # st.selectbox 위젯 생성 (이제 session_state['selected_folder'] 사용 가능)
@@ -556,20 +565,21 @@ if github_info_loaded:
         # 'selected_folder'가 folder_list에 있을 때만 index 설정
         if st.session_state['selected_folder'] in folder_list:
             selected_index = folder_list.index(st.session_state['selected_folder']) + 1
-        else:
-            selected_index = 0  # 기본값으로 '주제를 선택하세요.' 선택
-    
+        #else:
+            #selected_index = 0  # 기본값으로 '주제를 선택하세요.' 선택
+        st.session_state['selected_folder_index'] = selected_index
+        st.session_state['folder_list_option'] = [folderlist_init_value] + folder_list
         # 폴더 선택 selectbox 생성 (새 폴더 추가 후, 선택값으로 설정)
         selected_folder = st.selectbox(
             "보고서 주제 리스트",
-            options=["주제를 선택하세요."] + folder_list,  # 옵션 리스트에 새 폴더 반영
-            index=selected_index,  # 새로 선택된 폴더를 기본값으로 선택
-            key="selected_folder"
+            options=st.session_state['folder_list_option'],  # 옵션 리스트에 새 폴더 반영
+            index=st.session_state['selected_folder_index'],  # 새로 선택된 폴더를 기본값으로 선택
+            key="selected_folder_value"
         )
         # 파일 업로드와 요청사항 리스트의 기본 폴더 설정
         if selected_folder != "주제를 선택하세요.":
-            st.session_state['upload_folder'] = f"uploadFiles/{selected_folder}"
-            st.session_state['selected_folder'] = f"{selected_folder}"
+            st.session_state['upload_folder'] = f"uploadFiles/{selected_folder_value}"
+            st.session_state['selected_folder'] = f"{selected_folder_value}"
             
     with col2:        
         new_folder_name = st.text_input("새 폴더명 입력", max_chars=20, key="new_folder_name")
@@ -585,17 +595,11 @@ if github_info_loaded:
                 folder_created = create_new_folder_in_github(st.session_state['github_repo'], new_folder_name, st.session_state['github_token'], st.session_state['github_branch'])
                 if folder_created:
                     folder_list.append(new_folder_name)  # 새 폴더를 리스트에 추가
-                    
-                    # st.session_state에 'selected_folder' 키가 있는지 확인 후 설정
-                    #if 'selected_folder' not in st.session_state:
-                    st.session_state['selected_folder'] = new_folder_name
-                    #else:
-                        #st.session_state['selected_folder'] = new_folder_name
-                    
+                    st.session_state['selected_folder_index'] = len(folder_list) - 1
+                    st.session_state['folder_list_option'] = [folderlist_init_value] + folder_list
+                    st.session_state['upload_folder'] = f"uploadFiles/{new_folder_name}"
+                    st.session_state['selected_folder'] = f"{new_folder_name}"
                     st.success(f"'{new_folder_name}' 폴더가 성공적으로 생성되었습니다.")
-
-    
-    
 else:
     st.warning("GitHub 정보가 설정되지 않았습니다. 먼저 GitHub Token을 입력해 주세요.")
   
