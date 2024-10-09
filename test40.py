@@ -898,15 +898,24 @@ with col2:
             #file_data_list = []
             html_viewer_data = ""
             for idx, row in enumerate(st.session_state['rows']):
-                file_path = row['파일']
-                file_corun_llm_with_file_and_promptntent = get_file_from_github(st.session_state["github_repo"], st.session_state["github_branch"], file_path, st.session_state["github_token"])
+                file_path = st.session_state['rows'][idx]['파일']
+                file_content = get_file_from_github(st.session_state["github_repo"], st.session_state["github_branch"], file_path, st.session_state["github_token"])
+                #file_corun_llm_with_file_and_promptntent = get_file_from_github(st.session_state["github_repo"], st.session_state["github_branch"], file_path, st.session_state["github_token"])
                 file_type = file_path.split('.')[-1].lower()
                 report_html = ""
                 if file_content:
                     if file_type == 'xlsx':
                         selected_sheets = parse_sheet_selection(row['파일정보'], len(openpyxl.load_workbook(file_content).sheetnames))
                         file_data_dict = extract_sheets_from_excel(file_content, selected_sheets)
-                        report_html += generate_html_report_with_title([row['제목']], [file_data_dict])
+                        if file_data_dict is not None:
+                            # 제목 입력 값 가져오기
+                            report_html +=  f"<h3>{idx + 1}. {row['제목']}</h3>\n"
+                            for sheet_name, df in file_data_dict.items():
+                                wb = openpyxl.load_workbook(file_content)
+                                ws = wb[sheet_name]
+                                html_data = convert_df_to_html_with_styles_and_merging(ws, df)
+                               report_html += f"<div style='text-indent: 20px;'>{html_data}</div>\n"
+
                     else:
                         file_data = extract_data_from_file(file_content, file_type)
                         report_html += f"<h3>{idx + 1}. {row['제목']}</h3>\n<p>{file_data}</p>"
