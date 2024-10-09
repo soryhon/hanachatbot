@@ -627,8 +627,11 @@ else:
     st.warning("GitHub 정보가 설정되지 않았습니다. 먼저 GitHub Token을 입력해 주세요.")
   
 # 2 프레임
-st.subheader("작성 보고서 요청사항")
-
+#st.subheader("작성 보고서 요청사항")
+st.markdown(
+    "<p style='font-size:18px; font-weight:bold; color:#007BFF;'>작성 보고서 요청사항</p>",
+    unsafe_allow_html=True
+)
 # 파일 업로드
 #st.subheader("2. 파일 업로드")
 
