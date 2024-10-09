@@ -531,18 +531,16 @@ def run_llm_with_file_and_prompt(api_key, titles, requests, file_data_str):
         generated_prompt = f"""
         간결하고 깔끔한 보고서 데이터를 업데이트하고 보고서 내용에 대해서 알기 쉽게 내용 요약하고 설명해야 한다.
         아래의 항목 데이터를 분석하여 각 항목마다의 요청 사항에 대해 모두 만족할 수 있도록 최적화된 보고서를 완성해.
-        단, 반드시 항목 데이터는 보고서에 꼭 필요하니 최대한 그대로 구조와 데이터는 출력되게 하고 내용만 업데이트한다. 데이터를 요약하거나 누락되면 절대 안된다.
+        단, 반드시 항목 데이터는 보고서에 꼭 필요하니 최대한 그대로 구조와 데이터는 출력되게 하고 내용만 업데이트한다. 데이터를 중략하거나 누락되면 절대 안된다.
         항목 데이터 중 table 태그로 구성된 것을 표 형식이므로 th과 td 태그는 border는 사이즈 1이고 색상은 검정색으로 구성한다.
-        #table 태그 내 데이터를 분석하여 셀 병합이 적절하다고 판단되는 것은 태그 옵션을 활용하여 셀 병합으로 구성한다.
         응답할 때는 반드시 모든 항목 데이터의 수정한 데이터 내용과 HTML 태그를 보완한 모든 데이터를 업그레이드한 데이터로 보여주고 그 아래의 요약한 내용을 설명해줘야 한다.
         항목 데이터 위에는 그 어떤한 설명 내용이 먼저 응답하면 안 된다. 
-        아래의 '응답 결과 양식'에 맞춰 'AI 요약과 설명' 타이틀 추가하고 그 하단에 요약한 내용이 위치하고, 너가 가장 추천하는 보고서 양식에 맞춰 HTML 태그로 구현하여 보여줘야 한다.
+        아래의 '응답 결과 양식'에 맞춰 'AI 요약과 설명' 타이틀 추가하고 너가 가장 추천하는 보고서 양식에 맞춰 요약 내용을 HTML 태그로 변환하여 구현하여 보여줘야 한다.
         *응답 결과 양식*
+            '보고서 데이터 업데이트 내용'
             ---------------
-            항목 데이터 업데이트
-            ---------------
-            AI 요약 및 설명
-            ---------------
+            'AI 요약 및 설명 내용'
+
         - 요청사항
         [
             {request_list_str}
@@ -901,8 +899,8 @@ col1, col2, col3 = st.columns([0.2, 0.6, 0.2])
 with col1:
     st.write("")
 with col2:   
-# 보고서 실행 버튼
-    if st.button("보고서 실행", key="generate_report", use_container_width=True):
+# 보고서 작성 실행 버튼
+    if st.button("보고서 작성 실행", key="generate_report", use_container_width=True):
         if not st.session_state.get("openai_api_key"):
             st.error("먼저 OpenAI API 키를 입력하고 저장하세요!")
         elif not st.session_state['rows'] or all(not row["제목"] or not row["요청"] or not row["파일데이터"] for row in st.session_state['rows']):
