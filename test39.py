@@ -550,7 +550,7 @@ MAX_FILE_SIZE_BYTES = 100 * 1024 * 1024
 
 #Session_state 변수 초기화
 folderlist_init_value = "주제를 선택하세요."
-# 세션 상태에 selected_folder가 없다면 초기화
+# 세션 상태에 각 변수 없다면 초기화
 if 'selected_folder_name' not in st.session_state:
     st.session_state['selected_folder_name'] = folderlist_init_value
 if 'folder_list_option' not in st.session_state:       
@@ -559,6 +559,8 @@ if 'upload_folder' not in st.session_state:
     st.session_state['upload_folder'] = "uploadFiles" 
 if 'selected_folder_index' not in st.session_state:    
     st.session_state['selected_folder_index'] = 0
+if 'new_folder_text' not in st.session_state:    
+    st.session_state['new_folder_text'] = ""   
 refresh_page()
      
     
@@ -595,7 +597,7 @@ if github_info_loaded:
             refresh_page()
             
     with col2:        
-        new_folder_name = st.text_input("새 폴더명 입력", max_chars=20, key="new_folder_name")
+        new_folder_name = st.text_input("새 폴더명 입력", max_chars=20, key="new_folder_name", value=st.session_state['new_folder_text'])
    
     with col3:    
         st.write("")
