@@ -849,8 +849,8 @@ with col2:
                 file_data_list
             )
             st.session_state["response"] = responses
- with col3:
-        st.write("")           
+with col3:
+    st.write("")           
 
 # 9 프레임
 st.subheader("")
