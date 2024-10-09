@@ -470,6 +470,48 @@ def generate_html_report_with_title(titles, data_dicts):
     
     return report_html
 
+# LLM 연동 및 응답 처리 함수
+def execute_llm_request(api_key, prompt):
+    openai.api_key = api_key
+    responses = []
+
+    try:
+        # 텍스트 길이 제한 확인 (예: 4000자로 제한)
+        if len(prompt) > 4000:
+            st.error("프롬프트 글자 수 초과로 LLM 연동에 실패했습니다.")
+            return None
+
+        # 프롬프트 템플릿 설정
+        prompt_template = PromptTemplate(
+            template=prompt,
+            input_variables=[]
+        )
+
+        # LLM 모델 생성
+        llm = ChatOpenAI(model_name="gpt-4o")
+        chain = LLMChain(llm=llm, prompt=prompt_template)
+
+        success = False
+        retry_count = 0
+        max_retries = 5  # 최대 재시도 횟수
+
+        # 응답을 받을 때까지 재시도
+        while not success and retry_count < max_retries:
+            try:
+                response = chain.run({})
+                responses.append(response)
+                success = True
+            except RateLimitError:
+                retry_count += 1
+                st.warning(f"API 요청 한도를 초과했습니다. 10초 후 다시 시도합니다. 재시도 횟수: {retry_count}/{max_retries}")
+                time.sleep(10)
+
+            time.sleep(10)
+    except Exception as e:
+        st.error(f"LLM 실행 중 오류가 발생했습니다: {str(e)}")
+
+    return responses
+
 # LLM을 통해 프롬프트와 파일을 전달하고 응답을 받는 함수
 def run_llm_with_file_and_prompt(api_key, titles, requests, file_data_str):
     global global_generated_prompt
@@ -481,14 +523,15 @@ def run_llm_with_file_and_prompt(api_key, titles, requests, file_data_str):
     try:
         # 요청사항 리스트 문자열 생성
         request_list_str = "\n".join([
-            f"{i+1}.{title}의 항목 데이터에 대해 '{request}' 요청 사항을 만족하게 구성한다."
+            f"{i+1}.{title}의 항목 데이터에 대해 '{request}' 요청 사항을 만족하게 구성한다. 항목 데이터의 데이터 값은 유실되어서 안된다."
             for i, (title, request) in enumerate(zip(titles, requests))
         ])
 
         # 프롬프트 텍스트 정의
         generated_prompt = f"""
-        간결하고 깔끔한 보고서를 만들고 보고서 내용에 대한 알기 쉽게 요약하자.
+        간결하고 깔끔한 보고서 데이터를 업데이트하고 보고서 내용에 대해서 알기 쉽게 내용 요약하고 설명해야 한다.
         아래의 항목 데이터를 분석하여 각 항목마다의 요청 사항에 대해 모두 만족할 수 있도록 최적화된 보고서를 완성해.
+        단, 반드시 항목 데이터는 보고서에 꼭 필요하니 최대한 그대로 구성과 데이터는 출력되게 하고 내용만 업데이트한다. 데이터를 요약하거나 누락되면 절대 안된다.
         항목 데이터 중 table 태그로 구성된 것을 표 형식이므로 th과 td 태그는 border는 사이즈 1이고 색상은 검정색으로 구성한다.
         table 태그 내 데이터를 분석하여 셀 병합이 적절하다고 판단되는 것은 태그 옵션을 활용하여 셀 병합으로 구성한다.
         응답할 때는 반드시 모든 항목 데이터의 수정한 데이터 내용과 HTML 태그를 보완한 모든 데이터를 업그레이드한 데이터로 보여주고 그 아래의 요약한 내용을 설명해줘야 한다.
@@ -503,36 +546,12 @@ def run_llm_with_file_and_prompt(api_key, titles, requests, file_data_str):
         ]
         """
 
-        # 텍스트 길이 제한 확인 (예: 100000자로 제한)
-        if len(generated_prompt) > 100000:
-            st.error("프롬프트 글자 수 100,000자를 초과로 LLM 연동에 실패했습니다.")
-        else:
-            global_generated_prompt.append(generated_prompt)
-            prompt_template = PromptTemplate(
-                template=generated_prompt,
-                input_variables=[]
-            )
+        # 프롬프트를 저장
+        global_generated_prompt.append(generated_prompt)
 
-            # LLM 모델 생성
-            llm = ChatOpenAI(model_name="gpt-4")
-            chain = LLMChain(llm=llm, prompt=prompt_template)
-
-            success = False
-            retry_count = 0
-            max_retries = 5  # 최대 재시도 횟수
-
-            # 응답을 받을 때까지 재시도
-            while not success and retry_count < max_retries:
-                try:
-                    response = chain.run({})
-                    responses.append(response)
-                    success = True
-                except RateLimitError:
-                    retry_count += 1
-                    st.warning(f"API 요청 한도를 초과했습니다. 10초 후 다시 시도합니다. 재시도 횟수: {retry_count}/{max_retries}")
-                    time.sleep(10)
-
-                time.sleep(10)
+        # 분리된 LLM 연동 함수 호출
+        responses = execute_llm_request(api_key, generated_prompt)
+        
     except Exception as e:
         st.error(f"LLM 실행 중 오류가 발생했습니다: {str(e)}")
 
