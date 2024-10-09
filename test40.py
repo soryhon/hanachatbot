@@ -538,24 +538,23 @@ def run_llm_with_file_and_prompt(api_key, titles, requests, file_data_str):
     try:
         # 요청사항 리스트 문자열 생성
         request_list_str = "\n".join([
-            f"{i+1}.{title}의 항목 데이터에 대해 '{request}' 요청 사항을 만족하게 구성한다. 항목 데이터의 데이터 값은 중략으로 누락되어서 안된다."
+            f"{i+1}.{title}의 항목 데이터에 대해 '{request}' 요청 사항을 만족하게 구성한다. 항목 데이터의 데이터 값은 중략하거나 누락되어서 안된다."
             for i, (title, request) in enumerate(zip(titles, requests))
         ])
 
         # 프롬프트 텍스트 정의
         generated_prompt = f"""
-        간결하고 깔끔한 보고서 데이터를 업데이트하고 보고서 내용에 대해서 알기 쉽게 내용 요약하고 설명해야 한다.
-        아래의 항목 데이터를 분석하여 각 항목마다의 요청 사항에 대해 모두 만족할 수 있도록 최적화된 보고서를 완성해.
-        단, 반드시 항목 데이터는 보고서에 꼭 필요하니 최대한 그대로 구조와 데이터는 출력되게 하고 내용만 업데이트한다. 데이터를 중략하거나 누락되면 절대 안된다.
-        항목 데이터 중 table 태그로 구성된 것을 표 형식이므로 th과 td 태그는 border는 사이즈 1이고 색상은 검정색으로 구성한다.
-        응답할 때는 반드시 모든 항목 데이터의 수정한 데이터 내용과 HTML 태그를 보완한 모든 데이터를 업그레이드한 데이터로 보여주고 그 아래의 요약한 내용을 설명해줘야 한다.
-        항목 데이터 위에는 그 어떤한 설명 내용이 먼저 응답하면 안 된다. 
-        아래의 '응답 결과 양식'에 맞춰 'AI 요약과 설명' 타이틀 추가하고 너가 가장 추천하는 보고서 양식에 맞춰 요약 내용을 HTML 태그로 변환하여 구현하여 보여줘야 한다.
-        *응답 결과 양식*
-            '보고서 데이터 업데이트 내용'
-            ---------------
-            'AI 요약 및 설명 내용'
-
+        보고서 데이터를 간결하고 깔끔하게 업데이트하고 보고서 내용에 대해서 알기 쉽게 내용 요약하고 설명해야 한다.
+        아래의 항목 데이터를 분석하여 각 항목마다의 '요청사항' 리스트와 요구 사항에 대해 모두 만족할 수 있도록 최적화된 보고서를 완성해.
+        항목데이터 중 table 태그가 포함된 데이터는 엑셀에서 추출한 데이터로 표 형식으로 유지해야 한다
+        이 경우에는 반드시 항목 데이터는 보고서에 꼭 필요하니 최대한 그대로 구조와 데이터는 출력되게 하고 내용만 업데이트한다. 
+        th과 td 태그는 border는 사이즈 1이고 색상은 검정색으로 구성한다. table 태그 가로길이는 전체를 차지해야 한다.
+        표 형식으로 답변할 때는 반드시 모든 항목 데이터의 수정한 데이터 내용과 HTML 태그를 보완한 모든 데이터를 업그레이드한 데이터로 보여줘야 한다.
+        이외 table 태그가 포함 안된 데이터는 파일에서 텍스트를 추출한 데이터로 내용으로 보고서 양식에 맞춰 간결하고 깔끔하게 요약하고 html 형식으로 변환해야 한다.
+        답변할 때는 반드시 모든 항목 데이터의 수정한 데이터 내용과 HTML 태그를 보완한 모든 데이터를 업그레이드한 데이터로 보여주고 그 아래의 요약한 내용을 설명해줘야 한다.
+        항목 데이터를 업데이트 하는 결과 가장 먼저 나와야하고 위에는 그 어떤한 설명 내용이 응답하면 안 된다. 
+        그 다음 일정 간격을 두고 h3 태그를 활용해서 'AI 요약과 설명' 타이틀 추가하며 
+        전달받은 보고서 전반적인 내용에 대해 너가 선정한 가장 좋은 방법으로 요약과 설명하고 그 내용을 HTML 형식으로 변환하여 답변해야 한다.
         - 요청사항
         [
             {request_list_str}
@@ -564,8 +563,6 @@ def run_llm_with_file_and_prompt(api_key, titles, requests, file_data_str):
         [
             {file_data_str}
         ]
-
-        
         """
         
         # 텍스트 길이 제한 확인 (예: 100000자로 제한)
@@ -952,7 +949,9 @@ st.markdown(
 # 10 프레임
 # 결과 보고서 HTML 보기
 if "html_report" in st.session_state:
-    st.components.v1.html(st.session_state['html_report'], height=1024, scrolling=True)
+    st.write("")
+    html_report_value = f"<div style='border: 2px solid #cccccc; padding: 2px;'>{st.session_state['html_report']}</div>"
+    st.components.v1.html(html_report_value, height=1024, scrolling=True)
 
 # 11 프레임
 # 전달된 프롬프트
@@ -963,7 +962,8 @@ st.text_area("전달된 프롬프트:", value="\n\n".join(global_generated_promp
 if "response" in st.session_state:
     for idx, response in enumerate(st.session_state["response"]):
         st.text_area(f"응답 {idx+1}:", value=response, height=300)
-        st.components.v1.html(response, height=600, scrolling=True)
+        html_response_value = f"<div style='border: 2px solid #cccccc; padding: 2px;'>{response}</div>"
+        st.components.v1.html(html_response_value, height=1280, scrolling=True)
 
 # Frontend 기능 구현 끝 ---
 
