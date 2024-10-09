@@ -598,6 +598,24 @@ def refresh_page():
     else:
         st.session_state['is_updating'] = True
 
+def init_session_state(check_value):
+    if(check_value):
+            st.session_state['rows'] = [
+                {"제목": "", "요청": "", "파일": "", "데이터": "","파일데이터": ""}
+                for _ in range(st.session_state['num_requests'])
+            ]    
+            st.session_state['html_report'] = ""
+    else:
+        if 'selected_folder_name' not in st.session_state:
+            st.session_state['selected_folder_name'] = folderlist_init_value
+        if 'folder_list_option' not in st.session_state:       
+            st.session_state['folder_list_option'] = folderlist_init_value
+        if 'upload_folder' not in st.session_state:        
+            st.session_state['upload_folder'] = "uploadFiles" 
+        if 'selected_folder_index' not in st.session_state:    
+            st.session_state['selected_folder_index'] = 0
+        if 'new_folder_text' not in st.session_state:    
+            st.session_state['new_folder_text'] = ""
 # Backend 기능 구현 끝 ---
 
 # Frontend 기능 구현 시작 ---
@@ -612,16 +630,7 @@ MAX_FILE_SIZE_BYTES = 100 * 1024 * 1024
 #Session_state 변수 초기화
 folderlist_init_value = "주제를 선택하세요."
 # 세션 상태에 각 변수 없다면 초기화
-if 'selected_folder_name' not in st.session_state:
-    st.session_state['selected_folder_name'] = folderlist_init_value
-if 'folder_list_option' not in st.session_state:       
-    st.session_state['folder_list_option'] = folderlist_init_value
-if 'upload_folder' not in st.session_state:        
-    st.session_state['upload_folder'] = "uploadFiles" 
-if 'selected_folder_index' not in st.session_state:    
-    st.session_state['selected_folder_index'] = 0
-if 'new_folder_text' not in st.session_state:    
-    st.session_state['new_folder_text'] = ""
+init_session_state(False)
 refresh_page()
      
     
@@ -663,6 +672,7 @@ if github_info_loaded:
             st.session_state['upload_folder'] = f"uploadFiles/{selected_folder}"
             st.session_state['selected_folder_name'] = f"{selected_folder}"
             refresh_page()
+            init_session_state(True)
             
     with col2:        
         new_folder_name = st.text_input("새 폴더명 입력", max_chars=20, key="new_folder_name", value=st.session_state['new_folder_text'])
@@ -684,6 +694,7 @@ if github_info_loaded:
                     st.session_state['upload_folder'] = f"uploadFiles/{new_folder_name}"
                     st.session_state['selected_folder_name'] = f"{new_folder_name}"
                     refresh_page()
+                    init_session_state(True)
                     st.success(f"'{new_folder_name}' 폴더가 성공적으로 생성되었습니다.")
 else:
     st.warning("GitHub 정보가 설정되지 않았습니다. 먼저 GitHub Token을 입력해 주세요.")
@@ -775,14 +786,13 @@ with col3:
         ]
         st.success(f"{st.session_state['num_requests']}개의 요청사항이 설정되었습니다.")
         refresh_page()
+        init_session_state(True)
 
 with col4:
     if st.button("새로고침", key="refresh_requests", use_container_width=True):
         # 새로고침 버튼 클릭 시 요청사항 리스트 초기화
-        st.session_state['rows'] = [
-            {"제목": "", "요청": "", "파일": "", "데이터": "", "checked": False, "파일데이터": ""}
-            for _ in range(st.session_state['num_requests'])
-        ]
+        
+        init_session_state(True)
         st.success("요청사항 리스트가 초기화되었습니다.")
 
 # 6 프레임
@@ -798,9 +808,10 @@ with st.expander("요청사항 리스트", expanded=True):
         with st.container():
             col1, col2 = st.columns([0.05, 0.95])  # 체크박스와 제목 부분을 가로로 나눔
             with col1:
-                row_checked = st.checkbox("", key=f"row_checked_{idx}", value=row.get("checked", False))  # 체크박스만 추가
+                #row_checked = st.checkbox("", key=f"row_checked_{idx}", value=row.get("checked", False))  # 체크박스만 추가
+                st.write("")
             with col2:
-                #st.markdown(f"#### 요청사항 {idx+1}")
+                #st.markdown(f"요청사항 {idx+1}")
                 st.markdown(
                     f"<p style='font-size:16px; font-weight:bold; color:#000000; margin-top:5px;'>{idx+1}.요청사항</p>",
                     unsafe_allow_html=True
