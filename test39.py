@@ -553,9 +553,9 @@ def run_llm_with_file_and_prompt(api_key, titles, requests, file_data_str):
 
         # 프롬프트를 저장
         global_generated_prompt.append(generated_prompt)
-            prompt_template = PromptTemplate(
-                template=generated_prompt,
-                input_variables=[]
+        prompt_template = PromptTemplate(
+            template=generated_prompt,
+            input_variables=[]
         )
 
         # LLM 모델 생성
