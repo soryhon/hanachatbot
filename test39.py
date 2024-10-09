@@ -566,11 +566,11 @@ refresh_page()
     
 # 1 프레임
 # 보고서 주제 및 폴더 선택, 새 폴더 만들기
-#st.subheader("1. 보고서 주제")
+st.subheader("1. 보고서 주제")
 report_title = "보고서"
 if 'selected_folder_name' in st.session_state:
     #report_title = f" {st.session_state['selected_folder_name']} 보고서"
-st.subheader(f"{report_title}")
+#st.subheader(f"{report_title}")
 
 if github_info_loaded:
     col1, col2, col3 = st.columns([0.5, 0.3, 0.2])
