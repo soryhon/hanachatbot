@@ -559,9 +559,6 @@ if 'upload_folder' not in st.session_state:
     st.session_state['upload_folder'] = "uploadFiles" 
 if 'selected_folder_index' not in st.session_state:    
     st.session_state['selected_folder_index'] = 0
-if 'new_folder_text' not in st.session_state:    
-    st.session_state['new_folder_text'] = ""   +
-
 refresh_page()
      
     
