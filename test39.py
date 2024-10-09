@@ -542,8 +542,8 @@ MAX_FILE_SIZE_BYTES = 100 * 1024 * 1024
 #Session_state 변수 초기화
 folderlist_init_value = "주제를 선택하세요."
 # 세션 상태에 selected_folder가 없다면 초기화
-if 'selected_folder' not in st.session_state:
-    st.session_state['selected_folder'] = folderlist_init_value
+if 'selected_folder_name' not in st.session_state:
+    st.session_state['selected_folder_name'] = folderlist_init_value
 if 'folder_list_option' not in st.session_state:       
     st.session_state['folder_list_option'] = folderlist_init_value
 if 'upload_folder' not in st.session_state:        
@@ -579,7 +579,7 @@ if github_info_loaded:
         # 파일 업로드와 요청사항 리스트의 기본 폴더 설정
         if selected_folder != "주제를 선택하세요.":
             st.session_state['upload_folder'] = f"uploadFiles/{selected_folder_value}"
-            st.session_state['selected_folder'] = f"{selected_folder_value}"
+            st.session_state['selected_folder_name'] = f"{selected_folder_value}"
             
     with col2:        
         new_folder_name = st.text_input("새 폴더명 입력", max_chars=20, key="new_folder_name")
@@ -598,7 +598,7 @@ if github_info_loaded:
                     st.session_state['selected_folder_index'] = len(folder_list) - 1
                     st.session_state['folder_list_option'] = [folderlist_init_value] + folder_list
                     st.session_state['upload_folder'] = f"uploadFiles/{new_folder_name}"
-                    st.session_state['selected_folder'] = f"{new_folder_name}"
+                    st.session_state['selected_folder_name'] = f"{new_folder_name}"
                     st.success(f"'{new_folder_name}' 폴더가 성공적으로 생성되었습니다.")
 else:
     st.warning("GitHub 정보가 설정되지 않았습니다. 먼저 GitHub Token을 입력해 주세요.")
