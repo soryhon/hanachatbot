@@ -528,6 +528,14 @@ def run_llm_with_file_and_prompt(api_key, titles, requests, file_data_list):
         st.error(f"LLM 실행 중 오류가 발생했습니다: {str(e)}")
     return responses
 
+def refresh_page()
+    if 'is_updating' not in st.session_state:
+        st.session_state['is_updating'] = False
+    elif st.session_state['is_updating']:
+        st.session_state['is_updating'] = False
+    else:
+        st.session_state['is_updating'] = True
+
 # Backend 기능 구현 끝 ---
 
 # Frontend 기능 구현 시작 ---
@@ -548,10 +556,8 @@ if 'folder_list_option' not in st.session_state:
     st.session_state['folder_list_option'] = folderlist_init_value
 if 'upload_folder' not in st.session_state:        
     st.session_state['upload_folder'] = "uploadFiles"
-if 'selected_folder_index' not in st.session_state:        
-    st.session_state['selected_folder_index'] = 0
-if 'is_updating' not in st.session_state:
-    st.session_state['is_updating'] = False     
+refresh_page()
+     
     
 # 1 프레임: 보고서 주제 및 폴더 선택, 새 폴더 만들기
 st.subheader("1. 보고서 주제")
@@ -583,7 +589,7 @@ if github_info_loaded:
         if selected_folder != "주제를 선택하세요.":
             st.session_state['upload_folder'] = f"uploadFiles/{selected_folder}"
             st.session_state['selected_folder_name'] = f"{selected_folder}"
-            st.session_state['is_updating'] = True
+            refresh_page()
             
     with col2:        
         new_folder_name = st.text_input("새 폴더명 입력", max_chars=20, key="new_folder_name")
@@ -604,6 +610,7 @@ if github_info_loaded:
                     st.session_state['folder_list_option'] = [folderlist_init_value] + folder_list
                     st.session_state['upload_folder'] = f"uploadFiles/{new_folder_name}"
                     st.session_state['selected_folder_name'] = f"{new_folder_name}"
+                    refresh_page()
                     st.success(f"'{new_folder_name}' 폴더가 성공적으로 생성되었습니다.")
 else:
     st.warning("GitHub 정보가 설정되지 않았습니다. 먼저 GitHub Token을 입력해 주세요.")
