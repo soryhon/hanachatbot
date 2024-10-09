@@ -673,8 +673,48 @@ else:
     st.warning("GitHub 정보가 저장되기 전에는 파일 업로드를 할 수 없습니다. 먼저 GitHub 정보를 입력해 주세요.")
 
 # 3 프레임
+# 요청사항 설정
+st.subheader("3. 요청사항 설정")
+
+# 요청사항 갯수 설정 입력 및 버튼
+col1, col2, col3, col4 = st.columns([0.2, 0.4, 0.2, 0.2])
+
+with col1:
+    st.write("요청사항 설정")
+    
+with col2:
+    # 요청사항 갯수 입력 (1-9)
+    num_requests = st.number_input(
+        "요청사항 갯수 입력창",
+        min_value=1,
+        max_value=9,
+        value=1,
+        step=1,
+        key="num_requests"
+    )
+
+with col3:
+    if st.button("설정", key="set_requests"):
+        # 설정 버튼 클릭 시 요청사항 리스트 초기화 및 새로운 요청사항 갯수 설정
+        st.session_state['rows'] = [
+            {"제목": "", "요청": "", "파일": "", "데이터": "", "checked": False, "파일데이터": ""}
+            for _ in range(st.session_state['num_requests'])
+        ]
+        st.success(f"{st.session_state['num_requests']}개의 요청사항이 설정되었습니다.")
+        refresh_page()
+
+with col4:
+    if st.button("새로고침", key="refresh_requests"):
+        # 새로고침 버튼 클릭 시 요청사항 리스트 초기화
+        st.session_state['rows'] = [
+            {"제목": "", "요청": "", "파일": "", "데이터": "", "checked": False, "파일데이터": ""}
+            for _ in range(st.session_state['num_requests'])
+        ]
+        st.success("요청사항 리스트가 초기화되었습니다.")
+
+# 4 프레임
 # 작성 보고서 요청사항
-st.subheader("3. 작성 보고서 요청사항")
+st.subheader("4. 작성 보고서 요청사항")
 
 # 요청사항 리스트
 with st.expander("요청사항 리스트", expanded=True):
@@ -747,30 +787,29 @@ with st.expander("요청사항 리스트", expanded=True):
         if row_checked:
             checked_rows.append(idx)
 
-# 4 프레임
 # 행 추가 및 삭제 버튼을 가로로 배치하고 각 버튼의 너비를 30%로 설정
-col1, col2, col3 = st.columns([0.3, 0.3, 0.3])
+#col1, col2, col3 = st.columns([0.3, 0.3, 0.3])
 
-with col1:
-    if st.button("행 추가", key="add_row", use_container_width=True):
-        new_row = {"제목": "", "요청": "", "파일": "", "데이터": "", "checked": False,"파일데이터":""}
-        st.session_state['rows'].append(new_row)
+#with col1:
+    #if st.button("행 추가", key="add_row", use_container_width=True):
+        #new_row = {"제목": "", "요청": "", "파일": "", "데이터": "", "checked": False,"파일데이터":""}
+        #st.session_state['rows'].append(new_row)
 
-with col2:
-    if st.button("행 삭제", key="delete_row", use_container_width=True):
-        if checked_rows:
-            st.session_state['rows'] = [row for idx, row in enumerate(rows) if idx not in checked_rows]
-            st.success(f"체크된 {len(checked_rows)}개의 요청사항이 삭제되었습니다.")
-        else:
-            st.warning("삭제할 요청사항을 선택해주세요.")
+#with col2:
+    #if st.button("행 삭제", key="delete_row", use_container_width=True):
+        #if checked_rows:
+            #st.session_state['rows'] = [row for idx, row in enumerate(rows) if idx not in checked_rows]
+            #st.success(f"체크된 {len(checked_rows)}개의 요청사항이 삭제되었습니다.")
+        #else:
+            #st.warning("삭제할 요청사항을 선택해주세요.")
     
-with col3:
-    if st.button("새로고침", key="refresh_page", use_container_width=True):
-        st.success("새로고침 하였습니다.")
+#with col3:
+    #if st.button("새로고침", key="refresh_page", use_container_width=True):
+        #st.success("새로고침 하였습니다.")
 
 # 5 프레임
 # 보고서 실행 버튼
-st.subheader("4. 보고서 실행")
+st.subheader("5. 보고서 실행")
 
 if st.button("보고서 실행", key="generate_report", use_container_width=True):
     if not st.session_state.get("openai_api_key"):
@@ -803,7 +842,7 @@ with col2:
 
 # 6 프레임
 # 결과 보고서
-st.subheader("5. 결과 보고서")
+st.subheader("6. 결과 보고서")
 
 # 결과 보고서 HTML 보기
 if "html_report" in st.session_state:
