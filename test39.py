@@ -556,7 +556,9 @@ if 'selected_folder_name' not in st.session_state:
 if 'folder_list_option' not in st.session_state:       
     st.session_state['folder_list_option'] = folderlist_init_value
 if 'upload_folder' not in st.session_state:        
-    st.session_state['upload_folder'] = "uploadFiles"
+    st.session_state['upload_folder'] = "uploadFiles" 
+if 'selected_folder_index' not in st.session_state:    
+    st.session_state['selected_folder_index'] = 0
 refresh_page()
      
     
