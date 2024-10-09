@@ -546,38 +546,36 @@ def run_llm_with_file_and_prompt(api_key, titles, requests, file_data_str):
         ]
         """
         
-        #global_generated_prompt.append(generated_prompt)
+        # 텍스트 길이 제한 확인 (예: 100000자로 제한)
+        if len(generated_prompt) > 100000:
+            st.error("프롬프트 글자 수 초과로 LLM 연동에 실패했습니다.")
+        else:
+            global_generated_prompt.append(generated_prompt)
+            prompt_template = PromptTemplate(
+                template=generated_prompt,
+                input_variables=[]
+            )
 
-        # 분리된 LLM 연동 함수 호출
-        #responses = execute_llm_request(api_key, generated_prompt)
+            # LLM 모델 생성
+            llm = ChatOpenAI(model_name="gpt-4")
+            chain = LLMChain(llm=llm, prompt=prompt_template)
 
-        # 프롬프트를 저장
-        global_generated_prompt.append(generated_prompt)
-        prompt_template = PromptTemplate(
-            template=generated_prompt,
-            input_variables=[]
-        )
+            success = False
+            retry_count = 0
+            max_retries = 5  # 최대 재시도 횟수
 
-        # LLM 모델 생성
-        llm = ChatOpenAI(model_name="gpt-4o")
-        chain = LLMChain(llm=llm, prompt=prompt_template)
+            # 응답을 받을 때까지 재시도
+            while not success and retry_count < max_retries:
+                try:
+                    response = chain.run({})
+                    responses.append(response)
+                    success = True
+                except RateLimitError:
+                    retry_count += 1
+                    st.warning(f"API 요청 한도를 초과했습니다. 10초 후 다시 시도합니다. 재시도 횟수: {retry_count}/{max_retries}")
+                    time.sleep(10)
 
-        success = False
-        retry_count = 0
-        max_retries = 5  # 최대 재시도 횟수
-
-        # 응답을 받을 때까지 재시도
-        while not success and retry_count < max_retries:
-            try:
-                response = chain.run({})
-                responses.append(response)
-                success = True
-            except RateLimitError:
-                retry_count += 1
-                st.warning(f"API 요청 한도를 초과했습니다. 10초 후 다시 시도합니다. 재시도 횟수: {retry_count}/{max_retries}")
                 time.sleep(10)
-
-            time.sleep(10)
     except Exception as e:
         st.error(f"LLM 실행 중 오류가 발생했습니다: {str(e)}")
 
