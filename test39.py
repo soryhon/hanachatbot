@@ -827,6 +827,7 @@ with col2:
 # 8 프레임
 st.subheader("")
 col1, col2, col3 = st.columns([0.2, 0.6, 0.2])
+
 with col1:
     st.write("")
 with col2:   
@@ -849,7 +850,7 @@ with col2:
             )
             st.session_state["response"] = responses
  with col3:
-    st.write("")           
+        st.write("")           
 
 # 9 프레임
 st.subheader("")
