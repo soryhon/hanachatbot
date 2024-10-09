@@ -557,7 +557,7 @@ def run_llm_with_file_and_prompt(api_key, titles, requests, file_data_str):
             )
 
             # LLM 모델 생성
-            llm = ChatOpenAI(model_name="gpt-4")
+            llm = ChatOpenAI(model_name="gpt-4o")
             chain = LLMChain(llm=llm, prompt=prompt_template)
 
             success = False
