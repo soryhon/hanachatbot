@@ -949,7 +949,7 @@ st.markdown(
 # 10 프레임
 # 결과 보고서 HTML 보기
 if "html_report" in st.session_state:
-    st.write("")
+    st.write("파일 데이터 추출 보기")
     html_report_value = f"<div style='border: 2px solid #cccccc; padding: 2px;'>{st.session_state['html_report']}</div>"
     st.components.v1.html(html_report_value, height=1024, scrolling=True)
 
@@ -962,6 +962,7 @@ st.text_area("전달된 프롬프트:", value="\n\n".join(global_generated_promp
 if "response" in st.session_state:
     for idx, response in enumerate(st.session_state["response"]):
         st.text_area(f"응답 {idx+1}:", value=response, height=300)
+        st.write("결과 보고서 완성")
         html_response_value = f"<div style='border: 2px solid #cccccc; padding: 2px;'>{response}</div>"
         st.components.v1.html(html_response_value, height=1280, scrolling=True)
 
