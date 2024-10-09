@@ -390,6 +390,7 @@ def validate_sheet_input(input_value):
 def handle_sheet_selection(file_content, sheet_count, idx):
     # 3개의 객체를 가로로 배치
     col1, col2, col3 = st.columns([0.33, 0.33, 0.33])
+
     
     with col1:
         st.text_input(f"시트 갯수_{idx}", value=f"{sheet_count}개", key=f"sheet_count_{idx}", disabled=True)  # 시트 갯수 표시 (비활성화)
@@ -601,7 +602,7 @@ def refresh_page():
 def init_session_state(check_value):
     if(check_value):
             st.session_state['rows'] = [
-                {"제목": "", "요청": "", "파일": "", "데이터": "","파일데이터": ""}
+                {"제목": "", "요청": "", "파일": "", "데이터": "","파일정보":0 }
                 for _ in range(st.session_state['num_requests'])
             ]    
             st.session_state['html_report'] = ""
@@ -672,7 +673,7 @@ if github_info_loaded:
             st.session_state['upload_folder'] = f"uploadFiles/{selected_folder}"
             st.session_state['selected_folder_name'] = f"{selected_folder}"
             refresh_page()
-            init_session_state(True)
+            
             
     with col2:        
         new_folder_name = st.text_input("새 폴더명 입력", max_chars=20, key="new_folder_name", value=st.session_state['new_folder_text'])
@@ -781,7 +782,7 @@ with col3:
     if st.button("설정", key="set_requests", use_container_width=True):
         # 설정 버튼 클릭 시 요청사항 리스트 초기화 및 새로운 요청사항 갯수 설정
         st.session_state['rows'] = [
-            {"제목": "", "요청": "", "파일": "", "데이터": "", "checked": False, "파일데이터": ""}
+            {"제목": "", "요청": "", "파일": "", "데이터": "", "파일정보": 0}
             for _ in range(st.session_state['num_requests'])
         ]
         st.success(f"{st.session_state['num_requests']}개의 요청사항이 설정되었습니다.")
@@ -799,7 +800,7 @@ with col4:
 # 요청사항 리스트
 with st.expander("요청사항 리스트", expanded=True):
     if 'rows' not in st.session_state:
-        st.session_state['rows'] = [{"제목": "", "요청": "", "파일": "", "데이터": "", "checked": False,"파일데이터":""}]
+        st.session_state['rows'] = [{"제목": "", "요청": "", "파일": "", "데이터": "", "파일정보":0}]
 
     rows = st.session_state['rows']
     checked_rows = []
@@ -819,7 +820,7 @@ with st.expander("요청사항 리스트", expanded=True):
         
             row['제목'] = st.text_input(f"제목_{idx} (요청사항 {idx+1})", row['제목'], key=f"title_{idx}")
             row['요청'] = st.text_area(f"요청_{idx} (요청사항 {idx+1})", row['요청'], key=f"request_{idx}")
-
+     
             file_list = ['파일을 선택하세요.']
             if st.session_state.get('github_token') and st.session_state.get('github_repo'):
                 file_list += get_github_files(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
@@ -860,7 +861,7 @@ with st.expander("요청사항 리스트", expanded=True):
                                 html_report_set +=  f"<h3>{idx + 1}. {row['제목']}</h3>\n"
                                 html_report_set += f"<p>{file_data}</p>"                        
                         html_report_set += "</div>\n"       
-                        row['파일데이터'] = html_report_set
+                        row['데이터'] = html_report_set
                         
                         generate_final_html_report(html_report_set)
 
@@ -871,26 +872,6 @@ with st.expander("요청사항 리스트", expanded=True):
 
         #if row_checked:
             #checked_rows.append(idx)
-
-# 행 추가 및 삭제 버튼을 가로로 배치하고 각 버튼의 너비를 30%로 설정
-#col1, col2, col3 = st.columns([0.3, 0.3, 0.3])
-
-#with col1:
-    #if st.button("행 추가", key="add_row", use_container_width=True):
-        #new_row = {"제목": "", "요청": "", "파일": "", "데이터": "", "checked": False,"파일데이터":""}
-        #st.session_state['rows'].append(new_row)
-
-#with col2:
-    #if st.button("행 삭제", key="delete_row", use_container_width=True):
-        #if checked_rows:
-            #st.session_state['rows'] = [row for idx, row in enumerate(rows) if idx not in checked_rows]
-            #st.success(f"체크된 {len(checked_rows)}개의 요청사항이 삭제되었습니다.")
-        #else:
-            #st.warning("삭제할 요청사항을 선택해주세요.")
-    
-#with col3:
-    #if st.button("새로고침", key="refresh_page", use_container_width=True):
-        #st.success("새로고침 하였습니다.")
 
 # 7 프레임
 # 보고서 저장, 보고서 불러오기 버튼을 같은 행에 가로로 배치하고 각 버튼의 너비를 50%로 설정
@@ -914,7 +895,7 @@ with col2:
     if st.button("보고서 작성 실행", key="generate_report", use_container_width=True):
         if not st.session_state.get("openai_api_key"):
             st.error("먼저 OpenAI API 키를 입력하고 저장하세요!")
-        elif not st.session_state['rows'] or all(not row["제목"] or not row["요청"] or not row["파일데이터"] for row in st.session_state['rows']):
+        elif not st.session_state['rows'] or all(not row["제목"] or not row["요청"] or not row["데이터"] for row in st.session_state['rows']):
             st.error("요청사항의 제목, 요청, 파일을 모두 입력해야 합니다!")
         else:
             # 전달할 변수 정의
