@@ -914,7 +914,7 @@ with col2:
                                 wb = openpyxl.load_workbook(file_content)
                                 ws = wb[sheet_name]
                                 html_data = convert_df_to_html_with_styles_and_merging(ws, df)
-                               report_html += f"<div style='text-indent: 20px;'>{html_data}</div>\n"
+                                report_html += f"<div style='text-indent: 20px;'>{html_data}</div>\n"
 
                     else:
                         file_data = extract_data_from_file(file_content, file_type)
