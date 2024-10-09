@@ -454,10 +454,10 @@ def handle_file_selection(file_path, file_content, file_type, idx):
         sheet_count = len(wb.sheetnames)
 
         # 시트 선택 로직 처리
-        file_data_dict = handle_sheet_selection(file_content, sheet_count, idx)
-        return file_data_dict
-    else:
-        return extract_data_from_file(file_content, file_type)
+        handle_sheet_selection(file_content, sheet_count, idx)
+        #return file_data_dict
+    #else:
+        #return extract_data_from_file(file_content, file_type)
 
 # HTML 보고서 생성 함수 (배열에서 데이터 가져옴)
 def generate_final_html_report(file_data):
@@ -843,6 +843,7 @@ with st.expander("요청사항 리스트", expanded=True):
 
             if selected_file != '파일을 선택하세요.':
                 st.session_state['rows'][idx]['파일'] = selected_file
+           
                 file_path = selected_file
                 file_content = get_file_from_github(
                     st.session_state["github_repo"], 
@@ -851,7 +852,17 @@ with st.expander("요청사항 리스트", expanded=True):
                     st.session_state["github_token"]
                 )
 
-                
+                if file_content:
+                    file_type = file_path.split('.')[-1].lower()
+
+                    # 파일 형식 검증 (지원되는 파일만 처리)
+                    if file_type not in supported_file_types:
+                        st.error(f"지원하지 않는 파일입니다: {file_path}")
+                        row['데이터'] = ""
+                    else:      
+                        handle_file_selection(file_path, file_content, file_type, idx)
+                else:
+                    st.error(f"{selected_file} 파일을 GitHub에서 불러오지 못했습니다.")  
             st.text_input(f"파일 경로_{idx} (요청사항 {idx+1})", row['파일'], disabled=True, key=f"file_{idx}")
 
         #if row_checked:
