@@ -741,7 +741,7 @@ with st.expander("요청사항 리스트", expanded=True):
             with col2:
                 #st.markdown(f"#### 요청사항 {idx+1}")
                 st.markdown(
-                    f"<p style='font-size:16px; font-weight:bold; color:#000000; margin-top:5px;'>#### 요청사항 {idx+1}</p>",
+                    f"<p style='font-size:16px; font-weight:bold; color:#000000; margin-top:5px;'>{idx+1}.요청사항</p>",
                     unsafe_allow_html=True
                 )
         
