@@ -826,7 +826,7 @@ with col2:
         
 # 8 프레임
 st.subheader("")
-col1, col2 = st.columns([0.2, 0.6, 0.2])
+col1, col2, col3 = st.columns([0.2, 0.6, 0.2])
 with col1:
     st.write("")
 with col2:   
