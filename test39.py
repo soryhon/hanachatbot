@@ -503,9 +503,9 @@ def run_llm_with_file_and_prompt(api_key, titles, requests, file_data_str):
         ]
         """
 
-        # 텍스트 길이 제한 확인 (예: 4000자로 제한)
-        if len(generated_prompt) > 4000:
-            st.error("프롬프트 글자 수 4,000자를 초과로 LLM 연동에 실패했습니다.")
+        # 텍스트 길이 제한 확인 (예: 100000자로 제한)
+        if len(generated_prompt) > 100000:
+            st.error("프롬프트 글자 수 100,000자를 초과로 LLM 연동에 실패했습니다.")
         else:
             global_generated_prompt.append(generated_prompt)
             prompt_template = PromptTemplate(
