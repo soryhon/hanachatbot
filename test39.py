@@ -570,7 +570,7 @@ refresh_page()
 report_title = "보고서"
 if 'selected_folder_name' in st.session_state:
     if st.session_state['selected_folder_name'] != folderlist_init_value:
-        report_title = " /" + st.session_state['selected_folder_name'] + "/ 보고서"
+        report_title = " [" + st.session_state['selected_folder_name'] + "] 보고서"
 st.subheader(report_title)
 
 if github_info_loaded:
