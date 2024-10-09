@@ -389,29 +389,43 @@ def validate_sheet_input(input_value):
 # 시트 선택 로직 추가
 def handle_sheet_selection(file_content, sheet_count, idx):
     # 3개의 객체를 가로로 배치
-    col1, col2, col3 = st.columns([0.33, 0.33, 0.33])
-
-    
+    col1, col2 = st.columns([0.5, 0.5])
     with col1:
         st.text_input(f"시트 갯수_{idx}", value=f"{sheet_count}개", key=f"sheet_count_{idx}", disabled=True)  # 시트 갯수 표시 (비활성화)
     
     with col2:
-        sheet_selection = st.text_input(f"시트 선택_{idx}(예: 1-3, 5)", value="1", key=f"sheet_selection_{idx}")
-
-    with col3:
-        select_button = st.button("선택", key=f"select_button_{idx}", use_container_width=True)
-
-    # 시트 선택 버튼이 눌렸을 때만 파일 데이터를 가져옴
-    if select_button:
+        # st.session_state['rows']와 st.session_state['rows'][idx]['파일정보']가 유효한지 확인하여 값 설정
+        if st.session_state.get('rows') and st.session_state['rows'][idx].get('파일정보'):
+            sheet_selection_value = st.session_state['rows'][idx]['파일정보']
+        else:
+            sheet_selection_value = '1'
+        
+        sheet_selection = st.text_input(
+            f"시트 선택_{idx}(예: 1-3, 5)", 
+            value=sheet_selection_value, 
+            key=f"sheet_selection_{idx}"
+        )
+    
+        # 입력값 변경 시 세션에 저장
         if validate_sheet_input(sheet_selection):
-            selected_sheets = parse_sheet_selection(sheet_selection, sheet_count)
-            if selected_sheets:
-                file_data = extract_sheets_from_excel(file_content, selected_sheets)
-                return file_data
-            else:
-                st.error("선택한 시트가 잘못되었습니다.")
+            st.session_state['rows'][idx]['파일정보'] = sheet_selection
         else:
             st.error("잘못된 입력입니다. 숫자와 '-', ',' 만 입력할 수 있습니다.")
+
+    #with col3:
+        #select_button = st.button("선택", key=f"select_button_{idx}", use_container_width=True)
+
+    # 시트 선택 버튼이 눌렸을 때만 파일 데이터를 가져옴
+    #if select_button:
+        #if validate_sheet_input(sheet_selection):
+            #selected_sheets = parse_sheet_selection(sheet_selection, sheet_count)
+            #if selected_sheets:
+                #file_data = extract_sheets_from_excel(file_content, selected_sheets)
+                #return file_data
+            #else:
+                #st.error("선택한 시트가 잘못되었습니다.")
+        #else:
+            #st.error("잘못된 입력입니다. 숫자와 '-', ',' 만 입력할 수 있습니다.")
     return None
 
 # 시트 선택 입력값을 분석하는 함수
@@ -602,7 +616,7 @@ def refresh_page():
 def init_session_state(check_value):
     if(check_value):
             st.session_state['rows'] = [
-                {"제목": "", "요청": "", "파일": "", "데이터": "","파일정보":0 }
+                {"제목": "", "요청": "", "파일": "", "데이터": "","파일정보":'0' }
                 for _ in range(st.session_state['num_requests'])
             ]    
             st.session_state['html_report'] = ""
@@ -782,7 +796,7 @@ with col3:
     if st.button("설정", key="set_requests", use_container_width=True):
         # 설정 버튼 클릭 시 요청사항 리스트 초기화 및 새로운 요청사항 갯수 설정
         st.session_state['rows'] = [
-            {"제목": "", "요청": "", "파일": "", "데이터": "", "파일정보": 0}
+            {"제목": "", "요청": "", "파일": "", "데이터": "", "파일정보": '0'}
             for _ in range(st.session_state['num_requests'])
         ]
         st.success(f"{st.session_state['num_requests']}개의 요청사항이 설정되었습니다.")
@@ -891,26 +905,45 @@ col1, col2, col3 = st.columns([0.2, 0.6, 0.2])
 with col1:
     st.write("")
 with col2:   
-# 보고서 작성 실행 버튼
-    if st.button("보고서 작성 실행", key="generate_report", use_container_width=True):
+
+# 보고서 실행 버튼 클릭 시 함수 호출 수정
+    if st.button("보고서 실행", key="generate_report", use_container_width=True):
         if not st.session_state.get("openai_api_key"):
             st.error("먼저 OpenAI API 키를 입력하고 저장하세요!")
-        elif not st.session_state['rows'] or all(not row["제목"] or not row["요청"] or not row["데이터"] for row in st.session_state['rows']):
+        elif not st.session_state['rows'] or all(not row["제목"] or not row["요청"] or not row["파일"] for row in st.session_state['rows']):
             st.error("요청사항의 제목, 요청, 파일을 모두 입력해야 합니다!")
         else:
-            # 전달할 변수 정의
+            # 파일 데이터 가져와서 HTML 보고서 생성
+            file_data_list = []
+            for idx, row in enumerate(st.session_state['rows']):
+                file_path = row['파일']
+                file_content = get_file_from_github(st.session_state["github_repo"], st.session_state["github_branch"], file_path, st.session_state["github_token"])
+                file_type = file_path.split('.')[-1].lower()
+    
+                if file_content:
+                    if file_type == 'xlsx':
+                        selected_sheets = parse_sheet_selection(row['파일정보'], len(openpyxl.load_workbook(file_content).sheetnames))
+                        file_data_dict = extract_sheets_from_excel(file_content, selected_sheets)
+                        row['파일데이터'] = generate_html_report_with_title([row['제목']], [file_data_dict])
+                    else:
+                        file_data = extract_data_from_file(file_content, file_type)
+                        row['파일데이터'] = f"<h3>{idx + 1}. {row['제목']}</h3>\n<p>{file_data}</p>"
+    
+                    file_data_list.append(row['파일데이터'])
+    
+            # LLM 함수 호출
             titles = [row['제목'] for row in st.session_state['rows']]
             requests = [row['요청'] for row in st.session_state['rows']]
-            file_data_str = st.session_state['html_report']
     
-            # 수정된 함수 호출
             responses = run_llm_with_file_and_prompt(
                 st.session_state["openai_api_key"], 
                 titles, 
                 requests, 
-                file_data_str
+                file_data_list
             )
             st.session_state["response"] = responses
+
+
 with col3:
     st.write("")           
 
