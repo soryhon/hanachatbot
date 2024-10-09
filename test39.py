@@ -523,7 +523,7 @@ def run_llm_with_file_and_prompt(api_key, titles, requests, file_data_str):
     try:
         # 요청사항 리스트 문자열 생성
         request_list_str = "\n".join([
-            f"{i+1}.{title}의 항목 데이터에 대해 '{request}' 요청 사항을 만족하게 구성한다. 항목 데이터의 데이터 값은 유실되어서 안된다."
+            f"{i+1}.{title}의 항목 데이터에 대해 '{request}' 요청 사항을 만족하게 구성한다. 항목 데이터의 데이터 값은 중략으로 누락되어서 안된다."
             for i, (title, request) in enumerate(zip(titles, requests))
         ])
 
