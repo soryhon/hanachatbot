@@ -693,6 +693,7 @@ with col1:
         "<p style='font-size:16px; font-weight:bold; color:#000000;'>요청사항 갯수</p>",
         unsafe_allow_html=True
     )
+    
 with col2:
     # 요청사항 갯수 입력 (1-9)
     num_requests = st.number_input(
