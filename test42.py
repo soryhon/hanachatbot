@@ -962,23 +962,28 @@ st.text_area("전달된 프롬프트:", value="\n\n".join(global_generated_promp
 # 12 프레임
 # LLM 응답 보기
 if "response" in st.session_state:
-    for idx, response in enumerate(st.session_state["response"]):
-        st.text_area(f"응답 {idx+1}:", value=response, height=300)
-        st.write("결과 보고서 완성")
-        html_response_value = f"<div style='border: 2px solid #cccccc; padding: 2px;'>{response}</div>"
-        st.components.v1.html(html_response_value, height=1280, scrolling=True)
-
+    with st.container():
+        for idx, response in enumerate(st.session_state["response"]):
+            st.text_area(f"응답 {idx+1}:", value=response, height=300)
+            st.write("결과 보고서 완성")
+            html_response_value = f"<div style='border: 2px solid #cccccc; padding: 2px;'>{response}</div>"
+            st.components.v1.html(html_response_value, height=1280, scrolling=True)
+    
 # 결과 저장 버튼
-    if st.button("결과 저장", key="save_result"):
-        # HTML 응답 데이터를 파일로 저장하고 다운로드 링크 제공
-        file_name, temp_file_path = save_html_response(html_response_value, st.session_state['selected_folder_name'])
-        st.success(f"{file_name} 파일이 생성되었습니다.")
-        st.download_button(
-            label="다운로드",
-            data=open(temp_file_path, 'r', encoding='utf-8').read(),
-            file_name=file_name,
-            mime="text/html"
-        )
+        col1, col2 = st.columns([0.4, 0.6])
+        with col1:
+            if st.button("결과 저장", key="save_result"):
+                # HTML 응답 데이터를 파일로 저장하고 다운로드 링크 제공
+                file_name, temp_file_path = save_html_response(html_response_value, st.session_state['selected_folder_name'])
+                st.success(f"{file_name} 파일이 생성되었습니다.")
+                st.download_button(
+                    label="다운로드",
+                    data=open(temp_file_path, 'r', encoding='utf-8').read(),
+                    file_name=file_name,
+                    mime="text/html"
+                )
+        with cols2:
+            st.write()
     
 # Frontend 기능 구현 끝 ---
 
