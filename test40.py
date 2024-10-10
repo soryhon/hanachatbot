@@ -55,7 +55,7 @@ def load_env_info():
             github_token = st.text_input("GitHub Token을 입력하세요", type="password", key="github_token_input")
         else:
             github_set = True
-            st.success("GitHub 정보가 자동으로 설정되었습니다!")
+            #st.success("GitHub 정보가 자동으로 설정되었습니다!")
         st.session_state["github_token"] = github_token
 
     with col2:
@@ -63,7 +63,7 @@ def load_env_info():
             openai_api_key = st.text_input("OpenAI API 키를 입력하세요", type="password", key="openai_api_key_input")
         else:
             openai_set = True
-            st.success("OpenAI API 키가 자동으로 설정되었습니다!")
+            #st.success("OpenAI API 키가 자동으로 설정되었습니다!")
         st.session_state["openai_api_key"] = openai_api_key
 
     # GitHub 저장소 정보 세션에 저장
