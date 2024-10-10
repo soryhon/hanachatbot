@@ -613,8 +613,7 @@ def init_session_state(check_value):
             st.session_state['selected_folder_index'] = 0
         if 'new_folder_text' not in st.session_state:    
             st.session_state['new_folder_text'] = ""
-        if 'start_check' not in st.session_state: 
-            st.session_state['start_check'] = False
+
 # Backend 기능 구현 끝 ---
 
 # Frontend 기능 구현 시작 ---
@@ -631,7 +630,8 @@ folderlist_init_value = "주제를 선택하세요."
 # 세션 상태에 각 변수 없다면 초기화
 init_session_state(False)
 refresh_page()
-     
+if 'start_check' not in st.session_state: 
+    st.session_state['start_check'] = False   
     
 # 1 프레임
 # 보고서 타이틀틀
@@ -694,12 +694,14 @@ if github_info_loaded:
                     st.session_state['folder_list_option'] = [folderlist_init_value] + folder_list
                     st.session_state['upload_folder'] = f"uploadFiles/{new_folder_name}"
                     st.session_state['selected_folder_name'] = f"{new_folder_name}"
+                    st.session_state['start_check'] = True 
                     refresh_page()
                     init_session_state(True)
                     st.success(f"'{new_folder_name}' 폴더가 성공적으로 생성되었습니다.")
 else:
     st.warning("GitHub 정보가 설정되지 않았습니다. 먼저 GitHub Token을 입력해 주세요.")
 
+#보고서 작성 시작 체크
 if st.session_state['selected_folder_name'] != folderlist_init_value:
     if st.session_state['start_check'] == False:
         with st.container():
