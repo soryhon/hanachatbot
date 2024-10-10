@@ -615,6 +615,8 @@ def init_session_state(check_value):
             st.session_state['selected_folder_index'] = 0
         if 'new_folder_text' not in st.session_state:    
             st.session_state['new_folder_text'] = ""
+        if 'start_check' not in st.session_state: 
+            st.session_state['start_check'] = False 
 
 # Backend 기능 구현 끝 ---
 
@@ -632,8 +634,7 @@ folderlist_init_value = "주제를 선택하세요."
 # 세션 상태에 각 변수 없다면 초기화
 init_session_state(False)
 refresh_page()
-if 'start_check' not in st.session_state: 
-    st.session_state['start_check'] = False   
+  
     
 # 1 프레임
 # 보고서 타이틀틀
