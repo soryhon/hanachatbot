@@ -411,21 +411,6 @@ def handle_sheet_selection(file_content, sheet_count, idx):
             st.session_state['rows'][idx]['파일정보'] = sheet_selection
         else:
             st.error("잘못된 입력입니다. 숫자와 '-', ',' 만 입력할 수 있습니다.")
-
-    #with col3:
-        #select_button = st.button("선택", key=f"select_button_{idx}", use_container_width=True)
-
-    # 시트 선택 버튼이 눌렸을 때만 파일 데이터를 가져옴
-    #if select_button:
-        #if validate_sheet_input(sheet_selection):
-            #selected_sheets = parse_sheet_selection(sheet_selection, sheet_count)
-            #if selected_sheets:
-                #file_data = extract_sheets_from_excel(file_content, selected_sheets)
-                #return file_data
-            #else:
-                #st.error("선택한 시트가 잘못되었습니다.")
-        #else:
-            #st.error("잘못된 입력입니다. 숫자와 '-', ',' 만 입력할 수 있습니다.")
     return None
 
 # 시트 선택 입력값을 분석하는 함수
@@ -810,60 +795,60 @@ with col4:
 # 6 프레임
 # 요청사항 리스트
 with st.expander("요청사항 리스트", expanded=True):
-    if 'rows' not in st.session_state:
-        st.session_state['rows'] = [{"제목": "", "요청": "", "파일": "", "데이터": "", "파일정보":'1'}]
-
-    rows = st.session_state['rows']
-    checked_rows = []
-
-    for idx, row in enumerate(rows):
-        with st.container():
-            col1, col2 = st.columns([0.01, 0.99])  # 체크박스와 제목 부분을 가로로 나눔
-            with col1:
-                #row_checked = st.checkbox("", key=f"row_checked_{idx}", value=row.get("checked", False))  # 체크박스만 추가
-                st.write("")
-            with col2:
-                #st.markdown(f"요청사항 {idx+1}")
-                st.markdown(
-                    f"<p style='font-size:16px; font-weight:bold; color:#000000; margin-top:5px;'>{idx+1}.요청사항</p>",
-                    unsafe_allow_html=True
-                )
-        
-            row['제목'] = st.text_input(f"제목_{idx} (요청사항 {idx+1})", row['제목'], key=f"title_{idx}")
-            row['요청'] = st.text_area(f"요청_{idx} (요청사항 {idx+1})", row['요청'], key=f"request_{idx}")
-     
-            file_list = ['파일을 선택하세요.']
-            if st.session_state.get('github_token') and st.session_state.get('github_repo'):
-                file_list += get_github_files(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
-
-            selected_file = st.selectbox(f"파일 선택_{idx} (요청사항 {idx+1})", options=file_list, key=f"file_select_{idx}")
-
-            if selected_file != '파일을 선택하세요.':
-                st.session_state['rows'][idx]['파일'] = selected_file
-           
-                file_path = selected_file
-                file_content = get_file_from_github(
-                    st.session_state["github_repo"], 
-                    st.session_state["github_branch"], 
-                    file_path, 
-                    st.session_state["github_token"]
-                )
-
-                if file_content:
-                    file_type = file_path.split('.')[-1].lower()
-
-                    # 파일 형식 검증 (지원되는 파일만 처리)
-                    if file_type not in supported_file_types:
-                        st.error(f"지원하지 않는 파일입니다: {file_path}")
-                        row['데이터'] = ""
-                    else:      
-                        handle_file_selection(file_path, file_content, file_type, idx)
-                else:
-                    st.error(f"{selected_file} 파일을 GitHub에서 불러오지 못했습니다.")  
-            st.text_input(f"파일 경로_{idx} (요청사항 {idx+1})", row['파일'], disabled=True, key=f"file_{idx}")
-
-        #if row_checked:
-            #checked_rows.append(idx)
+    #if 'rows' not in st.session_state:
+        #st.session_state['rows'] = [{"제목": "", "요청": "", "파일": "", "데이터": "", "파일정보":'1'}]
+    if s'rows' not in st.session_state: and st.session_state['rows']:
+        rows = st.session_state['rows']
+        checked_rows = []
+    
+        for idx, row in enumerate(rows):
+            with st.container():
+                col1, col2 = st.columns([0.01, 0.99]) 
+                with col1:
+                    #row_checked = st.checkbox("", key=f"row_checked_{idx}", value=row.get("checked", False))  # 체크박스만 추가
+                    st.write("")
+                with col2:
+                    #st.markdown(f"요청사항 {idx+1}")
+                    st.markdown(
+                        f"<p style='font-size:16px; font-weight:bold; color:#000000; margin-top:5px;'>{idx+1}.요청사항</p>",
+                        unsafe_allow_html=True
+                    )
+            
+                row['제목'] = st.text_input(f"제목_{idx} (요청사항 {idx+1})", row['제목'], key=f"title_{idx}")
+                row['요청'] = st.text_area(f"요청_{idx} (요청사항 {idx+1})", row['요청'], key=f"request_{idx}")
+         
+                file_list = ['파일을 선택하세요.']
+                if st.session_state.get('github_token') and st.session_state.get('github_repo'):
+                    file_list += get_github_files(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
+    
+                selected_file = st.selectbox(f"파일 선택_{idx} (요청사항 {idx+1})", options=file_list, key=f"file_select_{idx}")
+    
+                if selected_file != '파일을 선택하세요.':
+                    st.session_state['rows'][idx]['파일'] = selected_file
+               
+                    file_path = selected_file
+                    file_content = get_file_from_github(
+                        st.session_state["github_repo"], 
+                        st.session_state["github_branch"], 
+                        file_path, 
+                        st.session_state["github_token"]
+                    )
+    
+                    if file_content:
+                        file_type = file_path.split('.')[-1].lower()
+    
+                        # 파일 형식 검증 (지원되는 파일만 처리)
+                        if file_type not in supported_file_types:
+                            st.error(f"지원하지 않는 파일입니다: {file_path}")
+                            row['데이터'] = ""
+                        else:      
+                            handle_file_selection(file_path, file_content, file_type, idx)
+                    else:
+                        st.error(f"{selected_file} 파일을 GitHub에서 불러오지 못했습니다.")  
+                st.text_input(f"파일 경로_{idx} (요청사항 {idx+1})", row['파일'], disabled=True, key=f"file_{idx}")
+    
+            #if row_checked:
+                #checked_rows.append(idx)
 
 # 7 프레임
 # 보고서 저장, 보고서 불러오기 버튼을 같은 행에 가로로 배치하고 각 버튼의 너비를 50%로 설정
