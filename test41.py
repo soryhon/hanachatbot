@@ -597,10 +597,12 @@ def refresh_page():
 
 def init_session_state(check_value):
     if(check_value):
+        if 'rows' in st.session_state and 'num_requests' in st.session_state:
             st.session_state['rows'] = [
                 {"제목": "", "요청": "", "파일": "", "데이터": "","파일정보":"1" }
                 for _ in range(st.session_state['num_requests'])
             ]    
+        if 'html_report' in st.session_state
             st.session_state['html_report'] = ""
     else:
         if 'selected_folder_name' not in st.session_state:
@@ -694,7 +696,7 @@ if github_info_loaded:
                     st.session_state['folder_list_option'] = [folderlist_init_value] + folder_list
                     st.session_state['upload_folder'] = f"uploadFiles/{new_folder_name}"
                     st.session_state['selected_folder_name'] = f"{new_folder_name}"
-                    st.session_state['start_check'] = False 
+                    st.session_state['start_check'] = False
                     refresh_page()
                     init_session_state(True)
                     st.success(f"'{new_folder_name}' 폴더가 성공적으로 생성되었습니다.")
