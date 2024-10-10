@@ -701,16 +701,17 @@ else:
     st.warning("GitHub 정보가 설정되지 않았습니다. 먼저 GitHub Token을 입력해 주세요.")
 
 if st.session_state['selected_folder_name'] != folderlist_init_value:
-    with st.container():
-        col1, col2, col3 = st.columns([0.1, 0.8, 0.1]) 
-        with col1:
-            st.write("")
-        with col2:
-            if st.session_state['start_check'] == False:
-                if st.button(f"[{st.session_state['selected_folder_name']} 보고서 작성 시작", key="start_check", use_container_width=True):
-                   st.session_state['start_check'] = True  
-        with col3:
-            st.write("")
+    if st.session_state['start_check'] == False:
+        with st.container():
+            col1, col2, col3 = st.columns([0.1, 0.8, 0.1]) 
+            with col1:
+                st.write("")
+            with col2:
+                
+                    if st.button(f"[{st.session_state['selected_folder_name']} 작성 시작", key="start_check", use_container_width=True):
+                       st.session_state['start_check'] = True  
+            with col3:
+                st.write("")
     else:    
         # 3 프레임
         st.subheader("")
