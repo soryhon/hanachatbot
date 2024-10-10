@@ -711,7 +711,7 @@ if st.session_state['selected_folder_name'] != folderlist_init_value:
             with col1:
                 st.write("")
             with col2:                
-                    if st.button("▽ 보고서 작성 시작", key="start_check", use_container_width=True):
+                    if st.button("▽ 보고서 작성 시작", key="start_check_btn", use_container_width=True):
                         st.session_state['start_check'] = True  
             with col3:
                 st.write("")
