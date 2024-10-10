@@ -701,9 +701,16 @@ else:
     st.warning("GitHub 정보가 설정되지 않았습니다. 먼저 GitHub Token을 입력해 주세요.")
 
 if st.session_state['selected_folder_name'] != folderlist_init_value:
-    if st.session_state['start_check'] == False:
-        if st.button(f"[{st.session_state['selected_folder_name']} 보고서 작성 시작", key="start_check"):
-           st.session_state['start_check'] = True  
+    with st.container():
+        col1, col2, col3 = st.columns([0.1, 0.8, 0.1]) 
+        with col1:
+            st.write("")
+        with col2:
+            if st.session_state['start_check'] == False:
+                if st.button(f"[{st.session_state['selected_folder_name']} 보고서 작성 시작", key="start_check", use_container_width=True):
+                   st.session_state['start_check'] = True  
+        with col3:
+            st.write("")
     else:    
         # 3 프레임
         st.subheader("")
@@ -891,7 +898,6 @@ if st.session_state['selected_folder_name'] != folderlist_init_value:
                     for idx, row in enumerate(st.session_state['rows']):
                         file_path = st.session_state['rows'][idx]['파일']
                         file_content = get_file_from_github(st.session_state["github_repo"], st.session_state["github_branch"], file_path, st.session_state["github_token"])
-                        #file_corun_llm_with_file_and_promptntent = get_file_from_github(st.session_state["github_repo"], st.session_state["github_branch"], file_path, st.session_state["github_token"])
                         file_type = file_path.split('.')[-1].lower()
                         report_html = ""
                         if file_content:
