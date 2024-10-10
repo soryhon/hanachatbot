@@ -673,6 +673,7 @@ if github_info_loaded:
         if selected_folder != "주제를 선택하세요.":
             st.session_state['upload_folder'] = f"uploadFiles/{selected_folder}"
             st.session_state['selected_folder_name'] = f"{selected_folder}"
+            st.session_state['start_check'] = False
             refresh_page()
             #st.success(f"[{selected_folder}] 보고서가 선택되었습니다.")
         #else:   
