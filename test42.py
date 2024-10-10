@@ -969,16 +969,16 @@ if "response" in st.session_state:
         st.components.v1.html(html_response_value, height=1280, scrolling=True)
 
 # 결과 저장 버튼
-        if st.button("결과 저장", key="save_result"):
-            # HTML 응답 데이터를 파일로 저장하고 다운로드 링크 제공
-            file_name, temp_file_path = save_html_response(html_response_value, st.session_state['selected_folder_name'])
-            st.success(f"{file_name} 파일이 생성되었습니다.")
-            st.download_button(
-                label="다운로드",
-                data=open(temp_file_path, 'r', encoding='utf-8').read(),
-                file_name=file_name,
-                mime="text/html"
-            )
+    if st.button("결과 저장", key="save_result"):
+        # HTML 응답 데이터를 파일로 저장하고 다운로드 링크 제공
+        file_name, temp_file_path = save_html_response(html_response_value, st.session_state['selected_folder_name'])
+        st.success(f"{file_name} 파일이 생성되었습니다.")
+        st.download_button(
+            label="다운로드",
+            data=open(temp_file_path, 'r', encoding='utf-8').read(),
+            file_name=file_name,
+            mime="text/html"
+        )
     
 # Frontend 기능 구현 끝 ---
 
