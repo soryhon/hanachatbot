@@ -20,6 +20,7 @@ import openpyxl
 from openpyxl.utils import get_column_letter
 import re
 import tempfile
+import datetime
 
 # Backend 기능 구현 시작 ---
 
@@ -614,6 +615,19 @@ def init_session_state(check_value):
         if 'new_folder_text' not in st.session_state:    
             st.session_state['new_folder_text'] = ""
 
+def save_html_response(html_content, folder_name):
+    # 현재 시각 데이터 형식화 (예: 20241010124055)
+    current_time = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+    # 파일명 구성
+    file_name = f"{folder_name}_result_{current_time}.html"
+    
+    # 임시 파일 경로에 HTML 파일로 저장
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".html", mode='w', encoding='utf-8') as temp_file:
+        temp_file.write(html_content)
+        temp_file_path = temp_file.name
+
+    return file_name, temp_file_path
+    
 # Backend 기능 구현 끝 ---
 
 # Frontend 기능 구현 시작 ---
@@ -954,5 +968,17 @@ if "response" in st.session_state:
         html_response_value = f"<div style='border: 2px solid #cccccc; padding: 2px;'>{response}</div>"
         st.components.v1.html(html_response_value, height=1280, scrolling=True)
 
+# 결과 저장 버튼
+        if st.button("결과 저장", key="save_result"):
+            # HTML 응답 데이터를 파일로 저장하고 다운로드 링크 제공
+            file_name, temp_file_path = save_html_response(html_response_value, st.session_state['selected_folder_name'])
+            st.success(f"{file_name} 파일이 생성되었습니다.")
+            st.download_button(
+                label="다운로드",
+                data=open(temp_file_path, 'r', encoding='utf-8').read(),
+                file_name=file_name,
+                mime="text/html"
+            )
+    
 # Frontend 기능 구현 끝 ---
 
