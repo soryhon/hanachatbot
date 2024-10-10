@@ -669,9 +669,9 @@ if github_info_loaded:
             st.session_state['upload_folder'] = f"uploadFiles/{selected_folder}"
             st.session_state['selected_folder_name'] = f"{selected_folder}"
             refresh_page()
-            st.success(f"[{selected_folder}] 보고서가 선택되었습니다.")
-        else:   
-            st.warning("보고서 주제를 선택하세요.")
+            #st.success(f"[{selected_folder}] 보고서가 선택되었습니다.")
+        #else:   
+            #st.warning("보고서 주제를 선택하세요.")
             
     with col2:        
         new_folder_name = st.text_input("새 폴더명 입력", max_chars=20, key="new_folder_name", value=st.session_state['new_folder_text'])
@@ -698,7 +698,7 @@ if github_info_loaded:
 else:
     st.warning("GitHub 정보가 설정되지 않았습니다. 먼저 GitHub Token을 입력해 주세요.")
 
-if st.session_state['selected_folder_name']:
+if st.session_state['selected_folder_name'] != folderlist_init_value:
 
     # 3 프레임
     st.subheader("")
