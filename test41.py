@@ -602,7 +602,7 @@ def init_session_state(check_value):
                 {"제목": "", "요청": "", "파일": "", "데이터": "","파일정보":"1" }
                 for _ in range(st.session_state['num_requests'])
             ]    
-        if 'html_report' in st.session_state
+        if 'html_report' in st.session_state:
             st.session_state['html_report'] = ""
     else:
         if 'selected_folder_name' not in st.session_state:
