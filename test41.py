@@ -694,7 +694,7 @@ if github_info_loaded:
                     st.session_state['folder_list_option'] = [folderlist_init_value] + folder_list
                     st.session_state['upload_folder'] = f"uploadFiles/{new_folder_name}"
                     st.session_state['selected_folder_name'] = f"{new_folder_name}"
-                    st.session_state['start_check'] = True 
+                    st.session_state['start_check'] = False 
                     refresh_page()
                     init_session_state(True)
                     st.success(f"'{new_folder_name}' 폴더가 성공적으로 생성되었습니다.")
