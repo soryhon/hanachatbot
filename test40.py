@@ -671,7 +671,7 @@ if github_info_loaded:
             refresh_page()
             st.success(f"[{selected_folder}] 보고서가 선택되었습니다.")
         else:   
-            st.warning("보고서 주래를 선택하세요.")
+            st.warning("보고서 주제를 선택하세요.")
             
     with col2:        
         new_folder_name = st.text_input("새 폴더명 입력", max_chars=20, key="new_folder_name", value=st.session_state['new_folder_text'])
