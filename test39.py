@@ -957,16 +957,19 @@ else:
     st.warning("GitHub 정보가 설정되지 않았습니다. 먼저 GitHub Token을 입력해 주세요.")
 
 
-report_title = "작성할 보고서를 선택하세요."
-if 'selected_folder_name' in st.session_state:
-    if st.session_state['selected_folder_name'] != folderlist_init_value:
-        report_title = " [" + st.session_state['selected_folder_name'] + "] 보고서"
+
 col1, col2, col3 = st.columns([0.2, 0.6, 0.2])
 with col1:
     st.write("")
 with col2:   
+    report_title = "작성할 보고서를 선택하세요."
+    title_style = "font-size:14px; font-weight:normal; color:#cccccc;border: 1px solid #dddddd;"
+    if 'selected_folder_name' in st.session_state:
+        if st.session_state['selected_folder_name'] != folderlist_init_value:
+            report_title = " [" + st.session_state['selected_folder_name'] + "] 보고서"
+            title_style = "font-size:20px; font-weight:bold; color:#000000;border: 0px solid #dddddd;"
     st.markdown(
-        f"<div style='text-align:center;font-size:20px; font-weight:bold; color:#000000;border: 0px solid #FF5733;border-radius: 10px;width:100%'>{report_title}</div>",
+        f"<div style='text-align:center;font-size:20px; font-weight:bold; color:#000000;border: 0px solid #dddddd;border-radius: 10px;width:100%;padding 10px;'>{report_title}</div>",
         unsafe_allow_html=True
     )
    
