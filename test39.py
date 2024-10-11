@@ -939,7 +939,7 @@ if github_info_loaded:
                             st.success(f"'{new_folder_name}' 폴더가 성공적으로 생성되었습니다.")
                                 
         
-        col1, col2 = st.columns([0.25, 0.75])
+        col1, col2 = st.columns([0.22, 0.78])
         with col1:
             st.write("")
             st.markdown(
