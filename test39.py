@@ -965,7 +965,7 @@ col1, col2, col3 = st.columns([0.2, 0.6, 0.2])
 with col1:
     st.write("")
 with col2:   
-    st.button(f"{report_title}", key="set_report",
+    disabled_button = st.button(f"{report_title}")
         if not some_condition:
             st.markdown(
                 """
@@ -978,7 +978,9 @@ with col2:
                 }
                 </style>
                 """,
-        unsafe_allow_html=True,use_container_width=True)
+                unsafe_allow_html=True,
+                use_container_width=True
+            )
         #if report_title != "작성할 보고서를 선택하세요.":
             #st.session_state['check_report'] = False
 with col3:
