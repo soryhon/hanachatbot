@@ -791,11 +791,14 @@ def apply_template_to_session_state(file_name):
         
         # 세션 상태에 값 저장
         st.session_state['selected_folder_name'] = selected_folder_name
-        st.session_state['num_requests'] = num_requests
         st.session_state['rows'] = rows
         st.session_state['is_updating'] = False
         st.session_state['upload_folder'] = f"uploadFiles/{selected_folder_name}"
         
+        # 'num_requests'는 직접 변경할 수 없으므로 Streamlit에서 제공하는 방법으로 값을 설정
+        if "num_requests" in st.session_state:
+            st.session_state["num_requests"] = num_requests
+
         st.success(f"'{selected_folder_name}' 템플릿이 불러와졌습니다.")
     
     except FileNotFoundError:
@@ -804,6 +807,7 @@ def apply_template_to_session_state(file_name):
         st.error(f"'{file_name}' 파일을 파싱하는 중 오류가 발생했습니다. JSON 형식을 확인해주세요.")
     except Exception as e:
         st.error(f"템플릿 불러오기 중 오류가 발생했습니다: {str(e)}")
+
         
 # [보고서 불러오기] 버튼 클릭 시 JSON 파일 리스트를 보여주고, 선택한 파일의 내용을 세션 상태에 반영
 def load_template_button_function():
