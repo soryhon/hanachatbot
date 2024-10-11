@@ -970,7 +970,7 @@ with col2:
         """
         <style>
         /* '특별한 버튼'에만 적용할 스타일 */
-        div[data-testid="stButton"] > button[aria-label="selected_report_title"] {
+        .stButton > button[aria-label="selected_report_title"] {
             border: 0px solid #FF5733; /* 테두리 색상 및 두께 */
             color: #000000; /* 글자 색 */
             border-radius: 10px; /* 테두리 둥글기 */
