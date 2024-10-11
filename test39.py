@@ -796,8 +796,8 @@ def apply_template_to_session_state(file_name):
         st.session_state['upload_folder'] = f"uploadFiles/{selected_folder_name}"
         
         # 'num_requests'는 직접 변경할 수 없으므로 Streamlit에서 제공하는 방법으로 값을 설정
-        if "num_requests" in st.session_state:
-            st.session_state["num_requests"] = num_requests
+        #if "num_requests" in st.session_state:
+            #st.session_state["num_requests"] = num_requests
 
         st.success(f"'{selected_folder_name}' 템플릿이 불러와졌습니다.")
     
