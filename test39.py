@@ -749,7 +749,7 @@ def apply_template_to_session_state2(template_data):
     
     # 세션 상태 업데이트
     st.session_state['selected_folder_name'] = selected_folder_name
-    st.session_state['num_requests'] = num_requests
+    #st.session_state['num_requests'] = num_requests
     st.session_state['rows'] = rows
     st.session_state['is_updating'] = False
     st.session_state['upload_folder'] = f"uploadFiles/{selected_folder_name}"
@@ -786,7 +786,7 @@ def apply_template_to_session_state(file_name):
         
         # JSON 데이터에서 세션 상태 적용
         selected_folder_name = template_data.get('selected_folder_name', '')
-        num_requests = template_data.get('num_requests', 1)
+        #num_requests = template_data.get('num_requests', 1)
         rows = template_data.get('rows', [])
         
         # 세션 상태에 값 저장
