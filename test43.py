@@ -21,6 +21,7 @@ from openpyxl.utils import get_column_letter
 import re
 import tempfile
 import datetime
+from datetime import datetime
 
 # Backend 기능 구현 시작 ---
 
@@ -614,6 +615,18 @@ def init_session_state(check_value):
             st.session_state['selected_folder_index'] = 0
         if 'new_folder_text' not in st.session_state:    
             st.session_state['new_folder_text'] = ""
+        if 'check_report' not in st.session_state:    
+            st.session_state['check_report'] = True
+        if 'check_upload' not in st.session_state:    
+            st.session_state['check_upload'] = False        
+        if 'check_request' not in st.session_state:    
+            st.session_state['check_request'] = False
+        if 'check_result' not in st.session_state:    
+            st.session_state['check_result'] = False
+        if 'check_count' not in st.session_state:    
+            st.session_state['check_count'] = False
+        
+        
 
 def save_html_response(html_content, folder_name):
     # 현재 시각 데이터 형식화 (예: 20241010124055)
@@ -627,7 +640,206 @@ def save_html_response(html_content, folder_name):
         temp_file_path = temp_file.name
 
     return file_name, temp_file_path
+
+# GitHub에 폴더가 존재하는지 확인하는 함수
+def check_and_create_github_folder(folder_name, repo, branch, token):
+    url = f"https://api.github.com/repos/{repo}/contents/{folder_name}"
+    headers = {"Authorization": f"token {token}"}
+
+    # 폴더 존재 여부 확인
+    response = requests.get(url, headers=headers)
+    if response.status_code == 404:  # 폴더가 없으면 생성
+        # 폴더 생성하기 위한 커밋 메시지와 파일 내용 설정
+        data = {
+            "message": f"Create {folder_name} folder",
+            "content": "",  # GitHub에서는 폴더 자체를 직접 생성할 수 없으므로 빈 파일 생성으로 대체
+            "branch": branch
+        }
+        # 빈 파일 생성 (ex: .gitkeep)
+        file_url = f"{url}/.gitkeep"
+        response = requests.put(file_url, headers=headers, data=json.dumps(data))
+        if response.status_code == 201:
+            st.success(f"{folder_name} 폴더가 생성되었습니다.")
+        else:
+            st.error(f"{folder_name} 폴더 생성 실패: {response.json()}")
+    elif response.status_code == 200:
+        #st.info(f"{folder_name} 폴더가 이미 존재합니다.")
+        return None
+    else:
+        st.error(f"폴더 확인 중 오류 발생: {response.json()}")
+        
+# JSON 파일 저장 함수
+def save_template_to_json():
+    repo = st.session_state["github_repo"]
+    branch = st.session_state["github_branch"]
+    token = st.session_state["github_token"]
+
+    # GitHub 토큰과 레포지토리 설정 확인
+    if not token or not repo:
+        st.error("GitHub 토큰이나 저장소 정보가 설정되지 않았습니다.")
+        return
+        
+    # JSON 데이터 구조 생성
+    template_data = {
+        "selected_folder_name": st.session_state['selected_folder_name'],
+        "num_requests": st.session_state['num_requests'],
+        "rows": st.session_state['rows'],
+        "rows_length": len(st.session_state['rows']),
+        "timestamp": datetime.now().strftime("%Y%m%d%H%M%S")
+    }
+
+    # 파일명 생성
+    folder_name = st.session_state['selected_folder_name']
+    timestamp = template_data["timestamp"]
+    json_file_name = f"{folder_name}_Template_{timestamp}.json"
+
+    # GitHub 저장소 내 templateFiles 폴더 생성 및 파일 저장
+    template_folder = "templateFiles"
+    check_and_create_github_folder(template_folder, repo, branch, token)
+   
+    # 저장할 파일 경로
+    json_file_path = f"{template_folder}/{json_file_name}"
+
+    # JSON 파일을 Base64로 인코딩
+    json_content = json.dumps(template_data, ensure_ascii=False, indent=4)
+    json_base64 = base64.b64encode(json_content.encode('utf-8')).decode('utf-8')
+
+    # GitHub에 파일 업로드
+    url = f"https://api.github.com/repos/{repo}/contents/{json_file_path}"
+    headers = {"Authorization": f"token {token}"}
+    data = {
+        "message": f"Add {json_file_name}",
+        "content": json_base64,
+        "branch": branch
+    }
+
+    response = requests.put(url, headers=headers, json=data)
+    if response.status_code == 201:
+        st.success(f"{json_file_name} 파일이 {template_folder} 폴더에 저장되었습니다.")
+    else:
+        st.error(f"파일 저장 실패: {response.json()}")
+
+# GitHub에서 templateFiles 폴더 내의 JSON 파일 리스트를 가져오는 함수
+def get_template_files_list(repo, branch, token):
+    template_folder = "templateFiles"
+    url = f"https://api.github.com/repos/{repo}/contents/{template_folder}?ref={branch}"
+    headers = {"Authorization": f"token {token}"}
+    response = requests.get(url, headers=headers)
+
+    if response.status_code == 200:
+        # JSON 파일만 필터링하여 리스트로 반환
+        return [item['name'] for item in response.json() if item['name'].endswith('.json')]
+    else:
+        st.error("templateFiles 폴더의 파일 목록을 가져오지 못했습니다.")
+        return []
+
+# JSON 파일의 내용을 불러오는 함수
+def load_template_from_github(repo, branch, token, file_name):
+    template_folder = "templateFiles"
+    json_file_path = f"{template_folder}/{file_name}"
+    url = f"https://api.github.com/repos/{repo}/contents/{json_file_path}?ref={branch}"
+    headers = {"Authorization": f"token {token}"}
+    response = requests.get(url, headers=headers)
+
+    if response.status_code == 200:
+        file_content = base64.b64decode(response.json()['content'])
+        return json.loads(file_content)
+    else:
+        st.error(f"{file_name} 파일을 가져오지 못했습니다.")
+        return None
+
+# 불러온 JSON 데이터를 세션 상태에 반영하는 함수
+def apply_template_to_session_state2(template_data):
+    if not template_data:
+        st.error("불러온 템플릿 데이터가 없습니다.")
+        return
     
+    # JSON 데이터에서 필요한 값 추출 및 세션 상태 업데이트
+    selected_folder_name = template_data.get('selected_folder_name', '')
+    #num_requests = template_data.get('num_requests', 1)
+    rows = template_data.get('rows', [])
+    
+    # 세션 상태 업데이트
+    st.session_state['selected_folder_name'] = selected_folder_name
+    #st.session_state['num_requests'] = num_requests
+    st.session_state['rows'] = rows
+    st.session_state['is_updating'] = False
+    st.session_state['upload_folder'] = f"uploadFiles/{selected_folder_name}"
+    
+    # folder_list에서 selected_folder_name의 인덱스 찾기
+    folder_list = st.session_state.get('folder_list_option', [])
+    if selected_folder_name in folder_list:
+        selected_index = folder_list.index(selected_folder_name)
+        st.session_state['selected_folder_index'] = selected_index + 1
+    
+    # 엑셀 파일 처리: 파일 정보에 따라 시트 선택 입력창 추가
+    for idx, row in enumerate(rows):
+        file_name = row.get("파일")
+        file_info = row.get("파일정보", "1")
+        if file_name and file_name.endswith('.xlsx'):
+            # 시트 선택 로직 적용
+            file_content = get_file_from_github(
+                st.session_state["github_repo"],
+                st.session_state["github_branch"],
+                file_name,
+                st.session_state["github_token"]
+            )
+            if file_content:
+                handle_sheet_selection(file_content, len(openpyxl.load_workbook(file_content).sheetnames), idx)
+                st.session_state['rows'][idx]['파일정보'] = file_info
+    # 변경 사항을 화면에 반영하기 위해 페이지 리로드
+    st.experimental_rerun()
+
+def apply_template_to_session_state(file_name):
+    try:
+        # 템플릿 JSON 파일 로드
+        with open(file_name, 'r', encoding='utf-8') as f:
+            template_data = json.load(f)
+        
+        # JSON 데이터에서 세션 상태 적용
+        selected_folder_name = template_data.get('selected_folder_name', '')
+        #num_requests = template_data.get('num_requests', 1)
+        rows = template_data.get('rows', [])
+        
+        # 세션 상태에 값 저장
+        st.session_state['selected_folder_name'] = selected_folder_name
+        st.session_state['rows'] = rows
+        st.session_state['is_updating'] = False
+        st.session_state['upload_folder'] = f"uploadFiles/{selected_folder_name}"
+        
+        # 'num_requests'는 직접 변경할 수 없으므로 Streamlit에서 제공하는 방법으로 값을 설정
+        #if "num_requests" in st.session_state:
+            #st.session_state["num_requests"] = num_requests
+
+        st.success(f"'{selected_folder_name}' 템플릿이 불러와졌습니다.")
+    
+    except FileNotFoundError:
+        st.error(f"파일 '{file_name}'을 찾을 수 없습니다.")
+    except json.JSONDecodeError:
+        st.error(f"'{file_name}' 파일을 파싱하는 중 오류가 발생했습니다. JSON 형식을 확인해주세요.")
+    except Exception as e:
+        st.error(f"템플릿 불러오기 중 오류가 발생했습니다: {str(e)}")
+
+        
+# [보고서 불러오기] 버튼 클릭 시 JSON 파일 리스트를 보여주고, 선택한 파일의 내용을 세션 상태에 반영
+def load_template_button_function():
+   
+    repo = st.session_state["github_repo"]
+    branch = st.session_state["github_branch"]
+    token = st.session_state["github_token"]
+
+    # templateFiles 폴더 내 JSON 파일 리스트 가져오기
+    template_files = get_template_files_list(repo, branch, token)
+
+    if template_files:
+        selected_template = st.selectbox("불러올 보고서 양식 파일 리스트", options=["저장된 보고서 양식을 선택하세요"] + template_files)
+        if selected_template != "저장된 보고서 양식을 선택하세요":
+            # 선택한 템플릿 불러오기
+            template_data = load_template_from_github(repo, branch, token, selected_template)
+            if template_data:
+                apply_template_to_session_state(f"templateFiles/{selected_template}")
+                st.success(f"{selected_template} 템플릿이 성공적으로 불러와졌습니다.")
+            
 # Backend 기능 구현 끝 ---
 
 # Frontend 기능 구현 시작 ---
@@ -657,65 +869,116 @@ st.subheader("척척하나 - " +report_title)
 # 2 프레임
 # 보고서 주제 및 폴더 선택, 새 폴더 만들기
 if github_info_loaded:
-    col1, col2, col3 = st.columns([0.5, 0.3, 0.2])
-  
-    with col1:
-        folder_list = get_folder_list_from_github(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
-        # st.selectbox 위젯 생성 (이제 session_state['selected_folder'] 사용 가능)
-        #selected_folder = st.selectbox("보고서 주제 리스트", options=["주제를 선택하세요."] + folder_list, key="selected_folder")
-
-        # 'selected_folder'가 folder_list에 있을 때만 index 설정
-        selected_index = st.session_state['selected_folder_index']
-        if st.session_state['selected_folder_name'] in folder_list:
-            selected_index = folder_list.index(st.session_state['selected_folder_name']) + 1
-        #else:
-            #selected_index = 0  # 기본값으로 '주제를 선택하세요.' 선택
-        st.session_state['selected_folder_index'] = selected_index
-        st.session_state['folder_list_option'] = [folderlist_init_value] + folder_list
-        # 폴더 선택 selectbox 생성 (새 폴더 추가 후, 선택값으로 설정)
-        selected_folder = st.selectbox(
-            "보고서 주제 리스트",
-            options=st.session_state['folder_list_option'],  # 옵션 리스트에 새 폴더 반영
-            index=st.session_state['selected_folder_index'],  # 새로 선택된 폴더를 기본값으로 선택
-            key="selected_folder"
-        )
-        # 파일 업로드와 요청사항 리스트의 기본 폴더 설정
-        if selected_folder != "주제를 선택하세요.":
-            st.session_state['upload_folder'] = f"uploadFiles/{selected_folder}"
-            st.session_state['selected_folder_name'] = f"{selected_folder}"
-            refresh_page()
-            #st.success(f"[{selected_folder}] 보고서가 선택되었습니다.")
-        #else:   
-            #st.warning("보고서 주제를 선택하세요.")
-            
-    with col2:        
-        new_folder_name = st.text_input("새 폴더명 입력", max_chars=20, key="new_folder_name", value=st.session_state['new_folder_text'])
+    with st.expander("보고서 선택", expanded=st.session_state['check_report']):
    
-    with col3:    
-        st.write("")
-        if st.button("새로만들기", key="new_folder"):
-            if not new_folder_name:
-                st.error("새로운 보고서 주제를 입력하세요.")
-            elif new_folder_name in folder_list:
-                st.warning("이미 존재합니다.")
-            else:
-                # 폴더 생성 후 목록에 추가
-                folder_created = create_new_folder_in_github(st.session_state['github_repo'], new_folder_name, st.session_state['github_token'], st.session_state['github_branch'])
-                if folder_created:
-                    folder_list.append(new_folder_name)  # 새 폴더를 리스트에 추가
-                    st.session_state['selected_folder_index'] = len(folder_list) - 1
-                    st.session_state['folder_list_option'] = [folderlist_init_value] + folder_list
-                    st.session_state['upload_folder'] = f"uploadFiles/{new_folder_name}"
-                    st.session_state['selected_folder_name'] = f"{new_folder_name}"
-                    refresh_page()
-                    init_session_state(True)
-                    st.success(f"'{new_folder_name}' 폴더가 성공적으로 생성되었습니다.")
+        col1, col2, col3, col4 = st.columns([0.2, 0.3, 0.05, 0.35])
+        with col1:
+            st.write("")
+            st.markdown(
+                "<p style='font-size:14px; font-weight:bold; color:#999999;'>보고서 주제 선택</p>",
+                unsafe_allow_html=True
+            )
+        with col2:
+            folder_list = get_folder_list_from_github(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
+            # st.selectbox 위젯 생성 (이제 session_state['selected_folder'] 사용 가능)
+            #selected_folder = st.selectbox("보고서 주제 리스트트", options=["주제를 선택하세요."] + folder_list, key="selected_folder")
+    
+            # 'selected_folder'가 folder_list에 있을 때만 index 설정
+            selected_index = st.session_state['selected_folder_index']
+            if st.session_state['selected_folder_name'] in folder_list:
+                selected_index = folder_list.index(st.session_state['selected_folder_name']) + 1
+            #else:
+                #selected_index = 0  # 기본값으로 '주제를 선택하세요.' 선택
+            st.session_state['selected_folder_index'] = selected_index
+            st.session_state['folder_list_option'] = [folderlist_init_value] + folder_list
+            # 폴더 선택 selectbox 생성 (새 폴더 추가 후, 선택값으로 설정)
+            selected_folder = st.selectbox(
+                "보고서 주제 리스트",
+                options=st.session_state['folder_list_option'],  # 옵션 리스트에 새 폴더 반영
+                index=st.session_state['selected_folder_index'],  # 새로 선택된 폴더를 기본값으로 선택
+                key="selected_folder"
+            )
+            # 파일 업로드와 요청사항 리스트의 기본 폴더 설정
+            if selected_folder != "주제를 선택하세요.":
+                st.session_state['upload_folder'] = f"uploadFiles/{selected_folder}"
+                st.session_state['selected_folder_name'] = f"{selected_folder}"
+                refresh_page()
+                st.session_state['check_report']=False
+                st.session_state['check_count']=True
+                #st.success(f"[{selected_folder}] 보고서가 선택되었습니다.")
+            #else:   
+                #st.warning("보고서 주제를 선택하세요.")
+        with col3:
+            st.write("")
+            st.write("")
+            st.markdown(
+                "<p style='font-size:20px; font-weight:bold; color:#dddddd;text-align:center'>|</p>",
+                unsafe_allow_html=True
+            )
+        with col4:       
+            col1, col2 = st.columns([0.7, 0.3])
+            with col1:
+                new_folder_name = st.text_input("새로 등록할 보고서명 입력", max_chars=20, key="new_folder_name", value=st.session_state['new_folder_text'])
+            with col2:
+                st.write("")
+                st.write("")
+                if st.button("등록", key="new_folder"):
+                    if not new_folder_name:
+                        st.error("새로운 보고서 주제를 입력하세요.")
+                    elif new_folder_name in folder_list:
+                        st.warning("이미 존재합니다.")
+                    else:
+                        # 폴더 생성 후 목록에 추가
+                        folder_created = create_new_folder_in_github(st.session_state['github_repo'], new_folder_name, st.session_state['github_token'], st.session_state['github_branch'])
+                        if folder_created:
+                            folder_list.append(new_folder_name)  # 새 폴더를 리스트에 추가
+                            st.session_state['selected_folder_index'] = len(folder_list) - 1
+                            st.session_state['folder_list_option'] = [folderlist_init_value] + folder_list
+                            st.session_state['upload_folder'] = f"uploadFiles/{new_folder_name}"
+                            st.session_state['selected_folder_name'] = f"{new_folder_name}"
+                            
+                            st.session_state['check_report']=False
+                            st.session_state['check_count']=True
+                            refresh_page()
+                            init_session_state(True)
+                            st.success(f"'{new_folder_name}' 폴더가 성공적으로 생성되었습니다.")
+                                
+        
+        col1, col2 = st.columns([0.21, 0.79])
+        with col1:
+            st.write("")
+            st.markdown(
+                "<p style='font-size:14px; font-weight:bold; color:#999999;'>보고서 불러오기</p>",
+                unsafe_allow_html=True
+            )
+        with col2:    
+            load_template_button_function()
+
 else:
     st.warning("GitHub 정보가 설정되지 않았습니다. 먼저 GitHub Token을 입력해 주세요.")
 
 
+
+col1, col2, col3 = st.columns([0.2, 0.6, 0.2])
+with col1:
+    st.write("")
+with col2:   
+    report_title = "작성할 보고서를 선택하세요."
+    title_style="font-size:15px; font-weight:normal; color:#cccccc;border: 1px solid #dddddd;letter-spacing: 1px;"
+    if 'selected_folder_name' in st.session_state:
+        if st.session_state['selected_folder_name'] != folderlist_init_value:
+            report_title = " [" + st.session_state['selected_folder_name'] + "] 보고서"
+            title_style="font-size:20px; font-weight:bold; color:#000000;border: 0px solid #dddddd;letter-spacing: 4px;"
+    st.markdown(
+        f"<div style='text-align:center;{title_style};border-radius: 10px;width:100%;padding: 10px;margin-top:10px;margin-bottom:10px;'>{report_title}</div>",
+        unsafe_allow_html=True
+    )
+   
+with col3:
+    st.write("")
+
 # 3 프레임
-st.subheader("")
+#st.subheader("")
 st.markdown(
     "<p style='font-size:18px; font-weight:bold; color:#007BFF;'>작성 보고서 요청사항</p>",
     unsafe_allow_html=True
@@ -727,7 +990,7 @@ st.markdown(
 supported_file_types = ['xlsx', 'pptx', 'docx', 'csv', 'png', 'jpg', 'jpeg', 'pdf', 'txt', 'log']
 
 if github_info_loaded:
-    with st.expander("보고서 데이터 파일 업로드", expanded=True):
+    with st.expander("보고서 데이터 파일 업로드", expanded=st.session_state['check_upload']):
         uploaded_files = st.file_uploader("파일을 여러 개 드래그 앤 드롭하여 업로드하세요. (최대 100MB)", accept_multiple_files=True)
 
         if uploaded_files:
@@ -773,46 +1036,48 @@ else:
 
 # 5 프레임
 # 요청사항 갯수 설정 입력 및 버튼
-col1, col2, col3, col4 = st.columns([0.2, 0.4, 0.2, 0.2])
-
-with col1:
-    st.markdown(
-        "<p style='font-size:16px; font-weight:bold; color:#000000; margin-top:20px;'>요청사항 갯수</p>",
-        unsafe_allow_html=True
-    )
-    
-with col2:
-    # 요청사항 갯수 입력 (1-9)
-    num_requests = st.number_input(
-        "요청사항 갯수 입력창",
-        min_value=1,
-        max_value=9,
-        value=1,
-        step=1,
-        key="num_requests"
-    )
-
-with col3:
-    if st.button("설정", key="set_requests", use_container_width=True):
-        # 설정 버튼 클릭 시 요청사항 리스트 초기화 및 새로운 요청사항 갯수 설정
-        st.session_state['rows'] = [
-            {"제목": "", "요청": "", "파일": "", "데이터": "", "파일정보": "1"}
-            for _ in range(st.session_state['num_requests'])
-        ]
-        st.success(f"{st.session_state['num_requests']}개의 요청사항이 설정되었습니다.")
-        refresh_page()
-        init_session_state(True)
-
-with col4:
-    if st.button("새로고침", key="refresh_requests", use_container_width=True):
-        # 새로고침 버튼 클릭 시 요청사항 리스트 초기화
+with st.expander("요청사항 설정", expanded=st.session_state['check_count']):
+    col1, col2, col3 = st.columns([0.3, 0.4, 0.3])
+    with col1:
+        st.markdown(
+            "<p style='font-size:16px; font-weight:bold; color:#000000; margin-top:20px;'>요청사항 갯수</p>",
+            unsafe_allow_html=True
+        )
         
-        init_session_state(True)
-        st.success("요청사항 리스트가 초기화되었습니다.")
+    with col2:
+        # 요청사항 갯수 입력 (1-9)
+        num_requests = st.number_input(
+            "요청사항 갯수 입력창",
+            min_value=1,
+            max_value=9,
+            value=1,
+            step=1,
+            key="num_requests"
+        )
+    
+    with col3:
+        if st.button("설정", key="set_requests", use_container_width=True):
+            # 설정 버튼 클릭 시 요청사항 리스트 초기화 및 새로운 요청사항 갯수 설정
+            st.session_state['rows'] = [
+                {"제목": "", "요청": "", "파일": "", "데이터": "", "파일정보": "1"}
+                for _ in range(st.session_state['num_requests'])
+            ]
+            st.success(f"{st.session_state['num_requests']}개의 요청사항이 설정되었습니다.")
+            st.session_state['check_request']=True
+            st.session_state['check_count']=False
+            refresh_page()
+            init_session_state(True)
+    
+    #with col4:
+        #if st.button("새로고침", key="refresh_requests", use_container_width=True):
+            # 새로고침 버튼 클릭 시 요청사항 리스트 초기화
+            
+            #init_session_state(True)
+            #st.success("요청사항 리스트가 초기화되었습니다.")
 
 # 6 프레임
 # 요청사항 리스트
-with st.expander("요청사항 리스트", expanded=True):
+with st.expander("요청사항 리스트", expanded=st.session_state['check_request']):
     if 'rows' not in st.session_state:
         st.session_state['rows'] = [{"제목": "", "요청": "", "파일": "", "데이터": "", "파일정보":"1"}]
 
@@ -868,19 +1133,21 @@ with st.expander("요청사항 리스트", expanded=True):
         #if row_checked:
             #checked_rows.append(idx)
 
-# 7 프레임
+# 6 프레임
 # 보고서 저장, 보고서 불러오기 버튼을 같은 행에 가로로 배치하고 각 버튼의 너비를 50%로 설정
-col1, col2 = st.columns([0.5, 0.5])
-with col1:
-    if st.button("보고서 저장", key="save_template", use_container_width=True):
-        st.success("양식이 저장되었습니다.")
+#col1, col2 = st.columns([0.5, 0.5])
+#with col1:
+    #if st.button("보고서 저장", key="save_template", use_container_width=True):
+        #st.success("양식이 저장되었습니다.")
+        #save_template_to_json()
 
-with col2:
-    if st.button("보고서 불러오기", key="load_template", use_container_width=True):
-        st.success("양식이 불러와졌습니다.")
+#with col2:
+    #load_template_button_function()
+    #if st.button("보고서 불러오기", key="load_template", use_container_width=True):
+       
         
-# 8 프레임
-st.subheader("")
+# 7 프레임
+#st.subheader("")
 col1, col2, col3 = st.columns([0.2, 0.6, 0.2])
 
 with col1:
@@ -897,6 +1164,9 @@ with col2:
             # 파일 데이터 가져와서 HTML 보고서 생성
             #file_data_list = []
             html_viewer_data = ""
+            
+            st.session_state['check_result']=True
+  
             for idx, row in enumerate(st.session_state['rows']):
                 file_path = st.session_state['rows'][idx]['파일']
                 file_content = get_file_from_github(st.session_state["github_repo"], st.session_state["github_branch"], file_path, st.session_state["github_token"])
@@ -940,50 +1210,58 @@ with col2:
 with col3:
     st.write("")           
 
-# 9 프레임
-st.subheader("")
+# 8 프레임
+#st.subheader("")
 # 결과 보고서
 st.markdown(
     "<p style='font-size:18px; font-weight:bold; color:#007BFF;'>결과 보고서</p>",
     unsafe_allow_html=True
 )
 
-# 10 프레임
-# 결과 보고서 HTML 보기
-if "html_report" in st.session_state:
-    st.write("파일 데이터 추출 보기")
-    html_report_value = f"<div style='border: 2px solid #cccccc; padding: 2px;'>{st.session_state['html_report']}</div>"
-    st.components.v1.html(html_report_value, height=1024, scrolling=True)
+
+# 9 프레임
+# LLM 응답 보기
+with st.expander("결과 보고서 보기", expanded=st.session_state['check_result']):
+    if "response" in st.session_state:
+        for idx, response in enumerate(st.session_state["response"]):
+            #st.text_area(f"응답 {idx+1}:", value=response, height=300)
+            st.write("결과 보고서 완성")
+            html_response_value = f"<div style='border: 0px solid #cccccc; padding: 1px;'>{response}</div>"
+            st.components.v1.html(html_response_value, height=1280, scrolling=True)
+    
+    # 10 프레임
+    # 결과 저장 버튼
+    col1, col2 = st.columns([0.5, 0.5])
+    with col1:
+        if st.button("결과 내용 저장", key="save_result", use_container_width=True):
+            if "response" in st.session_state:
+                # HTML 응답 데이터를 파일로 저장하고 다운로드 링크 제공
+                file_name, temp_file_path = save_html_response(html_response_value, st.session_state['selected_folder_name'])
+                st.success(f"{file_name} 파일이 생성되었습니다.")
+                st.download_button(
+                    label="다운로드",
+                    use_container_width=True,
+                    data=open(temp_file_path, 'r', encoding='utf-8').read(),
+                    file_name=file_name,
+                    mime="text/html"
+                )
+            else:
+                st.warning("결과 보고서를 먼저 실행하세요.")
+    with col2:
+        if st.button("보고서 양식 저장", key="save_template", use_container_width=True):
+            save_template_to_json()
+
 
 # 11 프레임
-# 전달된 프롬프트
-st.text_area("전달된 프롬프트:", value="\n\n".join(global_generated_prompt), height=150)
+# 결과 보고서 HTML 보기
+#if "html_report" in st.session_state:
+    #st.write("파일 데이터 추출 보기")
+    #html_report_value = f"<div style='border: 2px solid #cccccc; padding: 2px;'>{st.session_state['html_report']}</div>"
+    #st.components.v1.html(html_report_value, height=1024, scrolling=True)
 
 # 12 프레임
-# LLM 응답 보기
-if "response" in st.session_state:
-    for idx, response in enumerate(st.session_state["response"]):
-        st.text_area(f"응답 {idx+1}:", value=response, height=300)
-        st.write("결과 보고서 완성")
-        html_response_value = f"<div style='border: 2px solid #cccccc; padding: 2px;'>{response}</div>"
-        st.components.v1.html(html_response_value, height=1280, scrolling=True)
-
-# 결과 저장 버튼
-    col1, col2 = st.columns([0.4, 0.6])
-    with col1:
-        if st.button("결과 저장", key="save_result", use_container_width=True):
-            # HTML 응답 데이터를 파일로 저장하고 다운로드 링크 제공
-            file_name, temp_file_path = save_html_response(html_response_value, st.session_state['selected_folder_name'])
-            st.success(f"{file_name} 파일이 생성되었습니다.")
-            st.download_button(
-                label="다운로드",
-                use_container_width=True,
-                data=open(temp_file_path, 'r', encoding='utf-8').read(),
-                file_name=file_name,
-                mime="text/html"
-            )
-    with col2:
-        st.write()
+# 전달된 프롬프트
+#st.text_area("전달된 프롬프트:", value="\n\n".join(global_generated_prompt), height=150)
     
 # Frontend 기능 구현 끝 ---
 
