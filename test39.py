@@ -936,10 +936,11 @@ if github_info_loaded:
                             st.session_state['folder_list_option'] = [folderlist_init_value] + folder_list
                             st.session_state['upload_folder'] = f"uploadFiles/{new_folder_name}"
                             st.session_state['selected_folder_name'] = f"{new_folder_name}"
-                            refresh_page()
-                            init_session_state(True)
+                            
                             st.session_state['check_report']=False
                             st.session_state['check_count']=True
+                            refresh_page()
+                            init_session_state(True)
                             st.success(f"'{new_folder_name}' 폴더가 성공적으로 생성되었습니다.")
                                 
         
@@ -1062,6 +1063,8 @@ with st.expander("요청사항 설정", expanded=st.session_state['check_count']
                 for _ in range(st.session_state['num_requests'])
             ]
             st.success(f"{st.session_state['num_requests']}개의 요청사항이 설정되었습니다.")
+            st.session_state['check_request']=True
+            st.session_state['check_count']=False
             refresh_page()
             init_session_state(True)
     
@@ -1161,6 +1164,9 @@ with col2:
             # 파일 데이터 가져와서 HTML 보고서 생성
             #file_data_list = []
             html_viewer_data = ""
+            
+            st.session_state['check_result']=True
+  
             for idx, row in enumerate(st.session_state['rows']):
                 file_path = st.session_state['rows'][idx]['파일']
                 file_content = get_file_from_github(st.session_state["github_repo"], st.session_state["github_branch"], file_path, st.session_state["github_token"])
