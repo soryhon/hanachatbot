@@ -953,6 +953,20 @@ else:
     st.warning("GitHub 정보가 설정되지 않았습니다. 먼저 GitHub Token을 입력해 주세요.")
 
 
+report_title = "작성할 보고서를 선택하세요."
+if 'selected_folder_name' in st.session_state:
+    if st.session_state['selected_folder_name'] != folderlist_init_value:
+        report_title = " [" + st.session_state['selected_folder_name'] + "] 보고서"
+col1, col2, col3 = st.columns([0.2, 0.6, 0.2])
+with col1:
+    st.write("")
+with col2:   
+    st.button(f"{report_title}", key="set_requests", use_container_width=True):
+        if report_title != "작성할 보고서를 선택하세요.":
+            st.session_state['check_report'] = False
+with col3:
+    st.write("")
+
 # 3 프레임
 #st.subheader("")
 st.markdown(
