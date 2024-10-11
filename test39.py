@@ -935,7 +935,7 @@ st.markdown(
 supported_file_types = ['xlsx', 'pptx', 'docx', 'csv', 'png', 'jpg', 'jpeg', 'pdf', 'txt', 'log']
 
 if github_info_loaded:
-    with st.expander("보고서 데이터 파일 업로드", expanded=True):
+    with st.expander("보고서 데이터 파일 업로드", expanded=False):
         uploaded_files = st.file_uploader("파일을 여러 개 드래그 앤 드롭하여 업로드하세요. (최대 100MB)", accept_multiple_files=True)
 
         if uploaded_files:
