@@ -1226,7 +1226,7 @@ with st.expander("결과 보고서 보기", expanded=st.session_state['check_res
             #st.text_area(f"응답 {idx+1}:", value=response, height=300)
             st.write("결과 보고서 완성")
             html_response_value = f"<div style='border: 0px solid #cccccc; padding: 1px;'>{response}</div>"
-            st.components.v1.html(html_response_value, height=1280, scrolling=True)
+            st.components.v1.html(html_response_value, height=800, scrolling=True)
     
     # 10 프레임
     # 결과 저장 버튼
@@ -1256,7 +1256,7 @@ with st.expander("결과 보고서 보기", expanded=st.session_state['check_res
 #if "html_report" in st.session_state:
     #st.write("파일 데이터 추출 보기")
     #html_report_value = f"<div style='border: 2px solid #cccccc; padding: 2px;'>{st.session_state['html_report']}</div>"
-    #st.components.v1.html(html_report_value, height=600, scrolling=True)
+    #st.components.v1.html(html_report_value, height=10240, scrolling=True)
 
 # 12 프레임
 # 전달된 프롬프트
