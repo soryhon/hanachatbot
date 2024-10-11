@@ -1090,7 +1090,7 @@ with st.expander("요청사항 리스트", expanded=True):
        
         
 # 7 프레임
-st.subheader("")
+#st.subheader("")
 col1, col2, col3 = st.columns([0.2, 0.6, 0.2])
 
 with col1:
@@ -1151,7 +1151,7 @@ with col3:
     st.write("")           
 
 # 8 프레임
-st.subheader("")
+#st.subheader("")
 # 결과 보고서
 st.markdown(
     "<p style='font-size:18px; font-weight:bold; color:#007BFF;'>결과 보고서</p>",
