@@ -661,6 +661,12 @@ def save_template_to_json():
     repo = st.session_state["github_repo"]
     branch = st.session_state["github_branch"]
     token = st.session_state["github_token"]
+
+    # GitHub 토큰과 레포지토리 설정 확인
+    if not token or not repo:
+        st.error("GitHub 토큰이나 저장소 정보가 설정되지 않았습니다.")
+        return
+        
     # JSON 데이터 구조 생성
     template_data = {
         "selected_folder_name": st.session_state['selected_folder_name'],
