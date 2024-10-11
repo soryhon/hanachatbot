@@ -965,22 +965,21 @@ col1, col2, col3 = st.columns([0.2, 0.6, 0.2])
 with col1:
     st.write("")
 with col2:   
-    disabled_button = st.button(f"{report_title}")
-        if not some_condition:
-            st.markdown(
-                """
-                <style>
-                .stButton > button {
-                    background-color: #ddd;
-                    color: #666;
-                    cursor: not-allowed;
-                    pointer-events: none;
-                }
-                </style>
-                """,
-                unsafe_allow_html=True,
-                use_container_width=True
-            )
+    disabled_button = st.button(f"{report_title}", use_container_width=True)
+    st.markdown(
+        """
+        <style>
+        .stButton > button {
+            background-color: #ddd;
+            color: #666;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+        
+    )
         #if report_title != "작성할 보고서를 선택하세요.":
             #st.session_state['check_report'] = False
 with col3:
