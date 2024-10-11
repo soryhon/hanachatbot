@@ -966,8 +966,8 @@ with col1:
     st.write("")
 with col2:   
     st.markdown(
-        f"<div style='font-size:20px; font-weight:bold; color:#000000;border: 1px solid #FF5733;border-radius: 10px;'>{report_title}</div>",
-        unsafe_allow_html=True, use_container_width=True
+        f"<div style='font-size:20px; font-weight:bold; color:#000000;border: 1px solid #FF5733;border-radius: 10px;width:100%'>{report_title}</div>",
+        unsafe_allow_html=True
     )
    
 with col3:
