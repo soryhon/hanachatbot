@@ -900,8 +900,10 @@ if github_info_loaded:
                 #st.warning("보고서 주제를 선택하세요.")
         with col3:
             st.write("")
-            st.write("│")
-            st.write("│")
+            st.markdown(
+                "<p style='font-size:18px; font-weight:bold; color:#dddddd;'>|</p>",
+                unsafe_allow_html=True
+            )
         with col4:       
             col1, col2 = st.columns([0.7, 0.3])
             with col1:
