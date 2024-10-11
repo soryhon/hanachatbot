@@ -862,7 +862,7 @@ st.subheader("척척하나 - " +report_title)
 # 보고서 주제 및 폴더 선택, 새 폴더 만들기
 if github_info_loaded:
     with st.expander("보고서 선택", expanded=True):
-        with st.expander("보고서 주제 선택", expanded=True):
+        with st.contanier():
             col1, col2, col3 = st.columns([0.2, 0.4, 0.4])
             with col1:
                 st.write("")
@@ -922,7 +922,7 @@ if github_info_loaded:
                                 init_session_state(True)
                                 st.success(f"'{new_folder_name}' 폴더가 성공적으로 생성되었습니다.")
                                 
-        with st.expander("보고서 주제 선택", expanded=True):
+        with st.contanier():
             col1, col2 = st.columns([0.2, 0.8])
             with col1:
                 st.write("")
