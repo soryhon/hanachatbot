@@ -981,7 +981,7 @@ else:
 
 # 5 프레임
 # 요청사항 갯수 설정 입력 및 버튼
- with st.expander("요청사항 설정", expanded=True):
+with st.expander("요청사항 설정", expanded=True):
     col1, col2, col3 = st.columns([0.3, 0.4, 0.3])
     with col1:
         st.markdown(
