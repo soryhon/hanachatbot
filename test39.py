@@ -863,7 +863,7 @@ st.subheader("척척하나 - " +report_title)
 if github_info_loaded:
     with st.expander("보고서 선택", expanded=True):
    
-        col1, col2, col3 = st.columns([0.2, 0.4, 0.4])
+        col1, col2, col3 = st.columns([0.2, 0.3, 0.05, 0.35])
         with col1:
             st.write("")
             st.markdown(
@@ -898,8 +898,11 @@ if github_info_loaded:
                 #st.success(f"[{selected_folder}] 보고서가 선택되었습니다.")
             #else:   
                 #st.warning("보고서 주제를 선택하세요.")
-                
-        with col3:       
+        with col3:
+            st.write("")
+            st.write("|")
+            st.write("")
+        with col4:       
             col1, col2 = st.columns([0.7, 0.3])
             with col1:
                 new_folder_name = st.text_input("새 보고서 주제명 입력", max_chars=20, key="new_folder_name", value=st.session_state['new_folder_text'])
