@@ -793,6 +793,7 @@ def load_template_button_function():
         st.warning(" 템플릿을 불러오고 있습니다.3")
         if selected_template != "템플릿을 선택하세요":
             # 선택한 템플릿 불러오기
+            st.write(selected_template)
             st.warning(f"{selected_template} 템플릿을 불러오고 있습니다.")
             template_data = load_template_from_github(repo, branch, token, selected_template)
             if template_data:
@@ -801,7 +802,7 @@ def load_template_button_function():
             else:
                 st.error("1 템플릿을 불러오기 실패") 
         else:
-            st.warning(" 템플릿을 불러오고 있습니다.3")    
+            st.warning(" 템플릿을 불러오고 있습니다.4")    
     else:
         st.error("2 템플릿을 불러오기 실패")
 # Backend 기능 구현 끝 ---
