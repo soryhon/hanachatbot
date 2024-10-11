@@ -893,25 +893,28 @@ if github_info_loaded:
             #else:   
                 #st.warning("보고서 주제를 선택하세요.")
                 
-        with col2:        
-            new_folder_name = st.text_input("새 보고서 주제명 입력", max_chars=20, key="new_folder_name", value=st.session_state['new_folder_text'])
-            if st.button("등록", key="new_folder"):
-                if not new_folder_name:
-                    st.error("새로운 보고서 주제를 입력하세요.")
-                elif new_folder_name in folder_list:
-                    st.warning("이미 존재합니다.")
-                else:
-                    # 폴더 생성 후 목록에 추가
-                    folder_created = create_new_folder_in_github(st.session_state['github_repo'], new_folder_name, st.session_state['github_token'], st.session_state['github_branch'])
-                    if folder_created:
-                        folder_list.append(new_folder_name)  # 새 폴더를 리스트에 추가
-                        st.session_state['selected_folder_index'] = len(folder_list) - 1
-                        st.session_state['folder_list_option'] = [folderlist_init_value] + folder_list
-                        st.session_state['upload_folder'] = f"uploadFiles/{new_folder_name}"
-                        st.session_state['selected_folder_name'] = f"{new_folder_name}"
-                        refresh_page()
-                        init_session_state(True)
-                        st.success(f"'{new_folder_name}' 폴더가 성공적으로 생성되었습니다.")
+        with col2:       
+            col1, col2 = st.columns([0.7, 0.3])
+            with col1:
+                new_folder_name = st.text_input("새 보고서 주제명 입력", max_chars=20, key="new_folder_name", value=st.session_state['new_folder_text'])
+            with col2:
+                if st.button("등록", key="new_folder"):
+                    if not new_folder_name:
+                        st.error("새로운 보고서 주제를 입력하세요.")
+                    elif new_folder_name in folder_list:
+                        st.warning("이미 존재합니다.")
+                    else:
+                        # 폴더 생성 후 목록에 추가
+                        folder_created = create_new_folder_in_github(st.session_state['github_repo'], new_folder_name, st.session_state['github_token'], st.session_state['github_branch'])
+                        if folder_created:
+                            folder_list.append(new_folder_name)  # 새 폴더를 리스트에 추가
+                            st.session_state['selected_folder_index'] = len(folder_list) - 1
+                            st.session_state['folder_list_option'] = [folderlist_init_value] + folder_list
+                            st.session_state['upload_folder'] = f"uploadFiles/{new_folder_name}"
+                            st.session_state['selected_folder_name'] = f"{new_folder_name}"
+                            refresh_page()
+                            init_session_state(True)
+                            st.success(f"'{new_folder_name}' 폴더가 성공적으로 생성되었습니다.")
         with col3:    
             load_template_button_function()
 
