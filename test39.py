@@ -965,9 +965,22 @@ col1, col2, col3 = st.columns([0.2, 0.6, 0.2])
 with col1:
     st.write("")
 with col2:   
-    disabled_button = st.button(f"{report_title}", disabled=True, use_container_width=True)
-        #if report_title != "작성할 보고서를 선택하세요.":
-            #st.session_state['check_report'] = False
+    disabled_button = st.button(f"{report_title}", key="selected_report_title" disabled=True, use_container_width=True)
+    st.markdown(
+        """
+        <style>
+        /* '특별한 버튼'에만 적용할 스타일 */
+        div[data-testid="stButton"] > button[aria-label="selected_report_title"] {
+            border: 1px solid #FF5733; /* 테두리 색상 및 두께 */
+            color: #000000; /* 글자 색 */
+            border-radius: 10px; /* 테두리 둥글기 */
+            background-color: #FAFAFA; /* 배경색 */
+            font-size:18px;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+        )
 with col3:
     st.write("")
 
