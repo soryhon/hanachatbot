@@ -820,13 +820,9 @@ def load_template_button_function():
     template_files = get_template_files_list(repo, branch, token)
 
     if template_files:
-
-        #apply_template_to_session_state("templateFiles/IT보안 점검일지_Template_20241011072910.json")
-        selected_template = st.selectbox("불러올 보고서 양식 선택", options=["템플릿을 선택하세요"] + template_files)
-        if selected_template != "템플릿을 선택하세요":
+        selected_template = st.selectbox("불러올 보고서 양식 파일 리스트", options=["보고서 양식을 선택하세요"] + template_files)
+        if selected_template != "보고서 양식을 선택하세요":
             # 선택한 템플릿 불러오기
-            st.write(selected_template)
-            st.warning(f"{selected_template} 템플릿을 불러오고 있습니다.")
             template_data = load_template_from_github(repo, branch, token, selected_template)
             if template_data:
                 apply_template_to_session_state(f"templateFiles/{selected_template}")
@@ -867,13 +863,13 @@ if github_info_loaded:
         with col1:
             st.write("")
             st.markdown(
-                "<p style='font-size:14px; font-weight:bold; color:#999999;'>보고서 주제</p>",
+                "<p style='font-size:14px; font-weight:bold; color:#999999;'>보고서 주제 선택</p>",
                 unsafe_allow_html=True
             )
         with col2:
             folder_list = get_folder_list_from_github(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
             # st.selectbox 위젯 생성 (이제 session_state['selected_folder'] 사용 가능)
-            #selected_folder = st.selectbox("보고서 주제 리스트", options=["주제를 선택하세요."] + folder_list, key="selected_folder")
+            #selected_folder = st.selectbox("보고서 주제 리스트트", options=["주제를 선택하세요."] + folder_list, key="selected_folder")
     
             # 'selected_folder'가 folder_list에 있을 때만 index 설정
             selected_index = st.session_state['selected_folder_index']
@@ -908,7 +904,7 @@ if github_info_loaded:
         with col4:       
             col1, col2 = st.columns([0.7, 0.3])
             with col1:
-                new_folder_name = st.text_input("새 보고서 주제명 입력", max_chars=20, key="new_folder_name", value=st.session_state['new_folder_text'])
+                new_folder_name = st.text_input("새 보고서명 입력", max_chars=20, key="new_folder_name", value=st.session_state['new_folder_text'])
             with col2:
                 st.write("")
                 st.write("")
