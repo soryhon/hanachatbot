@@ -674,8 +674,8 @@ def save_template_to_json():
     timestamp = template_data["timestamp"]
     json_file_name = f"{folder_name}_Template_{timestamp}.json"
 
-    # GitHub 저장소 내 TemplateFiles 폴더 생성 및 파일 저장
-    template_folder = "TemplateFiles"
+    # GitHub 저장소 내 templateFiles 폴더 생성 및 파일 저장
+    template_folder = "templateFiles"
     check_and_create_github_folder(template_folder, repo, branch, token)
    
     # 저장할 파일 경로
@@ -686,12 +686,12 @@ def save_template_to_json():
     json_base64 = json_content.decode('utf-8')
 
     # GitHub에 파일 업로드
-    url = f"https://api.github.com/repos/{github_repo}/contents/{json_file_path}"
-    headers = {"Authorization": f"token {github_token}"}
+    url = f"https://api.github.com/repos/{repo}/contents/{json_file_path}"
+    headers = {"Authorization": f"token {token}"}
     data = {
         "message": f"Add {json_file_name}",
         "content": json_base64,
-        "branch": GITHUB_BRANCH
+        "branch": brnach
     }
 
     response = requests.put(url, headers=headers, data=json.dumps(data))
