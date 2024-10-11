@@ -1165,9 +1165,10 @@ if "response" in st.session_state:
 
 # 10 프레임
 # 결과 저장 버튼
-    col1, col2 = st.columns([0.5, 0.5])
-    with col1:
-        if st.button("결과 내용 저장", key="save_result", use_container_width=True):
+col1, col2 = st.columns([0.5, 0.5])
+with col1:
+    if st.button("결과 내용 저장", key="save_result", use_container_width=True):
+        if "response" in st.session_state:
             # HTML 응답 데이터를 파일로 저장하고 다운로드 링크 제공
             file_name, temp_file_path = save_html_response(html_response_value, st.session_state['selected_folder_name'])
             st.success(f"{file_name} 파일이 생성되었습니다.")
@@ -1178,9 +1179,11 @@ if "response" in st.session_state:
                 file_name=file_name,
                 mime="text/html"
             )
-    with col2:
-        if st.button("보고서 양식 저장", key="save_template", use_container_width=True):
-            save_template_to_json()
+        else:
+            st.warning("결과 보고서를 먼저 실행하세요.")
+with col2:
+    if st.button("보고서 양식 저장", key="save_template", use_container_width=True):
+        save_template_to_json()
 
 
 # 11 프레임
