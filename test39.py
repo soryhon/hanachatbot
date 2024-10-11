@@ -630,9 +630,9 @@ def save_html_response(html_content, folder_name):
     return file_name, temp_file_path
 
 # GitHub에 폴더가 존재하는지 확인하는 함수
-def check_and_create_github_folder(folder_name):
-    url = f"https://api.github.com/repos/{github_repo}/contents/{folder_name}"
-    headers = {"Authorization": f"token {github_token}"}
+def check_and_create_github_folder(folder_name, repo, branch, token):
+    url = f"https://api.github.com/repos/{repo}/contents/{folder_name}"
+    headers = {"Authorization": f"token {token}"}
 
     # 폴더 존재 여부 확인
     response = requests.get(url, headers=headers)
@@ -657,6 +657,9 @@ def check_and_create_github_folder(folder_name):
         
 # JSON 파일 저장 함수
 def save_template_to_json():
+    repo = st.session_state["github_repo"]
+    branch = st.session_state["github_branch"]
+    token = st.session_state["github_token"]
     # JSON 데이터 구조 생성
     template_data = {
         "selected_folder_name": st.session_state['selected_folder_name'],
@@ -673,8 +676,8 @@ def save_template_to_json():
 
     # GitHub 저장소 내 TemplateFiles 폴더 생성 및 파일 저장
     template_folder = "TemplateFiles"
-    check_and_create_github_folder(template_folder)
-    
+    check_and_create_github_folder(template_folder, repo, branch, token)
+   
     # 저장할 파일 경로
     json_file_path = f"{template_folder}/{json_file_name}"
 
