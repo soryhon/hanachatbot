@@ -743,9 +743,9 @@ def apply_template_to_session_state(template_data):
         return
     
     # JSON 데이터에서 필요한 값 추출 및 세션 상태 업데이트
-    selected_folder_name = template_data.get('selected_folder_name')
-    num_requests = template_data.get('num_requests')
-    rows = template_data.get('rows')
+    selected_folder_name = template_data.get('selected_folder_name', '')
+    num_requests = template_data.get('num_requests', 1)
+    rows = template_data.get('rows', [])
     
     # 세션 상태 업데이트
     st.session_state['selected_folder_name'] = selected_folder_name
