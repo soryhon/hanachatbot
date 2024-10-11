@@ -927,7 +927,7 @@ st.markdown(
 
 # 4 프레임
 # 요청사항 갯수 설정 입력 및 버튼
-col1, col2, col3, col4 = st.columns([0.3, 0.3, 0.3])
+col1, col2, col3 = st.columns([0.3, 0.3, 0.3])
 with col1:
     # 파일 업로드
     # 지원되는 파일 형식 리스트
