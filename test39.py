@@ -861,7 +861,7 @@ st.subheader("척척하나 - " +report_title)
 # 2 프레임
 # 보고서 주제 및 폴더 선택, 새 폴더 만들기
 if github_info_loaded:
-    with st.container():
+    with st.expander("보고서 선택", expanded=True):
         col1, col2, col3 = st.columns([0.3, 0.4, 0.3])
       
         with col1:
