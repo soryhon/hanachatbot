@@ -863,7 +863,7 @@ st.subheader("척척하나 - " +report_title)
 if github_info_loaded:
     with st.expander("보고서 선택", expanded=True):
    
-        col1, col2, col3 = st.columns([0.2, 0.3, 0.05, 0.35])
+        col1, col2, col3, col4 = st.columns([0.2, 0.3, 0.05, 0.35])
         with col1:
             st.write("")
             st.markdown(
