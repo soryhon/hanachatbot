@@ -707,6 +707,93 @@ def save_template_to_json():
     else:
         st.error(f"파일 저장 실패: {response.json()}")
 
+# GitHub에서 templateFiles 폴더 내의 JSON 파일 리스트를 가져오는 함수
+def get_template_files_list(repo, branch, token):
+    template_folder = "templateFiles"
+    url = f"https://api.github.com/repos/{repo}/contents/{template_folder}?ref={branch}"
+    headers = {"Authorization": f"token {token}"}
+    response = requests.get(url, headers=headers)
+
+    if response.status_code == 200:
+        # JSON 파일만 필터링하여 리스트로 반환
+        return [item['name'] for item in response.json() if item['name'].endswith('.json')]
+    else:
+        st.error("templateFiles 폴더의 파일 목록을 가져오지 못했습니다.")
+        return []
+
+# JSON 파일의 내용을 불러오는 함수
+def load_template_from_github(repo, branch, token, file_name):
+    template_folder = "templateFiles"
+    json_file_path = f"{template_folder}/{file_name}"
+    url = f"https://api.github.com/repos/{repo}/contents/{json_file_path}?ref={branch}"
+    headers = {"Authorization": f"token {token}"}
+    response = requests.get(url, headers=headers)
+
+    if response.status_code == 200:
+        file_content = base64.b64decode(response.json()['content'])
+        return json.loads(file_content)
+    else:
+        st.error(f"{file_name} 파일을 가져오지 못했습니다.")
+        return None
+
+# 불러온 JSON 데이터를 세션 상태에 반영하는 함수
+def apply_template_to_session_state(template_data):
+    if not template_data:
+        st.error("불러온 템플릿 데이터가 없습니다.")
+        return
+    
+    # JSON 데이터에서 필요한 값 추출 및 세션 상태 업데이트
+    selected_folder_name = template_data.get('selected_folder_name')
+    num_requests = template_data.get('num_requests')
+    rows = template_data.get('rows')
+    
+    # 세션 상태 업데이트
+    st.session_state['selected_folder_name'] = selected_folder_name
+    st.session_state['num_requests'] = num_requests
+    st.session_state['rows'] = rows
+    st.session_state['is_updating'] = False
+    st.session_state['upload_folder'] = f"uploadFiles/{selected_folder_name}"
+    
+    # folder_list에서 selected_folder_name의 인덱스 찾기
+    folder_list = st.session_state.get('folder_list_option', [])
+    if selected_folder_name in folder_list:
+        selected_index = folder_list.index(selected_folder_name)
+        st.session_state['selected_folder_index'] = selected_index + 1
+    
+    # 엑셀 파일 처리: 파일 정보에 따라 시트 선택 입력창 추가
+    for idx, row in enumerate(rows):
+        file_name = row.get("파일")
+        file_info = row.get("파일정보", "1")
+        if file_name and file_name.endswith('.xlsx'):
+            # 시트 선택 로직 적용
+            file_content = get_file_from_github(
+                st.session_state["github_repo"],
+                st.session_state["github_branch"],
+                file_name,
+                st.session_state["github_token"]
+            )
+            if file_content:
+                handle_sheet_selection(file_content, len(openpyxl.load_workbook(file_content).sheetnames), idx)
+                st.session_state['rows'][idx]['파일정보'] = file_info
+
+# [보고서 불러오기] 버튼 클릭 시 JSON 파일 리스트를 보여주고, 선택한 파일의 내용을 세션 상태에 반영
+def load_template_button_function():
+    repo = st.session_state["github_repo"]
+    branch = st.session_state["github_branch"]
+    token = st.session_state["github_token"]
+
+    # templateFiles 폴더 내 JSON 파일 리스트 가져오기
+    template_files = get_template_files_list(repo, branch, token)
+    
+    if template_files:
+        selected_template = st.selectbox("불러올 보고서 템플릿을 선택하세요", options=["템플릿을 선택하세요"] + template_files)
+        
+        if selected_template != "템플릿을 선택하세요":
+            # 선택한 템플릿 불러오기
+            template_data = load_template_from_github(repo, branch, token, selected_template)
+            if template_data:
+                apply_template_to_session_state(template_data)
+                st.success(f"{selected_template} 템플릿이 성공적으로 불러와졌습니다.")
         
 # Backend 기능 구현 끝 ---
 
