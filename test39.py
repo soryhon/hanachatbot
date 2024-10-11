@@ -904,7 +904,7 @@ if github_info_loaded:
         with col4:       
             col1, col2 = st.columns([0.7, 0.3])
             with col1:
-                new_folder_name = st.text_input("새 보고서명 입력", max_chars=20, key="new_folder_name", value=st.session_state['new_folder_text'])
+                new_folder_name = st.text_input("새로 등록할 보고서명 입력", max_chars=20, key="new_folder_name", value=st.session_state['new_folder_text'])
             with col2:
                 st.write("")
                 st.write("")
