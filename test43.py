@@ -629,16 +629,15 @@ def init_session_state(check_value):
         
 
 def save_html_response(html_content, folder_name):
-    # 현재 시각 데이터 형식화 (예: 20241010124055)
+    # 현재 시간을 'YYYYMMDDHHMMSS' 형식으로 가져오기
     current_time = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-    # 파일명 구성
-    file_name = f"{folder_name}_result_{current_time}.html"
+    file_name = f"{selected_folder_name}_result_{current_time}.html"
     
-    # 임시 파일 경로에 HTML 파일로 저장
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".html", mode='w', encoding='utf-8') as temp_file:
-        temp_file.write(html_content)
-        temp_file_path = temp_file.name
-
+    # HTML 파일 임시 경로에 저장
+    temp_file_path = f"/tmp/{file_name}"
+    with open(temp_file_path, 'w', encoding='utf-8') as f:
+        f.write(html_response_value)
+    
     return file_name, temp_file_path
 
 # GitHub에 폴더가 존재하는지 확인하는 함수
