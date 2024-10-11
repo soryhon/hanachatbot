@@ -1045,7 +1045,7 @@ with col1:
 
 with col2:
     if st.button("보고서 불러오기", key="load_template", use_container_width=True):
-        st.success("양식이 불러와졌습니다.")
+        load_template_button_function()
         
 # 8 프레임
 st.subheader("")
