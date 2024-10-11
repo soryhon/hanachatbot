@@ -901,7 +901,7 @@ if github_info_loaded:
         with col3:
             st.write("")
             st.markdown(
-                "<p style='font-size:18px; font-weight:bold; color:#dddddd;'>|</p>",
+                "<p style='font-size:20px; font-weight:bold; color:#dddddd;text-align:center'>|</p>",
                 unsafe_allow_html=True
             )
         with col4:       
