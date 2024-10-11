@@ -689,8 +689,8 @@ def save_template_to_json():
     json_file_path = f"{template_folder}/{json_file_name}"
 
     # JSON 파일을 Base64로 인코딩
-    json_content = json.dumps(template_data, ensure_ascii=False, indent=4).encode('utf-8')
-    json_base64 = json_content.decode('utf-8')
+    json_content = json.dumps(template_data, ensure_ascii=False, indent=4)
+    json_base64 = base64.b64encode(json_content.encode('utf-8')).decode('utf-8')
 
     # GitHub에 파일 업로드
     url = f"https://api.github.com/repos/{repo}/contents/{json_file_path}"
@@ -701,11 +701,12 @@ def save_template_to_json():
         "branch": branch
     }
 
-    response = requests.put(url, headers=headers, data=json.dumps(data))
+    response = requests.put(url, headers=headers, json=data)
     if response.status_code == 201:
         st.success(f"{json_file_name} 파일이 {template_folder} 폴더에 저장되었습니다.")
     else:
         st.error(f"파일 저장 실패: {response.json()}")
+
         
 # Backend 기능 구현 끝 ---
 
