@@ -615,6 +615,18 @@ def init_session_state(check_value):
             st.session_state['selected_folder_index'] = 0
         if 'new_folder_text' not in st.session_state:    
             st.session_state['new_folder_text'] = ""
+        if 'check_report' not in st.session_state:    
+            st.session_state['check_report'] = True
+        if 'check_upload' not in st.session_state:    
+            st.session_state['check_upload'] = False        
+        if 'check_request' not in st.session_state:    
+            st.session_state['check_request'] = False
+        if 'check_result' not in st.session_state:    
+            st.session_state['check_result'] = False
+        if 'check_count' not in st.session_state:    
+            st.session_state['check_count'] = False
+        
+        
 
 def save_html_response(html_content, folder_name):
     # 현재 시각 데이터 형식화 (예: 20241010124055)
@@ -857,7 +869,7 @@ st.subheader("척척하나 - " +report_title)
 # 2 프레임
 # 보고서 주제 및 폴더 선택, 새 폴더 만들기
 if github_info_loaded:
-    with st.expander("보고서 선택", expanded=True):
+    with st.expander("보고서 선택", expanded=st.session_state['check_report']):
    
         col1, col2, col3, col4 = st.columns([0.2, 0.3, 0.05, 0.35])
         with col1:
@@ -954,7 +966,7 @@ st.markdown(
 supported_file_types = ['xlsx', 'pptx', 'docx', 'csv', 'png', 'jpg', 'jpeg', 'pdf', 'txt', 'log']
 
 if github_info_loaded:
-    with st.expander("보고서 데이터 파일 업로드", expanded=False):
+    with st.expander("보고서 데이터 파일 업로드", expanded=st.session_state['check_upload']):
         uploaded_files = st.file_uploader("파일을 여러 개 드래그 앤 드롭하여 업로드하세요. (최대 100MB)", accept_multiple_files=True)
 
         if uploaded_files:
@@ -1000,7 +1012,7 @@ else:
 
 # 5 프레임
 # 요청사항 갯수 설정 입력 및 버튼
-with st.expander("요청사항 설정", expanded=True):
+with st.expander("요청사항 설정", expanded=st.session_state['check_count']):
     col1, col2, col3 = st.columns([0.3, 0.4, 0.3])
     with col1:
         st.markdown(
@@ -1039,7 +1051,7 @@ with st.expander("요청사항 설정", expanded=True):
 
 # 6 프레임
 # 요청사항 리스트
-with st.expander("요청사항 리스트", expanded=True):
+with st.expander("요청사항 리스트", expanded=st.session_state['check_request']):
     if 'rows' not in st.session_state:
         st.session_state['rows'] = [{"제목": "", "요청": "", "파일": "", "데이터": "", "파일정보":"1"}]
 
@@ -1180,7 +1192,7 @@ st.markdown(
 
 # 9 프레임
 # LLM 응답 보기
-with st.expander("결과 보고서 보기", expanded=False):
+with st.expander("결과 보고서 보기", expanded=st.session_state['check_result']):
     if "response" in st.session_state:
         for idx, response in enumerate(st.session_state["response"]):
             #st.text_area(f"응답 {idx+1}:", value=response, height=300)
