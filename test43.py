@@ -684,7 +684,7 @@ def save_template_to_json():
         "num_requests": st.session_state['num_requests'],
         "rows": st.session_state['rows'],
         "rows_length": len(st.session_state['rows']),
-        "timestamp": datetime.now().strftime("%Y%m%d%H%M%S")
+        "timestamp": datetime.datetime.now().strftime("%Y%m%d%H%M%S")
     }
 
     # 파일명 생성
