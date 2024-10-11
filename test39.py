@@ -926,63 +926,63 @@ st.markdown(
 )
 
 # 4 프레임
-# 요청사항 갯수 설정 입력 및 버튼
-col1, col2, col3 = st.columns([0.3, 0.3, 0.3])
-with col1:
-    # 파일 업로드
-    # 지원되는 파일 형식 리스트
-    supported_file_types = ['xlsx', 'pptx', 'docx', 'csv', 'png', 'jpg', 'jpeg', 'pdf', 'txt', 'log']
-    
-    if github_info_loaded:
-        with st.expander("보고서 데이터 파일 업로드", expanded=True):
-            uploaded_files = st.file_uploader("파일을 여러 개 드래그 앤 드롭하여 업로드하세요. (최대 100MB)", accept_multiple_files=True)
-    
-            if uploaded_files:
-                for uploaded_file in uploaded_files:
-                    file_type = uploaded_file.name.split('.')[-1].lower()
-    
-                    if file_type not in supported_file_types:
-                        st.error(f"지원하지 않는 파일입니다: {uploaded_file.name}")
-                        continue
-    
-                    if uploaded_file.size > MAX_FILE_SIZE_BYTES:
-                        st.warning(f"'{uploaded_file.name}' 파일은 {MAX_FILE_SIZE_MB}MB 제한을 초과했습니다. 파일 크기를 줄이거나 GitHub에 직접 푸시하세요.")
-                    else:
-                        file_content = uploaded_file.read()
-                        file_name = uploaded_file.name
-                        #folder_name = 'uploadFiles'
-                        folder_name = st.session_state.get('upload_folder', 'uploadFiles')
-    
-                        sha = get_file_sha(st.session_state['github_repo'], f"{folder_name}/{file_name}", st.session_state['github_token'], branch=st.session_state['github_branch'])
-    
-                        if sha:
-                            st.warning(f"'{file_name}' 파일이 이미 존재합니다. 덮어쓰시겠습니까?")
-                            col1, col2 = st.columns(2)
-    
-                            with col1:
-                                if st.button(f"'{file_name}' 덮어쓰기", key=f"overwrite_{file_name}"):
-                                    upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
-                                    st.success(f"'{file_name}' 파일이 성공적으로 덮어쓰기 되었습니다.")
-                                    uploaded_files = None
-                                    break
-    
-                            with col2:
-                                if st.button("취소", key=f"cancel_{file_name}"):
-                                    st.info("덮어쓰기가 취소되었습니다.")
-                                    uploaded_files = None
-                                    break
-                        else:
-                            upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'])
-                            st.success(f"'{file_name}' 파일이 성공적으로 업로드되었습니다.")
-                            uploaded_files = None
-    else:
-        st.warning("GitHub 정보가 저장되기 전에는 파일 업로드를 할 수 없습니다. 먼저 GitHub 정보를 입력해 주세요.")
+# 파일 업로드
+# 지원되는 파일 형식 리스트
+supported_file_types = ['xlsx', 'pptx', 'docx', 'csv', 'png', 'jpg', 'jpeg', 'pdf', 'txt', 'log']
 
-#with col1:
-    #st.markdown(
-        #"<p style='font-size:16px; font-weight:bold; color:#000000; margin-top:20px;'>요청사항 갯수</p>",
-        #unsafe_allow_html=True
-    #)
+if github_info_loaded:
+    with st.expander("보고서 데이터 파일 업로드", expanded=True):
+        uploaded_files = st.file_uploader("파일을 여러 개 드래그 앤 드롭하여 업로드하세요. (최대 100MB)", accept_multiple_files=True)
+
+        if uploaded_files:
+            for uploaded_file in uploaded_files:
+                file_type = uploaded_file.name.split('.')[-1].lower()
+
+                if file_type not in supported_file_types:
+                    st.error(f"지원하지 않는 파일입니다: {uploaded_file.name}")
+                    continue
+
+                if uploaded_file.size > MAX_FILE_SIZE_BYTES:
+                    st.warning(f"'{uploaded_file.name}' 파일은 {MAX_FILE_SIZE_MB}MB 제한을 초과했습니다. 파일 크기를 줄이거나 GitHub에 직접 푸시하세요.")
+                else:
+                    file_content = uploaded_file.read()
+                    file_name = uploaded_file.name
+                    #folder_name = 'uploadFiles'
+                    folder_name = st.session_state.get('upload_folder', 'uploadFiles')
+
+                    sha = get_file_sha(st.session_state['github_repo'], f"{folder_name}/{file_name}", st.session_state['github_token'], branch=st.session_state['github_branch'])
+
+                    if sha:
+                        st.warning(f"'{file_name}' 파일이 이미 존재합니다. 덮어쓰시겠습니까?")
+                        col1, col2 = st.columns(2)
+
+                        with col1:
+                            if st.button(f"'{file_name}' 덮어쓰기", key=f"overwrite_{file_name}"):
+                                upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
+                                st.success(f"'{file_name}' 파일이 성공적으로 덮어쓰기 되었습니다.")
+                                uploaded_files = None
+                                break
+
+                        with col2:
+                            if st.button("취소", key=f"cancel_{file_name}"):
+                                st.info("덮어쓰기가 취소되었습니다.")
+                                uploaded_files = None
+                                break
+                    else:
+                        upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'])
+                        st.success(f"'{file_name}' 파일이 성공적으로 업로드되었습니다.")
+                        uploaded_files = None
+else:
+    st.warning("GitHub 정보가 저장되기 전에는 파일 업로드를 할 수 없습니다. 먼저 GitHub 정보를 입력해 주세요.")
+
+# 5 프레임
+# 요청사항 갯수 설정 입력 및 버튼
+col1, col2, col3 = st.columns([0.3, 0.4, 0.3])
+with col1:
+    st.markdown(
+        "<p style='font-size:16px; font-weight:bold; color:#000000; margin-top:20px;'>요청사항 갯수</p>",
+        unsafe_allow_html=True
+    )
     
 with col2:
     # 요청사항 갯수 입력 (1-9)
@@ -1013,7 +1013,7 @@ with col3:
         #init_session_state(True)
         #st.success("요청사항 리스트가 초기화되었습니다.")
 
-# 5 프레임
+# 6 프레임
 # 요청사항 리스트
 with st.expander("요청사항 리스트", expanded=True):
     if 'rows' not in st.session_state:
@@ -1084,7 +1084,7 @@ with st.expander("요청사항 리스트", expanded=True):
     #if st.button("보고서 불러오기", key="load_template", use_container_width=True):
        
         
-# 6 프레임
+# 7 프레임
 st.subheader("")
 col1, col2, col3 = st.columns([0.2, 0.6, 0.2])
 
@@ -1145,7 +1145,7 @@ with col2:
 with col3:
     st.write("")           
 
-# 7 프레임
+# 8 프레임
 st.subheader("")
 # 결과 보고서
 st.markdown(
@@ -1154,7 +1154,7 @@ st.markdown(
 )
 
 
-# 8 프레임
+# 9 프레임
 # LLM 응답 보기
 if "response" in st.session_state:
     for idx, response in enumerate(st.session_state["response"]):
@@ -1163,7 +1163,7 @@ if "response" in st.session_state:
         html_response_value = f"<div style='border: 1px solid #cccccc; padding: 2px;'>{response}</div>"
         st.components.v1.html(html_response_value, height=1280, scrolling=True)
 
-# 9 프레임
+# 10 프레임
 # 결과 저장 버튼
     col1, col2 = st.columns([0.5, 0.5])
     with col1:
@@ -1183,14 +1183,14 @@ if "response" in st.session_state:
             save_template_to_json()
 
 
-# 10 프레임
+# 11 프레임
 # 결과 보고서 HTML 보기
 #if "html_report" in st.session_state:
     #st.write("파일 데이터 추출 보기")
     #html_report_value = f"<div style='border: 2px solid #cccccc; padding: 2px;'>{st.session_state['html_report']}</div>"
     #st.components.v1.html(html_report_value, height=1024, scrolling=True)
 
-# 11 프레임
+# 12 프레임
 # 전달된 프롬프트
 #st.text_area("전달된 프롬프트:", value="\n\n".join(global_generated_prompt), height=150)
     
