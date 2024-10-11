@@ -829,7 +829,7 @@ def load_template_button_function():
             st.warning(f"{selected_template} 템플릿을 불러오고 있습니다.")
             template_data = load_template_from_github(repo, branch, token, selected_template)
             if template_data:
-                apply_template_to_session_state2(template_data)
+                apply_template_to_session_state(f"templateFiles/{selected_template}")
                 st.success(f"{selected_template} 템플릿이 성공적으로 불러와졌습니다.")
             
 # Backend 기능 구현 끝 ---
