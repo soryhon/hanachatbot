@@ -631,7 +631,7 @@ def init_session_state(check_value):
 def save_html_response(html_content, folder_name):
     # 현재 시간을 'YYYYMMDDHHMMSS' 형식으로 가져오기
     current_time = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-    file_name = f"{selected_folder_name}_result_{current_time}.html"
+    file_name = f"{folder_name}_result_{current_time}.html"
     
     # HTML 파일 임시 경로에 저장
     temp_file_path = f"/tmp/{file_name}"
