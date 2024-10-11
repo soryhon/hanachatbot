@@ -691,7 +691,7 @@ def save_template_to_json():
     data = {
         "message": f"Add {json_file_name}",
         "content": json_base64,
-        "branch": brnach
+        "branch": branch
     }
 
     response = requests.put(url, headers=headers, data=json.dumps(data))
