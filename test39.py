@@ -893,8 +893,8 @@ if github_info_loaded:
             #st.warning("보고서 주제를 선택하세요.")
             
     with col2:        
-        new_folder_name = st.text_input("새 폴더명 입력", max_chars=20, key="new_folder_name", value=st.session_state['new_folder_text'])
-        if st.button("새로만들기", key="new_folder"):
+        new_folder_name = st.text_input("새 보고서 주제명 입력", max_chars=20, key="new_folder_name", value=st.session_state['new_folder_text'])
+        if st.button("등록", key="new_folder"):
             if not new_folder_name:
                 st.error("새로운 보고서 주제를 입력하세요.")
             elif new_folder_name in folder_list:
