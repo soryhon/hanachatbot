@@ -969,7 +969,7 @@ with col2:
             report_title = " [" + st.session_state['selected_folder_name'] + "] 보고서"
             title_style="font-size:20px; font-weight:bold; color:#000000;border: 0px solid #dddddd;letter-spacing: 4px;"
     st.markdown(
-        f"<div style='text-align:center;{title_style};border-radius: 10px;width:100%;padding: 10px;margin-top:10px;margin-bottom:5px;'>{report_title}</div>",
+        f"<div style='text-align:center;{title_style};border-radius: 10px;width:100%;padding: 10px;margin-top:10px;margin-bottom:10px;'>{report_title}</div>",
         unsafe_allow_html=True
     )
    
