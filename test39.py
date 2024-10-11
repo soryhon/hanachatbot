@@ -820,8 +820,8 @@ def load_template_button_function():
     template_files = get_template_files_list(repo, branch, token)
 
     if template_files:
-        selected_template = st.selectbox("불러올 보고서 양식 파일 리스트", options=["보고서 양식을 선택하세요"] + template_files)
-        if selected_template != "보고서 양식을 선택하세요":
+        selected_template = st.selectbox("불러올 보고서 양식 파일 리스트", options=["저장된 보고서 양식을 선택하세요"] + template_files)
+        if selected_template != "저장된 보고서 양식을 선택하세요":
             # 선택한 템플릿 불러오기
             template_data = load_template_from_github(repo, branch, token, selected_template)
             if template_data:
