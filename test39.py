@@ -965,7 +965,7 @@ col1, col2, col3 = st.columns([0.2, 0.6, 0.2])
 with col1:
     st.write("")
 with col2:   
-    disabled_button = st.button(f"{report_title}", key="selected_report_title" disabled=True, use_container_width=True)
+    disabled_button = st.button(f"{report_title}", key="selected_report_title", disabled=True, use_container_width=True)
     st.markdown(
         """
         <style>
