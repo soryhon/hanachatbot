@@ -903,6 +903,8 @@ if github_info_loaded:
                 st.session_state['upload_folder'] = f"uploadFiles/{selected_folder}"
                 st.session_state['selected_folder_name'] = f"{selected_folder}"
                 refresh_page()
+                st.session_state['check_report']=False
+                st.session_state['check_count']=True
                 #st.success(f"[{selected_folder}] 보고서가 선택되었습니다.")
             #else:   
                 #st.warning("보고서 주제를 선택하세요.")
@@ -936,6 +938,8 @@ if github_info_loaded:
                             st.session_state['selected_folder_name'] = f"{new_folder_name}"
                             refresh_page()
                             init_session_state(True)
+                            st.session_state['check_report']=False
+                            st.session_state['check_count']=True
                             st.success(f"'{new_folder_name}' 폴더가 성공적으로 생성되었습니다.")
                                 
         
@@ -961,7 +965,7 @@ col1, col2, col3 = st.columns([0.2, 0.6, 0.2])
 with col1:
     st.write("")
 with col2:   
-    if st.button(f"{report_title}", key="set_requests", use_container_width=True):
+    if st.button(f"{report_title}", key="set_report", use_container_width=True):
         if report_title != "작성할 보고서를 선택하세요.":
             st.session_state['check_report'] = False
 with col3:
