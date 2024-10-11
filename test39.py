@@ -792,6 +792,7 @@ def load_template_button_function():
         
         if selected_template != "템플릿을 선택하세요":
             # 선택한 템플릿 불러오기
+            st.warning(f"{selected_template} 템플릿이 성공적으로 불러와졌습니다.")
             template_data = load_template_from_github(repo, branch, token, selected_template)
             if template_data:
                 apply_template_to_session_state(template_data)
