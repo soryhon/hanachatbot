@@ -1154,7 +1154,7 @@ with col1:
 with col2:   
 
 # 보고서 실행 버튼 클릭 시 함수 호출 수정
-    if st.button("보고서 실행", key="generate_report", use_container_width=True):
+    if st.button("보고서 작성 실행", key="generate_report", use_container_width=True):
         if not st.session_state.get("openai_api_key"):
             st.error("먼저 OpenAI API 키를 입력하고 저장하세요!")
         elif not st.session_state['rows'] or all(not row["제목"] or not row["요청"] or not row["파일"] for row in st.session_state['rows']):
