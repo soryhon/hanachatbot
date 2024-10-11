@@ -744,7 +744,7 @@ def apply_template_to_session_state2(template_data):
     
     # JSON 데이터에서 필요한 값 추출 및 세션 상태 업데이트
     selected_folder_name = template_data.get('selected_folder_name', '')
-    num_requests = template_data.get('num_requests', 1)
+    #num_requests = template_data.get('num_requests', 1)
     rows = template_data.get('rows', [])
     
     # 세션 상태 업데이트
@@ -829,7 +829,7 @@ def load_template_button_function():
             st.warning(f"{selected_template} 템플릿을 불러오고 있습니다.")
             template_data = load_template_from_github(repo, branch, token, selected_template)
             if template_data:
-                apply_template_to_session_state(template_data)
+                apply_template_to_session_state2(template_data)
                 st.success(f"{selected_template} 템플릿이 성공적으로 불러와졌습니다.")
             
 # Backend 기능 구현 끝 ---
