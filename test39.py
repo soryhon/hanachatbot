@@ -641,7 +641,7 @@ def check_and_create_github_folder(folder_name, repo, branch, token):
         data = {
             "message": f"Create {folder_name} folder",
             "content": "",  # GitHub에서는 폴더 자체를 직접 생성할 수 없으므로 빈 파일 생성으로 대체
-            "branch": github_branch
+            "branch": branch
         }
         # 빈 파일 생성 (ex: .gitkeep)
         file_url = f"{url}/.gitkeep"
