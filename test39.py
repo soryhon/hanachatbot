@@ -921,8 +921,9 @@ if github_info_loaded:
                                 refresh_page()
                                 init_session_state(True)
                                 st.success(f"'{new_folder_name}' 폴더가 성공적으로 생성되었습니다.")
-         with st.expander("보고서 주제 선택", expanded=True):
-             col1, col2 = st.columns([0.2, 0.8])
+                                
+        with st.expander("보고서 주제 선택", expanded=True):
+            col1, col2 = st.columns([0.2, 0.8])
             with col1:
                 st.write("")
                 st.markdown(
