@@ -1091,65 +1091,64 @@ with st.expander("요청사항 리스트", expanded=True):
         
 # 7 프레임
 #st.subheader("")
-with st.expander("보고서 작성 실행", expanded=True):
-    col1, col2, col3 = st.columns([0.2, 0.6, 0.2])
+col1, col2, col3 = st.columns([0.2, 0.6, 0.2])
+
+with col1:
+    st.write("")
+with col2:   
+
+# 보고서 실행 버튼 클릭 시 함수 호출 수정
+    if st.button("보고서 실행", key="generate_report", use_container_width=True):
+        if not st.session_state.get("openai_api_key"):
+            st.error("먼저 OpenAI API 키를 입력하고 저장하세요!")
+        elif not st.session_state['rows'] or all(not row["제목"] or not row["요청"] or not row["파일"] for row in st.session_state['rows']):
+            st.error("요청사항의 제목, 요청, 파일을 모두 입력해야 합니다!")
+        else:
+            # 파일 데이터 가져와서 HTML 보고서 생성
+            #file_data_list = []
+            html_viewer_data = ""
+            for idx, row in enumerate(st.session_state['rows']):
+                file_path = st.session_state['rows'][idx]['파일']
+                file_content = get_file_from_github(st.session_state["github_repo"], st.session_state["github_branch"], file_path, st.session_state["github_token"])
+                file_type = file_path.split('.')[-1].lower()
+                report_html = ""
+                if file_content:
+                    if file_type == 'xlsx':
+                        selected_sheets = parse_sheet_selection(row['파일정보'], len(openpyxl.load_workbook(file_content).sheetnames))
+                        file_data_dict = extract_sheets_from_excel(file_content, selected_sheets)
+                        if file_data_dict is not None:
+                            # 제목 입력 값 가져오기
+                            report_html +=  f"<h3>{idx + 1}. {row['제목']}</h3>\n"
+                            for sheet_name, df in file_data_dict.items():
+                                wb = openpyxl.load_workbook(file_content)
+                                ws = wb[sheet_name]
+                                html_data = convert_df_to_html_with_styles_and_merging(ws, df)
+                                report_html += f"<div style='text-indent: 20px;'>{html_data}</div>\n"
+
+                    else:
+                        file_data = extract_data_from_file(file_content, file_type)
+                        report_html += f"<h3>{idx + 1}. {row['제목']}</h3>\n<p>{file_data}</p>"
+                    if idx > 0 :
+                        report_html += "<p/>"
+                    html_viewer_data += report_html    
+                    #file_data_list.append(row['데이터'])
+                st.session_state['html_report'] = html_viewer_data
+            
+            # LLM 함수 호출
+            titles = [row['제목'] for row in st.session_state['rows']]
+            requests = [row['요청'] for row in st.session_state['rows']]
     
-    with col1:
-        st.write("")
-    with col2:   
-    
-    # 보고서 실행 버튼 클릭 시 함수 호출 수정
-        if st.button("보고서 실행", key="generate_report", use_container_width=True):
-            if not st.session_state.get("openai_api_key"):
-                st.error("먼저 OpenAI API 키를 입력하고 저장하세요!")
-            elif not st.session_state['rows'] or all(not row["제목"] or not row["요청"] or not row["파일"] for row in st.session_state['rows']):
-                st.error("요청사항의 제목, 요청, 파일을 모두 입력해야 합니다!")
-            else:
-                # 파일 데이터 가져와서 HTML 보고서 생성
-                #file_data_list = []
-                html_viewer_data = ""
-                for idx, row in enumerate(st.session_state['rows']):
-                    file_path = st.session_state['rows'][idx]['파일']
-                    file_content = get_file_from_github(st.session_state["github_repo"], st.session_state["github_branch"], file_path, st.session_state["github_token"])
-                    file_type = file_path.split('.')[-1].lower()
-                    report_html = ""
-                    if file_content:
-                        if file_type == 'xlsx':
-                            selected_sheets = parse_sheet_selection(row['파일정보'], len(openpyxl.load_workbook(file_content).sheetnames))
-                            file_data_dict = extract_sheets_from_excel(file_content, selected_sheets)
-                            if file_data_dict is not None:
-                                # 제목 입력 값 가져오기
-                                report_html +=  f"<h3>{idx + 1}. {row['제목']}</h3>\n"
-                                for sheet_name, df in file_data_dict.items():
-                                    wb = openpyxl.load_workbook(file_content)
-                                    ws = wb[sheet_name]
-                                    html_data = convert_df_to_html_with_styles_and_merging(ws, df)
-                                    report_html += f"<div style='text-indent: 20px;'>{html_data}</div>\n"
-    
-                        else:
-                            file_data = extract_data_from_file(file_content, file_type)
-                            report_html += f"<h3>{idx + 1}. {row['제목']}</h3>\n<p>{file_data}</p>"
-                        if idx > 0 :
-                            report_html += "<p/>"
-                        html_viewer_data += report_html    
-                        #file_data_list.append(row['데이터'])
-                    st.session_state['html_report'] = html_viewer_data
-                
-                # LLM 함수 호출
-                titles = [row['제목'] for row in st.session_state['rows']]
-                requests = [row['요청'] for row in st.session_state['rows']]
-        
-                responses = run_llm_with_file_and_prompt(
-                    st.session_state["openai_api_key"], 
-                    titles, 
-                    requests, 
-                    st.session_state['html_report']
-                )
-                st.session_state["response"] = responses
-    
-    
-    with col3:
-        st.write("")           
+            responses = run_llm_with_file_and_prompt(
+                st.session_state["openai_api_key"], 
+                titles, 
+                requests, 
+                st.session_state['html_report']
+            )
+            st.session_state["response"] = responses
+
+
+with col3:
+    st.write("")           
 
 # 8 프레임
 #st.subheader("")
