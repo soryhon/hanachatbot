@@ -627,7 +627,75 @@ def save_html_response(html_content, folder_name):
         temp_file_path = temp_file.name
 
     return file_name, temp_file_path
+
+# GitHub에 폴더가 존재하는지 확인하는 함수
+def check_and_create_github_folder(folder_name):
+    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{folder_name}"
+    headers = {"Authorization": f"token {GITHUB_TOKEN}"}
+
+    # 폴더 존재 여부 확인
+    response = requests.get(url, headers=headers)
+    if response.status_code == 404:  # 폴더가 없으면 생성
+        # 폴더 생성하기 위한 커밋 메시지와 파일 내용 설정
+        data = {
+            "message": f"Create {folder_name} folder",
+            "content": "",  # GitHub에서는 폴더 자체를 직접 생성할 수 없으므로 빈 파일 생성으로 대체
+            "branch": GITHUB_BRANCH
+        }
+        # 빈 파일 생성 (ex: .gitkeep)
+        file_url = f"{url}/.gitkeep"
+        response = requests.put(file_url, headers=headers, data=json.dumps(data))
+        if response.status_code == 201:
+            st.success(f"{folder_name} 폴더가 생성되었습니다.")
+        else:
+            st.error(f"{folder_name} 폴더 생성 실패: {response.json()}")
+    elif response.status_code == 200:
+        st.info(f"{folder_name} 폴더가 이미 존재합니다.")
+    else:
+        st.error(f"폴더 확인 중 오류 발생: {response.json()}")
+        
+# JSON 파일 저장 함수
+def save_template_to_json():
+    # JSON 데이터 구조 생성
+    template_data = {
+        "selected_folder_name": st.session_state['selected_folder_name'],
+        "num_requests": st.session_state['num_requests'],
+        "rows": st.session_state['rows'],
+        "rows_length": len(st.session_state['rows']),
+        "timestamp": datetime.now().strftime("%Y%m%d%H%M%S")
+    }
+
+    # 파일명 생성
+    folder_name = st.session_state['selected_folder_name']
+    timestamp = template_data["timestamp"]
+    json_file_name = f"{folder_name}_Template_{timestamp}.json"
+
+    # GitHub 저장소 내 TemplateFiles 폴더 생성 및 파일 저장
+    template_folder = "TemplateFiles"
+    check_and_create_github_folder(template_folder)
     
+    # 저장할 파일 경로
+    json_file_path = f"{template_folder}/{json_file_name}"
+
+    # JSON 파일을 Base64로 인코딩
+    json_content = json.dumps(template_data, ensure_ascii=False, indent=4).encode('utf-8')
+    json_base64 = json_content.decode('utf-8')
+
+    # GitHub에 파일 업로드
+    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{json_file_path}"
+    headers = {"Authorization": f"token {GITHUB_TOKEN}"}
+    data = {
+        "message": f"Add {json_file_name}",
+        "content": json_base64,
+        "branch": GITHUB_BRANCH
+    }
+
+    response = requests.put(url, headers=headers, data=json.dumps(data))
+    if response.status_code == 201:
+        st.success(f"{json_file_name} 파일이 {template_folder} 폴더에 저장되었습니다.")
+    else:
+        st.error(f"파일 저장 실패: {response.json()}")
+        
 # Backend 기능 구현 끝 ---
 
 # Frontend 기능 구현 시작 ---
@@ -873,7 +941,8 @@ with st.expander("요청사항 리스트", expanded=True):
 col1, col2 = st.columns([0.5, 0.5])
 with col1:
     if st.button("보고서 저장", key="save_template", use_container_width=True):
-        st.success("양식이 저장되었습니다.")
+        #st.success("양식이 저장되었습니다.")
+        save_template_to_json()
 
 with col2:
     if st.button("보고서 불러오기", key="load_template", use_container_width=True):
