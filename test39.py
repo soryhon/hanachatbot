@@ -822,7 +822,7 @@ def load_template_button_function():
     if template_files:
 
         #apply_template_to_session_state("templateFiles/IT보안 점검일지_Template_20241011072910.json")
-        selected_template = st.selectbox("불러올 보고서 템플릿을 선택하세요", options=["템플릿을 선택하세요"] + template_files)
+        selected_template = st.selectbox("불러올 보고서 양식 선택", options=["템플릿을 선택하세요"] + template_files)
         if selected_template != "템플릿을 선택하세요":
             # 선택한 템플릿 불러오기
             st.write(selected_template)
