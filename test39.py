@@ -811,19 +811,18 @@ def apply_template_to_session_state(file_name):
         
 # [보고서 불러오기] 버튼 클릭 시 JSON 파일 리스트를 보여주고, 선택한 파일의 내용을 세션 상태에 반영
 def load_template_button_function():
-    st.warning("템플릿을 불러오고 있습니다.1")
+   
     repo = st.session_state["github_repo"]
     branch = st.session_state["github_branch"]
     token = st.session_state["github_token"]
 
     # templateFiles 폴더 내 JSON 파일 리스트 가져오기
     template_files = get_template_files_list(repo, branch, token)
-    st.warning(" 템플릿을 불러오고 있습니다.2")
+
     if template_files:
 
-        apply_template_to_session_state("templateFiles/IT보안 점검일지_Template_20241011072910.json")
+        #apply_template_to_session_state("templateFiles/IT보안 점검일지_Template_20241011072910.json")
         selected_template = st.selectbox("불러올 보고서 템플릿을 선택하세요", options=["템플릿을 선택하세요"] + template_files)
-        st.warning(" 템플릿을 불러오고 있습니다.3")
         if selected_template != "템플릿을 선택하세요":
             # 선택한 템플릿 불러오기
             st.write(selected_template)
@@ -832,12 +831,7 @@ def load_template_button_function():
             if template_data:
                 apply_template_to_session_state(template_data)
                 st.success(f"{selected_template} 템플릿이 성공적으로 불러와졌습니다.")
-            else:
-                st.error("1 템플릿을 불러오기 실패") 
-        else:
-            st.warning(" 템플릿을 불러오고 있습니다.4")    
-    else:
-        st.error("2 템플릿을 불러오기 실패")
+            
 # Backend 기능 구현 끝 ---
 
 # Frontend 기능 구현 시작 ---
@@ -1087,8 +1081,9 @@ with col1:
         save_template_to_json()
 
 with col2:
-    if st.button("보고서 불러오기", key="load_template", use_container_width=True):
-        load_template_button_function()
+    load_template_button_function()
+    #if st.button("보고서 불러오기", key="load_template", use_container_width=True):
+       
         
 # 8 프레임
 st.subheader("")
