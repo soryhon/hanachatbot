@@ -631,8 +631,8 @@ def save_html_response(html_content, folder_name):
 
 # GitHub에 폴더가 존재하는지 확인하는 함수
 def check_and_create_github_folder(folder_name):
-    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{folder_name}"
-    headers = {"Authorization": f"token {GITHUB_TOKEN}"}
+    url = f"https://api.github.com/repos/{github_repo}/contents/{folder_name}"
+    headers = {"Authorization": f"token {github_token}"}
 
     # 폴더 존재 여부 확인
     response = requests.get(url, headers=headers)
@@ -641,7 +641,7 @@ def check_and_create_github_folder(folder_name):
         data = {
             "message": f"Create {folder_name} folder",
             "content": "",  # GitHub에서는 폴더 자체를 직접 생성할 수 없으므로 빈 파일 생성으로 대체
-            "branch": GITHUB_BRANCH
+            "branch": github_branch
         }
         # 빈 파일 생성 (ex: .gitkeep)
         file_url = f"{url}/.gitkeep"
