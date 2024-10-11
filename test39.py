@@ -790,7 +790,7 @@ def load_template_button_function():
     st.warning(" 템플릿을 불러오고 있습니다.2")
     if template_files:
         selected_template = st.selectbox("불러올 보고서 템플릿을 선택하세요", options=["템플릿을 선택하세요"] + template_files)
-        
+        st.warning(" 템플릿을 불러오고 있습니다.2")
         if selected_template != "템플릿을 선택하세요":
             # 선택한 템플릿 불러오기
             st.warning(f"{selected_template} 템플릿을 불러오고 있습니다.")
@@ -798,8 +798,10 @@ def load_template_button_function():
             if template_data:
                 apply_template_to_session_state(template_data)
                 st.success(f"{selected_template} 템플릿이 성공적으로 불러와졌습니다.")
+            else:
+                st.error("1 템플릿을 불러오기 실패")            
     else:
-        st.error(" 템플릿을 불러오기 실패")
+        st.error("2 템플릿을 불러오기 실패")
 # Backend 기능 구현 끝 ---
 
 # Frontend 기능 구현 시작 ---
