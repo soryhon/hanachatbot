@@ -775,7 +775,9 @@ def apply_template_to_session_state(template_data):
             if file_content:
                 handle_sheet_selection(file_content, len(openpyxl.load_workbook(file_content).sheetnames), idx)
                 st.session_state['rows'][idx]['파일정보'] = file_info
-
+    # 변경 사항을 화면에 반영하기 위해 페이지 리로드
+    st.experimental_rerun()
+    
 # [보고서 불러오기] 버튼 클릭 시 JSON 파일 리스트를 보여주고, 선택한 파일의 내용을 세션 상태에 반영
 def load_template_button_function():
     repo = st.session_state["github_repo"]
