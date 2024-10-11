@@ -651,7 +651,7 @@ def check_and_create_github_folder(folder_name, repo, branch, token):
         else:
             st.error(f"{folder_name} 폴더 생성 실패: {response.json()}")
     elif response.status_code == 200:
-        st.info(f"{folder_name} 폴더가 이미 존재합니다.")
+        #st.info(f"{folder_name} 폴더가 이미 존재합니다.")
     else:
         st.error(f"폴더 확인 중 오류 발생: {response.json()}")
         
