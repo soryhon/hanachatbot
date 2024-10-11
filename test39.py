@@ -683,8 +683,8 @@ def save_template_to_json():
     json_base64 = json_content.decode('utf-8')
 
     # GitHub에 파일 업로드
-    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{json_file_path}"
-    headers = {"Authorization": f"token {GITHUB_TOKEN}"}
+    url = f"https://api.github.com/repos/{github_repo}/contents/{json_file_path}"
+    headers = {"Authorization": f"token {github_token}"}
     data = {
         "message": f"Add {json_file_name}",
         "content": json_base64,
