@@ -923,7 +923,7 @@ else:
 
 
 # 3 프레임
-st.subheader("")
+#st.subheader("")
 st.markdown(
     "<p style='font-size:18px; font-weight:bold; color:#007BFF;'>작성 보고서 요청사항</p>",
     unsafe_allow_html=True
@@ -1161,34 +1161,35 @@ st.markdown(
 
 # 9 프레임
 # LLM 응답 보기
-if "response" in st.session_state:
-    for idx, response in enumerate(st.session_state["response"]):
-        st.text_area(f"응답 {idx+1}:", value=response, height=300)
-        st.write("결과 보고서 완성")
-        html_response_value = f"<div style='border: 1px solid #cccccc; padding: 2px;'>{response}</div>"
-        st.components.v1.html(html_response_value, height=1280, scrolling=True)
-
-# 10 프레임
-# 결과 저장 버튼
-col1, col2 = st.columns([0.5, 0.5])
-with col1:
-    if st.button("결과 내용 저장", key="save_result", use_container_width=True):
-        if "response" in st.session_state:
-            # HTML 응답 데이터를 파일로 저장하고 다운로드 링크 제공
-            file_name, temp_file_path = save_html_response(html_response_value, st.session_state['selected_folder_name'])
-            st.success(f"{file_name} 파일이 생성되었습니다.")
-            st.download_button(
-                label="다운로드",
-                use_container_width=True,
-                data=open(temp_file_path, 'r', encoding='utf-8').read(),
-                file_name=file_name,
-                mime="text/html"
-            )
-        else:
-            st.warning("결과 보고서를 먼저 실행하세요.")
-with col2:
-    if st.button("보고서 양식 저장", key="save_template", use_container_width=True):
-        save_template_to_json()
+with st.expander("결과 보고서 보기", expanded=False):
+    if "response" in st.session_state:
+        for idx, response in enumerate(st.session_state["response"]):
+            #st.text_area(f"응답 {idx+1}:", value=response, height=300)
+            st.write("결과 보고서 완성")
+            html_response_value = f"<div style='border: 0px solid #cccccc; padding: 1px;'>{response}</div>"
+            st.components.v1.html(html_response_value, height=1280, scrolling=True)
+    
+    # 10 프레임
+    # 결과 저장 버튼
+    col1, col2 = st.columns([0.5, 0.5])
+    with col1:
+        if st.button("결과 내용 저장", key="save_result", use_container_width=True):
+            if "response" in st.session_state:
+                # HTML 응답 데이터를 파일로 저장하고 다운로드 링크 제공
+                file_name, temp_file_path = save_html_response(html_response_value, st.session_state['selected_folder_name'])
+                st.success(f"{file_name} 파일이 생성되었습니다.")
+                st.download_button(
+                    label="다운로드",
+                    use_container_width=True,
+                    data=open(temp_file_path, 'r', encoding='utf-8').read(),
+                    file_name=file_name,
+                    mime="text/html"
+                )
+            else:
+                st.warning("결과 보고서를 먼저 실행하세요.")
+    with col2:
+        if st.button("보고서 양식 저장", key="save_template", use_container_width=True):
+            save_template_to_json()
 
 
 # 11 프레임
