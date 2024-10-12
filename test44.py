@@ -1244,13 +1244,13 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
     
 # 10 프레임
 # 결과 저장 버튼
-    col1, col2, col3 = st.columns([0.21, 0.29, 0.5])
+    col1, col2 = st.columns([0.5, 0.5])
+    #with col1:
+        #st.markdown(
+            #"<p style='font-size:14px; font-weight:bold; color:#000000; margin-top:20px;text-align:center;'>결과 보고서<br/>기준일자 지정</p>",
+            #unsafe_allow_html=True
+        #)
     with col1:
-        st.markdown(
-            "<p style='font-size:14px; font-weight:bold; color:#000000; margin-top:20px;text-align:center;'>결과 보고서<br/>기준일자 지정</p>",
-            unsafe_allow_html=True
-        )
-    with col2:
         # 오늘 날짜 가져오기
         today = datetime.date.today()
         
@@ -1283,9 +1283,9 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
         # 날짜를 YYYYMMDD 형식으로 변환
         # 날짜 데이터 메모리에 저장
         st.session_state['report_date_str'] = report_date.strftime("%Y%m%d")
-    with col3:
+    with col2:
         st.markdown(
-            "<p style='font-size:14px; font-weight:normal; color:#cccccc; margin-top:20px;text-align:left;'>⬅️결과 보고서 저장을 위해 기준일자를 지정해주세요.</p>",
+            "<p style='font-size:14px; font-weight:normal; color:#444444; margin-top:20px;text-align:left;'>⬅️결과 보고서 저장을 위해 기준일자를 지정해주세요.</p>",
             unsafe_allow_html=True
         )
     col1, col2 = st.columns([0.5, 0.5])
