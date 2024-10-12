@@ -1042,8 +1042,10 @@ with st.expander("요청사항 설정", expanded=st.session_state['check_count']
         )
     
     with col3:
-        st.write("")
-        st.write("")
+        st.markdown(
+            "<p style='font-size:18px; margin-top:15px;'></p>",
+            unsafe_allow_html=True
+        )
         if st.button("설정", key="set_requests", use_container_width=True):
             # 설정 버튼 클릭 시 요청사항 리스트 초기화 및 새로운 요청사항 갯수 설정
             st.session_state['rows'] = [
