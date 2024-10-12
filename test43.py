@@ -925,7 +925,7 @@ if github_info_loaded:
                             init_session_state(True)
                             st.success("성공")            
         st.markdown(
-            "<hr style='border-color:#dddddd;width:100%;padding:0px;margin:0px'></hr>",
+            "<hr style='border:1px dotted #dddddd;width:100%;padding:0px;margin:0px'></hr>",
             unsafe_allow_html=True
         )
 
