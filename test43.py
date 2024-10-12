@@ -859,77 +859,78 @@ with col2:
 # 보고서 주제 및 폴더 선택, 새 폴더 만들기
 if github_info_loaded:
     with st.expander("보고서 선택", expanded=st.session_state['check_report']):
-   
-        col1, col2, col3, col4 = st.columns([0.2, 0.3, 0.05, 0.35])
-        with col1:
-            st.write("")
-            st.markdown(
-                "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>보고서 주제<br/>선택 / 등록</p>",
-                unsafe_allow_html=True
-            )
-        with col2:
-            folder_list = get_folder_list_from_github(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
-            # st.selectbox 위젯 생성 (이제 session_state['selected_folder'] 사용 가능)
-
-            # 'selected_folder'가 folder_list에 있을 때만 index 설정
-            selected_index = st.session_state['selected_folder_index']
-            if st.session_state['selected_folder_name'] in folder_list:
-                selected_index = folder_list.index(st.session_state['selected_folder_name']) + 1
-            #else:
-                #selected_index = 0  # 기본값으로 '주제를 선택하세요.' 선택
-            st.session_state['selected_folder_index'] = selected_index
-            st.session_state['folder_list_option'] = [folderlist_init_value] + folder_list
-            # 폴더 선택 selectbox 생성 (새 폴더 추가 후, 선택값으로 설정)
-            selected_folder = st.selectbox(
-                "보고서 주제 리스트",
-                options=st.session_state['folder_list_option'],  # 옵션 리스트에 새 폴더 반영
-                index=st.session_state['selected_folder_index'],  # 새로 선택된 폴더를 기본값으로 선택
-                key="selected_folder"
-            )
-            # 파일 업로드와 요청사항 리스트의 기본 폴더 설정
-            if selected_folder != "주제를 선택하세요.":
-                st.session_state['upload_folder'] = f"uploadFiles/{selected_folder}"
-                st.session_state['selected_folder_name'] = f"{selected_folder}"
-                refresh_page()
-                st.session_state['check_report']=False
-                st.session_state['check_count']=True
-                #st.success(f"[{selected_folder}] 보고서가 선택되었습니다.")
-            #else:   
-                #st.warning("보고서 주제를 선택하세요.")
-        with col3:
-            st.markdown(
-                "<p style='font-size:20px; font-weight:bold; color:#dddddd;text-align:center;margin-top:28px;'>|</p>",
-                unsafe_allow_html=True
-            )
-        with col4:
-            col1, col2 = st.columns([0.7, 0.3])
+        st.write("")
+        with st.expander("보고서 주제 선택", expanded=True):
+            col1, col2, col3, col4 = st.columns([0.2, 0.3, 0.05, 0.35])
             with col1:
-                new_folder_name = st.text_input("새로 등록할 보고서명 입력", max_chars=20, key="new_folder_name", value=st.session_state['new_folder_text'])
-            with col2:
+                st.write("")
                 st.markdown(
-                    "<p style='font-size:18px; margin-top:27px;'></p>",
+                    "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>보고서 주제<br/>선택 / 등록</p>",
                     unsafe_allow_html=True
                 )
-                if st.button("등록", key="new_folder"):
-                    if not new_folder_name:
-                        st.error("새로운 보고서 주제를 입력하세요.")
-                    elif new_folder_name in folder_list:
-                        st.warning("이미 존재합니다.")
-                    else:
-                        # 폴더 생성 후 목록에 추가
-                        folder_created = create_new_folder_in_github(st.session_state['github_repo'], new_folder_name, st.session_state['github_token'], st.session_state['github_branch'])
-                        if folder_created:
-                            folder_list.append(new_folder_name)  # 새 폴더를 리스트에 추가
-                            st.session_state['selected_folder_index'] = len(folder_list) - 1
-                            st.session_state['folder_list_option'] = [folderlist_init_value] + folder_list
-                            st.session_state['upload_folder'] = f"uploadFiles/{new_folder_name}"
-                            st.session_state['selected_folder_name'] = f"{new_folder_name}"
-                            
-                            st.session_state['check_report']=False
-                            st.session_state['check_count']=True
-                            refresh_page()
-                            init_session_state(True)
-                            st.success("성공")            
+            with col2:
+                folder_list = get_folder_list_from_github(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
+                # st.selectbox 위젯 생성 (이제 session_state['selected_folder'] 사용 가능)
+    
+                # 'selected_folder'가 folder_list에 있을 때만 index 설정
+                selected_index = st.session_state['selected_folder_index']
+                if st.session_state['selected_folder_name'] in folder_list:
+                    selected_index = folder_list.index(st.session_state['selected_folder_name']) + 1
+                #else:
+                    #selected_index = 0  # 기본값으로 '주제를 선택하세요.' 선택
+                st.session_state['selected_folder_index'] = selected_index
+                st.session_state['folder_list_option'] = [folderlist_init_value] + folder_list
+                # 폴더 선택 selectbox 생성 (새 폴더 추가 후, 선택값으로 설정)
+                selected_folder = st.selectbox(
+                    "보고서 주제 리스트",
+                    options=st.session_state['folder_list_option'],  # 옵션 리스트에 새 폴더 반영
+                    index=st.session_state['selected_folder_index'],  # 새로 선택된 폴더를 기본값으로 선택
+                    key="selected_folder"
+                )
+                # 파일 업로드와 요청사항 리스트의 기본 폴더 설정
+                if selected_folder != "주제를 선택하세요.":
+                    st.session_state['upload_folder'] = f"uploadFiles/{selected_folder}"
+                    st.session_state['selected_folder_name'] = f"{selected_folder}"
+                    refresh_page()
+                    st.session_state['check_report']=False
+                    st.session_state['check_count']=True
+                    #st.success(f"[{selected_folder}] 보고서가 선택되었습니다.")
+                #else:   
+                    #st.warning("보고서 주제를 선택하세요.")
+            with col3:
+                st.markdown(
+                    "<p style='font-size:20px; font-weight:bold; color:#dddddd;text-align:center;margin-top:28px;'>|</p>",
+                    unsafe_allow_html=True
+                )
+            with col4:
+                col1, col2 = st.columns([0.7, 0.3])
+                with col1:
+                    new_folder_name = st.text_input("새로 등록할 보고서명 입력", max_chars=20, key="new_folder_name", value=st.session_state['new_folder_text'])
+                with col2:
+                    st.markdown(
+                        "<p style='font-size:18px; margin-top:27px;'></p>",
+                        unsafe_allow_html=True
+                    )
+                    if st.button("등록", key="new_folder"):
+                        if not new_folder_name:
+                            st.error("새로운 보고서 주제를 입력하세요.")
+                        elif new_folder_name in folder_list:
+                            st.warning("이미 존재합니다.")
+                        else:
+                            # 폴더 생성 후 목록에 추가
+                            folder_created = create_new_folder_in_github(st.session_state['github_repo'], new_folder_name, st.session_state['github_token'], st.session_state['github_branch'])
+                            if folder_created:
+                                folder_list.append(new_folder_name)  # 새 폴더를 리스트에 추가
+                                st.session_state['selected_folder_index'] = len(folder_list) - 1
+                                st.session_state['folder_list_option'] = [folderlist_init_value] + folder_list
+                                st.session_state['upload_folder'] = f"uploadFiles/{new_folder_name}"
+                                st.session_state['selected_folder_name'] = f"{new_folder_name}"
+                                
+                                st.session_state['check_report']=False
+                                st.session_state['check_count']=True
+                                refresh_page()
+                                init_session_state(True)
+                                st.success("성공")            
         st.markdown(
             "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
             unsafe_allow_html=True
