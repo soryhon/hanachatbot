@@ -1073,15 +1073,15 @@ with st.expander("요청사항 리스트", expanded=st.session_state['check_requ
 
     for idx, row in enumerate(rows):
         with st.container():
-            col1, col2 = st.columns([0.01, 0.99]) 
-            with col1:
+            #col1, col2 = st.columns([0.01, 0.99]) 
+            #with col1:
                 #row_checked = st.checkbox("", key=f"row_checked_{idx}", value=row.get("checked", False))  # 체크박스만 추가
-                st.write("")
-            with col2:
-                st.markdown(
-                    f"<p style='font-size:16px; font-weight:bold; color:#000000; margin-top:5px;'>{idx+1}.요청사항</p>",
-                    unsafe_allow_html=True
-                )
+                #st.write("")
+            #with col2:
+            st.markdown(
+                f"<p style='font-size:16px; font-weight:bold; color:#000000; margin-top:5px;'>{idx+1}. 요청사항</p>",
+                unsafe_allow_html=True
+            )
         
             row['제목'] = st.text_input(f"제목 {idx+1} :", row['제목'], key=f"title_{idx}")
             row['요청'] = st.text_area(f"요청 {idx+1} :", row['요청'], key=f"request_{idx}")
