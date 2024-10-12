@@ -1074,7 +1074,7 @@ with st.expander("⚙️ 요청사항 및 기준일자 설정", expanded=st.sess
         )
     
     with col3:
-         st.markdown(
+        st.markdown(
             "<p style='font-size:18px; margin-top:27px;'></p>",
             unsafe_allow_html=True
         )
