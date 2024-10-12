@@ -927,7 +927,7 @@ if github_info_loaded:
                             st.success(f"'{new_folder_name}' 폴더가 성공적으로 생성되었습니다.")
                                 
         st.markdown(
-            "<hr style='border-color:#007BFF;width:90%'></hr>",
+            "<hr style='border-color:#dddddd;width:100%;padding:0px;margin:0px'></hr>",
             unsafe_allow_html=True
         )
 
