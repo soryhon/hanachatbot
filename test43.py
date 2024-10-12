@@ -892,7 +892,7 @@ if github_info_loaded:
                 #st.warning("보고서 주제를 선택하세요.")
         with col3:
             st.markdown(
-                "<p style='font-size:20px; font-weight:bold; color:#dddddd;text-align:center;margin-top:25px;'>|</p>",
+                "<p style='font-size:20px; font-weight:bold; color:#dddddd;text-align:center;margin-top:28px;'>|</p>",
                 unsafe_allow_html=True
             )
         with col4:
