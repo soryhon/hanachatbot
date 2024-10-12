@@ -1242,7 +1242,7 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
            
             if "response" in st.session_state:
 
-                 report_date = st.date_input(
+                report_date = st.date_input(
                     "보고서 기준일자 선택",
                     value=datetime.date.today(),
                     min_value=datetime.date(1900, 1, 1),
