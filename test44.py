@@ -637,19 +637,19 @@ def init_session_state(check_value):
         if 'check_count' not in st.session_state:    
             st.session_state['check_count'] = False
         
-        
-
-def save_html_response(html_content, folder_name):
+# HTML 파일을 저장하고 파일 경로를 반환하는 함수 (날짜 포함)
+def save_html_response(html_content, folder_name, report_date_str):
     # 현재 시간을 'YYYYMMDDHHMMSS' 형식으로 가져오기
-    current_time = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-    file_name = f"{folder_name}_result_{current_time}.html"
+    #current_time = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+    # HTML 파일명을 보고서명과 날짜로 설정
+    file_name = f"{folder_name}_result_{report_date_str}.html"
     
     # HTML 파일 임시 경로에 저장
     temp_file_path = f"/tmp/{file_name}"
     with open(temp_file_path, 'w', encoding='utf-8') as f:
-        f.write(html_response_value)
+        f.write(html_content)
     
-    return file_name, temp_file_path
+    return file_name, temp_file_path        
 
 # GitHub에 폴더가 존재하는지 확인하는 함수
 def check_and_create_github_folder(folder_name, repo, branch, token):
@@ -1239,14 +1239,41 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
     col1, col2 = st.columns([0.5, 0.5])
     with col1:
         if st.button("결과 내용 저장", key="save_result", use_container_width=True):
+           
             if "response" in st.session_state:
-                # HTML 응답 데이터를 파일로 저장하고 다운로드 링크 제공
-                file_name, temp_file_path = save_html_response(html_response_value, st.session_state['selected_folder_name'])
-                st.session_state['check_result'] = True
-                st.session_state['check_report'] = False
-                st.session_state['check_upload'] = False
-                st.session_state[''] = False
-                st.session_state['check_request'] = False
+
+                 report_date = st.date_input(
+                    "보고서 기준일자 선택",
+                    value=datetime.date.today(),
+                    min_value=datetime.date(1900, 1, 1),
+                    max_value=datetime.date.today(),
+                    key="report_date"
+                )
+                # 날짜를 YYYYMMDD 형식으로 변환
+                report_date_str = report_date.strftime("%Y%m%d")
+        
+                # 날짜 지정 버튼
+                if st.button("날짜 지정", key="set_report_date"):
+                    st.session_state['report_date_str'] = report_date_str
+                    st.success(f"선택된 보고서 기준일자는 {report_date_str}입니다.")
+
+                
+                folder_name = st.session_state['selected_folder_name']
+                report_date_str = st.session_state.get('report_date_str', datetime.datetime.now().strftime('%Y%m%d'))
+                
+                # save_html_response 함수를 사용하여 HTML 파일 저장
+                file_name, temp_file_path = save_html_response(html_response_value, folder_name, report_date_str)
+
+                # 파일 저장 경로 (reportFiles/{폴더명}/{일자})
+                github_folder = f"reportFiles/{folder_name}/{report_date_str}"
+
+                # 폴더 존재 확인 및 생성
+                check_and_create_github_folder(github_folder, st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
+                
+                # GitHub에 HTML 파일 저장
+                sha = get_file_sha(st.session_state['github_repo'], f"{github_folder}/{file_name}", st.session_state['github_token'], branch=st.session_state['github_branch'])
+                upload_file_to_github(st.session_state['github_repo'], github_folder, file_name, open(temp_file_path, 'rb').read(), st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
+
                 st.success(f"{file_name} 파일이 생성되었습니다.")
                 st.download_button(
                     label="다운로드",
@@ -1255,6 +1282,7 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
                     file_name=file_name,
                     mime="text/html"
                 )
+
             else:
                 st.warning("결과 보고서를 먼저 실행하세요.")
     with col2:
