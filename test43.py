@@ -909,7 +909,7 @@ if github_info_loaded:
                 load_template_button_function()
 
         with tab3:
-            col1, col2, col3 = st.columns([0.21, 0.4,0.39])
+            col1, col2, col3 = st.columns([0.21, 0.5,0.29])
             with col1:
                 st.write("")
                 st.markdown(
