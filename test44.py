@@ -1311,7 +1311,7 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
 
                 st.success(f"{file_name} 파일이 생성되었습니다.")
                 st.download_button(
-                    label="다운로드",
+                    label="💾 다운로드",
                     use_container_width=True,
                     data=open(temp_file_path, 'r', encoding='utf-8').read(),
                     file_name=file_name,
