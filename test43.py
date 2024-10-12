@@ -858,7 +858,7 @@ if github_info_loaded:
         with col1:
             st.write("")
             st.markdown(
-                "<p style='font-size:14px; font-weight:bold; color:#999999;'>보고서 주제<br/>선택/등록</p>",
+                "<p style='font-size:14px; font-weight:bold; color:#000000;text-align-center;'>보고서 주제<br/>선택/등록</p>",
                 unsafe_allow_html=True
             )
         with col2:
@@ -894,7 +894,7 @@ if github_info_loaded:
             st.write("")
             st.write("")
             st.markdown(
-                "<p style='font-size:20px; font-weight:bold; color:#dddddd;text-align:center'>|</p>",
+                "<p style='font-size:20px; font-weight:bold; color:#dddddd;text-align:center'>보고서 주제<br/>선택/등록</p>",
                 unsafe_allow_html=True
             )
         with col4:
@@ -934,7 +934,7 @@ if github_info_loaded:
         with col1:
             st.write("")
             st.markdown(
-                "<p style='font-size:14px; font-weight:bold; color:#999999;'>저장된 보고서<br/>불러오기</p>",
+                "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>저장된 보고서<br/>불러오기</p>",
                 unsafe_allow_html=True
             )
         with col2:    
