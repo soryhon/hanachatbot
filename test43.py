@@ -780,14 +780,14 @@ def apply_template_to_session_state(file_name):
         
         # 엑셀 파일 처리: 파일 정보에 따라 시트 선택 입력창 추가
         for idx, row in enumerate(rows):
-            file_name = row.get("파일")
+            selected_file_name = row.get("파일")
             file_info = row.get("파일정보", "1")
-            if file_name and file_name.endswith('.xlsx'):
+            if selected_file_name and selected_file_name.endswith('.xlsx'):
                 # 시트 선택 로직 적용
                 file_content = get_file_from_github(
                     st.session_state["github_repo"],
                     st.session_state["github_branch"],
-                    file_name,
+                    selected_file_name,
                     st.session_state["github_token"]
                 )
                 if file_content:
