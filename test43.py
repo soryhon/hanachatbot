@@ -598,6 +598,8 @@ def refresh_page():
         st.session_state['is_updating'] = True
 
 def init_session_state(check_value):
+    folderlist_init_value = "보고서명을 선택하세요."
+    templatelist_init_value = "불러올 보고서 양식을 선택하세요."
     if(check_value):
             st.session_state['rows'] = [
                 {"제목": "", "요청": "", "파일": "", "데이터": "","파일정보":"1" }
@@ -609,6 +611,10 @@ def init_session_state(check_value):
             st.session_state['selected_folder_name'] = folderlist_init_value
         if 'folder_list_option' not in st.session_state:       
             st.session_state['folder_list_option'] = folderlist_init_value
+        if 'selected_template_name' not in st.session_state:
+            st.session_state['selected_template_name'] = templatelist_init_value
+        if 'template_list_option' not in st.session_state:       
+            st.session_state['template_list_option'] = templatelist_init_value
         if 'upload_folder' not in st.session_state:        
             st.session_state['upload_folder'] = "uploadFiles" 
         if 'selected_folder_index' not in st.session_state:    
@@ -761,6 +767,7 @@ def apply_template_to_session_state(file_name):
         rows = template_data.get('rows', [])
         
         # 세션 상태에 값 저장
+
         st.session_state['selected_folder_name'] = selected_folder_name
         st.session_state['rows'] = rows
         st.session_state['is_updating'] = False
@@ -770,7 +777,7 @@ def apply_template_to_session_state(file_name):
         st.session_state['check_request'] = True
         st.session_state['check_result'] = False
         st.session_state['selected_folder_index'] = 0
-
+    
         # 'num_requests'는 직접 변경할 수 없으므로 Streamlit에서 제공하는 방법으로 값을 설정
         #if "num_requests" in st.session_state:
             #st.session_state["num_requests"] = num_requests
@@ -820,6 +827,7 @@ MAX_FILE_SIZE_BYTES = 100 * 1024 * 1024
 
 #Session_state 변수 초기화
 folderlist_init_value = "보고서명을 선택하세요."
+templatelist_init_value = "불러올 보고서 양식을 선택하세요."
 # 세션 상태에 각 변수 없다면 초기화
 init_session_state(False)
 refresh_page()
@@ -863,7 +871,7 @@ if github_info_loaded:
                 #else:
                     #selected_index = 0  # 기본값으로 '주제를 선택하세요.' 선택
                 st.session_state['selected_folder_index'] = selected_index
-                st.session_state['folder_list_option'] = [folderlist_init_value] + folder_list
+                st.session_state['folder_list_option'] = [] + folder_list
                 # 폴더 선택 selectbox 생성 (새 폴더 추가 후, 선택값으로 설정)
                 selected_folder = st.selectbox(
                     "등록된 보고서명 리스트",
@@ -872,7 +880,7 @@ if github_info_loaded:
                     key="selected_folder"
                 )
                 # 파일 업로드와 요청사항 리스트의 기본 폴더 설정
-                if selected_folder != "보고서명을 선택하세요.":
+                if selected_folder != folderlist_init_value:
                     st.session_state['upload_folder'] = f"uploadFiles/{selected_folder}"
                     st.session_state['selected_folder_name'] = f"{selected_folder}"
                     refresh_page()
@@ -898,16 +906,27 @@ if github_info_loaded:
                 template_files = get_template_files_list(repo, branch, token)
                 
                 if template_files:
-                    selected_template = st.selectbox("불러올 보고서 양식 파일 리스트", 
-                        options=["저장된 보고서 양식을 선택하세요"] + template_files, 
-                        index=st.session_state['selected_template_index']
+                    # 'selected_template'가 template_files에 있을 때만 index 설정
+                    #selected_temp_index = st.session_state['selected_template_index']
+                    if st.session_state['selected_folder_name'] in folder_list:
+                        selected_temp_index = template_files.index(st.session_state['selected_folder_name']) + 1                        
+                    else:
+                        selected_temp_index = 0
+                    st.session_state['selected_template_index'] = selected_temp_index    
+                    #보고서 양식 파일 리스트
+                    selected_template = st.selectbox(
+                        "불러올 보고서 양식 파일 리스트", 
+                        options=templatelist_init_value + template_files, 
+                        index=st.session_state['selected_template_index'],
+                        key="selected_template"
                     )
-                    if selected_template != "저장된 보고서 양식을 선택하세요":
+                    if selected_template != templatelist_init_value:
                         # 선택한 템플릿 불러오기
+                        st.session_state['selected_template_name'] = selected_template
                         template_data = load_template_from_github(repo, branch, token, selected_template)
                         if template_data:
                             apply_template_to_session_state(f"templateFiles/{selected_template}")
-                            #st.success(f"{selected_template} 템플릿이 성공적으로 불러와졌습니다.")
+                            #st.success(f"{selected_template} 양식을 성공적으로 불러왔습니다.")
 
         with tab3:
             col1, col2, col3 = st.columns([0.21, 0.5,0.29])
@@ -934,12 +953,12 @@ if github_info_loaded:
                         folder_created = create_new_folder_in_github(st.session_state['github_repo'], new_folder_name, st.session_state['github_token'], st.session_state['github_branch'])
                         if folder_created:
                             folder_list.append(new_folder_name)  # 새 폴더를 리스트에 추가
-                            st.session_state['selected_folder_index'] = len(folder_list) - 1
-                            st.session_state['selected_template_index'] = 0
-                            st.session_state['folder_list_option'] = [folderlist_init_value] + folder_list
+                            #st.session_state['selected_folder_index'] = len(folder_list) - 1
+                            #st.session_state['selected_template_index'] = 0
+                            st.session_state['folder_list_option'] = [] + folder_list
                             st.session_state['upload_folder'] = f"uploadFiles/{new_folder_name}"
                             st.session_state['selected_folder_name'] = f"{new_folder_name}"
-                            
+                            st.session_state['selected_template_name'] = templatelist_init_value
                             st.session_state['check_report']=False
                             st.session_state['check_count']=True
                             refresh_page()
@@ -962,7 +981,7 @@ with col2:
     report_title = "작성할 보고서를 선택하세요."
     title_style="font-size:15px; font-weight:normal; color:#cccccc;border: 1px solid #dddddd;letter-spacing: 1px;"
     if 'selected_folder_name' in st.session_state:
-        if st.session_state['selected_folder_name'] != folderlist_init_value:
+        if st.session_state['selected_folder_name'] != :
             report_title = " [" + st.session_state['selected_folder_name'] + "] 보고서"
             title_style="font-size:20px; font-weight:bold; color:#000000;border: 0px solid #dddddd;letter-spacing: 4px;"
     st.markdown(
