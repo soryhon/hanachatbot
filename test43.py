@@ -1170,7 +1170,10 @@ with col2:
             html_viewer_data = ""
             
             st.session_state['check_result']=True
-  
+            st.session_state['check_report'] = False
+            st.session_state['check_upload'] = False
+            st.session_state['check_count'] = False 
+            
             for idx, row in enumerate(st.session_state['rows']):
                 file_path = st.session_state['rows'][idx]['파일']
                 file_content = get_file_from_github(st.session_state["github_repo"], st.session_state["github_branch"], file_path, st.session_state["github_token"])
@@ -1241,6 +1244,11 @@ with st.expander("결과 보고서 보기", expanded=st.session_state['check_res
             if "response" in st.session_state:
                 # HTML 응답 데이터를 파일로 저장하고 다운로드 링크 제공
                 file_name, temp_file_path = save_html_response(html_response_value, st.session_state['selected_folder_name'])
+                st.session_state['check_result'] = True
+                st.session_state['check_report'] = False
+                st.session_state['check_upload'] = False
+                st.session_state['check_count'] = False
+                st.session_state['check_request'] = False
                 st.success(f"{file_name} 파일이 생성되었습니다.")
                 st.download_button(
                     label="다운로드",
@@ -1253,7 +1261,11 @@ with st.expander("결과 보고서 보기", expanded=st.session_state['check_res
                 st.warning("결과 보고서를 먼저 실행하세요.")
     with col2:
         if st.button("보고서 양식 저장", key="save_template", use_container_width=True):
-            st.session_state["check_result"] = True
+            st.session_state['check_result'] = True
+            st.session_state['check_report'] = False
+            st.session_state['check_upload'] = False
+            st.session_state['check_count'] = False
+            st.session_state['check_request'] = False
             save_template_to_json()
 
 
