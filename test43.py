@@ -859,7 +859,13 @@ with col2:
 # 보고서 주제 및 폴더 선택, 새 폴더 만들기
 if github_info_loaded:
     with st.expander("보고서 선택", expanded=st.session_state['check_report']):
-        tab1, tab2, tab3 = st.tabs(["보고서 주제 리스트 선택", "저장된 보고서 양식 불러오기","새로운 보고서명 만들기"])
+        tab1, tab2, tab3 = st.tabs([
+            st.markdown(
+                    "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;border:1px solid #dddddd;border-bottom:0px;margin-righnt:5px;'>보고서 주제 선택 </p>",
+                    unsafe_allow_html=True
+                ), 
+                                    
+                                    "저장된 보고서 양식 불러오기","새로운 보고서명 만들기"])
         with tab1:
             col1, col2 = st.columns([0.2, 0.8])
             with col1:
