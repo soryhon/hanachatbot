@@ -851,7 +851,7 @@ with col1:
     )
 with col2:
     st.markdown(
-        "<p style='font-size:13px; font-weight:normal; color:#aaaaaa; margin-top:10px;'>by <b style='font-size:16px;color:#FF9966'>CheokCeock</b><b style='font-size:18px;color:#009999'>1</b> prototype v.1</p>",
+        "<p style='font-size:13px; font-weight:normal; color:#aaaaaa; margin-top:10px;'>by <b style='font-size:16px;color:#FF9966'>CheokCeock</b><b style='font-size:18px;color:#009999'>1</b> <b style='font-size:14px;'>prototype v.01</b></p>",
         unsafe_allow_html=True
     )
 
