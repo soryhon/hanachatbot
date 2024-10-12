@@ -891,8 +891,6 @@ if github_info_loaded:
             #else:   
                 #st.warning("보고서 주제를 선택하세요.")
         with col3:
-            st.write("")
-            st.write("")
             st.markdown(
                 "<p style='font-size:20px; font-weight:bold; color:#dddddd;text-align:center'>|</p>",
                 unsafe_allow_html=True
@@ -902,9 +900,10 @@ if github_info_loaded:
             with col1:
                 new_folder_name = st.text_input("새로 등록할 보고서명 입력", max_chars=20, key="new_folder_name", value=st.session_state['new_folder_text'])
             with col2:
-                st.write("")
-                st.write("")
-                
+                st.markdown(
+                    "<p style='font-size:18px; margin-top:27px;'></p>",
+                    unsafe_allow_html=True
+                )
                 if st.button("등록", key="new_folder"):
                     if not new_folder_name:
                         st.error("새로운 보고서 주제를 입력하세요.")
@@ -1043,7 +1042,7 @@ with st.expander("요청사항 설정", expanded=st.session_state['check_count']
     
     with col3:
         st.markdown(
-            "<p style='font-size:18px; margin-top:25px;'></p>",
+            "<p style='font-size:18px; margin-top:27px;'></p>",
             unsafe_allow_html=True
         )
         if st.button("설정", key="set_requests", use_container_width=True):
