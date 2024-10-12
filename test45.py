@@ -1055,7 +1055,7 @@ else:
 # 5 프레임
 # 요청사항 갯수 설정 입력 및 버튼
 with st.expander("⚙️ 요청사항 및 기준일자 설정", expanded=st.session_state['check_count']):
-    col1, col2, col3 = st.columns([0.4, 0.3, 0.3])
+    col1, col2, col3 = st.columns([0.5, 0.25, 0.25])
     with col1:
         st.markdown(
             "<p style='font-size:14px; font-weight:normal; color:#444444; margin-top:35px;text-align:left;'>ℹ️작성에 필요한 요청사항 갯수를 설정해주세요.</p>",
