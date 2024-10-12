@@ -858,14 +858,13 @@ if github_info_loaded:
         with col1:
             st.write("")
             st.markdown(
-                "<p style='font-size:14px; font-weight:bold; color:#999999;'>보고서 주제 선택</p>",
+                "<p style='font-size:14px; font-weight:bold; color:#999999;'>보고서 주제<br/>선택/등록</p>",
                 unsafe_allow_html=True
             )
         with col2:
             folder_list = get_folder_list_from_github(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
             # st.selectbox 위젯 생성 (이제 session_state['selected_folder'] 사용 가능)
-            #selected_folder = st.selectbox("보고서 주제 리스트트", options=["주제를 선택하세요."] + folder_list, key="selected_folder")
-    
+
             # 'selected_folder'가 folder_list에 있을 때만 index 설정
             selected_index = st.session_state['selected_folder_index']
             if st.session_state['selected_folder_name'] in folder_list:
@@ -935,7 +934,7 @@ if github_info_loaded:
         with col1:
             st.write("")
             st.markdown(
-                "<p style='font-size:14px; font-weight:bold; color:#999999;'>보고서 불러오기</p>",
+                "<p style='font-size:14px; font-weight:bold; color:#999999;'>저장된 보고서<br/>불러오기</p>",
                 unsafe_allow_html=True
             )
         with col2:    
