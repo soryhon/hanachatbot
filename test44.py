@@ -1249,9 +1249,10 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
         if 'report_date_str' not in st.session_state:
             st.session_state['report_date_str'] = today.strftime('%Y%m%d')
         
+        
         # 세션에 저장된 'YYYYMMDD' 형식을 date 객체로 변환
         saved_date = datetime.datetime.strptime(st.session_state['report_date_str'], '%Y%m%d').date()
-
+        
         report_date = st.date_input(
             "보고서 기준일자 선택",
             value=saved_date,
