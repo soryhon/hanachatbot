@@ -1233,21 +1233,61 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
             st.write("결과 보고서 완성")
             html_response_value = f"<div style='border: 0px solid #cccccc; padding: 1px;'>{response}</div>"
             st.components.v1.html(html_response_value, height=1024, scrolling=True)
-    
-    # 10 프레임
-    # 결과 저장 버튼
+
+    st.markdown(
+        "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
+        unsafe_allow_html=True
+    )
+# 10 프레임
+# 결과 저장 버튼
     col1, col2 = st.columns([0.5, 0.5])
     with col1:
+        # 오늘 날짜 가져오기
+        today = datetime.date.today()
+        
+        # 'report_date_str' 세션 값이 있는지 확인하고, 없으면 'YYYYMMDD' 형식으로 today 값 설정
+        if 'report_date_str' not in st.session_state:
+            st.session_state['report_date_str'] = today.strftime('%Y%m%d')
+        
+        # 세션에 저장된 'YYYYMMDD' 형식을 date 객체로 변환
+        saved_date = datetime.datetime.strptime(st.session_state['report_date_str'], '%Y%m%d').date()
+
         report_date = st.date_input(
             "보고서 기준일자 선택",
-            value=datetime.date.today(),
-            min_value=datetime.date(1900, 1, 1),
-            max_value=datetime.date.today(),
+            value=saved_date,
+            min_value=datetime.date(2000, 1, 1),
+            max_value=today,
             key="report_date"
         )
         # 날짜를 YYYYMMDD 형식으로 변환
         # 날짜 데이터 메모리에 저장
         st.session_state['report_date_str'] = report_date.strftime("%Y%m%d")
+    with col2:
+        # JavaScript 코드로 클립보드 복사 기능 추가
+        copy_button_code = """
+            <script>
+            function copyToClipboard(text) {
+                const tempElement = document.createElement('textarea');
+                tempElement.value = text;
+                document.body.appendChild(tempElement);
+                tempElement.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempElement);
+                alert('복사되었습니다!');
+            }
+            </script>
+        """
+        
+        # HTML의 클립보드 복사 버튼
+        st.markdown(copy_button_code, unsafe_allow_html=True)       
+        # [복사] 버튼 클릭 시 복사되는 HTML 내용과 버튼 추가
+        st.markdown(f"""
+            <button onclick="copyToClipboard(`{html_response_value.replace('`', '\\`').replace('\n', '')}`)">복사</button>
+            """, 
+            unsafe_allow_html=True
+        )
+    col1, col2 = st.columns([0.5, 0.5])
+    with col1:   
         if st.button("결과 내용 저장", key="save_result", use_container_width=True):
            
             if "response" in st.session_state:                
