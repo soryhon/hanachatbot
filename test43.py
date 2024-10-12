@@ -103,7 +103,7 @@ def create_new_folder_in_github(repo, folder_name, token, branch='main'):
     response = requests.put(url, json=data, headers=headers)
     
     if response.status_code in [200, 201]:
-        st.success(f"'{folder_name}' 폴더가 성공적으로 생성되었습니다.")
+        #st.success(f"'{folder_name}' 폴더가 성공적으로 생성되었습니다.")
         return True
     elif response.status_code == 422:
         st.warning("이미 존재하는 폴더입니다.")
@@ -218,7 +218,7 @@ def create_github_folder_if_not_exists(repo, folder_name, token, branch='main'):
             "branch": branch
         }
         requests.put(create_folder_url, json=data, headers=headers)
-        st.success(f"'{folder_name}' 폴더가 성공적으로 생성되었습니다.")
+        #st.success(f"'{folder_name}' 폴더가 성공적으로 생성되었습니다.")
     # 폴더가 이미 존재할 경우 메시지를 표시하지 않음
 
 # GitHub API 요청을 처리하는 함수 (파일 목록을 가져옴)
