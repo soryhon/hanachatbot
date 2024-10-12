@@ -858,7 +858,7 @@ if github_info_loaded:
         with col1:
             st.write("")
             st.markdown(
-                "<p style='font-size:16px; font-weight:bold; color:#000000;text-align:center;'>보고서 주제<br/>선택 / 등록</p>",
+                "<p style='font-size:15px; font-weight:bold; color:#000000;text-align:center;'>보고서 주제<br/>선택 / 등록</p>",
                 unsafe_allow_html=True
             )
         with col2:
@@ -934,7 +934,7 @@ if github_info_loaded:
         with col1:
             st.write("")
             st.markdown(
-                "<p style='font-size:16px; font-weight:normal; color:#000000;text-align:center;'>저장된 보고서<br/>불러오기</p>",
+                "<p style='font-size:15px; font-weight:bold; color:#000000;text-align:center;'>저장된 보고서<br/>불러오기</p>",
                 unsafe_allow_html=True
             )
         with col2:    
@@ -1026,7 +1026,7 @@ with st.expander("요청사항 설정", expanded=st.session_state['check_count']
     col1, col2, col3 = st.columns([0.3, 0.4, 0.3])
     with col1:
         st.markdown(
-            "<p style='font-size:16px; font-weight:normal; color:#000000; margin-top:20px;text-align:center;'>요청사항 갯수</p>",
+            "<p style='font-size:15px; font-weight:bold; color:#000000; margin-top:20px;text-align:center;'>요청사항 갯수</p>",
             unsafe_allow_html=True
         )
         
