@@ -1244,7 +1244,7 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
     
 # 10 프레임
 # 결과 저장 버튼
-    col1, col2, col3 = st.columns([0.21, 0.4, 0.39])
+    col1, col2, col3 = st.columns([0.21, 0.39, 0.4])
     with col1:
         st.markdown(
             "<p style='font-size:14px; font-weight:bold; color:#000000; margin-top:20px;text-align:center;'>결과 보고서<br/>기준일자 지정</p>",
