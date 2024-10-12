@@ -926,7 +926,11 @@ if github_info_loaded:
                             init_session_state(True)
                             st.success(f"'{new_folder_name}' 폴더가 성공적으로 생성되었습니다.")
                                 
-        
+        st.markdown(
+            "<hr style='border-color:#007BFF;width:90%'></hr>",
+            unsafe_allow_html=True
+        )
+
         col1, col2 = st.columns([0.21, 0.79])
         with col1:
             st.write("")
