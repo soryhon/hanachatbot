@@ -874,7 +874,7 @@ if github_info_loaded:
                 #else:
                     #selected_index = 0  # 기본값으로 '주제를 선택하세요.' 선택
                 st.session_state['selected_folder_index'] = selected_index
-                st.session_state['folder_list_option'] = [] + folder_list
+                st.session_state['folder_list_option'] = [folderlist_init_value] + folder_list
                 # 폴더 선택 selectbox 생성 (새 폴더 추가 후, 선택값으로 설정)
                 selected_folder = st.selectbox(
                     "등록된 보고서명 리스트",
