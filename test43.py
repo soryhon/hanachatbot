@@ -842,12 +842,15 @@ refresh_page()
      
     
 # 1 프레임
-# 보고서 타이틀틀
-report_title = "보고서 자동 완성"
-if 'selected_folder_name' in st.session_state:
-    if st.session_state['selected_folder_name'] != folderlist_init_value:
-        report_title = " [" + st.session_state['selected_folder_name'] + "] 보고서"
-st.subheader("척척하나 - " +report_title)
+# 보고서 타이틀
+col1, col2 = st.columns([0.2, 0.8]) 
+with col1 :
+    st.subheader("척척하나")
+with col2 :
+    st.markdown(
+        "<p style='font-size:20px; font-weight:bold; color:#000000;text-align:left;'>- 일일 업무 보고서 자동 완성</p>",
+        unsafe_allow_html=True
+    )
 
 # 2 프레임
 # 보고서 주제 및 폴더 선택, 새 폴더 만들기
