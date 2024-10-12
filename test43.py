@@ -916,7 +916,7 @@ if github_info_loaded:
                     #보고서 양식 파일 리스트
                     selected_template = st.selectbox(
                         "불러올 보고서 양식 파일 리스트", 
-                        options=templatelist_init_value + template_files, 
+                        options=[templatelist_init_value] + template_files, 
                         index=st.session_state['selected_template_index'],
                         key="selected_template"
                     )
