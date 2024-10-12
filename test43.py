@@ -858,7 +858,7 @@ if github_info_loaded:
         with col1:
             st.write("")
             st.markdown(
-                "<p style='font-size:15px; font-weight:bold; color:#000000;text-align:center;'>보고서 주제<br/>선택 / 등록</p>",
+                "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>보고서 주제<br/>선택 / 등록</p>",
                 unsafe_allow_html=True
             )
         with col2:
@@ -934,7 +934,7 @@ if github_info_loaded:
         with col1:
             st.write("")
             st.markdown(
-                "<p style='font-size:15px; font-weight:bold; color:#000000;text-align:center;'>저장된 보고서<br/>불러오기</p>",
+                "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>저장된 보고서<br/>불러오기</p>",
                 unsafe_allow_html=True
             )
         with col2:    
@@ -1026,7 +1026,7 @@ with st.expander("요청사항 설정", expanded=st.session_state['check_count']
     col1, col2, col3 = st.columns([0.21, 0.4, 0.39])
     with col1:
         st.markdown(
-            "<p style='font-size:15px; font-weight:bold; color:#000000; margin-top:20px;text-align:center;'>요청사항 리스트<br/>갯수 설정</p>",
+            "<p style='font-size:14px; font-weight:bold; color:#000000; margin-top:20px;text-align:center;'>요청사항 리스트<br/>갯수 설정</p>",
             unsafe_allow_html=True
         )
         
@@ -1042,6 +1042,7 @@ with st.expander("요청사항 설정", expanded=st.session_state['check_count']
         )
     
     with col3:
+        st.write("")
         st.write("")
         if st.button("설정", key="set_requests", use_container_width=True):
             # 설정 버튼 클릭 시 요청사항 리스트 초기화 및 새로운 요청사항 갯수 설정
