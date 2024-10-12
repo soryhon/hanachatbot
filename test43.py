@@ -894,7 +894,7 @@ if github_info_loaded:
             st.write("")
             st.write("")
             st.markdown(
-                "<p style='font-size:20px; font-weight:bold; color:#dddddd;text-align:center'>보고서 주제<br/>선택/등록</p>",
+                "<p style='font-size:20px; font-weight:bold; color:#dddddd;text-align:center'></p>",
                 unsafe_allow_html=True
             )
         with col4:
