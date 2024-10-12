@@ -1285,7 +1285,7 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
         st.session_state['report_date_str'] = report_date.strftime("%Y%m%d")
     with col2:
         st.markdown(
-            "<p style='font-size:14px; font-weight:normal; color:#444444; margin-top:20px;text-align:left;'>⬅️결과 보고서 저장을 위해 기준일자를 지정해주세요.</p>",
+            "<p style='font-size:14px; font-weight:normal; color:#444444; margin-top:20px;text-align:left;'>⬅️보고서 저장을 위해 기준일자를 지정해주세요.</p>",
             unsafe_allow_html=True
         )
     col1, col2 = st.columns([0.5, 0.5])
