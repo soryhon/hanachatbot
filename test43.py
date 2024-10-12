@@ -843,10 +843,17 @@ refresh_page()
     
 # 1 프레임
 # 보고서 타이틀
-st.markdown(
-    "<p style='font-size:25px; font-weight:bold; color:#000000;'>척척하나- 일일 업무 보고서 자동 완성</p>",
-    unsafe_allow_html=True
-)
+col1, col2 = st.columns([0.7,0.3])
+with col1:
+    st.markdown(
+        "<p style='font-size:25px; font-weight:bold; color:#000000;'>척척하나 - 일일 업무 보고서 자동 완성</p>",
+        unsafe_allow_html=True
+    )
+with col2:
+    st.markdown(
+        "<p style='font-size:13px; font-weight:bold; color:#aaaaaa; margin-top:10px;'>by CheokCeock1 prototype v.1</p>",
+        unsafe_allow_html=True
+    )
 
 # 2 프레임
 # 보고서 주제 및 폴더 선택, 새 폴더 만들기
