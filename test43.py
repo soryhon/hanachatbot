@@ -1090,12 +1090,6 @@ with st.expander("요청사항 설정", expanded=st.session_state['check_count']
             refresh_page()
             init_session_state(True)
     
-    #with col4:
-        #if st.button("새로고침", key="refresh_requests", use_container_width=True):
-            # 새로고침 버튼 클릭 시 요청사항 리스트 초기화
-            
-            #init_session_state(True)
-            #st.success("요청사항 리스트가 초기화되었습니다.")
 
 # 6 프레임
 # 요청사항 리스트
@@ -1140,13 +1134,14 @@ with st.expander("요청사항 리스트", expanded=st.session_state['check_requ
 
                 if file_content:
                     file_type = file_path.split('.')[-1].lower()
-
-                    # 파일 형식 검증 (지원되는 파일만 처리)
-                    if file_type not in supported_file_types:
-                        st.error(f"지원하지 않는 파일입니다: {file_path}")
-                        row['데이터'] = ""
-                    else:      
-                        handle_file_selection(file_path, file_content, file_type, idx)
+                    with st.spinner('선택한 데이터 정보 확인 중입니다...'):
+                        # 파일 형식 검증 (지원되는 파일만 처리)
+                        if file_type not in supported_file_types:
+                            st.error(f"지원하지 않는 파일입니다: {file_path}")
+                            row['데이터'] = ""
+                        else:      
+                            handle_file_selection(file_path, file_content, file_type, idx)
+                        time.sleep(1) 
                 else:
                     st.error(f"{selected_file} 파일을 GitHub에서 불러오지 못했습니다.")  
             st.text_input(f"{idx+1}.요청사항 선택한 파일", row['파일'], disabled=True, key=f"file_{idx}")
