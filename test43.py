@@ -932,10 +932,10 @@ if github_info_loaded:
                                 refresh_page()
                                 init_session_state(True)
                                 st.success("성공")            
-                    st.markdown(
-                        "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
-                        unsafe_allow_html=True
-                    )
+                    #st.markdown(
+                        #"<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
+                        #unsafe_allow_html=True
+                    #)
         with tab2:
             col1, col2 = st.columns([0.21, 0.79])
             with col1:
