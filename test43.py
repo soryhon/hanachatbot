@@ -861,11 +861,11 @@ if github_info_loaded:
     with st.expander("보고서 선택", expanded=st.session_state['check_report']):
         tab1, tab2, tab3 = st.tabs(["등록된 보고서명 선택하기", "저장된 보고서 양식 불러오기","새로운 보고서명 만들기"])
         with tab1:
-            col1, col2 = st.columns([0.2, 0.8])
+            col1, col2 = st.columns([0.21, 0.79])
             with col1:
                 st.write("")
                 st.markdown(
-                    "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>등록된 보고서명<br/>선택 </p>",
+                    "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>등록된<br/>보고서명<br/>선택 </p>",
                     unsafe_allow_html=True
                 )
             with col2:
@@ -909,11 +909,11 @@ if github_info_loaded:
                 load_template_button_function()
 
         with tab3:
-            col1, col2, col3 = st.columns([0.2, 0.4,0.4])
+            col1, col2, col3 = st.columns([0.21, 0.4,0.39])
             with col1:
                 st.write("")
                 st.markdown(
-                    "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>t새로운 보고서명<br/>만들기</p>",
+                    "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>새로운<br/>보고서명<br/>만들기</p>",
                     unsafe_allow_html=True
                 )
             with col2:
@@ -923,9 +923,9 @@ if github_info_loaded:
                     "<p style='font-size:18px; margin-top:27px;'></p>",
                     unsafe_allow_html=True
                 )
-                if st.button("등록", key="new_folder"):
+                if st.button("보고서명 등록", key="new_folder", use_container_width=True):
                     if not new_folder_name:
-                        st.error("새로운 보고서 주제를 입력하세요.")
+                        st을 입력하세요.")
                     elif new_folder_name in folder_list:
                         st.warning("이미 존재합니다.")
                     else:
@@ -942,7 +942,7 @@ if github_info_loaded:
                             st.session_state['check_count']=True
                             refresh_page()
                             init_session_state(True)
-                            st.success("성공")            
+                            st.success("새로운 보고서명 등록 성공하였습니다.")            
         #st.markdown(
             #"<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
             #unsafe_allow_html=True
