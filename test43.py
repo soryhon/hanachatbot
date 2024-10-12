@@ -455,7 +455,7 @@ def generate_final_html_report(file_data):
         report_html += f"<div style='text-indent: 1px;'>\n{file_data}\n</div><p/.\n"
         st.session_state['html_report'] = report_html  # 최종 값을 세션 상태에 저장
 
-# 엑셀 데이터 및 제목을 HTML로 변환하여 하나의 세트로 출력하는 함수
+# 엑셀 데이터 및 을 HTML로 변환하여 하나의 세트로 출력하는 함수
 def generate_html_report_with_title(titles, data_dicts):
     report_html = ""
     
@@ -1083,14 +1083,14 @@ with st.expander("요청사항 리스트", expanded=st.session_state['check_requ
                 unsafe_allow_html=True
             )
         
-            row['제목'] = st.text_input(f"제목 {idx+1} :", row['제목'], key=f"title_{idx}")
-            row['요청'] = st.text_area(f"요청 {idx+1} :", row['요청'], key=f"request_{idx}")
+            row['제목'] = st.text_input(f"제목 : {idx+1}.요청사항의 제목을 입력해주세요.", row['제목'], key=f"title_{idx}")
+            row['요청'] = st.text_area(f"요청 : {idx+1}.요청사항의 요청할 내용을 입력해주세요.", row['요청'], key=f"request_{idx}")
      
             file_list = ['파일을 선택하세요.']
             if st.session_state.get('github_token') and st.session_state.get('github_repo'):
                 file_list += get_github_files(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
 
-            selected_file = st.selectbox(f"파일 선택 {idx+1} :", options=file_list, key=f"file_select_{idx}")
+            selected_file = st.selectbox(f"파일 선택 : {idx+1}.요청사항의 파일을 선택해주세요.:", options=file_list, key=f"file_select_{idx}")
 
             if selected_file != '파일을 선택하세요.':
                 st.session_state['rows'][idx]['파일'] = selected_file
