@@ -405,7 +405,7 @@ def handle_sheet_selection(file_content, sheet_count, idx):
         sheet_selection = st.text_input(
             f"시트 선택_{idx}(예: 1-3, 5)", 
             value=sheet_selection_value, 
-            key=f"sheet_selection_{idx}"
+            key=f"sheet_selection_{idx}_{file_name}"
         )
     
         # 입력값 변경 시 세션에 저장
