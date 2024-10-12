@@ -764,6 +764,10 @@ def apply_template_to_session_state2(template_data):
     st.session_state['rows'] = rows
     st.session_state['is_updating'] = False
     st.session_state['upload_folder'] = f"uploadFiles/{selected_folder_name}"
+    st.session_state['check_report'] = False
+    st.session_state['check_upload'] = False
+    st.session_state['check_request'] = True
+    st.session_state['check_result'] = False
     
     # folder_list에서 selected_folder_name의 인덱스 찾기
     folder_list = st.session_state.get('folder_list_option', [])
