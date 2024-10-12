@@ -1092,7 +1092,7 @@ with st.expander("요청사항 리스트", expanded=st.session_state['check_requ
             if st.session_state.get('github_token') and st.session_state.get('github_repo'):
                 file_list += get_github_files(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
 
-            selected_file = st.selectbox(f"파일 선택 : '{idx+1}.요청사항'의 파일을 선택해주세요.:", options=file_list, key=f"file_select_{idx}")
+            selected_file = st.selectbox(f"파일 선택 : '{idx+1}.요청사항'의 파일을 선택해주세요.", options=file_list, key=f"file_select_{idx}")
 
             if selected_file != '파일을 선택하세요.':
                 st.session_state['rows'][idx]['파일'] = selected_file
@@ -1116,7 +1116,7 @@ with st.expander("요청사항 리스트", expanded=st.session_state['check_requ
                         handle_file_selection(file_path, file_content, file_type, idx)
                 else:
                     st.error(f"{selected_file} 파일을 GitHub에서 불러오지 못했습니다.")  
-            st.text_input(f"파일 경로_{idx} (요청사항 {idx+1})", row['파일'], disabled=True, key=f"file_{idx}")
+            st.text_input(f"{idx+1}.요청사항 선택한 파일", row['파일'], disabled=True, key=f"file_{idx}")
 
         #if row_checked:
             #checked_rows.append(idx)
