@@ -21,9 +21,12 @@ from openpyxl.utils import get_column_letter
 import re
 import tempfile
 import datetime
-
+import locale
 
 # Backend 기능 구현 시작 ---
+
+# 로케일을 한국어로 설정
+locale.setlocale(locale.LC_TIME, 'ko_KR.UTF-8')
 
 # 전역변수로 프롬프트 및 파일 데이터 저장
 global_generated_prompt = []
