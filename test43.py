@@ -898,13 +898,15 @@ if github_info_loaded:
                 "<p style='font-size:20px; font-weight:bold; color:#dddddd;text-align:center'>|</p>",
                 unsafe_allow_html=True
             )
-        with col4:       
+        with col4:
+            click_new = False
             col1, col2 = st.columns([0.7, 0.3])
             with col1:
                 new_folder_name = st.text_input("새로 등록할 보고서명 입력", max_chars=20, key="new_folder_name", value=st.session_state['new_folder_text'])
             with col2:
                 st.write("")
                 st.write("")
+                
                 if st.button("등록", key="new_folder"):
                     if not new_folder_name:
                         st.error("새로운 보고서 주제를 입력하세요.")
@@ -924,7 +926,9 @@ if github_info_loaded:
                             st.session_state['check_count']=True
                             refresh_page()
                             init_session_state(True)
-                            st.success(f"'{new_folder_name}' 폴더가 성공적으로 생성되었습니다.")
+                            click_new = True
+                if click_new :
+                    st.success(f"'{new_folder_name}' 폴더가 성공적으로 생성되었습니다.")
                                 
         st.markdown(
             "<hr style='border-color:#dddddd;width:100%;padding:0px;margin:0px'></hr>",
