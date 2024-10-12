@@ -1274,7 +1274,7 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
             saved_date = today
     
         report_date = st.date_input(
-            "보고서 기준일자 선택",
+            "📅 보고서 기준일자 선택",
             value=saved_date,
             min_value=datetime.date(2000, 1, 1),
             max_value=today,
