@@ -1054,11 +1054,11 @@ else:
 
 # 5 프레임
 # 요청사항 갯수 설정 입력 및 버튼
-with st.expander("⚙️ 요청사항 설정", expanded=st.session_state['check_count']):
+with st.expander("⚙️ 요청사항 및 기준일자 설정", expanded=st.session_state['check_count']):
     col1, col2, col3 = st.columns([0.21, 0.4, 0.39])
     with col1:
         st.markdown(
-            "<p style='font-size:14px; font-weight:bold; color:#000000; margin-top:20px;text-align:center;'>요청사항 리스트<br/>갯수 설정</p>",
+            "<p style='font-size:14px; font-weight:normal; color:#000000; margin-top:20px;text-align:center;'>요청사항 리스트<br/>갯수 설정</p>",
             unsafe_allow_html=True
         )
         
@@ -1090,7 +1090,10 @@ with st.expander("⚙️ 요청사항 설정", expanded=st.session_state['check_
             refresh_page()
             init_session_state(True)
     
-
+    st.markdown(
+        "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
+        unsafe_allow_html=True
+    ) 
 # 6 프레임    
     col1, col2 = st.columns([0.5, 0.5])
     with col1:
