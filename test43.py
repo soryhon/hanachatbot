@@ -820,7 +820,7 @@ def apply_template_to_session_state(file_name):
         
         # folder_list에서 selected_folder_name의 인덱스 찾기
         folder_list = st.session_state.get('folder_list_option', [])
-        if folder_name in folder_list:
+        if selected_folder_name in folder_list:
             selected_index = folder_list.index(selected_folder_name)
             st.session_state['selected_folder_index'] = selected_index + 1
         
