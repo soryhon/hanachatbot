@@ -843,12 +843,12 @@ refresh_page()
     
 # 1 프레임
 # 보고서 타이틀
-col1, col2 = st.columns([0.4, 0.6]) 
+col1, col2 = st.columns([0.3, 0.7]) 
 with col1 :
     st.subheader("척척하나")
 with col2 :
     st.markdown(
-        "<p style='font-size30px; font-weight:bold; color:#000000;text-align:left;'>- 일일 업무 보고서 자동 완성</p>",
+        "<p style='font-size:30px; font-weight:bold; color:#000000;text-align:left;'>- 일일 업무 보고서 자동 완성</p>",
         unsafe_allow_html=True
     )
 
