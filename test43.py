@@ -848,7 +848,7 @@ with col1 :
     st.subheader("척척하나")
 with col2 :
     st.markdown(
-        "<p style='font-size:30px; font-weight:bold; color:#000000;text-align:left;'>- 일일 업무 보고서 자동 완성</p>",
+        "<p style='font-size:20px; font-weight:bold; color:#000000;'>- 일일 업무 보고서 자동 완성</p>",
         unsafe_allow_html=True
     )
 
