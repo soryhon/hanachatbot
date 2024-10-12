@@ -1228,10 +1228,11 @@ st.markdown(
 # LLM 응답 보기
 with st.expander("📊 결과 보고서 보기", expanded=st.session_state['check_result']):
     if "response" in st.session_state:
+        html_response_value = ""
         for idx, response in enumerate(st.session_state["response"]):
             #st.text_area(f"응답 {idx+1}:", value=response, height=300)
             st.write("결과 보고서 완성")
-            html_response_value = f"<div style='border: 0px solid #cccccc; padding: 1px;'>{response}</div>"
+            html_response_value += f"<div style='border: 0px solid #cccccc; padding: 1px;'>{response}</div>"
             st.components.v1.html(html_response_value, height=1024, scrolling=True)
 
     st.markdown(
