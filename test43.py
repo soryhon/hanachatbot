@@ -908,8 +908,8 @@ if github_info_loaded:
                 if template_files:
                     # 'selected_template'가 template_files에 있을 때만 index 설정
                     #selected_temp_index = st.session_state['selected_template_index']
-                    if st.session_state['selected_folder_name'] in folder_list:
-                        selected_temp_index = template_files.index(st.session_state['selected_folder_name']) + 1                        
+                    if st.session_state['selected_template_name'] in template_files:
+                        selected_temp_index = template_files.index(st.session_state['selected_template_name']) + 1                        
                     else:
                         selected_temp_index = 0
                     st.session_state['selected_template_index'] = selected_temp_index    
