@@ -1043,7 +1043,7 @@ with st.expander("요청사항 설정", expanded=st.session_state['check_count']
     
     with col3:
         st.markdown(
-            "<p style='font-size:18px; margin-top:15px;'></p>",
+            "<p style='font-size:18px; margin-top:25px;'></p>",
             unsafe_allow_html=True
         )
         if st.button("설정", key="set_requests", use_container_width=True):
