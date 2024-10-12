@@ -925,7 +925,7 @@ if github_info_loaded:
                 )
                 if st.button("보고서명 등록", key="new_folder", use_container_width=True):
                     if not new_folder_name:
-                        st을 입력하세요.")
+                        st.warning("새로 등록할 보고서명을 입력하세요.")
                     elif new_folder_name in folder_list:
                         st.warning("이미 존재합니다.")
                     else:
