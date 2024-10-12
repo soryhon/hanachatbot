@@ -1089,13 +1089,11 @@ with st.expander("⚙️ 요청사항 및 기준일자 설정", expanded=st.sess
             st.session_state['check_count']=False
             refresh_page()
             init_session_state(True)
-            
+    st.markdown(
+        "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
+        unsafe_allow_html=True
+    )      
     col1, col2 = st.columns([0.5, 0.5])
-    #with col1:
-        #st.markdown(
-            #"<p style='font-size:14px; font-weight:bold; color:#000000; margin-top:20px;text-align:center;'>결과 보고서<br/>기준일자 지정</p>",
-            #unsafe_allow_html=True
-        #)
     with col1:
         # 오늘 날짜 가져오기
         today = datetime.date.today()
