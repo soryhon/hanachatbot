@@ -97,3 +97,4 @@ openpyxl
 SpeechRecognition
 pydub
 boto3
+locale
