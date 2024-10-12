@@ -841,7 +841,7 @@ refresh_page()
 col1, col2 = st.columns([0.7,0.3])
 with col1:
     st.markdown(
-        "<p style='font-size:25px; font-weight:bold; color:#000000;'> 업무 보고서 자동 완성</p>",
+        "<p style='font-size:25px; font-weight:bold; color:#000000;'>업무 보고서 자동 완성 📚</p>",
         unsafe_allow_html=True
     )
 with col2:
