@@ -860,7 +860,8 @@ with col2:
 if github_info_loaded:
     with st.expander("보고서 선택", expanded=st.session_state['check_report']):
         st.write("")
-        with st.expander("보고서 주제 선택", expanded=True):
+        tab1, tab2 = st.tabs(["보고서 주제", "양식 불러오기"])
+        with tab1:
             col1, col2, col3, col4 = st.columns([0.2, 0.3, 0.05, 0.35])
             with col1:
                 st.write("")
@@ -931,20 +932,20 @@ if github_info_loaded:
                                 refresh_page()
                                 init_session_state(True)
                                 st.success("성공")            
-        st.markdown(
-            "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
-            unsafe_allow_html=True
-        )
-
-        col1, col2 = st.columns([0.21, 0.79])
-        with col1:
-            st.write("")
-            st.markdown(
-                "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>저장된 보고서<br/>양식 불러오기</p>",
-                unsafe_allow_html=True
-            )
-        with col2:    
-            load_template_button_function()
+                    st.markdown(
+                        "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
+                        unsafe_allow_html=True
+                    )
+        with tab2:
+            col1, col2 = st.columns([0.21, 0.79])
+            with col1:
+                st.write("")
+                st.markdown(
+                    "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>저장된 보고서<br/>양식 불러오기</p>",
+                    unsafe_allow_html=True
+                )
+            with col2:    
+                load_template_button_function()
 
 else:
     st.warning("GitHub 정보가 설정되지 않았습니다. 먼저 GitHub Token을 입력해 주세요.")
