@@ -1251,8 +1251,19 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
         
         
         # 세션에 저장된 'YYYYMMDD' 형식을 date 객체로 변환
-        saved_date = datetime.datetime.strptime(st.session_state['report_date_str'], '%Y%m%d').date()
-        
+        saved_date = today
+        # 날짜 문자열을 검사하여 잘못된 형식일 때 예외 처리
+        if 'report_date_str' in st.session_state and st.session_state['report_date_str']:
+            try:
+                # 저장된 날짜 문자열이 있으면 파싱
+                saved_date = datetime.datetime.strptime(st.session_state['report_date_str'], '%Y%m%d').date()
+            except ValueError:
+                # 날짜 형식이 맞지 않으면 오늘 날짜로 설정
+                st.warning("잘못된 날짜 형식입니다. 기본값으로 오늘 날짜를 사용합니다.")
+        else:
+            # 저장된 날짜가 없거나 빈 문자열일 경우 오늘 날짜로 설정
+            saved_date = today
+    
         report_date = st.date_input(
             "보고서 기준일자 선택",
             value=saved_date,
