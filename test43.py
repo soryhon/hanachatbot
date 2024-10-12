@@ -542,7 +542,7 @@ def run_llm_with_file_and_prompt(api_key, titles, requests, file_data_str):
         바. 이외 table 태그가 포함 안된 데이터는 파일에서 텍스트를 추출한 데이터로 내용으로 보고서 양식에 맞춰 간결하고 깔끔하게 요약하고 html 형식으로 변환해야 한다.
         사. 답변할 때는 반드시 모든 항목 데이터의 수정한 데이터 내용과 HTML 형삭에 맞춰 답변한다. 문단마다 줄바꿈을 적용하여 br태그 활용하고 가시성 높게 특수기호를 활용하여 보고서 양식에 준하게 요약한 내용을 설명해줘야 한다.
         아. 항목 데이터를 업데이트 하는 결과 가장 먼저 나와야하고 위에는 그 어떤한 설명 내용이 응답하면 안 된다. 
-        자. 그 다음 일정 간격을 두고 h3 태그를 활용해서 'AI 요약과 설명' 타이틀 추가하고 색상을 달리 구성한다. 너의 답변이라는 것을 표현하는 특수문자로 강조해도 된다.
+        자. 그 다음 일정 간격을 두고 h3 태그를 활용해서 '✨AI 요약과 설명' 타이틀 추가하고 색상을 달리 구성한다. 너의 답변이라는 것을 표현하는 특수문자로 강조해도 된다.
                전달받은 보고서 전반적인 내용에 대해 너가 선정한 가장 좋은 방법으로 요약과 설명하고 그 내용을 HTML 형식으로 변환하여 답변해야 한다.
         차. '````', '````HTML' 이 문구들이 답변에 포함되지 않아야 한다.
         -요청사항
@@ -1200,7 +1200,7 @@ with col2:
                         html_viewer_data += report_html    
                         #file_data_list.append(row['데이터'])
                     st.session_state['html_report'] = html_viewer_data
-                time.sleep(2)  # 예를 들어, 5초 동안 로딩 상태 유지
+                time.sleep(1)  # 예를 들어, 5초 동안 로딩 상태 유지
 
             with st.spinner('결과 보고서 작성 중입니다...'):
                 # LLM 함수 호출
@@ -1214,7 +1214,7 @@ with col2:
                     st.session_state['html_report']
                 )
                 st.session_state["response"] = responses
-                time.sleep(5)  # 예를 들어, 5초 동안 로딩 상태 유지
+                time.sleep(1)  # 예를 들어, 5초 동안 로딩 상태 유지
 
 
 with col3:
