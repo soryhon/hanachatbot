@@ -853,7 +853,7 @@ with col2:
 # 2 프레임
 # 보고서명 및 폴더 선택, 새 폴더 만들기
 if github_info_loaded:
-    with st.expander("보고서 선택", expanded=st.session_state['check_report']):
+    with st.expander("📝 보고서 선택", expanded=st.session_state['check_report']):
         tab1, tab2, tab3 = st.tabs(["등록된 보고서명 선택하기", "저장된 보고서 양식 불러오기","새로운 보고서명 만들기"])
         with tab1:
             col1, col2 = st.columns([0.21, 0.79])
@@ -1008,7 +1008,7 @@ st.markdown(
 supported_file_types = ['xlsx', 'pptx', 'docx', 'csv', 'png', 'jpg', 'jpeg', 'pdf', 'txt', 'log']
 
 if github_info_loaded:
-    with st.expander("보고서 데이터 파일 업로드", expanded=st.session_state['check_upload']):
+    with st.expander("⬆️ 데이터 파일 업로드", expanded=st.session_state['check_upload']):
         uploaded_files = st.file_uploader("파일을 여러 개 드래그 앤 드롭하여 업로드하세요. (최대 100MB)", accept_multiple_files=True)
 
         if uploaded_files:
@@ -1054,7 +1054,7 @@ else:
 
 # 5 프레임
 # 요청사항 갯수 설정 입력 및 버튼
-with st.expander("요청사항 설정", expanded=st.session_state['check_count']):
+with st.expander("⚙️ 요청사항 설정", expanded=st.session_state['check_count']):
     col1, col2, col3 = st.columns([0.21, 0.4, 0.39])
     with col1:
         st.markdown(
@@ -1093,7 +1093,7 @@ with st.expander("요청사항 설정", expanded=st.session_state['check_count']
 
 # 6 프레임
 # 요청사항 리스트
-with st.expander("📝 요청사항 리스트", expanded=st.session_state['check_request']):
+with st.expander("✍️ 요청사항 리스트", expanded=st.session_state['check_request']):
     if 'rows' not in st.session_state:
         st.session_state['rows'] = [{"제목": "", "요청": "", "파일": "", "데이터": "", "파일정보":"1"}]
 
@@ -1154,7 +1154,7 @@ with col1:
 with col2:   
 
 # 보고서 실행 버튼 클릭 시 함수 호출 수정
-    if st.button("보고서 작성 실행", key="generate_report", use_container_width=True):
+    if st.button("🚀 보고서 작성 실행", key="generate_report", use_container_width=True):
         st.session_state['check_result']=True
         st.session_state['check_report'] = False
         st.session_state['check_upload'] = False
@@ -1226,7 +1226,7 @@ st.markdown(
 
 # 9 프레임
 # LLM 응답 보기
-with st.expander("결과 보고서 보기", expanded=st.session_state['check_result']):
+with st.expander("📊 결과 보고서 보기", expanded=st.session_state['check_result']):
     if "response" in st.session_state:
         for idx, response in enumerate(st.session_state["response"]):
             #st.text_area(f"응답 {idx+1}:", value=response, height=300)
