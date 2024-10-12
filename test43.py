@@ -782,17 +782,18 @@ def apply_template_to_session_state(file_name):
         for idx, row in enumerate(rows):
             selected_file_name = row.get("파일")
             file_info = row.get("파일정보", "1")
+            
             if selected_file_name and selected_file_name.endswith('.xlsx'):
                 # 시트 선택 로직 적용
-                file_content = get_file_from_github(
-                    st.session_state["github_repo"],
-                    st.session_state["github_branch"],
-                    selected_file_name,
-                    st.session_state["github_token"]
-                )
-                if file_content:
-                    handle_sheet_selection(file_content, len(openpyxl.load_workbook(file_content).sheetnames), idx)
-                    st.session_state['rows'][idx]['파일정보'] = file_info
+                #file_content = get_file_from_github(
+                    #st.session_state["github_repo"],
+                    #st.session_state["github_branch"],
+                    #selected_file_name,
+                    #st.session_state["github_token"]
+                #)
+                #if file_content:
+                    #handle_sheet_selection(file_content, len(openpyxl.load_workbook(file_content).sheetnames), idx)
+                st.session_state['rows'][idx]['파일정보'] = file_info        
         st.success(f"'{selected_folder_name}' 양식을 불러오기 성공하였습니다.")
     
     except FileNotFoundError:
