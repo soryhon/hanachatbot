@@ -981,7 +981,7 @@ with col2:
     report_title = "작성할 보고서를 선택하세요."
     title_style="font-size:15px; font-weight:normal; color:#cccccc;border: 1px solid #dddddd;letter-spacing: 1px;"
     if 'selected_folder_name' in st.session_state:
-        if st.session_state['selected_folder_name'] != :
+        if st.session_state['selected_folder_name'] != folderlist_init_value:
             report_title = " [" + st.session_state['selected_folder_name'] + "] 보고서"
             title_style="font-size:20px; font-weight:bold; color:#000000;border: 0px solid #dddddd;letter-spacing: 4px;"
     st.markdown(
