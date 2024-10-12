@@ -636,7 +636,8 @@ def init_session_state(check_value):
             st.session_state['check_result'] = False
         if 'check_count' not in st.session_state:    
             st.session_state['check_count'] = False
-        
+        if 'report_date_str' not in st.session_state: 
+            st.session_state['report_date_str'] = ""
 # HTML 파일을 저장하고 파일 경로를 반환하는 함수 (날짜 포함)
 def save_html_response(html_content, folder_name, report_date_str):
     # 현재 시간을 'YYYYMMDDHHMMSS' 형식으로 가져오기
@@ -1246,7 +1247,8 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
             key="report_date"
         )
         # 날짜를 YYYYMMDD 형식으로 변환
-        report_date_str = report_date.strftime("%Y%m%d")
+        # 날짜 데이터 메모리에 저장
+        st.session_state['report_date_str'] = report_date.strftime("%Y%m%d")
         if st.button("결과 내용 저장", key="save_result", use_container_width=True):
            
             if "response" in st.session_state:                
