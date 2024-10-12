@@ -1238,26 +1238,18 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
     # 결과 저장 버튼
     col1, col2 = st.columns([0.5, 0.5])
     with col1:
+        report_date = st.date_input(
+            "보고서 기준일자 선택",
+            value=datetime.date.today(),
+            min_value=datetime.date(1900, 1, 1),
+            max_value=datetime.date.today(),
+            key="report_date"
+        )
+        # 날짜를 YYYYMMDD 형식으로 변환
+        report_date_str = report_date.strftime("%Y%m%d")
         if st.button("결과 내용 저장", key="save_result", use_container_width=True):
            
-            if "response" in st.session_state:
-
-                report_date = st.date_input(
-                    "보고서 기준일자 선택",
-                    value=datetime.date.today(),
-                    min_value=datetime.date(1900, 1, 1),
-                    max_value=datetime.date.today(),
-                    key="report_date"
-                )
-                # 날짜를 YYYYMMDD 형식으로 변환
-                report_date_str = report_date.strftime("%Y%m%d")
-        
-                # 날짜 지정 버튼
-                if st.button("날짜 지정", key="set_report_date"):
-                    st.session_state['report_date_str'] = report_date_str
-                    st.success(f"선택된 보고서 기준일자는 {report_date_str}입니다.")
-
-                
+            if "response" in st.session_state:                
                 folder_name = st.session_state['selected_folder_name']
                 report_date_str = st.session_state.get('report_date_str', datetime.datetime.now().strftime('%Y%m%d'))
                 
