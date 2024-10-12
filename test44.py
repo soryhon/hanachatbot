@@ -1226,20 +1226,22 @@ st.markdown(
 
 # 9 프레임
 # LLM 응답 보기
-html_response_value = ""
+html_result_value = "<div id='html_result_value'>"
 with st.expander("📊 결과 보고서 보기", expanded=st.session_state['check_result']):
     if "response" in st.session_state:
         
         for idx, response in enumerate(st.session_state["response"]):
             #st.text_area(f"응답 {idx+1}:", value=response, height=300)
             st.write("결과 보고서 완성")
-            html_response_value += f"<div style='border: 0px solid #cccccc; padding: 1px;'>{response}</div>"
+            html_response_value = f"<div style='border: 0px solid #cccccc; padding: 1px;'>{response}</div>"
+            html_result_value += html_response_value
             st.components.v1.html(html_response_value, height=1024, scrolling=True)
-
+    html_result_value += </div>
     st.markdown(
         "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
         unsafe_allow_html=True
     )
+    
 # 10 프레임
 # 결과 저장 버튼
     col1, col2 = st.columns([0.5, 0.5])
@@ -1279,24 +1281,21 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
     with col2:
         # JavaScript 코드로 클립보드 복사 기능 추가
         copy_button_code = """
-            <script>
-            function copyToClipboard(text) {
-                const tempElement = document.createElement('textarea');
-                tempElement.value = text;
-                document.body.appendChild(tempElement);
-                tempElement.select();
-                document.execCommand('copy');
-                document.body.removeChild(tempElement);
-                alert('복사되었습니다!');
-            }
-            </script>
+            function copyToClipboard() {{
+                var content = document.getElementById('html_result_value').innerHTML;
+                navigator.clipboard.writeText(content).then(function() {{
+                    alert('복사 완료!');
+                }}, function(err) {{
+                    console.error('복사 실패', err);
+            }});
+    }}
         """
         
         # HTML의 클립보드 복사 버튼
         st.markdown(copy_button_code, unsafe_allow_html=True)       
         # [복사] 버튼 클릭 시 복사되는 HTML 내용과 버튼 추가
         st.markdown(f"""
-            <button onclick="copyToClipboard(`{html_response_value.replace('`', '\\`').replace('\n', '')}`)">복사</button>
+            <button onclick="copyToClipboard()">복사</button>
             """, 
             unsafe_allow_html=True
         )
@@ -1309,7 +1308,7 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
                 report_date_str = st.session_state.get('report_date_str', datetime.datetime.now().strftime('%Y%m%d'))
                 
                 # save_html_response 함수를 사용하여 HTML 파일 저장
-                file_name, temp_file_path = save_html_response(html_response_value, folder_name, report_date_str)
+                file_name, temp_file_path = save_html_response(html_result_value, folder_name, report_date_str)
 
                 # 파일 저장 경로 (reportFiles/{폴더명}/{일자})
                 github_folder = f"reportFiles/{folder_name}/{report_date_str}"
