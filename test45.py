@@ -1074,8 +1074,64 @@ with st.expander("⚙️ 요청사항 및 기준일자 설정", expanded=st.sess
         )
     
     with col3:
+         st.markdown(
+            "<p style='font-size:18px; margin-top:27px;'></p>",
+            unsafe_allow_html=True
+        )
+        if st.button("설정", key="set_requests", use_container_width=True):
+            # 설정 버튼 클릭 시 요청사항 리스트 초기화 및 새로운 요청사항 갯수 설정
+            st.session_state['rows'] = [
+                {"제목": "", "요청": "", "파일": "", "데이터": "", "파일정보": "1"}
+                for _ in range(st.session_state['num_requests'])
+            ]
+            st.success(f"{st.session_state['num_requests']}개의 요청사항이 설정되었습니다.")
+            st.session_state['check_request']=True
+            st.session_state['check_count']=False
+            refresh_page()
+            init_session_state(True)
+            
+    col1, col2 = st.columns([0.5, 0.5])
+    #with col1:
+        #st.markdown(
+            #"<p style='font-size:14px; font-weight:bold; color:#000000; margin-top:20px;text-align:center;'>결과 보고서<br/>기준일자 지정</p>",
+            #unsafe_allow_html=True
+        #)
+    with col1:
+        # 오늘 날짜 가져오기
+        today = datetime.date.today()
+        
+        # 'report_date_str' 세션 값이 있는지 확인하고, 없으면 'YYYYMMDD' 형식으로 today 값 설정
+        if 'report_date_str' not in st.session_state:
+            st.session_state['report_date_str'] = today.strftime('%Y%m%d')
+        
+        
+        # 세션에 저장된 'YYYYMMDD' 형식을 date 객체로 변환
+        saved_date = today
+        # 날짜 문자열을 검사하여 잘못된 형식일 때 예외 처리
+        if 'report_date_str' in st.session_state and st.session_state['report_date_str']:
+            try:
+                # 저장된 날짜 문자열이 있으면 파싱
+                saved_date = datetime.datetime.strptime(st.session_state['report_date_str'], '%Y%m%d').date()
+            except ValueError:
+                # 날짜 형식이 맞지 않으면 오늘 날짜로 설정
+                st.warning("잘못된 날짜 형식입니다. 기본값으로 오늘 날짜를 사용합니다.")
+        else:
+            # 저장된 날짜가 없거나 빈 문자열일 경우 오늘 날짜로 설정
+            saved_date = today
+    
+        report_date = st.date_input(
+            "📅 보고서 기준일자 선택",
+            value=saved_date,
+            min_value=datetime.date(2000, 1, 1),
+            max_value=today,
+            key="report_date"
+        )
+        # 날짜를 YYYYMMDD 형식으로 변환
+        # 날짜 데이터 메모리에 저장
+        st.session_state['report_date_str'] = report_date.strftime("%Y%m%d")
+    with col2:
         st.markdown(
-            "<p style='font-size:18px; margin-top:27px;'>설정해주세요.</p>",
+            "<p style='font-size:14px; font-weight:normal; color:#444444; margin-top:35px;text-align:left;'>ℹ️보고서 저장을 위해 기준일자를 지정해주세요.</p>",
             unsafe_allow_html=True
         )
 # 요청사항 리스트
