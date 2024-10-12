@@ -1229,7 +1229,10 @@ st.markdown(
 html_result_value = "<div id='html_result_value'>"
 with st.expander("📊 결과 보고서 보기", expanded=st.session_state['check_result']):
     if "response" in st.session_state:
-        
+        st.markdown(
+            "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
+            unsafe_allow_html=True
+        )    
         for idx, response in enumerate(st.session_state["response"]):
             #st.text_area(f"응답 {idx+1}:", value=response, height=300)
 
