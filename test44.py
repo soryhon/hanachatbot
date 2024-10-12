@@ -1244,7 +1244,7 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
     
 # 10 프레임
 # 결과 저장 버튼
-    col1, col2, col3 = st.columns([0.21, 0.39, 0.4])
+    col1, col2, col3 = st.columns([0.21, 0.29, 0.5])
     with col1:
         st.markdown(
             "<p style='font-size:14px; font-weight:bold; color:#000000; margin-top:20px;text-align:center;'>결과 보고서<br/>기준일자 지정</p>",
@@ -1285,7 +1285,7 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
         st.session_state['report_date_str'] = report_date.strftime("%Y%m%d")
     with col3:
         st.markdown(
-            "<p style='font-size:14px; font-weight:bold; color:#000000; margin-top:20px;text-align:left;'>⬅️결과 보고서 저장을 위해 기준일자를 지정해주세요.</p>",
+            "<p style='font-size:14px; font-weight:normal; color:#cccccc; margin-top:20px;text-align:left;'>⬅️결과 보고서 저장을 위해 기준일자를 지정해주세요.</p>",
             unsafe_allow_html=True
         )
     col1, col2 = st.columns([0.5, 0.5])
