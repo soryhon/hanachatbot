@@ -747,52 +747,6 @@ def load_template_from_github(repo, branch, token, file_name):
         st.error(f"{file_name} 파일을 가져오지 못했습니다.")
         return None
 
-# 불러온 JSON 데이터를 세션 상태에 반영하는 함수
-def apply_template_to_session_state2(template_data):
-    if not template_data:
-        st.error("불러온 템플릿 데이터가 없습니다.")
-        return
-    
-    # JSON 데이터에서 필요한 값 추출 및 세션 상태 업데이트
-    selected_folder_name = template_data.get('selected_folder_name', '')
-    #num_requests = template_data.get('num_requests', 1)
-    rows = template_data.get('rows', [])
-    
-    # 세션 상태 업데이트
-    st.session_state['selected_folder_name'] = selected_folder_name
-    #st.session_state['num_requests'] = num_requests
-    st.session_state['rows'] = rows
-    st.session_state['is_updating'] = False
-    st.session_state['upload_folder'] = f"uploadFiles/{selected_folder_name}"
-    st.session_state['check_report'] = False
-    st.session_state['check_upload'] = False
-    st.session_state['check_request'] = True
-    st.session_state['check_result'] = False
-    
-    # folder_list에서 selected_folder_name의 인덱스 찾기
-    folder_list = st.session_state.get('folder_list_option', [])
-    if selected_folder_name in folder_list:
-        selected_index = folder_list.index(selected_folder_name)
-        st.session_state['selected_folder_index'] = selected_index + 1
-    
-    # 엑셀 파일 처리: 파일 정보에 따라 시트 선택 입력창 추가
-    for idx, row in enumerate(rows):
-        file_name = row.get("파일")
-        file_info = row.get("파일정보", "1")
-        if file_name and file_name.endswith('.xlsx'):
-            # 시트 선택 로직 적용
-            file_content = get_file_from_github(
-                st.session_state["github_repo"],
-                st.session_state["github_branch"],
-                file_name,
-                st.session_state["github_token"]
-            )
-            if file_content:
-                handle_sheet_selection(file_content, len(openpyxl.load_workbook(file_content).sheetnames), idx)
-                st.session_state['rows'][idx]['파일정보'] = file_info
-    # 변경 사항을 화면에 반영하기 위해 페이지 리로드
-    st.experimental_rerun()
-
 def apply_template_to_session_state(file_name):
     try:
         # 템플릿 JSON 파일 로드
@@ -839,7 +793,7 @@ def apply_template_to_session_state(file_name):
                 if file_content:
                     handle_sheet_selection(file_content, len(openpyxl.load_workbook(file_content).sheetnames), idx)
                     st.session_state['rows'][idx]['파일정보'] = file_info
-        st.success(f"'{selected_folder_name}' 양식을 불러와졌습니다.")
+        st.success(f"'{selected_folder_name}' 양식을 불러오기 성공하였습니다.")
     
     except FileNotFoundError:
         st.error(f"파일 '{file_name}'을 찾을 수 없습니다.")
@@ -866,7 +820,7 @@ def load_template_button_function():
             template_data = load_template_from_github(repo, branch, token, selected_template)
             if template_data:
                 apply_template_to_session_state(f"templateFiles/{selected_template}")
-                st.success(f"{selected_template} 템플릿이 성공적으로 불러와졌습니다.")
+                #st.success(f"{selected_template} 템플릿이 성공적으로 불러와졌습니다.")
             
 # Backend 기능 구현 끝 ---
 
