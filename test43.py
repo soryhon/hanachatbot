@@ -1253,6 +1253,7 @@ with st.expander("결과 보고서 보기", expanded=st.session_state['check_res
                 st.warning("결과 보고서를 먼저 실행하세요.")
     with col2:
         if st.button("보고서 양식 저장", key="save_template", use_container_width=True):
+            st.session_state["check_result"] = True
             save_template_to_json()
 
 
