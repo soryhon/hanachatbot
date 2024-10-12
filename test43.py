@@ -223,7 +223,7 @@ def create_github_folder_if_not_exists(repo, folder_name, token, branch='main'):
 
 # GitHub API 요청을 처리하는 함수 (파일 목록을 가져옴)
 def get_github_files(repo, branch, token):
-    # 보고서 주제 리스트에서 선택한 폴더가 upload_folder에 저장됨
+    # 보고서명 리스트에서 선택한 폴더가 upload_folder에 저장됨
     folder_name = st.session_state.get('upload_folder', 'uploadFiles')
     
     # upload_folder 하위 폴더 내의 파일을 가져옴
@@ -835,7 +835,7 @@ MAX_FILE_SIZE_MB = 100
 MAX_FILE_SIZE_BYTES = 100 * 1024 * 1024
 
 #Session_state 변수 초기화
-folderlist_init_value = "주제를 선택하세요."
+folderlist_init_value = "보고서명을 선택하세요."
 # 세션 상태에 각 변수 없다면 초기화
 init_session_state(False)
 refresh_page()
@@ -856,7 +856,7 @@ with col2:
     )
 
 # 2 프레임
-# 보고서 주제 및 폴더 선택, 새 폴더 만들기
+# 보고서명 및 폴더 선택, 새 폴더 만들기
 if github_info_loaded:
     with st.expander("보고서 선택", expanded=st.session_state['check_report']):
         tab1, tab2, tab3 = st.tabs(["등록된 보고서명 선택하기", "저장된 보고서 양식 불러오기","새로운 보고서명 만들기"])
@@ -882,21 +882,21 @@ if github_info_loaded:
                 st.session_state['folder_list_option'] = [folderlist_init_value] + folder_list
                 # 폴더 선택 selectbox 생성 (새 폴더 추가 후, 선택값으로 설정)
                 selected_folder = st.selectbox(
-                    "보고서 주제 리스트",
+                    "등록된 보고서명 리스트",
                     options=st.session_state['folder_list_option'],  # 옵션 리스트에 새 폴더 반영
                     index=st.session_state['selected_folder_index'],  # 새로 선택된 폴더를 기본값으로 선택
                     key="selected_folder"
                 )
                 # 파일 업로드와 요청사항 리스트의 기본 폴더 설정
-                if selected_folder != "주제를 선택하세요.":
+                if selected_folder != "보고서명을 선택하세요.":
                     st.session_state['upload_folder'] = f"uploadFiles/{selected_folder}"
                     st.session_state['selected_folder_name'] = f"{selected_folder}"
                     refresh_page()
                     st.session_state['check_report']=False
                     st.session_state['check_count']=True
-                    #st.success(f"[{selected_folder}] 보고서가 선택되었습니다.")
+                    #st.success(f"[{selected_folder}] 보고서명이이 선택되었습니다.")
                 #else:   
-                    #st.warning("보고서 주제를 선택하세요.")
+                    #st.warning("보고서명을 선택하세요.")
         with tab2:
             col1, col2 = st.columns([0.21, 0.79])
             with col1:
