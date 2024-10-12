@@ -397,10 +397,10 @@ def handle_sheet_selection(file_content, sheet_count, idx):
     
     with col2:
         # st.session_state['rows']와 st.session_state['rows'][idx]['파일정보']가 유효한지 확인하여 값 설정
-        if st.session_state.get('rows') and st.session_state['rows'][idx].get('파일정보'):
+        sheet_selection_value = '1'
+        if st.session_state.get('rows') and st.session_state['rows'][idx].get('파일') and st.session_state['rows'][idx].get('파일정보'):
             sheet_selection_value = st.session_state['rows'][idx]['파일정보']
-        else:
-            sheet_selection_value = '1'
+            file_name = st.session_state['rows'][idx]['파일']
         
         sheet_selection = st.text_input(
             f"시트 선택_{idx}(예: 1-3, 5)", 
