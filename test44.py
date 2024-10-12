@@ -1281,14 +1281,19 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
     with col2:
         # JavaScript 코드로 클립보드 복사 기능 추가
         copy_button_code = """
-            function copyToClipboard() {{
+            function copyToClipboard()
+            {
                 var content = document.getElementById('html_result_value').innerHTML;
-                navigator.clipboard.writeText(content).then(function() {{
-                    alert('복사 완료!');
-                }}, function(err) {{
-                    console.error('복사 실패', err);
-            }});
-    }}
+                navigator.clipboard.writeText(content).then(
+                    function() 
+                    {
+                        alert('복사 완료!');
+                    }, 
+                    function(err) {
+                        console.error('복사 실패', err);
+                    }
+                );
+            }
         """
         
         # HTML의 클립보드 복사 버튼
