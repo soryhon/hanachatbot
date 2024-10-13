@@ -73,7 +73,8 @@ if github_info_loaded:
                 # 파일 업로드와 요청사항 리스트의 기본 폴더 설정
                 if selected_folder != folderlist_init_value:
                     st.session_state['upload_folder'] = f"uploadFiles/{selected_folder}"
-                    st.session_state['selected_folder_name'] = f"{selected_folder}"                  
+                    st.session_state['selected_folder_name'] = f"{selected_folder}"  
+                    st.session_state['selected_template_name'] = templatelist_init_value
                     st.session_state['check_report']=False
                     st.session_state['check_setting']=True
                     st.session_state['selected_template_index'] = 0
