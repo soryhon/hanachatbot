@@ -42,15 +42,14 @@ date_list=[]
 if github_info_loaded:
 	with st.expander("📝 보고서 선택", expanded=st.session_state['check_report']):
 		col1, col2 = st.columns([0.21, 0.79])
-        	with col1:
-		st.write("")
-		st.markdown(
-			"<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>비교분석 할<br/>보고서명 선택 </p>",
-			unsafe_allow_html=True
-		)
+  	with col1:
+			st.write("")
+			st.markdown(
+				"<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>비교분석 할<br/>보고서명 선택 </p>",
+				unsafe_allow_html=True
+			)
 		with col2:
-    # 폴더 존재 확인 및 생성
-            
+    # 폴더 존재 확인 및 생성          
       folder_list = bd.get_report_folder_list_from_github(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
         
       # st.selectbox 위젯 생성 (이제 session_state['selected_folder'] 사용 가능)
