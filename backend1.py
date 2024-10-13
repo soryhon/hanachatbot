@@ -1037,17 +1037,10 @@ def run_llm_with_analysisfile_and_prompt(api_key, title, request, file_data_str)
     return responses
 
 def extract_text_within_brackets(response):
-    extracted_texts = []
-    pattern = r"\[\[.*?\]\]"  # '[['부터 ']]'까지의 텍스트 추출을 위한 패턴
 
     extracted_text = ""
     # responses는 리스트로, 각 응답을 반복하며 정규식으로 텍스트 추출
-    st.warning(f"len(response) : {len(response)}")
     if len(response) > 0 :
-        matches = re.findall(pattern, response)
-        extracted_texts.extend(matches)  # 모든 매칭된 텍스트를 리스트에 추가
-        #extracted_text = matches
-        st.warning(f"matches : {matches}")
         start_index = response.find('[[')  # '[['의 첫 번째 인덱스
         end_index = response.find(']]', start_index)  # ']]'의 첫 번째 인덱스
         
@@ -1055,8 +1048,7 @@ def extract_text_within_brackets(response):
         if start_index != -1 and end_index != -1 and (start_index < end_index):
             # '[[', ']]'을 포함한 부분을 추출
             extracted_text = response[start_index+2:end_index ]  # ']]'도 포함시키기 위해 +2
-            #extracted_texts.append(extracted_text)
-            st.warning(f"extracted_text : {extracted_text}")
+     
     return extracted_text
     
 # Backend 기능 구현 끝 ---
