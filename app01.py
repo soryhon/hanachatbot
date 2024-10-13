@@ -1,3 +1,5 @@
+import streamlit as st
+import pandas as pd
 import backend1 as bd
 
 # Frontend 기능 구현 시작 ---
