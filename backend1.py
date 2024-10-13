@@ -988,7 +988,7 @@ def run_llm_with_analysisfile_and_prompt(api_key, title, request, file_data_str)
                 4. 변화추이 표 : << !table 태그로 표현
             결과 차트 추천
                 1. 차트 방식 : << !차트 이름만 표기
-                2. python 코드 :[[ ]] << ![[ ]]사이에 코드만 표기, 줄바꿈은 <br/>로 표기,  
+                2. python 코드 :[[ ]] << ![[ ]]사이에 코드만 표기 
                 3. 차트 내용 : << !줄바꿈은 <br/>로 표기
         ]
         -요청사항
