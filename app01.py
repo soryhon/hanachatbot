@@ -211,7 +211,7 @@ with col2:
                 title = st.session_state['request_title']
                 request = st.session_state['request_text']
         
-                responses = run_llm_with_analysisfile_and_prompt(
+                responses = bd.run_llm_with_analysisfile_and_prompt(
                     st.session_state["openai_api_key"], 
                     title, 
                     request, 
