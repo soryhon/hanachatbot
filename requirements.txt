@@ -97,3 +97,5 @@ openpyxl
 SpeechRecognition
 pydub
 boto3
+plotly
+numpy
