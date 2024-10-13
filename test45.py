@@ -76,6 +76,7 @@ def load_env_info():
 
 # GitHub에서 unloadFiles 하위의 폴더 리스트를 가져오는 함수
 def get_folder_list_from_github(repo, branch, token, base_folder='uploadFiles'):
+    create_github_folder_if_not_exists(repo,base_folder, token, branch):
     url = f"https://api.github.com/repos/{repo}/contents/{base_folder}?ref={branch}"
     headers = {"Authorization": f"token {token}"}
     response = requests.get(url, headers=headers)
@@ -865,7 +866,7 @@ if github_info_loaded:
                 )
             with col2:
                 # 폴더 존재 확인 및 생성
-                check_and_create_github_folder("uploadFiles", st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
+                
                 folder_list = get_folder_list_from_github(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
                 # st.selectbox 위젯 생성 (이제 session_state['selected_folder'] 사용 가능)
     
