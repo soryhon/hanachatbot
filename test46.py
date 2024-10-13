@@ -926,7 +926,6 @@ def fetch_report_data_between_dates(repo, branch, token, selected_folder, start_
 
     # 시작일자, 마지막 일자 인덱스 추출
     start_index = max(0, min(range(len(date_list)), key=lambda i: abs(date_list[i] - start_date)))
-    #end_index = max(range(len(date_list)), key=lambda i: abs(date_list[i] - end_date))
     end_index = min(range(len(date_list)), key=lambda i: abs(date_list[i] - end_date))
     st.warning(f"{end_date}")
     st.warning(f"{len(date_list)}")
@@ -938,7 +937,7 @@ def fetch_report_data_between_dates(repo, branch, token, selected_folder, start_
     for idx in range(start_index, end_index + 1):
         folder_name = subfolder_list[idx]
         num += 1
-        report_html += f"<h3>{num}.기준일자: {date_list[idx].strftime('%Y년 %m월 %d일')}</h3>\n"
+        report_html += f"<h3>[보고서{num}]-기준일자: {date_list[idx].strftime('%Y년 %m월 %d일')}</h3>\n"
         folder_path = f"reportFiles/{selected_folder}/{folder_name}"
 
         # 해당 폴더 내 HTML 파일 목록을 가져옴
