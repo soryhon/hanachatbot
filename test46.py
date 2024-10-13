@@ -927,7 +927,8 @@ def fetch_report_data_between_dates(repo, branch, token, selected_folder, start_
     # 시작일자, 마지막 일자 인덱스 추출
     start_index = max(0, min(range(len(date_list)), key=lambda i: abs(date_list[i] - start_date)))
     end_index = max(range(len(date_list)), key=lambda i: abs(date_list[i] - end_date))
-
+    st.warning(f"start_index:{start_index}")
+    st.warning(f"end_index:{end_index}")
     # 조건에 맞는 폴더들의 데이터를 가져오기
     report_html = ""
     for idx in range(start_index, end_index + 1):
