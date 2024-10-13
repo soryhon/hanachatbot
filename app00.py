@@ -79,7 +79,7 @@ if github_info_loaded:
                     st.session_state['selected_template_name'] = templatelist_init_value
                     st.session_state['check_report']=False
                     st.session_state['check_setting']=True
-                    st.session_state['selected_template_index'] = 1
+                    st.session_state['selected_template_index'] = 0
                     bd.refresh_page()
                     #st.success(f"[{selected_folder}] 보고서명이이 선택되었습니다.")
                 #else:   
@@ -103,9 +103,9 @@ if github_info_loaded:
                     # 'selected_template'가 template_files에 있을 때만 index 설정
                     #selected_temp_index = st.session_state['selected_template_index']
                     if st.session_state['selected_template_name'] in template_files:
-                        selected_temp_index = template_files.index(st.session_state['selected_template_name']) + 1                        
+                        selected_temp_index = template_files.index(st.session_state['selected_template_name'])                         
                     else:
-                        selected_temp_index = 1
+                        selected_temp_index = 0
                     st.session_state['selected_template_index'] = selected_temp_index    
                     #보고서 양식 파일 리스트
                     selected_template = st.selectbox(
