@@ -260,7 +260,7 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
                 "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
                 unsafe_allow_html=True
             )   
-            ##st.code(chartcode, language='python')  # 추출한 Python 코드를 화면에 출력
+            st.code(chartcode, language='python')  # 추출한 Python 코드를 화면에 출력
             st.markdown(
                   "<p style='font-size:22px;font-weight:bold;color:#008080;padding:5px;'>📈 AI 차트 추천</p>",
                   unsafe_allow_html=True
