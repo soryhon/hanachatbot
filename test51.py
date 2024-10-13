@@ -252,19 +252,11 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
         for idx, response in enumerate(st.session_state["response"]):
             #st.text_area(f"응답 {idx+1}:", value=response, height=300)
             response_text, chartcode = bd.extract_text_within_brackets(response)
-            html_response_value = f"<div style='border: 0px solid #cccccc; padding: 1px;'>{response_text}</div>"
-            html_result_value += html_response_value
-            st.components.v1.html(html_response_value, height=1024, scrolling=True)
-      
-            # 추출된 코드를 화면에 출력
-            st.markdown(
-                "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
-                unsafe_allow_html=True
-            )   
+            
             fm, plt = bd.download_and_apply_font_from_github(st.session_state['github_repo'], st.session_state['github_branch'], fm, plt)
             #st.code(chartcode, language='python')  # 추출한 Python 코드를 화면에 출력
             st.markdown(
-                  "<p style='font-size:22px;font-weight:bold;color:#CC66FF;padding:5px;'>📈 AI 차트 추천</p>",
+                  "<p style='font-size:22px;font-weight:bold;color:#CC66FF;padding:5px;'>📈 AI 추천 차트</p>",
                   unsafe_allow_html=True
               )
             # eval()을 사용하여 Python 코드를 실행하고 차트를 출력
@@ -272,6 +264,17 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
                 exec(chartcode)  # exec()을 사용하여 추출된 Python 코드를 실행
             except Exception as e:
                 st.error(f"코드를 실행하는 중 오류가 발생했습니다: {str(e)}")
+            
+            # 추출된 코드를 화면에 출력
+            st.markdown(
+                "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
+                unsafe_allow_html=True
+            )   
+
+            html_response_value = f"<div style='border: 0px solid #cccccc; padding: 1px;'>{response_text}</div>"
+            html_result_value += html_response_value
+            st.components.v1.html(html_response_value, height=1024, scrolling=True)
+
     html_result_value += "</div>"
     st.markdown(
         "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
