@@ -1036,16 +1036,16 @@ def run_llm_with_analysisfile_and_prompt(api_key, title, request, file_data_str)
 
     return responses
 
-def extract_text_within_brackets(responses):
+def extract_text_within_brackets(response):
     extracted_texts = []
     pattern = r"\[\[.*?\]\]"  # '[['부터 ']]'까지의 텍스트 추출을 위한 패턴
 
     extracted_text = ""
     # responses는 리스트로, 각 응답을 반복하며 정규식으로 텍스트 추출
-    for response in responses:
+    if len(response) > 0 :
         matches = re.findall(pattern, response)
         extracted_texts.extend(matches)  # 모든 매칭된 텍스트를 리스트에 추가
-        extracted_text += matches
+        extracted_text = matches
 
     return extracted_text
     
