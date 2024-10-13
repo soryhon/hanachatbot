@@ -250,7 +250,7 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
 
         for idx, response in enumerate(st.session_state["response"]):
             #st.text_area(f"응답 {idx+1}:", value=response, height=300)
-            chartcode = bd.extract_text_within_brackets(response}
+            chartcode = bd.extract_text_within_brackets(response)
             html_response_value = f"<div style='border: 0px solid #cccccc; padding: 1px;'>{response}</div>"
             html_result_value += html_response_value
             st.components.v1.html(html_response_value, height=1024, scrolling=True)
