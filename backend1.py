@@ -1063,7 +1063,7 @@ def extract_text_within_brackets(response):
 
 # GitHub 저장소에서 폰트 파일을 다운로드하는 함수
 def download_and_apply_font_from_github(github_repo, branch, fm, plt):
-    file_file_path = "font/NanumGothic.ttf"
+    font_file_path = "font/NanumGothic.ttf"
     save_dir="/tmp"
     font_url = f"https://raw.githubusercontent.com/{github_repo}/{branch}/{font_file_path}"
     font_name = os.path.basename(font_file_path)  # 파일명 추출
