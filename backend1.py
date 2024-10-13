@@ -1046,9 +1046,17 @@ def extract_text_within_brackets(response):
     if len(response) > 0 :
         matches = re.findall(pattern, response)
         extracted_texts.extend(matches)  # 모든 매칭된 텍스트를 리스트에 추가
-        extracted_text = matches
+        #extracted_text = matches
         st.warning(f"matches : {matches}")
-
+        start_index = response.find('[[')  # '[['의 첫 번째 인덱스
+        end_index = response.find(']]', start_index)  # ']]'의 첫 번째 인덱스
+        
+        # '[['과 ']]'가 모두 존재할 때만 추출
+        if start_index != -1 and end_index != -1 and (start_index < end_index):
+            # '[[', ']]'을 포함한 부분을 추출
+            extracted_text = response[start_index:end_index + 2]  # ']]'도 포함시키기 위해 +2
+            #extracted_texts.append(extracted_text)
+            st.warning(f"extracted_text : {extracted_text}")
     return extracted_text
     
 # Backend 기능 구현 끝 ---
