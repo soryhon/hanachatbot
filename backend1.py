@@ -993,7 +993,7 @@ def run_llm_with_analysisfile_and_prompt(api_key, title, request, file_data_str)
                 3. 분석한 내용 : << !줄바꿈은 <br/>로 표기. 보고서 양식
                 4. 변화추이 표 : << !table 태그로 표현
                 5. 차트 설명 : << !줄바꿈은 <br/>로 표기
-                [& &] << !'[& &]'사이에 차트 python코드만 표기해야 함함
+                [[ ]]         << ![[ ]]사이에 차트 코드만 표기
                 
         ]
         -요청사항
@@ -1049,8 +1049,8 @@ def extract_text_within_brackets(response):
     extracted_text = ""
     # responses는 리스트로, 각 응답을 반복하며 정규식으로 텍스트 추출
     if len(response) > 0 :
-        start_index = response.find('[&')  # '[[-'의 첫 번째 인덱스
-        end_index = response.find('&]', start_index)  # '-]]'의 첫 번째 인덱스
+        start_index = response.find('[[')  # '[[-'의 첫 번째 인덱스
+        end_index = response.find(']]', start_index)  # '-]]'의 첫 번째 인덱스
         
         # '[['과 ']]'가 모두 존재할 때만 추출
         if start_index != -1 and end_index != -1 and (start_index < end_index):
