@@ -77,7 +77,7 @@ def load_env_info():
 
 # GitHub에 폴더가 존재하는지 확인하고 없으면 폴더를 생성하는 함수
 def check_and_create_github_folder_if_not_exists(repo, folder_name, token, branch='main'):
-    folder_path = f"/{folder_name}/.gitkeep"  # Git에서 빈 폴더 유지용 .gitkeep 파일
+    folder_path = f"{folder_name}/.gitkeep"  # Git에서 빈 폴더 유지용 .gitkeep 파일
     url = f"https://api.github.com/repos/{repo}/contents/{folder_path}?ref={branch}"
     headers = {"Authorization": f"token {token}"}
     
