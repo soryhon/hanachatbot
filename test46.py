@@ -1076,7 +1076,7 @@ with st.expander("⚙️ 요청사항 및 기준일자 설정", expanded=st.sess
             )
             st.session_state['start_date_value'] = start_date
         with col2:            
-            if 'end_date_value' in st.session_state:
+            if 'end_date_value' not in st.session_state:
                 st.session_state['end_date_value'] = today
             
             end_date = st.date_input("📅 마지막일자 선택택", 
