@@ -1028,6 +1028,9 @@ def run_llm_with_analysisfile_and_prompt(api_key, title, request, file_data_str)
             while not success and retry_count < max_retries:
                 try:
                     response = chain.run({})
+                    response = response.replace('/n', '<br/>')
+                    response = response.replace('```html', '')
+                    response = response.replace('```', '')
                     responses.append(response)
                     success = True
                 except RateLimitError:
@@ -1058,7 +1061,7 @@ def extract_text_within_brackets(response):
             extracted_text = extracted_text.replace('```', '')
         if start_index != -1 :
             comment_text = response[0:start_index ] 
-     
+
     return comment_text, extracted_text
 
 # GitHub 저장소에서 폰트 파일을 다운로드하는 함수
