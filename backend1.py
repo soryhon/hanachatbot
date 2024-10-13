@@ -1054,6 +1054,6 @@ def extract_text_within_brackets(response):
         if start_index != -1 :
             comment_text = response[0:start_index ] 
      
-    return comment_text, extracted_code
+    return comment_text, extracted_text
     
 # Backend 기능 구현 끝 ---
