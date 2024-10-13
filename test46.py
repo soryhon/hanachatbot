@@ -907,6 +907,19 @@ def get_subfolder_list(repo, branch, token, selected_folder):
         st.error(f"하위 폴더 리스트를 가져오지 못했습니다: {response.status_code}")
         return [], []
 
+# 특정 폴더 내에서 HTML 파일 목록을 가져오는 함수
+def get_html_files_from_folder(repo, branch, folder_path, token):
+    url = f"https://api.github.com/repos/{repo}/contents/{folder_path}?ref={branch}"
+    headers = {"Authorization": f"token {token}"}
+    response = requests.get(url, headers=headers)
+
+    if response.status_code == 200:
+        # HTML 파일만 필터링하여 리스트로 반환
+        return [item['name'] for item in response.json() if item['name'].endswith('.html')]
+    else:
+        st.error(f"{folder_path} 폴더에서 HTML 파일을 가져오지 못했습니다: {response.status_code}")
+        return []
+
 # 시작일자와 마지막 일자를 설정하고 버튼 클릭 시 데이터를 가져오는 함수
 def fetch_report_data_between_dates(repo, branch, token, selected_folder, start_date, end_date):
     subfolder_list, date_list = get_subfolder_list(repo, branch, token, selected_folder)
@@ -920,15 +933,25 @@ def fetch_report_data_between_dates(repo, branch, token, selected_folder, start_
     for idx in range(start_index, end_index + 1):
         folder_name = subfolder_list[idx]
         report_html += f"<h3>{idx + 1}. 기준일자: {date_list[idx].strftime('%Y년 %m월 %d일')}</h3>\n"
-        html_file_path = f"reportFiles/{selected_folder}/{folder_name}/result.html"
+        folder_path = f"reportFiles/{selected_folder}/{folder_name}"
 
-        # get_file_from_github() 함수 사용
-        file_content = get_file_from_github(repo, branch, html_file_path, token)
-        if file_content:
-            report_html += file_content.read().decode('utf-8')
+        # 해당 폴더 내 HTML 파일 목록을 가져옴
+        html_files = get_html_files_from_folder(repo, branch, folder_path, token)
+
+        # 폴더 내 HTML 파일이 있을 경우, 그 중 첫 번째 파일을 사용
+        if html_files:
+            html_file_path = f"{folder_path}/{html_files[0]}"
+            file_content = get_file_from_github(repo, branch, html_file_path, token)
+            if file_content:
+                report_html += file_content.read().decode('utf-8')
+            else:
+                st.error(f"{html_file_path} 파일을 GitHub에서 가져오지 못했습니다.")
+        else:
+            st.warning(f"{folder_path} 폴더 내에 HTML 파일이 없습니다.")
 
     # 화면에 출력
     st.components.v1.html(report_html, height=600, scrolling=True)
+
     
 # Backend 기능 구현 끝 ---
 
