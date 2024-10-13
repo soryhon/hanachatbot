@@ -1036,7 +1036,7 @@ def run_llm_with_analysisfile_and_prompt(api_key, title, request, file_data_str)
     return responses
 
 def extract_text_within_brackets(response):
-
+    comment_text = ""
     extracted_text = ""
     # responses는 리스트로, 각 응답을 반복하며 정규식으로 텍스트 추출
     if len(response) > 0 :
@@ -1047,7 +1047,9 @@ def extract_text_within_brackets(response):
         if start_index != -1 and end_index != -1 and (start_index < end_index):
             # '[[', ']]'을 포함한 부분을 추출
             extracted_text = response[start_index+2:end_index ]  # ']]'도 포함시키기 위해 +2
+        if start_index != -1 :
+            comment_text = response[0:comment_text ] 
      
-    return extracted_text
+    return comment_text, extracted_text
     
 # Backend 기능 구현 끝 ---
