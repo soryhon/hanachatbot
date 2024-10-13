@@ -1298,13 +1298,13 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
     col1, col2 = st.columns([0.5, 0.5])
     with col1:   
         if st.button("💾 결과 내용 저장", key="save_result", use_container_width=True):
-           
+            st.session_state['check_result'] = True
+            st.session_state['check_report'] = False
+            st.session_state['check_upload'] = False
+            st.session_state['check_setting'] = False
+            st.session_state['check_request'] = False
             if "response" in st.session_state:                
-                st.session_state['check_result'] = True
-                st.session_state['check_report'] = False
-                st.session_state['check_upload'] = False
-                st.session_state['check_setting'] = False
-                st.session_state['check_request'] = False
+                
                 folder_name = st.session_state['selected_folder_name']
                 report_date_str = st.session_state.get('report_date_str', datetime.datetime.now().strftime('%Y%m%d'))
                 
@@ -1322,13 +1322,18 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
                 upload_file_to_github(st.session_state['github_repo'], github_folder, file_name, open(temp_file_path, 'rb').read(), st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
 
                 st.success(f"{file_name} 파일이 생성되었습니다.")
-                st.download_button(
+                if st.download_button(
                     label="📥 다운로드",
                     use_container_width=True,
                     data=open(temp_file_path, 'r', encoding='utf-8').read(),
                     file_name=file_name,
                     mime="text/html"
-                )
+                ):
+                    st.session_state['check_result'] = True
+                    st.session_state['check_report'] = False
+                    st.session_state['check_upload'] = False
+                    st.session_state['check_setting'] = False
+                    st.session_state['check_request'] = False
 
             else:
                 st.warning("결과 보고서를 먼저 실행하세요.")
