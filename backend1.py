@@ -1042,6 +1042,7 @@ def extract_text_within_brackets(response):
 
     extracted_text = ""
     # responses는 리스트로, 각 응답을 반복하며 정규식으로 텍스트 추출
+    st.warning(f"len(response) : {len(response)}")
     if len(response) > 0 :
         matches = re.findall(pattern, response)
         extracted_texts.extend(matches)  # 모든 매칭된 텍스트를 리스트에 추가
