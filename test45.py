@@ -72,30 +72,73 @@ def load_env_info():
     st.session_state["github_branch"] = github_branch
 
     # GitHub 정보가 설정되었는지 확인하고 세션 상태 반영
+  
     return github_set
+
+# GitHub에 폴더가 존재하는지 확인하고 없으면 폴더를 생성하는 함수
+def check_and_create_github_folder_if_not_exists(repo, folder_name, token, branch='main'):
+    folder_path = f"/{folder_name}/.gitkeep"  # Git에서 빈 폴더 유지용 .gitkeep 파일
+    url = f"https://api.github.com/repos/{repo}/contents/{folder_path}?ref={branch}"
+    headers = {"Authorization": f"token {token}"}
+    
+    # 폴더 존재 여부 확인
+    response = requests.get(url, headers=headers)
+    
+    # 폴더가 존재하는 경우
+    if response.status_code == 200:
+        return True
+    
+    # 폴더가 없는 경우 (404)
+    elif response.status_code == 404:
+        st.warning(f"'{folder_name}' 폴더가 존재하지 않아 생성 중입니다.")
+        create_folder_url = f"https://api.github.com/repos/{repo}/contents/{folder_path}"
+        data = {
+            "message": f"Create {folder_name} folder with .gitkeep",
+            "content": base64.b64encode(b'').decode('utf-8'),  # 빈 파일 생성
+            "branch": branch
+        }
+        create_response = requests.put(create_folder_url, json=data, headers=headers)
+        
+        if create_response.status_code in [200, 201]:
+            st.success(f"'{folder_name}' 폴더가 성공적으로 생성되었습니다.")
+            return True
+        else:
+            st.error(f"폴더 생성 실패: {create_response.status_code}")
+            return False
+    
+    # 그 외 상태 코드 처리
+    else:
+        st.error(f"폴더 확인 중 오류 발생: {response.status_code}")
+        return False
+
 
 # GitHub에서 uploadFiles 하위의 폴더 리스트를 가져오는 함수
 def get_folder_list_from_github(repo, branch, token, base_folder='uploadFiles'):
-    url = f"https://api.github.com/repos/{repo}/contents/{base_folder}?ref={branch}"
-    headers = {"Authorization": f"token {token}"}
-    response = requests.get(url, headers=headers)
-    
-    # 폴더가 없을 경우 (404) 폴더를 생성하고 다시 폴더 리스트를 가져옴
-    if response.status_code == 404:
-        st.warning(f"'{base_folder}' 폴더가 존재하지 않아 생성 중입니다.")
-        create_new_folder_in_github(repo, base_folder, token, branch)  # 폴더 생성 및 .gitkeep 파일 추가
-        response = requests.get(url, headers=headers)  # 폴더 생성 후 다시 요청
+
+    folder_check = check_and_create_github_folder_if_not_exists(repo, base_folder, token, branch)  # 폴더 생성 및 .gitkeep 파일 추가
+    if folder_check:
+        url = f"https://api.github.com/repos/{repo}/contents/{base_folder}?ref={branch}"
+        headers = {"Authorization": f"token {token}"}
+        response = requests.get(url, headers=headers)
         
-        if response.status_code != 200:
-            st.error("폴더를 생성했지만 다시 폴더 리스트를 가져오지 못했습니다.")
+        # 폴더가 없을 경우 (404) 폴더를 생성하고 다시 폴더 리스트를 가져옴
+        if response.status_code == 404:
+            st.warning(f"'{base_folder}' 폴더가 존재하지 않아 생성 중입니다.")
+            
+            response = requests.get(url, headers=headers)  # 폴더 생성 후 다시 요청
+            
+            if response.status_code != 200:
+                st.error("폴더를 생성했지만 다시 폴더 리스트를 가져오지 못했습니다.")
+                return []
+        
+        if response.status_code == 200:
+            folders = [item['name'] for item in response.json() if item['type'] == 'dir']
+            return folders
+        else:
+            st.error("폴더 리스트를 가져오지 못했습니다. 저장소 정보나 토큰을 확인하세요.")
             return []
-    
-    if response.status_code == 200:
-        folders = [item['name'] for item in response.json() if item['type'] == 'dir']
-        return folders
     else:
-        st.error("폴더 리스트를 가져오지 못했습니다. 저장소 정보나 토큰을 확인하세요.")
-        return []
+        return [] 
         
 # GitHub에 새로운 폴더를 생성하는 함수
 def create_new_folder_in_github(repo, folder_name, token, branch='main'):
