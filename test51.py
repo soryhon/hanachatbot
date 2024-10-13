@@ -43,7 +43,7 @@ if github_info_loaded:
 	with st.expander("📝 보고서 선택", expanded=st.session_state['check_report']):
 		col1, col2 = st.columns([0.21, 0.79])
     
-  	with col1:
+  		with col1:
 			st.write("")
 			st.markdown(
 				"<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>비교분석 할<br/>보고서명 선택 </p>",
