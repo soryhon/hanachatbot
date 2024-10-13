@@ -273,7 +273,11 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
 
             html_response_value = f"<div style='border: 0px solid #cccccc; padding: 1px;'>{response_text}</div>"
             html_result_value += html_response_value
-            st.components.v1.html(html_response_value, height=1024, scrolling=True)
+            #st.components.v1.html(html_response_value, height=1024, scrolling=True)
+            try:
+                exec("st.components.v1.html(html_response_value, height=1024, scrolling=True)")  # exec()을 사용하여 추출된 Python 코드를 실행
+            except Exception as e:
+                st.error(f"코드를 실행하는 중 오류가 발생했습니다: {str(e)}")
 
     html_result_value += "</div>"
     st.markdown(
