@@ -1048,7 +1048,7 @@ def extract_text_within_brackets(response):
             # '[[', ']]'을 포함한 부분을 추출
             extracted_text = response[start_index+2:end_index ]  # ']]'도 포함시키기 위해 +2
         if start_index != -1 :
-            comment_text = response[0:comment_text ] 
+            comment_text = response[0:start_index ] 
      
     return comment_text, extracted_text
     
