@@ -255,7 +255,16 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
             html_result_value += html_response_value
             st.components.v1.html(html_response_value, height=1024, scrolling=True)
             st.write("Python 코드 발취")
-            st.write(chartcode)
+
+            # 추출된 코드를 화면에 출력
+            st.markdown("## 차트 생성 코드")
+            st.code(chartcode, language='python')  # 추출한 Python 코드를 화면에 출력
+            
+            # eval()을 사용하여 Python 코드를 실행하고 차트를 출력
+            try:
+                exec(chartcode)  # exec()을 사용하여 추출된 Python 코드를 실행
+            except Exception as e:
+                st.error(f"코드를 실행하는 중 오류가 발생했습니다: {str(e)}")
     html_result_value += "</div>"
     st.markdown(
         "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
