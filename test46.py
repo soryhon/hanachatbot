@@ -967,125 +967,46 @@ with col2:
 # 보고서명 및 폴더 선택, 새 폴더 만들기
 if github_info_loaded:
     with st.expander("📝 보고서 선택", expanded=st.session_state['check_report']):
-        tab1, tab2, tab3 = st.tabs(["• 등록된 보고서명 선택하기", "• 저장된 보고서 양식 불러오기","• 새로운 보고서명 만들기"])
-        with tab1:
-            col1, col2 = st.columns([0.21, 0.79])
-            with col1:
-                st.write("")
-                st.markdown(
-                    "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>등록된<br/>보고서명 선택 </p>",
-                    unsafe_allow_html=True
-                )
-            with col2:
-                # 폴더 존재 확인 및 생성
-                
-                folder_list = get_folder_list_from_github(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
-                # st.selectbox 위젯 생성 (이제 session_state['selected_folder'] 사용 가능)
-    
-                # 'selected_folder'가 folder_list에 있을 때만 index 설정
-                selected_index = st.session_state['selected_folder_index']
-                if st.session_state['selected_folder_name'] in folder_list:
-                    selected_index = folder_list.index(st.session_state['selected_folder_name']) + 1
-                #else:
-                    #selected_index = 0  # 기본값으로 '주제를 선택하세요.' 선택
-                st.session_state['selected_folder_index'] = selected_index
-                st.session_state['folder_list_option'] = [folderlist_init_value] + folder_list
-                # 폴더 선택 selectbox 생성 (새 폴더 추가 후, 선택값으로 설정)
-                selected_folder = st.selectbox(
-                    "등록된 보고서명 리스트",
-                    options=st.session_state['folder_list_option'],  # 옵션 리스트에 새 폴더 반영
-                    index=st.session_state['selected_folder_index'],  # 새로 선택된 폴더를 기본값으로 선택
-                    key="selected_folder"
-                )
-                # 파일 업로드와 요청사항 리스트의 기본 폴더 설정
-                if selected_folder != folderlist_init_value:
-                    st.session_state['upload_folder'] = f"uploadFiles/{selected_folder}"
-                    st.session_state['selected_folder_name'] = f"{selected_folder}"                  
-                    st.session_state['check_report']=False
-                    st.session_state['check_setting']=True
-                    st.session_state['selected_template_index'] = 0
-                    refresh_page()
-                    #st.success(f"[{selected_folder}] 보고서명이이 선택되었습니다.")
-                #else:   
-                    #st.warning("보고서명을 선택하세요.")
-        with tab2:
-            col1, col2 = st.columns([0.21, 0.79])
-            with col1:
-                st.write("")
-                st.markdown(
-                    "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>저장된 보고서<br/>양식 불러오기</p>",
-                    unsafe_allow_html=True
-                )
-            with col2:    
-                repo = st.session_state["github_repo"]
-                branch = st.session_state["github_branch"]
-                token = st.session_state["github_token"]
-                 # templateFiles 폴더 내 JSON 파일 리스트 가져오기
-                template_files = get_template_files_list(repo, branch, token)
-                
-                if template_files:
-                    # 'selected_template'가 template_files에 있을 때만 index 설정
-                    #selected_temp_index = st.session_state['selected_template_index']
-                    if st.session_state['selected_template_name'] in template_files:
-                        selected_temp_index = template_files.index(st.session_state['selected_template_name']) + 1                        
-                    else:
-                        selected_temp_index = 0
-                    st.session_state['selected_template_index'] = selected_temp_index    
-                    #보고서 양식 파일 리스트
-                    selected_template = st.selectbox(
-                        "불러올 보고서 양식 파일 리스트", 
-                        options=[templatelist_init_value] + template_files, 
-                        index=st.session_state['selected_template_index'],
-                        key="selected_template"
-                    )
-                    if selected_template != templatelist_init_value:
-                        # 선택한 템플릿 불러오기
-                        st.session_state['selected_template_name'] = selected_template
-                        template_data = load_template_from_github(repo, branch, token, selected_template)
-                        if template_data:
-                            apply_template_to_session_state(f"templateFiles/{selected_template}")
-                            #st.success(f"{selected_template} 양식을 성공적으로 불러왔습니다.")
+        col1, col2 = st.columns([0.21, 0.79])
+        with col1:
+            st.write("")
+            st.markdown(
+                "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>등록된<br/>보고서명 선택 </p>",
+                unsafe_allow_html=True
+            )
+        with col2:
+            # 폴더 존재 확인 및 생성
+            
+            folder_list = get_folder_list_from_github(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
+            # st.selectbox 위젯 생성 (이제 session_state['selected_folder'] 사용 가능)
 
-        with tab3:
-            col1, col2, col3 = st.columns([0.21, 0.5,0.29])
-            with col1:
-                st.write("")
-                st.markdown(
-                    "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>새로운 보고서명<br/>만들기</p>",
-                    unsafe_allow_html=True
-                )
-            with col2:
-                new_folder_name = st.text_input("새로 등록할 보고서명 입력", max_chars=20, key="new_folder_name", value=st.session_state['new_folder_text'])
-            with col3:
-                st.markdown(
-                    "<p style='font-size:18px; margin-top:27px;'></p>",
-                    unsafe_allow_html=True
-                )
-                if st.button("보고서명 등록", key="new_folder", use_container_width=True):
-                    if not new_folder_name:
-                        st.warning("새로 등록할 보고서명을 입력하세요.")
-                    elif new_folder_name in folder_list:
-                        st.warning("이미 존재합니다.")
-                    else:
-                        # 폴더 생성 후 목록에 추가
-                        folder_created = create_new_folder_in_github(st.session_state['github_repo'], new_folder_name, st.session_state['github_token'], st.session_state['github_branch'])
-                        if folder_created:
-                            folder_list.append(new_folder_name)  # 새 폴더를 리스트에 추가
-                            #st.session_state['selected_folder_index'] = len(folder_list) - 1
-                            #st.session_state['selected_template_index'] = 0
-                            st.session_state['folder_list_option'] = [] + folder_list
-                            st.session_state['upload_folder'] = f"uploadFiles/{new_folder_name}"
-                            st.session_state['selected_folder_name'] = f"{new_folder_name}"
-                            st.session_state['selected_template_name'] = templatelist_init_value
-                            st.session_state['check_report']=False
-                            st.session_state['check_setting']=True
-                            refresh_page()
-                            init_session_state(True)
-                            st.success("새로운 보고서명 등록 성공하였습니다.")            
-        #st.markdown(
-            #"<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
-            #unsafe_allow_html=True
-        #)
+            # 'selected_folder'가 folder_list에 있을 때만 index 설정
+            selected_index = st.session_state['selected_folder_index']
+            if st.session_state['selected_folder_name'] in folder_list:
+                selected_index = folder_list.index(st.session_state['selected_folder_name']) + 1
+            #else:
+                #selected_index = 0  # 기본값으로 '주제를 선택하세요.' 선택
+            st.session_state['selected_folder_index'] = selected_index
+            st.session_state['folder_list_option'] = [folderlist_init_value] + folder_list
+            # 폴더 선택 selectbox 생성 (새 폴더 추가 후, 선택값으로 설정)
+            selected_folder = st.selectbox(
+                "등록된 보고서명 리스트",
+                options=st.session_state['folder_list_option'],  # 옵션 리스트에 새 폴더 반영
+                index=st.session_state['selected_folder_index'],  # 새로 선택된 폴더를 기본값으로 선택
+                key="selected_folder"
+            )
+            # 파일 업로드와 요청사항 리스트의 기본 폴더 설정
+            if selected_folder != folderlist_init_value:
+                st.session_state['upload_folder'] = f"uploadFiles/{selected_folder}"
+                st.session_state['selected_folder_name'] = f"{selected_folder}"                  
+                st.session_state['check_report']=False
+                st.session_state['check_setting']=True
+                st.session_state['selected_template_index'] = 0
+                refresh_page()
+                #st.success(f"[{selected_folder}] 보고서명이이 선택되었습니다.")
+            #else:   
+                #st.warning("보고서명을 선택하세요.")
+
       
 else:
     st.warning("GitHub 정보가 설정되지 않았습니다. 먼저 GitHub Token을 입력해 주세요.")
@@ -1120,53 +1041,6 @@ st.markdown(
 
 # 5 프레임
 # 파일 업로드
-# 지원되는 파일 형식 리스트
-supported_file_types = ['xlsx', 'pptx', 'docx', 'csv', 'png', 'jpg', 'jpeg', 'pdf', 'txt', 'log']
-
-if github_info_loaded:
-    with st.expander("⬆️ 데이터 파일 업로드", expanded=st.session_state['check_upload']):
-        uploaded_files = st.file_uploader("파일을 여러 개 드래그 앤 드롭하여 업로드하세요. (최대 100MB)", accept_multiple_files=True)
-
-        if uploaded_files:
-            for uploaded_file in uploaded_files:
-                file_type = uploaded_file.name.split('.')[-1].lower()
-
-                if file_type not in supported_file_types:
-                    st.error(f"지원하지 않는 파일입니다: {uploaded_file.name}")
-                    continue
-
-                if uploaded_file.size > MAX_FILE_SIZE_BYTES:
-                    st.warning(f"'{uploaded_file.name}' 파일은 {MAX_FILE_SIZE_MB}MB 제한을 초과했습니다. 파일 크기를 줄이거나 GitHub에 직접 푸시하세요.")
-                else:
-                    file_content = uploaded_file.read()
-                    file_name = uploaded_file.name
-                    #folder_name = 'uploadFiles'
-                    folder_name = st.session_state.get('upload_folder', 'uploadFiles')
-
-                    sha = get_file_sha(st.session_state['github_repo'], f"{folder_name}/{file_name}", st.session_state['github_token'], branch=st.session_state['github_branch'])
-
-                    if sha:
-                        st.warning(f"'{file_name}' 파일이 이미 존재합니다. 덮어쓰시겠습니까?")
-                        col1, col2 = st.columns(2)
-
-                        with col1:
-                            if st.button(f"'{file_name}' 덮어쓰기", key=f"overwrite_{file_name}"):
-                                upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
-                                st.success(f"'{file_name}' 파일이 성공적으로 덮어쓰기 되었습니다.")
-                                uploaded_files = None
-                                break
-
-                        with col2:
-                            if st.button("취소", key=f"cancel_{file_name}"):
-                                st.info("덮어쓰기가 취소되었습니다.")
-                                uploaded_files = None
-                                break
-                    else:
-                        upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'])
-                        st.success(f"'{file_name}' 파일이 성공적으로 업로드되었습니다.")
-                        uploaded_files = None
-else:
-    st.warning("GitHub 정보가 저장되기 전에는 파일 업로드를 할 수 없습니다. 먼저 GitHub 정보를 입력해 주세요.")
 
 # 6 프레임
 # 요청사항 갯수 및 기준일자 설정 
