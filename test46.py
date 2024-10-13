@@ -1086,9 +1086,10 @@ with st.expander("⚙️ 요청사항 및 기준일자 설정", expanded=st.sess
                 key="end_date"
             )
             st.session_state['end_date_value'] = end_date
-        # 버튼 추가
-        #if st.button("보고서 데이터 가져오기"):
-            #fetch_report_data_between_dates(repo, branch, token, selected_folder, start_date, end_date)
+#버튼 추가
+    if st.button("보고서 데이터 가져오기"):
+        if date_list:
+            fetch_report_data_between_dates(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'], selected_folder, start_date, end_date)
             
    
 
