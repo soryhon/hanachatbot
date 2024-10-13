@@ -1136,7 +1136,7 @@ with st.expander("⚙️ 요청사항 및 기준일자 설정", expanded=st.sess
         st.session_state['report_date_str'] = report_date.strftime("%Y%m%d")
     with col2:
         st.markdown(
-            "<p style='font-size:14px; font-weight:normal; color:#444444; margin-top:35px;text-align:left;'>✔️ 보고서 저장을 위해 기준일자를 지정해주세요.</p>",
+            "<p style='font-size:14px; font-weight:normal; color:#444444; margin-top:35px;text-align:left;'>✔️ 보고서 저장을 위해 기준일자를 설정해주세요.</p>",
             unsafe_allow_html=True
         )
 # 요청사항 리스트
