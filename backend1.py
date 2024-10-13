@@ -992,7 +992,7 @@ def run_llm_with_analysisfile_and_prompt(api_key, title, request, file_data_str)
                 2. 보고서 설명 : << !줄바꿈은 <br/>로 표기.
                 3. 분석한 내용 : << !줄바꿈은 <br/>로 표기. 보고서 양식
                 4. 변화추이 표 : << !table 태그로 표현
-                5. 차트 내용 : << !줄바꿈은 <br/>로 표기
+                5. 차트 설명 : << !줄바꿈은 <br/>로 표기
                 [[ ]] << ![[ ]]사이에 python 차트 코드만 표기 
                 
         ]
