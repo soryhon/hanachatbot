@@ -633,8 +633,8 @@ def init_session_state(check_value):
             st.session_state['check_request'] = False
         if 'check_result' not in st.session_state:    
             st.session_state['check_result'] = False
-        if 'check_count' not in st.session_state:    
-            st.session_state['check_count'] = False
+        if 'check_setting' not in st.session_state:    
+            st.session_state['check_setting'] = False
         if 'report_date_str' not in st.session_state: 
             st.session_state['report_date_str'] = ""
 # HTML 파일을 저장하고 파일 경로를 반환하는 함수 (날짜 포함)
@@ -887,7 +887,7 @@ if github_info_loaded:
                     st.session_state['upload_folder'] = f"uploadFiles/{selected_folder}"
                     st.session_state['selected_folder_name'] = f"{selected_folder}"                  
                     st.session_state['check_report']=False
-                    st.session_state['check_count']=True
+                    st.session_state['check_setting']=True
                     st.session_state['selected_template_index'] = 0
                     refresh_page()
                     #st.success(f"[{selected_folder}] 보고서명이이 선택되었습니다.")
@@ -963,7 +963,7 @@ if github_info_loaded:
                             st.session_state['selected_folder_name'] = f"{new_folder_name}"
                             st.session_state['selected_template_name'] = templatelist_init_value
                             st.session_state['check_report']=False
-                            st.session_state['check_count']=True
+                            st.session_state['check_setting']=True
                             refresh_page()
                             init_session_state(True)
                             st.success("새로운 보고서명 등록 성공하였습니다.")            
@@ -1054,7 +1054,7 @@ else:
 
 # 5 프레임
 # 요청사항 갯수 설정 입력 및 버튼
-with st.expander("⚙️ 요청사항 및 기준일자 설정", expanded=st.session_state['check_count']):
+with st.expander("⚙️ 요청사항 및 기준일자 설정", expanded=st.session_state['check_setting']):
     col1, col2, col3 = st.columns([0.5, 0.25, 0.25])
     with col1:
         st.markdown(
@@ -1086,7 +1086,7 @@ with st.expander("⚙️ 요청사항 및 기준일자 설정", expanded=st.sess
             ]
             st.success(f"{st.session_state['num_requests']}개의 요청사항이 설정되었습니다.")
             st.session_state['check_request']=True
-            st.session_state['check_count']=False
+            st.session_state['check_setting']=False
             refresh_page()
             init_session_state(True)
     col1, col2 = st.columns([0.5, 0.5])
@@ -1205,7 +1205,7 @@ with col2:
         st.session_state['check_result']=True
         st.session_state['check_report'] = False
         st.session_state['check_upload'] = False
-        st.session_state['check_count'] = False
+        st.session_state['check_setting'] = False
         if not st.session_state.get("openai_api_key"):
             st.error("먼저 OpenAI API 키를 입력하고 저장하세요!")
         elif not st.session_state['rows'] or all(not row["제목"] or not row["요청"] or not row["파일"] for row in st.session_state['rows']):
@@ -1300,6 +1300,11 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
         if st.button("💾 결과 내용 저장", key="save_result", use_container_width=True):
            
             if "response" in st.session_state:                
+                st.session_state['check_result'] = True
+                st.session_state['check_report'] = False
+                st.session_state['check_upload'] = False
+                st.session_state['check_setting'] = False
+                st.session_state['check_request'] = False
                 folder_name = st.session_state['selected_folder_name']
                 report_date_str = st.session_state.get('report_date_str', datetime.datetime.now().strftime('%Y%m%d'))
                 
@@ -1332,7 +1337,7 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
             st.session_state['check_result'] = True
             st.session_state['check_report'] = False
             st.session_state['check_upload'] = False
-            st.session_state[''] = False
+            st.session_state['check_setting'] = False
             st.session_state['check_request'] = False
             save_template_to_json()
 
