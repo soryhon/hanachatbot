@@ -1,11 +1,9 @@
-import backend1
-
-
+import backend1 as bd
 
 # Frontend 기능 구현 시작 ---
 
 # GitHub 정보가 있는지 확인하고 파일 업로드 객체를 출력
-github_info_loaded = load_env_info()
+github_info_loaded = bd.load_env_info()
 
 # 업로드 가능한 파일 크기 제한 (100MB)
 MAX_FILE_SIZE_MB = 100
@@ -15,8 +13,8 @@ MAX_FILE_SIZE_BYTES = 100 * 1024 * 1024
 folderlist_init_value = "보고서명을 선택하세요."
 templatelist_init_value = "불러올 보고서 양식을 선택하세요."
 # 세션 상태에 각 변수 없다면 초기화
-init_session_state(False)
-refresh_page()
+bd.init_session_state(False)
+bd.refresh_page()
      
     
 # 1 프레임
@@ -49,7 +47,7 @@ if github_info_loaded:
         with col2:
             # 폴더 존재 확인 및 생성
             
-            folder_list = get_report_folder_list_from_github(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
+            folder_list = bd.get_report_folder_list_from_github(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
         
             # st.selectbox 위젯 생성 (이제 session_state['selected_folder'] 사용 가능)
 
@@ -75,12 +73,12 @@ if github_info_loaded:
                 st.session_state['check_report']=False
                 st.session_state['check_setting']=True
                 st.session_state['selected_template_index'] = 0
-                refresh_page()
+                bd.refresh_page()
                 #st.success(f"[{selected_folder}] 보고서명이이 선택되었습니다.")
                 
         
                 # 하위 폴더 리스트(날짜 리스트) 가져오기
-                subfolder_list, date_list = get_subfolder_list(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'], selected_folder)
+                subfolder_list, date_list = bd.get_subfolder_list(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'], selected_folder)
             #else:   
                 #st.warning("보고서명을 선택하세요.")
 
@@ -163,11 +161,11 @@ with st.expander("⚙️ 요청사항 및 기준일자 설정", expanded=st.sess
             )
             st.session_state['end_date_value'] = end_date
 #버튼 추가
-    if st.button("보고서 데이터 가져오기"):
-        if date_list:
-            html_request = fetch_report_data_between_dates(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'], selected_folder, start_date, end_date)
+    #if st.button("보고서 데이터 가져오기"):
+        #if date_list:
+            #html_request = bd.fetch_report_data_between_dates(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'], selected_folder, start_date, end_date)
 # 화면에 출력
-            st.components.v1.html(html_request, height=10246, scrolling=True)
+            #st.components.v1.html(html_request, height=10246, scrolling=True)
    
 
 # 7 프레임임
@@ -199,7 +197,7 @@ with col2:
             with st.spinner('요청사항과 보고서 파일 데이터를 추출 중입니다...'):
                  
                 # 파일 데이터 가져와서 HTML 보고서 생성
-                html_request = fetch_report_data_between_dates(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'], selected_folder, start_date, end_date)
+                html_request = bd.fetch_report_data_between_dates(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'], selected_folder, start_date, end_date)
                 st.session_state['html_report'] = html_request
                 
                 time.sleep(1)  # 예를 들어, 5초 동안 로딩 상태 유지
@@ -267,17 +265,17 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
                 report_date_str = st.session_state.get('report_date_str', datetime.datetime.now().strftime('%Y%m%d'))
                 
                 # save_html_response 함수를 사용하여 HTML 파일 저장
-                file_name, temp_file_path = save_html_response(html_result_value, folder_name, report_date_str)
+                file_name, temp_file_path = bd.save_html_response(html_result_value, folder_name, report_date_str)
 
                 # 파일 저장 경로 (reportFiles/{폴더명}/{일자})
                 github_folder = f"reportFiles/{folder_name}/{report_date_str}"
 
                 # 폴더 존재 확인 및 생성
-                check_and_create_github_folder(github_folder, st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
+                bd.check_and_create_github_folder(github_folder, st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
                 
                 # GitHub에 HTML 파일 저장
-                sha = get_file_sha(st.session_state['github_repo'], f"{github_folder}/{file_name}", st.session_state['github_token'], branch=st.session_state['github_branch'])
-                upload_file_to_github(st.session_state['github_repo'], github_folder, file_name, open(temp_file_path, 'rb').read(), st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
+                sha = bd.get_file_sha(st.session_state['github_repo'], f"{github_folder}/{file_name}", st.session_state['github_token'], branch=st.session_state['github_branch'])
+                bd.upload_file_to_github(st.session_state['github_repo'], github_folder, file_name, open(temp_file_path, 'rb').read(), st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
                 st.session_state['check_result'] = True
                 st.success(f"{file_name} 파일이 생성되었습니다.")
                 if st.download_button(
@@ -302,7 +300,7 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
             st.session_state['check_upload'] = False
             st.session_state['check_setting'] = False
             st.session_state['check_request'] = False
-            save_template_to_json()
+            bd.save_template_to_json()
 
 
 # 11 프레임
