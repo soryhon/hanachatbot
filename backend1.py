@@ -983,7 +983,7 @@ def run_llm_with_analysisfile_and_prompt(api_key, title, request, file_data_str)
         차. 'AI 비교 분석 결과'로 비교 분석 설명하고 아래에는 h3 태그를 활용해서 '결과 차트 추천' 타이틀 추가하고 각 데이별 변화된 추이를 차트로 표현할 수 있게 아래의 양식에 맞춰서 답변한다.
              차트는 반드시 python 기반으로 Streamlit에서 구현이 가능한 차트에서 추천해. 답변 양식의 각 항목별 타이틀을 뚜렷하게 강조해야 된다.
         카. 차트 위한 import streamlit as st, import pandas as pd, import matplotlib.pyplot as plt, import altair as alt, import matplotlib.font_manager as fm, import numpy as np 이 선언되어 있으니 import 할 필요 없이 구현하고,
-            이외 추가로 필요한 경우만 import 해야한다.
+            이외 추가로 필요한 경우만 import 해야한다. 차트 색상은 비비드 컬러에화려한 색상으로 뚜렷하게 하고 가시성 높게 글자 크기도 중간 크기로 설정해야 한다.
         카. 답변 양식 정의
         [
             전체 타이틀
