@@ -76,7 +76,7 @@ def load_env_info():
 
 # GitHub에서 unloadFiles 하위의 폴더 리스트를 가져오는 함수
 def get_folder_list_from_github(repo, branch, token, base_folder='uploadFiles'):
-    create_github_folder_if_not_exists(repo,base_folder, token, branch):
+    create_github_folder_if_not_exists(repo,base_folder, token, branch)
     url = f"https://api.github.com/repos/{repo}/contents/{base_folder}?ref={branch}"
     headers = {"Authorization": f"token {token}"}
     response = requests.get(url, headers=headers)
