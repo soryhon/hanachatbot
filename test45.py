@@ -1312,6 +1312,7 @@ with col2:
                     st.session_state['html_report']
                 )
                 st.session_state["response"] = responses
+                st.session_state['check_result'] = True
                 time.sleep(1)  # 예를 들어, 5초 동안 로딩 상태 유지
 
 
@@ -1335,7 +1336,8 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
         st.markdown(
             "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
             unsafe_allow_html=True
-        )    
+        )  
+        st.session_state['check_result'] = True
         for idx, response in enumerate(st.session_state["response"]):
             #st.text_area(f"응답 {idx+1}:", value=response, height=300)
 
@@ -1376,7 +1378,7 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
                 # GitHub에 HTML 파일 저장
                 sha = get_file_sha(st.session_state['github_repo'], f"{github_folder}/{file_name}", st.session_state['github_token'], branch=st.session_state['github_branch'])
                 upload_file_to_github(st.session_state['github_repo'], github_folder, file_name, open(temp_file_path, 'rb').read(), st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
-
+                st.session_state['check_result'] = True
                 st.success(f"{file_name} 파일이 생성되었습니다.")
                 if st.download_button(
                     label="📥 다운로드",
