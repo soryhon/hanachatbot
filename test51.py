@@ -4,6 +4,7 @@ import backend1 as bd
 import datetime
 import time
 import openpyxl
+import matplotlib.pyplot as plt
 
 # Frontend 기능 구현 시작 ---
 
