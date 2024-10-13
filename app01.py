@@ -299,13 +299,13 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
                 st.warning("결과 보고서를 먼저 실행하세요.")
      with col2:
           st.write("")
-        #if st.button("🗃️ 보고서 양식 저장", key="save_template", use_container_width=True):
-            #st.session_state['check_result'] = True
-            #st.session_state['check_report'] = False
-            #st.session_state['check_upload'] = False
-            #st.session_state['check_setting'] = False
-            #st.session_state['check_request'] = False
-            #bd.save_template_to_json()
+          #if st.button("🗃️ 보고서 양식 저장", key="save_template", use_container_width=True):
+               #st.session_state['check_result'] = True
+               #st.session_state['check_report'] = False
+               #st.session_state['check_upload'] = False
+               #st.session_state['check_setting'] = False
+               #st.session_state['check_request'] = False
+               #bd.save_template_to_json()
 
 
 # 11 프레임
