@@ -257,9 +257,12 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
             st.write("Python 코드 발취")
 
             # 추출된 코드를 화면에 출력
-            st.markdown("## 차트 생성 코드")
-            st.code(chartcode, language='python')  # 추출한 Python 코드를 화면에 출력
-            
+            st.markdown("📈 AI 차트 추천")
+            ##st.code(chartcode, language='python')  # 추출한 Python 코드를 화면에 출력
+            st.markdown(
+                  "<p style='font-size:20px;font-weight:bold;color:#008080;padding:5px;'></p>",
+                  unsafe_allow_html=True
+              )
             # eval()을 사용하여 Python 코드를 실행하고 차트를 출력
             try:
                 exec(chartcode)  # exec()을 사용하여 추출된 Python 코드를 실행
