@@ -6,7 +6,7 @@ import time
 import openpyxl
 import matplotlib.pyplot as plt
 import altair as alt
-
+import numpy as np
 
 # Frontend 기능 구현 시작 ---
 
