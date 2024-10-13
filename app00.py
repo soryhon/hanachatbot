@@ -76,7 +76,7 @@ if github_info_loaded:
                     st.session_state['check_report']=False
                     st.session_state['check_setting']=True
                     st.session_state['selected_template_index'] = 0
-                    refresh_page()
+                    bd.refresh_page()
                     #st.success(f"[{selected_folder}] 보고서명이이 선택되었습니다.")
                 #else:   
                     #st.warning("보고서명을 선택하세요.")
