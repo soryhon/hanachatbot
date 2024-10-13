@@ -70,10 +70,12 @@ if github_info_loaded:
                     index=st.session_state['selected_folder_index'],  # 새로 선택된 폴더를 기본값으로 선택
                     key="selected_folder"
                 )
+
+                 st.session_state['selected_folder_name'] = f"{selected_folder}" 
                 # 파일 업로드와 요청사항 리스트의 기본 폴더 설정
                 if selected_folder != folderlist_init_value:
                     st.session_state['upload_folder'] = f"uploadFiles/{selected_folder}"
-                    st.session_state['selected_folder_name'] = f"{selected_folder}"  
+                     
                     st.session_state['selected_template_name'] = templatelist_init_value
                     st.session_state['check_report']=False
                     st.session_state['check_setting']=True
@@ -112,9 +114,10 @@ if github_info_loaded:
                         index=st.session_state['selected_template_index'],
                         key="selected_template"
                     )
+                    # 선택한 템플릿 불러오기
+                    st.session_state['selected_template_name'] = selected_template
                     if selected_template != templatelist_init_value:
-                        # 선택한 템플릿 불러오기
-                        st.session_state['selected_template_name'] = selected_template
+                        
                         template_data = bd.load_template_from_github(repo, branch, token, selected_template)
                         if template_data:
                             bd.apply_template_to_session_state(f"templateFiles/{selected_template}")
