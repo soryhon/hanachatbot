@@ -746,7 +746,7 @@ def save_template_to_json():
     # JSON 데이터 구조 생성
     template_data = {
         "selected_folder_name": st.session_state['selected_folder_name'],
-        "num_requests": st.session_state['num_requests'],
+        #"num_requests": st.session_state['num_requests'],
         "rows": st.session_state['rows'],
         "rows_length": len(st.session_state['rows']),
         "timestamp": datetime.datetime.now().strftime("%Y%m%d%H%M%S")
