@@ -1010,7 +1010,7 @@ if github_info_loaded:
                 
         
                 # 하위 폴더 리스트(날짜 리스트) 가져오기
-                subfolder_list, date_list = get_subfolder_list(repo, branch, token, selected_folder)
+                subfolder_list, date_list = get_subfolder_list(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'], selected_folder)
             #else:   
                 #st.warning("보고서명을 선택하세요.")
 
