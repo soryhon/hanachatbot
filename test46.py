@@ -948,9 +948,8 @@ def fetch_report_data_between_dates(repo, branch, token, selected_folder, start_
                 st.error(f"{html_file_path} 파일을 GitHub에서 가져오지 못했습니다.")
         else:
             st.warning(f"{folder_path} 폴더 내에 HTML 파일이 없습니다.")
+    return report_html
 
-    # 화면에 출력
-    st.components.v1.html(report_html, height=600, scrolling=True)
 
     
 # Backend 기능 구현 끝 ---
@@ -1112,8 +1111,9 @@ with st.expander("⚙️ 요청사항 및 기준일자 설정", expanded=st.sess
 #버튼 추가
     if st.button("보고서 데이터 가져오기"):
         if date_list:
-            fetch_report_data_between_dates(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'], selected_folder, start_date, end_date)
-            
+            html_request = fetch_report_data_between_dates(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'], selected_folder, start_date, end_date)
+# 화면에 출력
+            st.components.v1.html(html_request, height=10246, scrolling=True)
    
 
 # 7 프레임임
