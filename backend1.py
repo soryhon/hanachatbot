@@ -21,6 +21,10 @@ from openpyxl.utils import get_column_letter
 import re
 import tempfile
 import datetime
+import matplotlib.pyplot as plt
+import matplotlib.font_manager as fm
+import altair as alt
+import numpy as np
 
 # Backend 기능 구현 시작 ---
 
@@ -978,7 +982,8 @@ def run_llm_with_analysisfile_and_prompt(api_key, title, request, file_data_str)
         자. '````', '````HTML' 이 문구들이 답변에 포함되지 않아야 한다.
         차. 'AI 비교 분석 결과'로 비교 분석 설명하고 아래에는 h3 태그를 활용해서 '결과 차트 추천' 타이틀 추가하고 각 데이별 변화된 추이를 차트로 표현할 수 있게 아래의 양식에 맞춰서 답변한다.
              차트는 반드시 python 기반으로 Streamlit에서 구현이 가능한 차트에서 추천해. 답변 양식의 각 항목별 타이틀을 뚜렷하게 강조해야 된다.
-             차트 코드 중 화면 출력 시 한글이 깨지지 않게 출력되도록 코딩해야 한다.
+        카. 차트 위한 import streamlit as st, import pandas as pd, import matplotlib.pyplot as plt, import altair as alt, import matplotlib.font_manager as fm, import numpy as np 이 선언되어 있으니 import 할 필요 없이 구현하고,
+            이외 추가로 필요한 경우만 import 해야한다.
         카. 답변 양식 정의
         [
             전체 타이틀
@@ -1055,5 +1060,31 @@ def extract_text_within_brackets(response):
             comment_text = response[0:start_index ] 
      
     return comment_text, extracted_text
-    
+
+# GitHub 저장소에서 폰트 파일을 다운로드하는 함수
+def download_and_apply_font_from_github(github_repo, branch, fm, plt):
+    file_file_path = "font/NanumGothic.ttf"
+    save_dir="/tmp"
+    font_url = f"https://raw.githubusercontent.com/{github_repo}/{branch}/{font_file_path}"
+    font_name = os.path.basename(font_file_path)  # 파일명 추출
+    font_path = os.path.join(save_dir, font_name)  # 저장할 경로
+
+    # 폰트 파일 다운로드
+    if not os.path.exists(font_path):
+        response = requests.get(font_url)
+        if response.status_code == 200:
+            with open(font_path, 'wb') as f:
+                f.write(response.content)
+            #st.success(f"폰트 {font_name} 다운로드 성공")
+        else:
+            raise Exception(f"폰트 다운로드 실패. 상태 코드: {response.status_code}")
+    else:
+        st.error(f"폰트 {font_name}이(가) 이미 존재합니다.")
+
+    # 폰트 파일을 matplotlib에 적용
+    font_prop = fm.FontProperties(fname=font_path)
+    plt.rcParams['font.family'] = font_prop.get_name()
+    #st.seccess(f"matplotlib에 폰트 {font_prop.get_name()} 적용 완료")
+
+    return fm, plt
 # Backend 기능 구현 끝 ---
