@@ -257,38 +257,38 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
 # 결과 저장 버튼
      col1, col2 = st.columns([0.5, 0.5])
      with col1:   
-        if st.button("💾 결과 내용 저장", key="save_result", use_container_width=True):
-            st.session_state['check_result'] = True
-            st.session_state['check_report'] = False
-            st.session_state['check_upload'] = False
-            st.session_state['check_setting'] = False
-            st.session_state['check_request'] = False
-            if "response" in st.session_state:                
+          if st.button("💾 결과 내용 저장", key="save_result", use_container_width=True):
+               st.session_state['check_result'] = True
+               st.session_state['check_report'] = False
+               st.session_state['check_upload'] = False
+               st.session_state['check_setting'] = False
+               st.session_state['check_request'] = False
+               if "response" in st.session_state:                
                 
-                folder_name = st.session_state['selected_folder_name']
-                report_date_str = st.session_state.get('report_date_str', datetime.datetime.now().strftime('%Y%m%d'))
-                
-                # save_html_response 함수를 사용하여 HTML 파일 저장
-                file_name, temp_file_path = bd.save_html_response(html_result_value, folder_name, report_date_str)
-
-                # 파일 저장 경로 (reportFiles/{폴더명}/{일자})
-                github_folder = f"reportFiles/{folder_name}/{report_date_str}"
-
-                # 폴더 존재 확인 및 생성
-                bd.check_and_create_github_folder(github_folder, st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
-                
-                # GitHub에 HTML 파일 저장
-                sha = bd.get_file_sha(st.session_state['github_repo'], f"{github_folder}/{file_name}", st.session_state['github_token'], branch=st.session_state['github_branch'])
-                bd.upload_file_to_github(st.session_state['github_repo'], github_folder, file_name, open(temp_file_path, 'rb').read(), st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
-                st.session_state['check_result'] = True
-                st.success(f"{file_name} 파일이 생성되었습니다.")
-                if st.download_button(
-                    label="📥 다운로드",
-                    use_container_width=True,
-                    data=open(temp_file_path, 'r', encoding='utf-8').read(),
-                    file_name=file_name,
-                    mime="text/html"
-                ):
+                     folder_name = st.session_state['selected_folder_name']
+                     report_date_str = st.session_state.get('report_date_str', datetime.datetime.now().strftime('%Y%m%d'))
+                     
+                     # save_html_response 함수를 사용하여 HTML 파일 저장
+                     file_name, temp_file_path = bd.save_html_response(html_result_value, folder_name, report_date_str)
+                    
+                     # 파일 저장 경로 (reportFiles/{폴더명}/{일자})
+                     github_folder = f"reportFiles/{folder_name}/{report_date_str}"
+                    
+                     # 폴더 존재 확인 및 생성
+                     bd.check_and_create_github_folder(github_folder, st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
+                     
+                     # GitHub에 HTML 파일 저장
+                     sha = bd.get_file_sha(st.session_state['github_repo'], f"{github_folder}/{file_name}", st.session_state['github_token'], branch=st.session_state['github_branch'])
+                     bd.upload_file_to_github(st.session_state['github_repo'], github_folder, file_name, open(temp_file_path, 'rb').read(), st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
+                     st.session_state['check_result'] = True
+                     st.success(f"{file_name} 파일이 생성되었습니다.")
+                     if st.download_button(
+                         label="📥 다운로드",
+                         use_container_width=True,
+                         data=open(temp_file_path, 'r', encoding='utf-8').read(),
+                         file_name=file_name,
+                         mime="text/html"
+                     ):
                     st.session_state['check_result'] = True
                     st.session_state['check_report'] = False
                     st.session_state['check_upload'] = False
