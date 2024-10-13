@@ -965,6 +965,8 @@ with col2:
 
 # 2 프레임
 # 보고서명 및 폴더 선택, 새 폴더 만들기
+subfolder_list=[]
+date_list=[]
 if github_info_loaded:
     with st.expander("📝 보고서 선택", expanded=st.session_state['check_report']):
         col1, col2 = st.columns([0.21, 0.79])
@@ -1005,6 +1007,10 @@ if github_info_loaded:
                 st.session_state['selected_template_index'] = 0
                 refresh_page()
                 #st.success(f"[{selected_folder}] 보고서명이이 선택되었습니다.")
+                
+        
+                # 하위 폴더 리스트(날짜 리스트) 가져오기
+                subfolder_list, date_list = get_subfolder_list(repo, branch, token, selected_folder)
             #else:   
                 #st.warning("보고서명을 선택하세요.")
 
@@ -1049,57 +1055,42 @@ with st.expander("⚙️ 요청사항 및 기준일자 설정", expanded=st.sess
     st.text_input("제목 : '제목을 입력해주세요.", key=f"requst_title")
 
     st.text_area("요청 : '요청할 내용을 입력해주세요.", key=f"request_text")
-    
-    col1, col2 = st.columns([0.5, 0.5])
-    with col1 :
+
+    if date_list:
         st.markdown(
             "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
             unsafe_allow_html=True
-        )      
-    with col2 :
-        st.markdown(
-            "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
-            unsafe_allow_html=True
-        )
-    col1, col2 = st.columns([0.5, 0.5])
-    with col1:
-        # 오늘 날짜 가져오기
+        )    
         today = datetime.date.today()
-        
-        # 'report_date_str' 세션 값이 있는지 확인하고, 없으면 'YYYYMMDD' 형식으로 today 값 설정
-        if 'report_date_str' not in st.session_state:
-            st.session_state['report_date_str'] = today.strftime('%Y%m%d')
-        
-        
-        # 세션에 저장된 'YYYYMMDD' 형식을 date 객체로 변환
-        saved_date = today
-        # 날짜 문자열을 검사하여 잘못된 형식일 때 예외 처리
-        if 'report_date_str' in st.session_state and st.session_state['report_date_str']:
-            try:
-                # 저장된 날짜 문자열이 있으면 파싱
-                saved_date = datetime.datetime.strptime(st.session_state['report_date_str'], '%Y%m%d').date()
-            except ValueError:
-                # 날짜 형식이 맞지 않으면 오늘 날짜로 설정
-                st.warning("잘못된 날짜 형식입니다. 기본값으로 오늘 날짜를 사용합니다.")
-        else:
-            # 저장된 날짜가 없거나 빈 문자열일 경우 오늘 날짜로 설정
-            saved_date = today
-    
-        report_date = st.date_input(
-            "📅 보고서 기준일자 선택",
-            value=saved_date,
-            min_value=datetime.date(2000, 1, 1),
-            max_value=today,
-            key="report_date"
-        )
-        # 날짜를 YYYYMMDD 형식으로 변환
-        # 날짜 데이터 메모리에 저장
-        st.session_state['report_date_str'] = report_date.strftime("%Y%m%d")
-    with col2:
-        st.markdown(
-            "<p style='font-size:14px; font-weight:normal; color:#444444; margin-top:35px;text-align:left;'>✔️ 보고서 저장을 위해 기준일자를 설정해주세요.</p>",
-            unsafe_allow_html=True
-        )
+        # 시작일자와 마지막 일자 달력 입력
+        col1, col2 = st.columns([0.5, 0.5])
+        with col1:
+            if 'start_date_value' not in st.session_state:
+                st.session_state['start_date_value'] = today
+                
+            start_date = st.date_input("📅 시작일자 선택", 
+                value=st.session_state['start_date_value'],
+                min_value=date_list[0],
+                max_value=today,
+                key="start_date"
+            )
+            st.session_state['start_date_value'] = start_date
+        with col2:            
+            if 'end_date_value' in st.session_state:
+                st.session_state['end_date_value'] = today
+            
+            end_date = st.date_input("📅 마지막일자 선택택", 
+                value=st.session_state['end_date_value'],
+                min_value=date_list[0],
+                max_value=today,
+                key="start_date"
+            )
+            st.session_state['end_date_value'] = end_date
+        # 버튼 추가
+        #if st.button("보고서 데이터 가져오기"):
+            #fetch_report_data_between_dates(repo, branch, token, selected_folder, start_date, end_date)
+            
+   
 
 # 7 프레임임
 # 요청사항 리스트
