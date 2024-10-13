@@ -1078,8 +1078,9 @@ def download_and_apply_font_from_github(github_repo, branch, fm, plt):
             #st.success(f"폰트 {font_name} 다운로드 성공")
         else:
             raise Exception(f"폰트 다운로드 실패. 상태 코드: {response.status_code}")
-    else:
-        st.error(f"폰트 {font_name}이(가) 이미 존재합니다.")
+    #else:
+        #st.error(f"폰트 {font_name}이(가) 이미 존재합니다.")
+        
 
     # 폰트 파일을 matplotlib에 적용
     font_prop = fm.FontProperties(fname=font_path)
