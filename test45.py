@@ -838,7 +838,7 @@ refresh_page()
     
 # 1 프레임
 # 보고서 타이틀
-col1, col2 = st.columns([0.7,0.3])
+col1, col2 = st.columns([0.55,0.45])
 with col1:
     st.markdown(
         "<p style='font-size:25px; font-weight:bold; color:#000000;'>업무 보고서 자동 완성 📚</p>",
