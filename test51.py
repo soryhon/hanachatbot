@@ -255,7 +255,7 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
             html_result_value += html_response_value
             st.components.v1.html(html_response_value, height=1024, scrolling=True)
             st.write("Python 코드 발취")
-            st.components.v1.html(chartcode, height=400, scrolling=True)
+            st.write(chartcode)
     html_result_value += "</div>"
     st.markdown(
         "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
