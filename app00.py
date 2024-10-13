@@ -471,7 +471,7 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
             unsafe_allow_html=True
         )  
         st.session_state['check_result'] = True
-        for idx, response in bd.enumerate(st.session_state["response"]):
+        for idx, response in enumerate(st.session_state["response"]):
             #st.text_area(f"응답 {idx+1}:", value=response, height=300)
 
             html_response_value = f"<div style='border: 0px solid #cccccc; padding: 1px;'>{response}</div>"
