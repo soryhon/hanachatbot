@@ -927,10 +927,7 @@ def fetch_report_data_between_dates(repo, branch, token, selected_folder, start_
     # 시작일자, 마지막 일자 인덱스 추출
     start_index = max(0, min(range(len(date_list)), key=lambda i: abs(date_list[i] - start_date)))
     end_index = min(range(len(date_list)), key=lambda i: abs(date_list[i] - end_date))
-    st.warning(f"{end_date}")
-    st.warning(f"{len(date_list)}")
-    st.warning(f"start_index:{start_index}")
-    st.warning(f"end_index:{end_index}")
+
     # 조건에 맞는 폴더들의 데이터를 가져오기
     report_html = ""
     num =0
@@ -955,7 +952,78 @@ def fetch_report_data_between_dates(repo, branch, token, selected_folder, start_
             st.warning(f"{folder_path} 폴더 내에 HTML 파일이 없습니다.")
     return report_html
 
+# LLM을 통해 프롬프트와 파일을 전달하고 응답을 받는 함수
+def run_llm_with_analysisfile_and_prompt(api_key, title, request, file_data_str):
+    global global_generated_prompt
+    openai.api_key = api_key
 
+    responses = []
+    global_generated_prompt = []  # 프롬프트들을 담을 리스트 초기화
+
+    try:
+
+        # 프롬프트 텍스트 정의
+        generated_prompt = f"""
+        아래의 항목 데이터는 여러 보고서 데이터를 하나로 취합한 것으로 '기준일자' 포함 타이틀로 데이터를 분류하고 기준일자별로 변화추이를 분석하여 설명해.
+        다음과 같은 조건에 모두 만족해야 한다.
+        가. '기준일자' 포함 타이틀로 데이터를 분류하여 총 몇 개의 보고서 데이터인지 판단해야 하고, 기준일자 통해서 각 분류한 데이터에 일자를 판별해야 한다.
+        나. 분류된 각 데이터 내 'AI 요약과 설명'이 포함한 행부터 마지막 행까지는 분석 대상이 아니므로 제외한다.
+        다. 이와 같이 데이터를 분류하여 기준일자 기준으로 처음부터 끝까지 보고서를 차례대로 비교하고 분석해야 한다.
+        라. 표 형식의로 table태그로 답변 할 때는 th과 td 태그는 border는 사이즈 1이고 색상은 검정색으로 구성한다. table 태그 가로길이는 전체를 차지해야 한다.
+        마. 이외 table 태그가 포함 안된 설명은 너가 생각한 가장 좋은 보고서 양식에 맞춰 간결하고 깔끔하게 요약하고 html 형식으로 변환해야 한다.
+        바. 답변할 때는 반드시 모든 항목 데이터의 수정한 데이터 내용과 HTML 형삭에 맞춰 답변한다. 문단마다 줄바꿈을 적용하여 br태그 활용하고 가시성 높게 특수기호를 활용하여 보고서 양식에 준하게 요약한 내용을 설명해줘야 한다.
+        사. 답변할 때 첫번째 행에는 h3 태그를 활용해서 '{title}' 문구가 반드시 시작되어야 한다.
+        아. 답변할 때 두번째 행에는 h3 태그를 활용해서 '✨AI 비교 분석 결과' 타이틀 추가하고 색상을 달리 구성한다. 너의 답변이라는 것을 표현하는 특수문자로 강조해.
+               전달받은 보고서 전반적인 내용에 대해 너가 선정한 가장 좋은 방법으로 요약과 설명하고 그 내용을 HTML 형식으로 변환하여 답변해야 한다.
+        자. '````', '````HTML' 이 문구들이 답변에 포함되지 않아야 한다.
+        차. 'AI 비교 분석 결과'로 비교 분석 설명하고 아래에는 h3 태그를 활용해서 '결과 차트 추천' 타이틀 추가하고 각 데이별 변화된 추이를 차트로 표현할 수 있게 아래의 양식에 맞춰서 답변한다.
+             차트는 반드시 python 기반으로 Streamlit에서 구현이 가능한 차트에서 추천해.
+             _차트 방식 :
+             _차트 구성 내용 :
+        -요청사항
+        [
+            {request}
+        ]
+        -항목 데이터
+        [
+            {file_data_str}
+        ]
+        """
+        
+        # 텍스트 길이 제한 확인 (예: 1000000자로 제한)
+        if len(generated_prompt) > 1000000:
+            st.error("프롬프트 글자 수 초과로 LLM 연동에 실패했습니다.")
+        else:
+            global_generated_prompt.append(generated_prompt)
+            prompt_template = PromptTemplate(
+                template=generated_prompt,
+                input_variables=[]
+            )
+
+            # LLM 모델 생성
+            llm = ChatOpenAI(model_name="gpt-4o")
+            chain = LLMChain(llm=llm, prompt=prompt_template)
+
+            success = False
+            retry_count = 0
+            max_retries = 5  # 최대 재시도 횟수
+
+            # 응답을 받을 때까지 재시도
+            while not success and retry_count < max_retries:
+                try:
+                    response = chain.run({})
+                    responses.append(response)
+                    success = True
+                except RateLimitError:
+                    retry_count += 1
+                    st.warning(f"API 요청 한도를 초과했습니다. 10초 후 다시 시도합니다. 재시도 횟수: {retry_count}/{max_retries}")
+                    time.sleep(10)
+
+                time.sleep(10)
+    except Exception as e:
+        st.error(f"LLM 실행 중 오류가 발생했습니다: {str(e)}")
+
+    return responses
     
 # Backend 기능 구현 끝 ---
 
@@ -1079,10 +1147,16 @@ st.markdown(
 # 6 프레임
 # 요청사항 갯수 및 기준일자 설정 
 with st.expander("⚙️ 요청사항 및 기준일자 설정", expanded=st.session_state['check_setting']):
-    st.text_input("제목 : '제목을 입력해주세요.", key=f"requst_title")
+    if 'request_title' not in st.session_state:
+        st.session_state['request_title'] = ""
+    request_title = request_titlest.text_input("제목 : '제목을 입력해주세요.", key=f"request_title")
+    st.session_state['request_title'] = request_title
 
+    if 'request_title' not in st.session_state:
+        st.session_state['request_title'] = ""
     st.text_area("요청 : '요청할 내용을 입력해주세요.", key=f"request_text")
-
+    st.session_state['request_text'] = request_text
+    
     if date_list:
         st.markdown(
             "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
@@ -1138,53 +1212,32 @@ with col2:
         st.session_state['check_report'] = False
         st.session_state['check_upload'] = False
         st.session_state['check_setting'] = False
+    
+        if 'html_report' not in st.session_state:
+                st.session_state['html_report'] = ""
+            
         if not st.session_state.get("openai_api_key"):
             st.error("먼저 OpenAI API 키를 입력하고 저장하세요!")
-        elif not st.session_state['rows'] or all(not row["제목"] or not row["요청"] or not row["파일"] for row in st.session_state['rows']):
-            st.error("요청사항의 제목, 요청, 파일을 모두 입력해야 합니다!")
+        elif not st.session_state['selected_folder_name'] or not st.session_state['request_title'] or not st.session_state['request_text'] or not st.session_state['start_date_value'] or not st.session_state['end_date_value']:
+            st.error("보고서명, 요청사항, 기준일자을 모두 입력해야 합니다!")
         else:
-            with st.spinner('요청사항과 파일 데이터을 추출 중입니다...'):
-        
+            with st.spinner('요청사항과 보고서 파일 데이터를 추출 중입니다...'):
+                 
                 # 파일 데이터 가져와서 HTML 보고서 생성
-                #file_data_list = []
-                html_viewer_data = ""
-                for idx, row in enumerate(st.session_state['rows']):
-                    file_path = st.session_state['rows'][idx]['파일']
-                    file_content = get_file_from_github(st.session_state["github_repo"], st.session_state["github_branch"], file_path, st.session_state["github_token"])
-                    file_type = file_path.split('.')[-1].lower()
-                    report_html = ""
-                    if file_content:
-                        if file_type == 'xlsx':
-                            selected_sheets = parse_sheet_selection(row['파일정보'], len(openpyxl.load_workbook(file_content).sheetnames))
-                            file_data_dict = extract_sheets_from_excel(file_content, selected_sheets)
-                            if file_data_dict is not None:
-                                # 제목 입력 값 가져오기
-                                report_html +=  f"<h3>{idx + 1}. {row['제목']}</h3>\n"
-                                for sheet_name, df in file_data_dict.items():
-                                    wb = openpyxl.load_workbook(file_content)
-                                    ws = wb[sheet_name]
-                                    html_data = convert_df_to_html_with_styles_and_merging(ws, df)
-                                    report_html += f"<div style='text-indent: 20px;'>{html_data}</div>\n"
-    
-                        else:
-                            file_data = extract_data_from_file(file_content, file_type)
-                            report_html += f"<h3>{idx + 1}. {row['제목']}</h3>\n<p>{file_data}</p>"
-                        if idx > 0 :
-                            report_html += "<p/>"
-                        html_viewer_data += report_html    
-                        #file_data_list.append(row['데이터'])
-                    st.session_state['html_report'] = html_viewer_data
+                html_request = fetch_report_data_between_dates(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'], selected_folder, start_date, end_date)
+                st.session_state['html_report'] = html_request
+                
                 time.sleep(1)  # 예를 들어, 5초 동안 로딩 상태 유지
 
             with st.spinner('결과 보고서 작성 중입니다...'):
                 # LLM 함수 호출
-                titles = [row['제목'] for row in st.session_state['rows']]
-                requests = [row['요청'] for row in st.session_state['rows']]
+                title = st.session_state['request_title']
+                request = st.session_state['request_text']
         
-                responses = run_llm_with_file_and_prompt(
+                responses = run_llm_with_analysisfile_and_prompt(
                     st.session_state["openai_api_key"], 
-                    titles, 
-                    requests, 
+                    title, 
+                    request, 
                     st.session_state['html_report']
                 )
                 st.session_state["response"] = responses
