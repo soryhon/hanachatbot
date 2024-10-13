@@ -261,7 +261,7 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
                 "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
                 unsafe_allow_html=True
             )   
-            fm, plt = download_and_apply_font_from_github(st.session_state['github_repo'], st.session_state['github_branch'], fm, plt)
+            fm, plt = bd.download_and_apply_font_from_github(st.session_state['github_repo'], st.session_state['github_branch'], fm, plt)
             st.code(chartcode, language='python')  # 추출한 Python 코드를 화면에 출력
             st.markdown(
                   "<p style='font-size:22px;font-weight:bold;color:#008080;padding:5px;'>📈 AI 차트 추천</p>",
