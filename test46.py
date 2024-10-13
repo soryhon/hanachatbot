@@ -870,7 +870,66 @@ def apply_template_to_session_state(file_name):
         st.error(f"'{file_name}' 파일을 파싱하는 중 오류가 발생했습니다. JSON 형식을 확인해주세요.")
     except Exception as e:
         st.error(f"템플릿 불러오기 중 오류가 발생했습니다: {str(e)}")
-           
+
+# 보고서명 리스트를 가져오고, reportFiles 폴더 존재 여부를 확인하고 없으면 생성하는 함수
+def get_report_folder_list_from_github(repo, branch, token):
+    base_folder = "reportFiles"
+    folder_check = check_and_create_github_folder_if_not_exists(repo, base_folder, token, branch)
+
+    if folder_check:
+        url = f"https://api.github.com/repos/{repo}/contents/{base_folder}?ref={branch}"
+        headers = {"Authorization": f"token {token}"}
+        response = requests.get(url, headers=headers)
+
+        if response.status_code == 200:
+            folder_list = [item['name'] for item in response.json() if item['type'] == 'dir']
+            return folder_list
+        else:
+            st.error(f"폴더 리스트를 가져오지 못했습니다: {response.status_code}")
+            return []
+    else:
+        st.error("reportFiles 폴더가 존재하지 않아 생성할 수 없습니다.")
+        return []
+
+# 폴더명 리스트와 하위 폴더 리스트 가져오기
+def get_subfolder_list(repo, branch, token, selected_folder):
+    base_folder = f"reportFiles/{selected_folder}"
+    url = f"https://api.github.com/repos/{repo}/contents/{base_folder}?ref={branch}"
+    headers = {"Authorization": f"token {token}"}
+    response = requests.get(url, headers=headers)
+
+    if response.status_code == 200:
+        subfolder_list = [item['name'] for item in response.json() if item['type'] == 'dir']
+        date_list = [datetime.datetime.strptime(folder, '%Y%m%d').date() for folder in subfolder_list]
+        date_list.sort()  # 날짜 오름차순 정렬
+        return subfolder_list, date_list
+    else:
+        st.error(f"하위 폴더 리스트를 가져오지 못했습니다: {response.status_code}")
+        return [], []
+
+# 시작일자와 마지막 일자를 설정하고 버튼 클릭 시 데이터를 가져오는 함수
+def fetch_report_data_between_dates(repo, branch, token, selected_folder, start_date, end_date):
+    subfolder_list, date_list = get_subfolder_list(repo, branch, token, selected_folder)
+
+    # 시작일자, 마지막 일자 인덱스 추출
+    start_index = max(0, min(range(len(date_list)), key=lambda i: abs(date_list[i] - start_date)))
+    end_index = max(range(len(date_list)), key=lambda i: abs(date_list[i] - end_date))
+
+    # 조건에 맞는 폴더들의 데이터를 가져오기
+    report_html = ""
+    for idx in range(start_index, end_index + 1):
+        folder_name = subfolder_list[idx]
+        report_html += f"<h3>{idx + 1}. 기준일자: {date_list[idx].strftime('%Y년 %m월 %d일')}</h3>\n"
+        html_file_path = f"reportFiles/{selected_folder}/{folder_name}/result.html"
+
+        # get_file_from_github() 함수 사용
+        file_content = get_file_from_github(repo, branch, html_file_path, token)
+        if file_content:
+            report_html += file_content.read().decode('utf-8')
+
+    # 화면에 출력
+    st.components.v1.html(report_html, height=600, scrolling=True)
+    
 # Backend 기능 구현 끝 ---
 
 # Frontend 기능 구현 시작 ---
