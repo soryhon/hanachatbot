@@ -1032,7 +1032,8 @@ else:
     st.warning("GitHub 정보가 설정되지 않았습니다. 먼저 GitHub Token을 입력해 주세요.")
 
 
-
+# 3 프레임
+# 보고서 타이틀 보기
 col1, col2, col3 = st.columns([0.2, 0.6, 0.2])
 with col1:
     st.write("")
@@ -1051,14 +1052,14 @@ with col2:
 with col3:
     st.write("")
 
-# 3 프레임
-#st.subheader("")
+# 4 프레임
+# 작성 보고서 요청사항 세부타이틀
 st.markdown(
     "<p style='font-size:18px; font-weight:bold; color:#007BFF;'>작성 보고서 요청사항</p>",
     unsafe_allow_html=True
 )
 
-# 4 프레임
+# 5 프레임
 # 파일 업로드
 # 지원되는 파일 형식 리스트
 supported_file_types = ['xlsx', 'pptx', 'docx', 'csv', 'png', 'jpg', 'jpeg', 'pdf', 'txt', 'log']
@@ -1108,8 +1109,8 @@ if github_info_loaded:
 else:
     st.warning("GitHub 정보가 저장되기 전에는 파일 업로드를 할 수 없습니다. 먼저 GitHub 정보를 입력해 주세요.")
 
-# 5 프레임
-# 요청사항 갯수 설정 입력 및 버튼
+# 6 프레임
+# 요청사항 갯수 및 기준일자 설정 
 with st.expander("⚙️ 요청사항 및 기준일자 설정", expanded=st.session_state['check_setting']):
     col1, col2, col3 = st.columns([0.5, 0.25, 0.25])
     with col1:
@@ -1195,6 +1196,8 @@ with st.expander("⚙️ 요청사항 및 기준일자 설정", expanded=st.sess
             "<p style='font-size:14px; font-weight:normal; color:#444444; margin-top:35px;text-align:left;'>✔️ 보고서 저장을 위해 기준일자를 설정해주세요.</p>",
             unsafe_allow_html=True
         )
+
+# 7 프레임임
 # 요청사항 리스트
 with st.expander("✍️ 요청사항 리스트", expanded=st.session_state['check_request']):
     if 'rows' not in st.session_state:
@@ -1249,9 +1252,9 @@ with st.expander("✍️ 요청사항 리스트", expanded=st.session_state['che
                     st.error(f"{selected_file} 파일을 GitHub에서 불러오지 못했습니다.")  
             st.text_input(f"{idx+1}.요청사항 선택한 파일", row['파일'], disabled=True, key=f"file_{idx}")
         
-# 7 프레임
+# 8 프레임
+# 보고서 작성 실행 버튼
 col1, col2, col3 = st.columns([0.2, 0.6, 0.2])
-
 with col1:
     st.write("")
 with col2:   
@@ -1319,17 +1322,15 @@ with col2:
 with col3:
     st.write("")           
 
-# 8 프레임
-#st.subheader("")
-# 결과 보고서
+# 9 프레임
+# 결과 보고서 세부 타이틀
 st.markdown(
     "<p style='font-size:18px; font-weight:bold; color:#007BFF;'>결과 보고서</p>",
     unsafe_allow_html=True
 )
 
-
-# 9 프레임
-# LLM 응답 보기
+# 10 프레임
+# 결과 보고서 LLM 응답 보기/ 결과 보고서 저장/ 보고서 양식 저장
 html_result_value = "<div id='html_result_value'>"
 with st.expander("📊 결과 보고서 보기", expanded=st.session_state['check_result']):
     if "response" in st.session_state:
@@ -1350,9 +1351,7 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
         unsafe_allow_html=True
     )
     
-# 10 프레임
 # 결과 저장 버튼
-
     col1, col2 = st.columns([0.5, 0.5])
     with col1:   
         if st.button("💾 결과 내용 저장", key="save_result", use_container_width=True):
