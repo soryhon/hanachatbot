@@ -1047,6 +1047,7 @@ def extract_text_within_brackets(response):
         matches = re.findall(pattern, response)
         extracted_texts.extend(matches)  # 모든 매칭된 텍스트를 리스트에 추가
         extracted_text = matches
+        st.warning(f"matches : {matches}")
 
     return extracted_text
     
