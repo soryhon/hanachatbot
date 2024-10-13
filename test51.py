@@ -42,6 +42,7 @@ date_list=[]
 if github_info_loaded:
 	with st.expander("📝 보고서 선택", expanded=st.session_state['check_report']):
 		col1, col2 = st.columns([0.21, 0.79])
+    
   	with col1:
 			st.write("")
 			st.markdown(
