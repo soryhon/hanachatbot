@@ -254,11 +254,11 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
             response_text, chartcode = bd.extract_text_within_brackets(response)
             
             fm, plt = bd.download_and_apply_font_from_github(st.session_state['github_repo'], st.session_state['github_branch'], fm, plt)
-            #st.code(chartcode, language='python')  # 추출한 Python 코드를 화면에 출력
+            st.code(chartcode, language='python')  # 추출한 Python 코드를 화면에 출력
             st.markdown(
                   "<p style='font-size:22px;font-weight:bold;color:#CC66FF;padding:5px;'>📈 AI 추천 차트</p>",
                   unsafe_allow_html=True
-              )
+            )
             # eval()을 사용하여 Python 코드를 실행하고 차트를 출력
             try:
                 exec(chartcode)  # exec()을 사용하여 추출된 Python 코드를 실행
