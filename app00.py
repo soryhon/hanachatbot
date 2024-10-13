@@ -362,7 +362,7 @@ with st.expander("✍️ 요청사항 리스트", expanded=st.session_state['che
                 st.session_state['rows'][idx]['파일'] = selected_file
            
                 file_path = selected_file
-                file_content = get_file_from_github(
+                file_content = bd.get_file_from_github(
                     st.session_state["github_repo"], 
                     st.session_state["github_branch"], 
                     file_path, 
