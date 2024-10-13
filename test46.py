@@ -1066,8 +1066,8 @@ with st.expander("⚙️ 요청사항 및 기준일자 설정", expanded=st.sess
         col1, col2 = st.columns([0.5, 0.5])
         with col1:
             if 'start_date_value' not in st.session_state:
-                st.session_state['start_date_value'] = today
-                
+                st.session_state['start_date_value'] = date_list[0]
+            
             start_date = st.date_input("📅 시작일자 선택", 
                 value=st.session_state['start_date_value'],
                 min_value=date_list[0],
