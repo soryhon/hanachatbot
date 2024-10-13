@@ -90,7 +90,7 @@ def check_and_create_github_folder_if_not_exists(repo, folder_name, token, branc
     
     # 폴더가 없는 경우 (404)
     elif response.status_code == 404:
-        st.warning(f"'{folder_name}' 폴더가 존재하지 않아 생성 중입니다.")
+        #st.warning(f"'{folder_name}' 폴더가 존재하지 않아 생성 중입니다.")
         create_folder_url = f"https://api.github.com/repos/{repo}/contents/{folder_path}"
         data = {
             "message": f"Create {folder_name} folder with .gitkeep",
