@@ -934,9 +934,11 @@ def fetch_report_data_between_dates(repo, branch, token, selected_folder, start_
     st.warning(f"end_index:{end_index}")
     # 조건에 맞는 폴더들의 데이터를 가져오기
     report_html = ""
+    num =0
     for idx in range(start_index, end_index + 1):
         folder_name = subfolder_list[idx]
-        report_html += f"<h3>{idx + 1}. 기준일자: {date_list[idx].strftime('%Y년 %m월 %d일')}</h3>\n"
+        num += 1
+        report_html += f"<h3>{num}.기준일자: {date_list[idx].strftime('%Y년 %m월 %d일')}</h3>\n"
         folder_path = f"reportFiles/{selected_folder}/{folder_name}"
 
         # 해당 폴더 내 HTML 파일 목록을 가져옴
