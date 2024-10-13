@@ -74,19 +74,29 @@ def load_env_info():
     # GitHub 정보가 설정되었는지 확인하고 세션 상태 반영
     return github_set
 
-# GitHub에서 unloadFiles 하위의 폴더 리스트를 가져오는 함수
+# GitHub에서 uploadFiles 하위의 폴더 리스트를 가져오는 함수
 def get_folder_list_from_github(repo, branch, token, base_folder='uploadFiles'):
-    check_and_create_github_folder(base_folder, repo, branch, token)
     url = f"https://api.github.com/repos/{repo}/contents/{base_folder}?ref={branch}"
     headers = {"Authorization": f"token {token}"}
     response = requests.get(url, headers=headers)
+    
+    # 폴더가 없을 경우 (404) 폴더를 생성하고 다시 폴더 리스트를 가져옴
+    if response.status_code == 404:
+        st.warning(f"'{base_folder}' 폴더가 존재하지 않아 생성 중입니다.")
+        create_new_folder_in_github(repo, base_folder, token, branch)  # 폴더 생성 및 .gitkeep 파일 추가
+        response = requests.get(url, headers=headers)  # 폴더 생성 후 다시 요청
+        
+        if response.status_code != 200:
+            st.error("폴더를 생성했지만 다시 폴더 리스트를 가져오지 못했습니다.")
+            return []
+    
     if response.status_code == 200:
         folders = [item['name'] for item in response.json() if item['type'] == 'dir']
         return folders
     else:
         st.error("폴더 리스트를 가져오지 못했습니다. 저장소 정보나 토큰을 확인하세요.")
         return []
-
+        
 # GitHub에 새로운 폴더를 생성하는 함수
 def create_new_folder_in_github(repo, folder_name, token, branch='main'):
     base_folder = "uploadFiles"
