@@ -1046,40 +1046,10 @@ st.markdown(
 # 6 프레임
 # 요청사항 갯수 및 기준일자 설정 
 with st.expander("⚙️ 요청사항 및 기준일자 설정", expanded=st.session_state['check_setting']):
-    col1, col2, col3 = st.columns([0.5, 0.25, 0.25])
-    with col1:
-        st.markdown(
-            "<p style='font-size:14px; font-weight:normal; color:#444444; margin-top:35px;text-align:left;'>✔️ 작성에 필요한 요청사항 갯수를 설정해주세요.</p>",
-            unsafe_allow_html=True
-        )
-        
-    with col2:
-        # 요청사항 갯수 입력 (1-9)
-        num_requests = st.number_input(
-            "🔢 요청사항 갯수 입력창",
-            min_value=1,
-            max_value=9,
-            value=1,
-            step=1,
-            key="num_requests"
-        )
+    st.text_input("제목 : '제목을 입력해주세요.", key=f"requst_title")
+
+    st.text_area("요청 : '요청할 내용을 입력해주세요.", key=f"request_text")
     
-    with col3:
-        st.markdown(
-            "<p style='font-size:18px; margin-top:27px;'></p>",
-            unsafe_allow_html=True
-        )
-        if st.button("설정", key="set_requests", use_container_width=True):
-            # 설정 버튼 클릭 시 요청사항 리스트 초기화 및 새로운 요청사항 갯수 설정
-            st.session_state['rows'] = [
-                {"제목": "", "요청": "", "파일": "", "데이터": "", "파일정보": "1"}
-                for _ in range(st.session_state['num_requests'])
-            ]
-            st.success(f"{st.session_state['num_requests']}개의 요청사항이 설정되었습니다.")
-            st.session_state['check_request']=True
-            st.session_state['check_setting']=False
-            refresh_page()
-            init_session_state(True)
     col1, col2 = st.columns([0.5, 0.5])
     with col1 :
         st.markdown(
@@ -1133,58 +1103,7 @@ with st.expander("⚙️ 요청사항 및 기준일자 설정", expanded=st.sess
 
 # 7 프레임임
 # 요청사항 리스트
-with st.expander("✍️ 요청사항 리스트", expanded=st.session_state['check_request']):
-    if 'rows' not in st.session_state:
-        st.session_state['rows'] = [{"제목": "", "요청": "", "파일": "", "데이터": "", "파일정보":"1"}]
 
-    rows = st.session_state['rows']
-    checked_rows = []
-
-    for idx, row in enumerate(rows):
-        with st.container():
-            #col1, col2 = st.columns([0.01, 0.99]) 
-            #with col1:
-                #row_checked = st.checkbox("", key=f"row_checked_{idx}", value=row.get("checked", False))  # 체크박스만 추가
-                #st.write("")
-            #with col2:
-            st.markdown(
-                f"<p style='font-size:16px; font-weight:bold; color:#000000; margin-top:5px;'>{idx+1}. 요청사항</p>",
-                unsafe_allow_html=True
-            )
-        
-            row['제목'] = st.text_input(f"제목 : '{idx+1}.요청사항'의 제목을 입력해주세요.", row['제목'], key=f"title_{idx}")
-            row['요청'] = st.text_area(f"요청 : '{idx+1}.요청사항'의 요청할 내용을 입력해주세요.", row['요청'], key=f"request_{idx}")
-     
-            file_list = ['파일을 선택하세요.']
-            if st.session_state.get('github_token') and st.session_state.get('github_repo'):
-                file_list += get_github_files(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
-
-            selected_file = st.selectbox(f"파일 선택 : '{idx+1}.요청사항'의 파일을 선택해주세요.", options=file_list, key=f"file_select_{idx}")
-
-            if selected_file != '파일을 선택하세요.':
-                st.session_state['rows'][idx]['파일'] = selected_file
-           
-                file_path = selected_file
-                file_content = get_file_from_github(
-                    st.session_state["github_repo"], 
-                    st.session_state["github_branch"], 
-                    file_path, 
-                    st.session_state["github_token"]
-                )
-
-                if file_content:
-                    file_type = file_path.split('.')[-1].lower()
-                    
-                    # 파일 형식 검증 (지원되는 파일만 처리)
-                    if file_type not in supported_file_types:
-                        st.error(f"지원하지 않는 파일입니다: {file_path}")
-                        row['데이터'] = ""
-                    else:      
-                        handle_file_selection(file_path, file_content, file_type, idx)
-                        
-                else:
-                    st.error(f"{selected_file} 파일을 GitHub에서 불러오지 못했습니다.")  
-            st.text_input(f"{idx+1}.요청사항 선택한 파일", row['파일'], disabled=True, key=f"file_{idx}")
         
 # 8 프레임
 # 보고서 작성 실행 버튼
