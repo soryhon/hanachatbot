@@ -103,14 +103,15 @@ if github_info_loaded:
                     # 'selected_template'가 template_files에 있을 때만 index 설정
                     #selected_temp_index = st.session_state['selected_template_index']
                     if st.session_state['selected_template_name'] in template_files:
-                        selected_temp_index = template_files.index(st.session_state['selected_template_name'])                         
+                        selected_temp_index = template_files.index(st.session_state['selected_template_name']) + 1                         
                     else:
                         selected_temp_index = 0
-                    st.session_state['selected_template_index'] = selected_temp_index    
+                    st.session_state['selected_template_index'] = selected_temp_index  
+                    st.session_state['template_list_option'] = [templatelist_init_value] + template_files
                     #보고서 양식 파일 리스트
                     selected_template = st.selectbox(
                         "불러올 보고서 양식 파일 리스트", 
-                        options=[templatelist_init_value] + template_files, 
+                        options=st.session_state['template_list_option'], 
                         index=st.session_state['selected_template_index'],
                         key="selected_template"
                     )
@@ -148,9 +149,9 @@ if github_info_loaded:
                         folder_created = bd.create_new_folder_in_github(st.session_state['github_repo'], new_folder_name, st.session_state['github_token'], st.session_state['github_branch'])
                         if folder_created:
                             folder_list.append(new_folder_name)  # 새 폴더를 리스트에 추가
-                            #st.session_state['selected_folder_index'] = len(folder_list) - 1
+                            #st.session_state['selected_folder_index'] = len(folder_list) + 1
                             #st.session_state['selected_template_index'] = 0
-                            st.session_state['folder_list_option'] = [] + folder_list
+                            st.session_state['folder_list_option'] = [folderlist_init_value] + folder_list
                             st.session_state['upload_folder'] = f"uploadFiles/{new_folder_name}"
                             st.session_state['selected_folder_name'] = f"{new_folder_name}"
                             st.session_state['selected_template_name'] = templatelist_init_value
