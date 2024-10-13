@@ -1149,12 +1149,12 @@ st.markdown(
 with st.expander("⚙️ 요청사항 및 기준일자 설정", expanded=st.session_state['check_setting']):
     if 'request_title' not in st.session_state:
         st.session_state['request_title'] = ""
-    request_title = st.text_input("제목 : '제목을 입력해주세요.", key=f"request_title")
+    request_title = st.text_input("제목 : '제목을 입력해주세요.", key="request_title_input")
     st.session_state['request_title'] = request_title
 
     if 'request_text' not in st.session_state:
         st.session_state['request_text'] = ""
-    request_text = st.text_area("요청 : '요청할 내용을 입력해주세요.", key=f"request_text")
+    request_text = st.text_area("요청 : '요청할 내용을 입력해주세요.", key="request_text_area")
     st.session_state['request_text'] = request_text
     
     if date_list:
