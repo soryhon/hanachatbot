@@ -51,7 +51,7 @@ if github_info_loaded:
             with col2:
                 # 폴더 존재 확인 및 생성
                 
-                folder_list = get_folder_list_from_github(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
+                folder_list = bd.get_folder_list_from_github(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
                 # st.selectbox bd.위젯 생성 (이제 session_state['selected_folder'] 사용 가능)
     
                 # 'selected_folder'가 folder_list에 있을 때만 index 설정
