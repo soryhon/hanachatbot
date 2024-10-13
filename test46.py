@@ -1079,11 +1079,11 @@ with st.expander("⚙️ 요청사항 및 기준일자 설정", expanded=st.sess
             if 'end_date_value' not in st.session_state:
                 st.session_state['end_date_value'] = today
             
-            end_date = st.date_input("📅 마지막일자 선택택", 
+            end_date = st.date_input("📅 마지막일자 선택", 
                 value=st.session_state['end_date_value'],
                 min_value=date_list[0],
                 max_value=today,
-                key="start_date"
+                key="end_date"
             )
             st.session_state['end_date_value'] = end_date
         # 버튼 추가
