@@ -228,7 +228,7 @@ with st.expander("⚙️ 요청사항 및 기준일자 설정", expanded=st.sess
         if st.button("설정", key="set_requests", use_container_width=True):
             # 설정 버튼 클릭 시 요청사항 리스트 초기화 및 새로운 요청사항 갯수 설정
             st.session_state['rows'] = [
-                {"제목": "", "요청": "", "파일": "", "데이터": "", "파일정보": "1"}
+                {"제목": "", "요청": "", "주소": ""}
                 for _ in range(st.session_state['num_requests'])
             ]
             st.success(f"{st.session_state['num_requests']}개의 요청사항이 설정되었습니다.")
