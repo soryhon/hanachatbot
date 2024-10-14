@@ -291,7 +291,7 @@ with st.expander("⚙️ 요청사항 및 기준일자 설정", expanded=st.sess
 # 요청사항 리스트
 with st.expander("✍️ 요청사항 리스트", expanded=st.session_state['check_request']):
     if 'rows' not in st.session_state:
-        st.session_state['rows'] = [{"제목": "", "요청": "", "주소": ""]
+        st.session_state['rows'] = [{"제목": "", "요청": "", "주소": ""}]
 
     rows = st.session_state['rows']
     checked_rows = []
