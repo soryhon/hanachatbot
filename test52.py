@@ -328,7 +328,7 @@ with col2:
         st.session_state['check_setting'] = False
         if not st.session_state.get("openai_api_key"):
             st.error("먼저 OpenAI API 키를 입력하고 저장하세요!")
-        elif not st.session_state['rows'] or all(not row["제목"] or not row["요청"] or not row["주소] for row in st.session_state['rows']):
+        elif not st.session_state['rows'] or all(not row["제목"] or not row["요청"] or not row["주소"] for row in st.session_state['rows']):
             st.error("요청사항의 제목, 요청, URL을 모두 입력해야 합니다!")
         else:
             with st.spinner('요청사항과 URL 동영상 파일의 데이터를를 추출 중입니다...'):
