@@ -307,9 +307,7 @@ with st.expander("✍️ 요청사항 리스트", expanded=st.session_state['che
             row['요청'] = st.text_area(f"요청 : '{idx+1}.요청사항'의 요청할 내용을 입력해주세요.", row['요청'], key=f"request_{idx}")
             row['파일'] = st.text_input(f"주소 : '{idx+1}.요청사항'의 동영상 URL를 입력해주세요.", row['파일'], key=f"url_{idx}")
             st.session_state['rows'][idx] = row
-            if st.session_state['rows'][idx]['파일'] != "" and bd.is_valid_url(st.session_state['rows'][idx]['파일']):
-                st.write("")
-            else:
+            if st.session_state['rows'][idx]['파일'] != "" and !bd.is_valid_url(st.session_state['rows'][idx]['파일']):
                 st.error("잘못된 URL 형식 입니다. 유효한 URL을 입력해야 분석을 실행할 수 있습니다.")
         
 # 8 프레임
