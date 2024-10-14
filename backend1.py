@@ -1194,4 +1194,16 @@ def is_valid_url(url):
     #URL이 유효한지 확인하는 함수
     return bool(url_pattern.match(url))
 
+def extract_transcript_from_youtube(video_url):
+    try:
+        # YouTube 영상 ID 추출
+        video_id = video_url.split('v=')[-1].split('&')[0]
+        
+        # YouTube 영상 자막 추출
+        transcript = YouTubeTranscriptApi.get_transcript(video_id)
+        return transcript
+    except Exception as e:
+        st.error(f"동영상 자막을 추출하는 데 실패했습니다: {str(e)}")
+        return None
+        
 # Backend 기능 구현 끝 ---
