@@ -335,10 +335,9 @@ with col2:
                 for idx, row in enumerate(st.session_state['rows']):
                     video_url = row['파일']
                     if video_url:
-                        transcript = extract_text_from_video_url(video_url)
+                        transcript = bd.extract_text_from_video_url(video_url)
                         if transcript:
-                            report_html +=  f"<h3>{idx + 1}. {row['제목']}</h3>\n"
-                            transcript = extract_text_from_video_url(video_url)
+                            report_html += f"<h3>{idx + 1}. {row['제목']}</h3>\n"
                             report_html += f"<div style='text-indent: 20px;'>{transcript}</div>\n"
                 st.session_state['html_report'] = report_html
                 time.sleep(1)  # 예를 들어, 5초 동안 로딩 상태 유지
