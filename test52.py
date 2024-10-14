@@ -228,7 +228,7 @@ with st.expander("⚙️ 요청사항 및 기준일자 설정", expanded=st.sess
         if st.button("설정", key="set_requests", use_container_width=True):
             # 설정 버튼 클릭 시 요청사항 리스트 초기화 및 새로운 요청사항 갯수 설정
             st.session_state['rows'] = [
-                {"제목": "", "요청": "", "주소": ""}
+                {"제목": "", "요청": "", "파일일": ""}
                 for _ in range(st.session_state['num_requests'])
             ]
             st.success(f"{st.session_state['num_requests']}개의 요청사항이 설정되었습니다.")
@@ -291,7 +291,7 @@ with st.expander("⚙️ 요청사항 및 기준일자 설정", expanded=st.sess
 # 요청사항 리스트
 with st.expander("✍️ 요청사항 리스트", expanded=st.session_state['check_request']):
     if 'rows' not in st.session_state:
-        st.session_state['rows'] = [{"제목": "", "요청": "", "주소": ""}]
+        st.session_state['rows'] = [{"제목": "", "요청": "", "파일": ""}]
 
     rows = st.session_state['rows']
     checked_rows = []
@@ -305,7 +305,7 @@ with st.expander("✍️ 요청사항 리스트", expanded=st.session_state['che
         
             row['제목'] = st.text_input(f"제목 : '{idx+1}.요청사항'의 제목을 입력해주세요.", row['제목'], key=f"title_{idx}")
             row['요청'] = st.text_area(f"요청 : '{idx+1}.요청사항'의 요청할 내용을 입력해주세요.", row['요청'], key=f"request_{idx}")
-            #row['주소'] = st.text_input(f"주소 : '{idx+1}.요청사항'의 동영상 URL를 입력해주세요.", row['주소'], key=f"url_{idx}")
+            row['파일'] = st.text_input(f"주소 : '{idx+1}.요청사항'의 동영상 URL를 입력해주세요.", row['파일일'], key=f"url_{idx}")
             
         
 # 8 프레임
@@ -331,7 +331,7 @@ with col2:
                 # 파일 데이터 가져와서 HTML 보고서 생성
                 report_html = ""
                 for idx, row in enumerate(st.session_state['rows']):
-                    video_url = row['주소']
+                    video_url = row['파일']
                     if video_url:
                         transcript = extract_text_from_video_url(video_url)
                         if transcript:
