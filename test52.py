@@ -305,7 +305,7 @@ with st.expander("✍️ 요청사항 리스트", expanded=st.session_state['che
         
             row['제목'] = st.text_input(f"제목 : '{idx+1}.요청사항'의 제목을 입력해주세요.", row['제목'], key=f"title_{idx}")
             row['요청'] = st.text_area(f"요청 : '{idx+1}.요청사항'의 요청할 내용을 입력해주세요.", row['요청'], key=f"request_{idx}")
-            row['파일'] = st.text_input(f"주소 : '{idx+1}.요청사항'의 동영상 URL를 입력해주세요.", row['파일일'], key=f"url_{idx}")
+            row['파일'] = st.text_input(f"주소 : '{idx+1}.요청사항'의 동영상 URL를 입력해주세요.", row['파일'], key=f"url_{idx}")
             
         
 # 8 프레임
