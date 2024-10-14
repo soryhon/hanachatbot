@@ -1183,4 +1183,15 @@ def run_llm_with_video_and_prompt(api_key, titles, requests, video_data_str):
 
     return responses
 
+# URL 패턴 검증을 위한 정규 표현식
+def is_valid_url(url):
+    url_pattern = re.compile(
+        r'^(https?:\/\/)'  # http 또는 https로 시작
+        r'((([A-Za-z]{1,})(\.[A-Za-z]{2,}))|([A-Za-z0-9.-]+\.[A-Za-z]{2,}))'  # 도메인 이름
+        r'(:\d+)?(\/[A-Za-z0-9#_\/.-]*)?'  # 포트번호, 경로, 앵커, 기타 정보
+        r'(\?[A-Za-z0-9=&]*)?$'  # 쿼리 파라미터
+    )
+    #URL이 유효한지 확인하는 함수
+    return bool(url_pattern.match(url))
+
 # Backend 기능 구현 끝 ---
