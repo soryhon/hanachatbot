@@ -99,4 +99,4 @@ pydub
 boto3
 plotly
 numpy
-
+youtube-transcript-api
