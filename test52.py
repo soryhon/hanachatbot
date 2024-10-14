@@ -198,53 +198,6 @@ st.markdown(
 
 # 5 프레임
 # 파일 업로드
-# 지원되는 파일 형식 리스트
-supported_file_types = ['xlsx', 'pptx', 'docx', 'csv', 'png', 'jpg', 'jpeg', 'pdf', 'txt', 'log']
-
-if github_info_loaded:
-    with st.expander("⬆️ 데이터 파일 업로드", expanded=st.session_state['check_upload']):
-        uploaded_files = st.file_uploader("파일을 여러 개 드래그 앤 드롭하여 업로드하세요. (최대 100MB)", accept_multiple_files=True)
-
-        if uploaded_files:
-            for uploaded_file in uploaded_files:
-                file_type = uploaded_file.name.split('.')[-1].lower()
-
-                if file_type not in supported_file_types:
-                    st.error(f"지원하지 않는 파일입니다: {uploaded_file.name}")
-                    continue
-
-                if uploaded_file.size > MAX_FILE_SIZE_BYTES:
-                    st.warning(f"'{uploaded_file.name}' 파일은 {MAX_FILE_SIZE_MB}MB 제한을 초과했습니다. 파일 크기를 줄이거나 GitHub에 직접 푸시하세요.")
-                else:
-                    file_content = uploaded_file.read()
-                    file_name = uploaded_file.name
-                    #folder_name = 'uploadFiles'
-                    folder_name = st.session_state.get('upload_folder', 'uploadFiles')
-
-                    sha = bd.get_file_sha(st.session_state['github_repo'], f"{folder_name}/{file_name}", st.session_state['github_token'], branch=st.session_state['github_branch'])
-
-                    if sha:
-                        st.warning(f"'{file_name}' 파일이 이미 존재합니다. 덮어쓰시겠습니까?")
-                        col1, col2 = st.columns(2)
-
-                        with col1:
-                            if st.button(f"'{file_name}' 덮어쓰기", key=f"overwrite_{file_name}"):
-                                bd.upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
-                                st.success(f"'{file_name}' 파일이 성공적으로 덮어쓰기 되었습니다.")
-                                uploaded_files = None
-                                break
-
-                        with col2:
-                            if st.button("취소", key=f"cancel_{file_name}"):
-                                st.info("덮어쓰기가 취소되었습니다.")
-                                uploaded_files = None
-                                break
-                    else:
-                        bd.upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'])
-                        st.success(f"'{file_name}' 파일이 성공적으로 업로드되었습니다.")
-                        uploaded_files = None
-else:
-    st.warning("GitHub 정보가 저장되기 전에는 파일 업로드를 할 수 없습니다. 먼저 GitHub 정보를 입력해 주세요.")
 
 # 6 프레임
 # 요청사항 갯수 및 기준일자 설정 
@@ -338,7 +291,7 @@ with st.expander("⚙️ 요청사항 및 기준일자 설정", expanded=st.sess
 # 요청사항 리스트
 with st.expander("✍️ 요청사항 리스트", expanded=st.session_state['check_request']):
     if 'rows' not in st.session_state:
-        st.session_state['rows'] = [{"제목": "", "요청": "", "파일": "", "데이터": "", "파일정보":"1"}]
+        st.session_state['rows'] = [{"제목": "", "요청": "", "주소": ""]
 
     rows = st.session_state['rows']
     checked_rows = []
@@ -357,37 +310,8 @@ with st.expander("✍️ 요청사항 리스트", expanded=st.session_state['che
         
             row['제목'] = st.text_input(f"제목 : '{idx+1}.요청사항'의 제목을 입력해주세요.", row['제목'], key=f"title_{idx}")
             row['요청'] = st.text_area(f"요청 : '{idx+1}.요청사항'의 요청할 내용을 입력해주세요.", row['요청'], key=f"request_{idx}")
-     
-            file_list = ['파일을 선택하세요.']
-            if st.session_state.get('github_token') and st.session_state.get('github_repo'):
-                file_list += bd.get_github_files(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
-
-            selected_file = st.selectbox(f"파일 선택 : '{idx+1}.요청사항'의 파일을 선택해주세요.", options=file_list, key=f"file_select_{idx}")
-
-            if selected_file != '파일을 선택하세요.':
-                st.session_state['rows'][idx]['파일'] = selected_file
-           
-                file_path = selected_file
-                file_content = bd.get_file_from_github(
-                    st.session_state["github_repo"], 
-                    st.session_state["github_branch"], 
-                    file_path, 
-                    st.session_state["github_token"]
-                )
-
-                if file_content:
-                    file_type = file_path.split('.')[-1].lower()
-                    
-                    # 파일 형식 검증 (지원되는 파일만 처리)
-                    if file_type not in supported_file_types:
-                        st.error(f"지원하지 않는 파일입니다: {file_path}")
-                        row['데이터'] = ""
-                    else:      
-                        bd.handle_file_selection(file_path, file_content, file_type, idx)
-                        
-                else:
-                    st.error(f"{selected_file} 파일을 GitHub에서 불러오지 못했습니다.")  
-            st.text_input(f"{idx+1}.요청사항 선택한 파일", row['파일'], disabled=True, key=f"file_{idx}")
+            row['주소'] = st.text_input(f"주소 : '{idx+1}.요청사항'의 동영상URL를 입력해주세요.", row['주소'], key=f"url_{idx}")
+            
         
 # 8 프레임
 # 보고서 작성 실행 버튼
@@ -404,40 +328,22 @@ with col2:
         st.session_state['check_setting'] = False
         if not st.session_state.get("openai_api_key"):
             st.error("먼저 OpenAI API 키를 입력하고 저장하세요!")
-        elif not st.session_state['rows'] or all(not row["제목"] or not row["요청"] or not row["파일"] for row in st.session_state['rows']):
-            st.error("요청사항의 제목, 요청, 파일을 모두 입력해야 합니다!")
+        elif not st.session_state['rows'] or all(not row["제목"] or not row["요청"] or not row["주소] for row in st.session_state['rows']):
+            st.error("요청사항의 제목, 요청, URL을 모두 입력해야 합니다!")
         else:
-            with st.spinner('요청사항과 파일 데이터을 추출 중입니다...'):
+            with st.spinner('요청사항과 URL 동영상 파일의 데이터를를 추출 중입니다...'):
         
                 # 파일 데이터 가져와서 HTML 보고서 생성
-                #file_data_list = []
-                html_viewer_data = ""
+                report_html = ""
                 for idx, row in enumerate(st.session_state['rows']):
-                    file_path = st.session_state['rows'][idx]['파일']
-                    file_content = bd.get_file_from_github(st.session_state["github_repo"], st.session_state["github_branch"], file_path, st.session_state["github_token"])
-                    file_type = file_path.split('.')[-1].lower()
-                    report_html = ""
-                    if file_content:
-                        if file_type == 'xlsx':
-                            selected_sheets = bd.parse_sheet_selection(row['파일정보'], len(openpyxl.load_workbook(file_content).sheetnames))
-                            file_data_dict = bd.extract_sheets_from_excel(file_content, selected_sheets)
-                            if file_data_dict is not None:
-                                # 제목 입력 값 가져오기
-                                report_html +=  f"<h3>{idx + 1}. {row['제목']}</h3>\n"
-                                for sheet_name, df in file_data_dict.items():
-                                    wb = openpyxl.load_workbook(file_content)
-                                    ws = wb[sheet_name]
-                                    html_data = bd.convert_df_to_html_with_styles_and_merging(ws, df)
-                                    report_html += f"<div style='text-indent: 20px;'>{html_data}</div>\n"
-    
-                        else:
-                            file_data = bd.extract_data_from_file(file_content, file_type)
-                            report_html += f"<h3>{idx + 1}. {row['제목']}</h3>\n<p>{file_data}</p>"
-                        if idx > 0 :
-                            report_html += "<p/>"
-                        html_viewer_data += report_html    
-                        #file_data_list.append(row['데이터'])
-                    st.session_state['html_report'] = html_viewer_data
+                    video_url = row['주소']
+                    if video_url:
+                        transcript = extract_text_from_video_url(video_url)
+                        if transcript:
+                            report_html +=  f"<h3>{idx + 1}. {row['제목']}</h3>\n"
+                            transcript = extract_text_from_video_url(video_url)
+                            report_html += f"<div style='text-indent: 20px;'>{transcript}</div>\n"
+                st.session_state['html_report'] = report_html
                 time.sleep(1)  # 예를 들어, 5초 동안 로딩 상태 유지
 
             with st.spinner('결과 보고서 작성 중입니다...'):
@@ -445,7 +351,7 @@ with col2:
                 titles = [row['제목'] for row in st.session_state['rows']]
                 requests = [row['요청'] for row in st.session_state['rows']]
         
-                responses = bd.run_llm_with_file_and_prompt(
+                responses = bd.run_llm_with_video_and_prompt(
                     st.session_state["openai_api_key"], 
                     titles, 
                     requests, 
