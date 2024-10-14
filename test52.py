@@ -333,8 +333,10 @@ with col2:
                 report_html = ""
                 for idx, row in enumerate(st.session_state['rows']):
                     video_url = row['파일']
+                    st.write(f{video_url})
                     if video_url:
                         transcript = bd.extract_text_from_video_url(video_url)
+                        st.write(f{transcript})
                         if transcript:
                             report_html += f"<h3>{idx + 1}. {row['제목']}</h3>\n"
                             report_html += f"<div style='text-indent: 20px;'>{transcript}</div>\n"
