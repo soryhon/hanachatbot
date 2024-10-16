@@ -1224,7 +1224,25 @@ def fetch_captions(video_url):
         print(f"Error: {str(e)}")
         return None
 
-
+def fetch_captions_with_ytdlp(video_url):
+    try:
+        ydl_opts = {
+            'writesubtitles': True,
+            'subtitleslangs': ['en'],  # 영어 자막
+            'skip_download': True  # 동영상 다운로드는 생략
+        }
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info_dict = ydl.extract_info(video_url, download=False)
+            subtitles = info_dict.get('subtitles')
+            if subtitles and 'en' in subtitles:
+                # 자막 URL에서 자막을 가져옴
+                subtitle_url = subtitles['en'][0]['url']
+                response = requests.get(subtitle_url)
+                return response.text
+            else:
+                return "이 동영상에는 영어 자막이 없습니다."
+    except Exception as e:
+        return f"동영상 자막을 추출하는 데 실패했습니다: {str(e)}"
 
 def fetch_korean_and_english_captions(video_url):
     try:
