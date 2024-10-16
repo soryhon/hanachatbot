@@ -1228,7 +1228,7 @@ def fetch_captions_with_ytdlp(video_url):
     try:
         ydl_opts = {
             'writesubtitles': True,
-            'subtitleslangs': ['en'],  # 영어 자막
+            'subtitleslangs': ['ko'],  # 영어 자막
             'skip_download': True  # 동영상 다운로드는 생략
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
