@@ -1271,7 +1271,7 @@ def extract_transcript_from_youtube(video_url):
     try:
         # YouTube 영상 ID 추출
         video_id = video_url.split('v=')[-1].split('&')[0]
-        
+        st.success(video_id)
         # 자막 추출 (한국어 자막을 우선적으로 시도)
         transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
         
