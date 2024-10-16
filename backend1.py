@@ -1268,67 +1268,13 @@ def fetch_korean_and_english_captions(video_url):
         #return f"자막을 가져오는 데 실패했습니다: {str(e)}", None
 # 유튜브 URL에서 자막을 추출하는 함수 (한국어와 영어)
 def extract_transcript_from_youtube(video_url):
-    try:
-        # YouTube 영상 ID 추출
-        video_id = video_url.split('v=')[-1].split('&')[0]
-        st.success(video_id)
-        # 자막 추출 (한국어 자막을 우선적으로 시도)
-        transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
-        
-        transcript_ko = None
-        transcript_en = None
+
+    transcript_ko = None
+    transcript_en = None
 
 
-        st.warning("자막 1")
-        if transcript_ko == None and transcript_ko == transcript_en:
-            ydl_opts = {
-                'writesubtitles': True,
-                'subtitleslangs': ['en', 'ko'],  # 영어와 한국어 자막
-                'skip_download': True,  # 동영상 다운로드 생략
-                'allsubtitles': True  # 모든 자막 가져오기
-            }
-            
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                info_dict = ydl.extract_info(video_url, download=False)
-                subtitles = info_dict.get('subtitles', {})
-                
-                # 영어 자막 URL
-                english_captions = None
-                if 'en' in subtitles:
-                    english_caption_url = subtitles['en'][0]['url']
-                    english_response = requests.get(english_caption_url)
-                    transcript_en = english_response.text
-        
-                # 한국어 자막 URL
-                korean_captions = None
-                if 'ko' in subtitles:
-                    korean_caption_url = subtitles['ko'][0]['url']
-                    korean_response = requests.get(korean_caption_url)
-                    transcript_ko = korean_response.text
-            st.warning("자막 2")
-        if transcript_ko == None and transcript_ko == transcript_en:
-            yt = YouTube(video_url)
-            captions = yt.captions.get_by_language_code('ko')  # 영어 자막 가져오기
-            transcript_ko =  captions.generate_srt_captions() if captions else None
-            captions_en = yt.captions.get_by_language_code('EN')  # 영어 자막 가져오기
-            transcript_en =  captions_en.generate_srt_captions() if captions else None
-            st.warning("자막 3")
-        
-        if transcript_ko == None and transcript_ko == transcript_en:
-            loader = YoutubeLoader.from_youtube_url(
-                url,
-                add_video_info=add_video_info,
-                language="ko",
-            )
-            transcript_ko =  loader.load()
-            loader = YoutubeLoader.from_youtube_url(
-                url,
-                add_video_info=add_video_info,
-                language="en",
-            )
-            transcript_en =  loader.load()
-            st.warning("자막 4")
-        return transcript_ko, transcript_en
+
+    return transcript_ko, transcript_en
 
     #except TranscriptsDisabled:
         #st.error("이 동영상은 자막이 비활성화되어 있습니다.")
