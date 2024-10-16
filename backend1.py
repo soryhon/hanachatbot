@@ -1287,7 +1287,7 @@ def extract_transcript_from_youtube(video_url):
         transcript_en = transcript_en.fetch()
   
         st.warning("자막 1")
-        if transcript_ko = None and transcript_ko == transcript_en:
+        if transcript_ko = None and transcript_ko = transcript_en:
             ydl_opts = {
                 'writesubtitles': True,
                 'subtitleslangs': ['en', 'ko'],  # 영어와 한국어 자막
