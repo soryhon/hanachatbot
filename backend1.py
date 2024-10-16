@@ -1217,7 +1217,7 @@ from pytube import YouTube
 def fetch_captions(video_url):
     try:
         yt = YouTube(video_url)
-        captions = yt.captions.get_by_language_code('en')  # 영어 자막 가져오기
+        captions = yt.captions.get_by_language_code('ko')  # 영어 자막 가져오기
         return captions.generate_srt_captions() if captions else None
     except Exception as e:
         print(f"Error: {str(e)}")
