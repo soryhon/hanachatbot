@@ -335,8 +335,8 @@ with col2:
                     video_url = row['파일']
                     st.write(f"{video_url}")
                     if video_url:
-                        #transcript = bd.extract_text_from_video_url(video_url)
-                        transcript = bd.fetch_captions_with_ytdlp(video_url)
+                        transcript = bd.extract_text_from_video_url(video_url)
+                        #transcript = bd.fetch_captions_with_ytdlp(video_url)
                         #transcript = bd.fetch_korean_and_english_captions(video_url)
                         #transcript = bd.extract_text_from_video_url(video_url)
                         #transcript = bd.extract_transcript_from_youtube(video_url)
