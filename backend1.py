@@ -30,6 +30,8 @@ from langchain.chat_models import ChatOpenAI
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 from youtube_transcript_api import YouTubeTranscriptApi
+from pytube import YouTube
+
 
 # Backend 기능 구현 시작 ---
 
@@ -1212,7 +1214,6 @@ def extract_text_from_video_url(url, language="ko", add_video_info=True):
         st.error(f"동영상 자막을 추출하는 데 실패했습니다: {str(e)}")
         return None
 
-from pytube import YouTube
 
 def fetch_captions(video_url):
     try:
