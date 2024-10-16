@@ -1280,10 +1280,10 @@ def extract_transcript_from_youtube(video_url):
 
         # 한국어 자막과 영어 자막을 각각 가져옴
    
-        transcript_ko = transcript_list.find_transcript(['ko'])
+        transcript_ko = transcript_list.find_transcript(["ko"])
         transcript_ko = transcript_ko.fetch()
 
-        transcript_en = transcript_list.find_transcript(['en'])
+        transcript_en = transcript_list.find_transcript(["en"])
         transcript_en = transcript_en.fetch()
   
         st.warning("자막 1")
