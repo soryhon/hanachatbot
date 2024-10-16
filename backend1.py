@@ -1278,16 +1278,7 @@ def extract_transcript_from_youtube(video_url):
         transcript_ko = None
         transcript_en = None
 
-        # 한국어 자막과 영어 자막을 각각 가져옴
-        try:
-            transcript_ko = transcript_list.find_transcript(["ko"])
-            transcript_ko = transcript_ko.fetch()
-    
-            transcript_en = transcript_list.find_transcript(["en"])
-            transcript_en = transcript_en.fetch()
-        except Exception as e:
-            transcript_ko = None
-            transcript_en = None
+
         st.warning("자막 1")
         if transcript_ko == None and transcript_ko == transcript_en:
             ydl_opts = {
