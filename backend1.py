@@ -29,9 +29,9 @@ from langchain.document_loaders import YoutubeLoader
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
-from pytube import YouTube
 import yt_dlp
-from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled
+from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled, NoTranscriptFound
+from pytube import YouTube
 
 # Backend 기능 구현 시작 ---
 
@@ -1189,33 +1189,7 @@ def is_valid_url(url):
     #URL이 유효한지 확인하는 함수
     return bool(url_pattern.match(url))
 
-def extract_transcript_from_youtube(video_url):
-    try:
-        # YouTube 영상 ID 추출
-        video_id = video_url.split('v=')[-1].split('&')[0]
-        
-        # YouTube 영상 자막 추출
-        transcript = YouTubeTranscriptApi.get_transcript(video_id, languages=['ko', 'en'])
-        return transcript
-    except TranscriptsDisabled as e:
-        st.error(f"해당 동영상에는 자막이 비활성화되어 있습니다: {str(e)}")
-        return None
-    except Exception as e:
-        st.error(f"동영상 자막을 추출하는 데 실패했습니다: {str(e)}")
-        return None
 
-def extract_text_from_transcript(transcript):
-    try:
-        # 텍스트만 추출하여 리스트로 저장
-        text_data = [item['text'] for item in transcript]
-        
-        # 텍스트를 하나의 문자열로 연결
-        combined_text = ' '.join(text_data)
-        
-        return combined_text
-    except Exception as e:
-        st.error(f"자막에서 텍스트를 추출하는 데 실패했습니다: {str(e)}")
-        return None
         
 # 주어진 동영상 URL에서 자막을 추출하여 반환하는 함수.
 def extract_text_from_video_url(url, language="ko", add_video_info=True):
@@ -1292,5 +1266,45 @@ def fetch_korean_and_english_captions(video_url):
 
     #except Exception as e:
         #return f"자막을 가져오는 데 실패했습니다: {str(e)}", None
+# 유튜브 URL에서 자막을 추출하는 함수 (한국어와 영어)
+def extract_transcript_from_youtube(video_url):
+    try:
+        # YouTube 영상 ID 추출
+        video_id = video_url.split('v=')[-1].split('&')[0]
+        
+        # 자막 추출 (한국어 자막을 우선적으로 시도)
+        transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+        
+        transcript_ko = None
+        transcript_en = None
+
+        # 한국어 자막과 영어 자막을 각각 가져옴
+        try:
+            transcript_ko = transcript_list.find_transcript(['ko'])
+            transcript_ko = transcript_ko.fetch()
+        except NoTranscriptFound:
+            st.warning("한국어 자막을 찾을 수 없습니다.")
+        
+        try:
+            transcript_en = transcript_list.find_transcript(['en'])
+            transcript_en = transcript_en.fetch()
+        except NoTranscriptFound:
+            st.warning("영어 자막을 찾을 수 없습니다.")
+
+        # 자막 데이터 추출
+        return transcript_ko, transcript_en
+
+    except TranscriptsDisabled:
+        st.error("이 동영상은 자막이 비활성화되어 있습니다.")
+    except Exception as e:
+        st.error(f"동영상 자막을 추출하는 데 실패했습니다: {str(e)}")
+    return None, None
+
+# 자막 텍스트만 추출하는 함수
+def extract_text_from_transcript(transcript):
+    if transcript:
+        return ' '.join([item['text'] for item in transcript])
+    return None
+    
 
 # Backend 기능 구현 끝 ---
