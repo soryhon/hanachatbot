@@ -1320,7 +1320,8 @@ def extract_transcript_from_youtube(video_url):
             captions_en = yt.captions.get_by_language_code('EN')  # 영어 자막 가져오기
             transcript_en =  captions_en.generate_srt_captions() if captions else None
             st.warning("자막 3")
-         if transcript_ko = None and transcript_ko == transcript_en:
+        
+        if transcript_ko = None and transcript_ko == transcript_en:
             loader = YoutubeLoader.from_youtube_url(
                 url,
                 add_video_info=add_video_info,
@@ -1340,7 +1341,7 @@ def extract_transcript_from_youtube(video_url):
         st.error("이 동영상은 자막이 비활성화되어 있습니다.")
     except Exception as e:
         st.error(f"동영상 자막을 추출하는 데 실패했습니다: {str(e)}")
-    return None, None
+        return None, None
 
 # 자막 텍스트만 추출하는 함수
 def extract_text_from_transcript(transcript):
