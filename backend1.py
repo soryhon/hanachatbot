@@ -1098,15 +1098,7 @@ def download_and_apply_font_from_github(github_repo, branch, fm, plt):
 
     return fm, plt
 
-# 주어진 동영상 URL에서 자막을 추출하여 반환하는 함수.
-def extract_text_from_video_url(video_url):
-    try:
-        loader = YoutubeLoader.from_youtube_url(video_url)
-        transcript = loader.load()
-        return transcript
-    except Exception as e:
-        st.error(f"동영상 자막을 추출하는 데 실패했습니다: {str(e)}")
-        return None
+
         
 # LLM을 통해 프롬프트와 파일을 전달하고 응답을 받는 함수
 def run_llm_with_video_and_prompt(api_key, titles, requests, video_data_str):
@@ -1206,5 +1198,14 @@ def extract_transcript_from_youtube(video_url):
     except Exception as e:
         st.error(f"동영상 자막을 추출하는 데 실패했습니다: {str(e)}")
         return None
+
+# 주어진 동영상 URL에서 자막을 추출하여 반환하는 함수.
+def extract_text_from_video_url(url, language="ko", add_video_info=True):
+    loader = YoutubeLoader.from_youtube_url(
+        url,
+        add_video_info=add_video_info,
+        language=language,
+    )
+    return loader.load()
         
 # Backend 기능 구현 끝 ---
