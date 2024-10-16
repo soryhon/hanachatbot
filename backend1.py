@@ -1224,25 +1224,34 @@ def fetch_captions(video_url):
         print(f"Error: {str(e)}")
         return None
 
-import yt_dlp
 
-def fetch_captions_with_ytdlp(video_url):
+def fetch_korean_and_english_captions(video_url):
     try:
         ydl_opts = {
             'writesubtitles': True,
-            'subtitleslangs': ['en'],  # 영어 자막
+            'subtitleslangs': ['en', 'ko'],  # 한국어와 영어 자막
             'skip_download': True  # 동영상 다운로드는 생략
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info_dict = ydl.extract_info(video_url, download=False)
-            subtitles = info_dict.get('subtitles')
-            if subtitles and 'en' in subtitles:
-                # 자막 URL에서 자막을 가져옴
-                subtitle_url = subtitles['en'][0]['url']
-                response = requests.get(subtitle_url)
-                return response.text
-            else:
-                return "이 동영상에는 영어 자막이 없습니다."
+            subtitles = info_dict.get('subtitles', {})
+
+            # 한국어 자막 확인
+            korean_captions = None
+            if 'ko' in subtitles:
+                korean_caption_url = subtitles['ko'][0]['url']
+                korean_response = requests.get(korean_caption_url)
+                korean_captions = korean_response.text
+
+            # 영어 자막 확인
+            english_captions = None
+            if 'en' in subtitles:
+                english_caption_url = subtitles['en'][0]['url']
+                english_response = requests.get(english_caption_url)
+                english_captions = english_response.text
+
+            # 자막 결과 반환
+            return korean_captions, english_captions
     except Exception as e:
-        return f"동영상 자막을 추출하는 데 실패했습니다: {str(e)}"
+        return f"동영상 자막을 추출하는 데 실패했습니다: {str(e)}", None
 # Backend 기능 구현 끝 ---
