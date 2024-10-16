@@ -1276,11 +1276,7 @@ def extract_transcript_from_youtube(video_url):
 
     return transcript_ko, transcript_en
 
-    #except TranscriptsDisabled:
-        #st.error("이 동영상은 자막이 비활성화되어 있습니다.")
-    except Exception as e:
-        st.error(f"동영상 자막을 추출하는 데 실패했습니다: {str(e)}")
-        return None, None
+
 
 # 자막 텍스트만 추출하는 함수
 def extract_text_from_transcript(transcript):
