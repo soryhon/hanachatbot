@@ -1285,7 +1285,7 @@ def extract_transcript_from_youtube(video_url):
     
             transcript_en = transcript_list.find_transcript(["en"])
             transcript_en = transcript_en.fetch()
-        except Exception as e
+        except Exception as e:
             transcript_ko = None
             transcript_en = None
         st.warning("자막 1")
