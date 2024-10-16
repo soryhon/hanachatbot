@@ -29,9 +29,9 @@ from langchain.document_loaders import YoutubeLoader
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
-from youtube_transcript_api import YouTubeTranscriptApi
 from pytube import YouTube
 import yt_dlp
+from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled
 
 # Backend 기능 구현 시작 ---
 
