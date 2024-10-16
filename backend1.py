@@ -1212,5 +1212,15 @@ def extract_text_from_video_url(url, language="ko", add_video_info=True):
         st.error(f"동영상 자막을 추출하는 데 실패했습니다: {str(e)}")
         return None
 
+from pytube import YouTube
+
+def fetch_captions(video_url):
+    try:
+        yt = YouTube(video_url)
+        captions = yt.captions.get_by_language_code('en')  # 영어 자막 가져오기
+        return captions.generate_srt_captions() if captions else None
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return None
             
 # Backend 기능 구현 끝 ---
