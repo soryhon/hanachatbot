@@ -1325,13 +1325,13 @@ def extract_transcript_from_youtube(video_url):
             loader = YoutubeLoader.from_youtube_url(
                 url,
                 add_video_info=add_video_info,
-                language="ko,
+                language="ko",
             )
             transcript_ko =  loader.load()
             loader = YoutubeLoader.from_youtube_url(
                 url,
                 add_video_info=add_video_info,
-                language="ko,
+                language="en",
             )
             transcript_en =  loader.load()
             st.warning("자막 4")
