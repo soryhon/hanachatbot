@@ -1290,8 +1290,54 @@ def extract_transcript_from_youtube(video_url):
             transcript_en = transcript_en.fetch()
         except NoTranscriptFound:
             st.warning("영어 자막을 찾을 수 없습니다.")
-
-        # 자막 데이터 추출
+        st.warning("자막 1")
+        if transcript_ko = None and transcript_ko == transcript_en:
+            ydl_opts = {
+                'writesubtitles': True,
+                'subtitleslangs': ['en', 'ko'],  # 영어와 한국어 자막
+                'skip_download': True,  # 동영상 다운로드 생략
+                'allsubtitles': True  # 모든 자막 가져오기
+            }
+            
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                info_dict = ydl.extract_info(video_url, download=False)
+                subtitles = info_dict.get('subtitles', {})
+                
+                # 영어 자막 URL
+                english_captions = None
+                if 'en' in subtitles:
+                    english_caption_url = subtitles['en'][0]['url']
+                    english_response = requests.get(english_caption_url)
+                    transcript_en = english_response.text
+        
+                # 한국어 자막 URL
+                korean_captions = None
+                if 'ko' in subtitles:
+                    korean_caption_url = subtitles['ko'][0]['url']
+                    korean_response = requests.get(korean_caption_url)
+                    transcript_ko = korean_response.text
+            st.warning("자막 2")
+        if transcript_ko = None and transcript_ko == transcript_en:
+            yt = YouTube(video_url)
+            captions = yt.captions.get_by_language_code('ko')  # 영어 자막 가져오기
+            transcript_ko =  captions.generate_srt_captions() if captions else None
+            captions_en = yt.captions.get_by_language_code('EN')  # 영어 자막 가져오기
+            transcript_en =  captions_en.generate_srt_captions() if captions else None
+            st.warning("자막 3")
+         if transcript_ko = None and transcript_ko == transcript_en:
+            loader = YoutubeLoader.from_youtube_url(
+                url,
+                add_video_info=add_video_info,
+                language="ko,
+            )
+            transcript_ko =  loader.load()
+            loader = YoutubeLoader.from_youtube_url(
+                url,
+                add_video_info=add_video_info,
+                language="ko,
+            )
+            transcript_en =  loader.load()
+            st.warning("자막 4")
         return transcript_ko, transcript_en
 
     except TranscriptsDisabled:
