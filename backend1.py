@@ -1201,11 +1201,16 @@ def extract_transcript_from_youtube(video_url):
 
 # 주어진 동영상 URL에서 자막을 추출하여 반환하는 함수.
 def extract_text_from_video_url(url, language="ko", add_video_info=True):
-    loader = YoutubeLoader.from_youtube_url(
-        url,
-        add_video_info=add_video_info,
-        language=language,
-    )
-    return loader.load()
-        
+    try:
+        loader = YoutubeLoader.from_youtube_url(
+            url,
+            add_video_info=add_video_info,
+            language=language,
+        )
+        return loader.load()
+    except Exception as e:
+        st.error(f"동영상 자막을 추출하는 데 실패했습니다: {str(e)}")
+        return None
+
+            
 # Backend 기능 구현 끝 ---
