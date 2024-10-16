@@ -1195,10 +1195,10 @@ def extract_transcript_from_youtube(video_url):
         video_id = video_url.split('v=')[-1].split('&')[0]
         
         # YouTube 영상 자막 추출
-        transcript = YouTubeTranscriptApi.get_transcript(video_id)
+        transcript = YouTubeTranscriptApi.get_transcript(video_id, languages=['ko', 'en'])
         return transcript
-    except YouTubeTranscriptApi.CouldNotRetrieveTranscript as e:
-        st.error(f"해당 동영상에는 자막이 활성화되어 있지 않습니다: {str(e)}")
+    except TranscriptsDisabled as e:
+        st.error(f"해당 동영상에는 자막이 비활성화되어 있습니다: {str(e)}")
         return None
     except Exception as e:
         st.error(f"동영상 자막을 추출하는 데 실패했습니다: {str(e)}")
