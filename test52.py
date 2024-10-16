@@ -336,6 +336,7 @@ with col2:
                     st.write(f"{video_url}")
                     if video_url:
                         transcript = bd.extract_text_from_video_url(video_url)
+                        #transcript = bd.extract_text_from_video_url(video_url)
                         #transcript = bd.extract_transcript_from_youtube(video_url)
                         st.write(f"{transcript}")
                         if transcript:
