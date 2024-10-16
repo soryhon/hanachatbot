@@ -102,3 +102,4 @@ numpy
 youtube-transcript-api
 pytube
 git+https://github.com/pytube/pytube
+yt-dlp
