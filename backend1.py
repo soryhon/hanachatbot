@@ -1190,99 +1190,28 @@ def is_valid_url(url):
     return bool(url_pattern.match(url))
 
 
-        
-# 주어진 동영상 URL에서 자막을 추출하여 반환하는 함수.
-def extract_text_from_video_url(url, language="ko", add_video_info=True):
-    try:
-        loader = YoutubeLoader.from_youtube_url(
-            url,
-            add_video_info=add_video_info,
-            language=language,
-        )
-        return loader.load()
-    except Exception as e:
-        st.error(f"동영상 자막을 추출하는 데 실패했습니다: {str(e)}")
+# Whisper API를 통해 음성 파일에서 텍스트 추출하는 함수
+def extract_text_from_audio_to_whisper(file_content, file_type):
+    # Whisper API에서 지원하는 확장자
+    supported_audio_types = ['mp3', 'wav', 'm4a', 'mp4', 'mpeg', 'webm', 'ogg', 'aac', 'flac']
+
+    if file_type not in supported_audio_types:
+        st.error(f"{file_type} 형식은 Whisper API에서 지원되지 않습니다.")
         return None
 
-
-def fetch_captions(video_url):
     try:
-        yt = YouTube(video_url)
-        captions = yt.captions.get_by_language_code('ko')  # 영어 자막 가져오기
-        return captions.generate_srt_captions() if captions else None
+        # Whisper API 요청
+        openai.api_key = st.session_state["openai_api_key"]
+        audio_data = file_content.read()  # Bytes 형태의 파일 데이터를 Whisper API로 전달
+        response = openai.Audio.transcribe("whisper-1", audio_data)
+
+        # 추출된 텍스트 반환
+        return response['text']
+
     except Exception as e:
-        print(f"Error: {str(e)}")
+        st.error(f"Whisper API를 통해 음성 파일에서 텍스트를 추출하는 중 오류가 발생했습니다: {str(e)}")
         return None
 
-def fetch_captions_with_ytdlp(video_url):
-    try:
-        ydl_opts = {
-            'writesubtitles': True,
-            'subtitleslangs': ['ko'],  # 영어 자막
-            'skip_download': True  # 동영상 다운로드는 생략
-        }
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info_dict = ydl.extract_info(video_url, download=False)
-            subtitles = info_dict.get('subtitles')
-            if subtitles and 'en' in subtitles:
-                # 자막 URL에서 자막을 가져옴
-                subtitle_url = subtitles['en'][0]['url']
-                response = requests.get(subtitle_url)
-                return response.text
-            else:
-                return "이 동영상에는 영어 자막이 없습니다."
-    except Exception as e:
-        return f"동영상 자막을 추출하는 데 실패했습니다: {str(e)}"
-
-def fetch_korean_and_english_captions(video_url):
-    #try:
-    ydl_opts = {
-        'writesubtitles': True,
-        'subtitleslangs': ['en', 'ko'],  # 영어와 한국어 자막
-        'skip_download': True,  # 동영상 다운로드 생략
-        'allsubtitles': True  # 모든 자막 가져오기
-    }
-    
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        info_dict = ydl.extract_info(video_url, download=False)
-        subtitles = info_dict.get('subtitles', {})
-        
-        # 영어 자막 URL
-        english_captions = None
-        if 'en' in subtitles:
-            english_caption_url = subtitles['en'][0]['url']
-            english_response = requests.get(english_caption_url)
-            english_captions = english_response.text
-
-        # 한국어 자막 URL
-        korean_captions = None
-        if 'ko' in subtitles:
-            korean_caption_url = subtitles['ko'][0]['url']
-            korean_response = requests.get(korean_caption_url)
-            korean_captions = korean_response.text
-
-        # 자막 결과 반환
-        return korean_captions, english_captions
-
-    #except Exception as e:
-        #return f"자막을 가져오는 데 실패했습니다: {str(e)}", None
-# 유튜브 URL에서 자막을 추출하는 함수 (한국어와 영어)
-def extract_transcript_from_youtube(video_url):
-
-    transcript_ko = None
-    transcript_en = None
-
-
-
-    return transcript_ko, transcript_en
-
-
-
-# 자막 텍스트만 추출하는 함수
-def extract_text_from_transcript(transcript):
-    if transcript:
-        return ' '.join([item['text'] for item in transcript])
-    return None
     
 
 # Backend 기능 구현 끝 ---
