@@ -31,7 +31,7 @@ from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 from youtube_transcript_api import YouTubeTranscriptApi
 from pytube import YouTube
-
+import yt_dlp
 
 # Backend 기능 구현 시작 ---
 
