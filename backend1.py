@@ -1287,7 +1287,7 @@ def extract_transcript_from_youtube(video_url):
         transcript_en = transcript_en.fetch()
   
         st.warning("자막 1")
-        if transcript_ko = None and transcript_ko = transcript_en:
+        if transcript_ko == None and transcript_ko == transcript_en:
             ydl_opts = {
                 'writesubtitles': True,
                 'subtitleslangs': ['en', 'ko'],  # 영어와 한국어 자막
@@ -1313,7 +1313,7 @@ def extract_transcript_from_youtube(video_url):
                     korean_response = requests.get(korean_caption_url)
                     transcript_ko = korean_response.text
             st.warning("자막 2")
-        if transcript_ko = None and transcript_ko == transcript_en:
+        if transcript_ko == None and transcript_ko == transcript_en:
             yt = YouTube(video_url)
             captions = yt.captions.get_by_language_code('ko')  # 영어 자막 가져오기
             transcript_ko =  captions.generate_srt_captions() if captions else None
@@ -1321,7 +1321,7 @@ def extract_transcript_from_youtube(video_url):
             transcript_en =  captions_en.generate_srt_captions() if captions else None
             st.warning("자막 3")
         
-        if transcript_ko = None and transcript_ko == transcript_en:
+        if transcript_ko == None and transcript_ko == transcript_en:
             loader = YoutubeLoader.from_youtube_url(
                 url,
                 add_video_info=add_video_info,
