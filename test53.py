@@ -385,7 +385,7 @@ with st.expander("✍️ 요청사항 리스트", expanded=st.session_state['che
                     else:      
                         #bd.handle_file_selection(file_path, file_content, file_type, idx)
                         #row['데이터'] = bd.extract_text_from_audio_to_whisper(file_content, file_type)
-                        row['데이터'] = bd.extract_text_from_audio(file_content, file_type)
+                        row['데이터'] = bd.extract_text_from_audio(file_content, file_type, file_path)
                
                         st.write(f"{row['데이터']}")
                 else:
