@@ -199,7 +199,7 @@ st.markdown(
 # 5 프레임
 # 파일 업로드
 # 지원되는 파일 형식 리스트
-supported_file_types = ['xlsx', 'pptx', 'docx', 'csv', 'png', 'jpg', 'jpeg', 'pdf', 'txt', 'log']
+supported_file_types = ['xlsx', 'pptx', 'docx', 'csv', 'png', 'jpg', 'jpeg', 'pdf', 'txt', 'log', 'mp3', 'wav', 'm4a', 'mp4', 'mpeg', 'webm', 'ogg', 'aac', 'flac']
 
 if github_info_loaded:
     with st.expander("⬆️ 데이터 파일 업로드", expanded=st.session_state['check_upload']):
