@@ -1193,7 +1193,7 @@ def is_valid_url(url):
 # Whisper API를 통해 음성 파일에서 텍스트 추출하는 함수
 def extract_text_from_audio_to_whisper(file_content, file_type):
     # Whisper API에서 지원하는 확장자
-    supported_audio_types = ['mp3', 'wav', 'm4a', 'mp4', 'mpeg', 'webm', 'ogg', 'aac', 'flac']
+    supported_audio_types = ['flac', 'm4a', 'mp3', 'mp4', 'mpeg', 'mpga', 'oga', 'ogg', 'wav', 'webm']
 
     if file_type not in supported_audio_types:
         st.error(f"{file_type} 형식은 Whisper API에서 지원되지 않습니다.")
