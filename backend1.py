@@ -1289,7 +1289,7 @@ def convert_m4a_to_wav_from_install(file_content):
         wav_path = temp_wav_file.name
         
         # ffmpeg을 사용하여 m4a -> wav 변환
-        command = ['/tmp/ffmpeg', '-i', m4a_path, wav_path]
+        command = ['/usr/bin/ffmpeg', '-i', m4a_path, wav_path]
         subprocess.run(command, check=True)
 
         # 변환된 wav 파일 열기
@@ -1393,8 +1393,8 @@ def extract_text_from_audio(file_content, file_type):
     if file_type == 'm4a':
         st.write("m4a 파일을 변환 중입니다...")
         #file_content = convert_m4a_to_wav(file_content)
-        file_content = convert_m4a_to_mp3(file_content)
-        #file_content = convert_m4a_to_wav_from_install(file_content)
+        #file_content = convert_m4a_to_mp3(file_content)
+        file_content = convert_m4a_to_wav_from_install(file_content)
         if file_content is None:
             st.write("m4a 파일을 None")
             return None
