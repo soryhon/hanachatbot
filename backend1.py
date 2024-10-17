@@ -1213,21 +1213,14 @@ def extract_text_from_audio_to_whisper(file_content, file_type):
         # Whisper API 요청
         openai.api_key = st.session_state["openai_api_key"]
 
-        # 임시 파일 생성 (영문 및 숫자로 된 파일명 사용)
-        with tempfile.NamedTemporaryFile(suffix=f".{file_type}", delete=False) as temp_file:
+        # 파일을 BytesIO로 읽어오고 Whisper API에 전달 (파일 이름 포함)
+        with tempfile.NamedTemporaryFile(suffix=f".{file_type}") as temp_file:
             temp_file.write(file_content.read())  # Bytes 형태의 파일 데이터를 임시 파일로 작성
             temp_file.flush()  # 디스크에 저장
-            temp_file_name = temp_file.name  # 임시 파일 경로 저장
 
-        # 로그로 파일 정보를 출력해 파일 처리 상황을 확인
-        st.write(f"임시 파일 생성 완료: {temp_file_name}, 크기: {os.path.getsize(temp_file_name)} bytes")
-
-        # Whisper API로 임시 파일 경로를 전달하여 음성 파일의 텍스트 추출
-        with open(temp_file_name, 'rb') as audio_file:
-            response = openai.Audio.transcribe("whisper-1", audio_file)
-
-        # 임시 파일 삭제
-        os.remove(temp_file_name)
+            # Whisper API로 임시 파일 경로를 전달하여 음성 파일의 텍스트 추출
+            with open(temp_file.name, 'rb') as audio_file:
+                response = openai.Audio.transcribe("whisper-1", audio_file)
 
         # 추출된 텍스트 반환
         return response['text']
