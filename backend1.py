@@ -1318,8 +1318,9 @@ def convert_m4a_to_wav(file_content, file_path):
         # 변환된 wav 파일 경로
         temp_wav_file = tempfile.NamedTemporaryFile(suffix=".wav", delete=False)
         wav_path = temp_wav_file.name
-        st.write(f"m4a_path : {m4a_path}")
-        st.write(f"wav_path : {wav_path}")
+        #st.write(f"m4a_path : {m4a_path}")
+        #st.write(f"wav_path : {wav_path}")
+        
         # ffmpeg을 사용하여 m4a -> wav 변환
         command = ['ffmpeg', '-i', m4a_path, wav_path]
         subprocess.run(command, check=True)
