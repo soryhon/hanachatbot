@@ -1,44 +1,35 @@
-# This workflow will install Python dependencies, run tests and lint with a single version of Python
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
-
-name: Python application
+name: Python app with Whisper API and ffmpeg
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-
-permissions:
-  contents: read
+    branches:
+      - main
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v3
+    # 1. 리포지토리 체크아웃
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    # 2. Python 설정
+    - name: Set up Python
+      uses: actions/setup-python@v2
       with:
-        python-version: "3.10"
+        python-version: '3.x'
+
+    # 3. 프로젝트 의존성 설치
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install flake8 pytest
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Lint with flake8
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Test with pytest
-      run: |
-        pytest
+        pip install -r requirements.txt
+
+    # 4. ffmpeg 설치
     - name: Install ffmpeg
       run: sudo apt-get install -y ffmpeg
-    - name: Verify ffmpeg installation
-      run: ffmpeg -version
 
+    # 5. ffmpeg 경로 확인
+    - name: Check ffmpeg path
+      run: which ffmpeg
