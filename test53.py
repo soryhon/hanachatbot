@@ -333,7 +333,7 @@ with st.expander("⚙️ 요청사항 및 기준일자 설정", expanded=st.sess
             "<p style='font-size:14px; font-weight:normal; color:#444444; margin-top:35px;text-align:left;'>✔️ 보고서 저장을 위해 기준일자를 설정해주세요.</p>",
             unsafe_allow_html=True
         )
-
+ffmpeg_path = bd.install_ffmpeg()
 # 7 프레임임
 # 요청사항 리스트
 with st.expander("✍️ 요청사항 리스트", expanded=st.session_state['check_request']):
@@ -384,7 +384,9 @@ with st.expander("✍️ 요청사항 리스트", expanded=st.session_state['che
                         row['데이터'] = ""
                     else:      
                         #bd.handle_file_selection(file_path, file_content, file_type, idx)
-                        row['데이터'] = bd. extract_text_from_audio_to_whisper(file_content, file_type)
+                        #row['데이터'] = bd.extract_text_from_audio_to_whisper(file_content, file_type)
+                        row['데이터'] = bd.extract_text_from_audio(file_content, file_type)
+               
                         st.write(f"{row['데이터']}")
                 else:
                     st.error(f"{selected_file} 파일을 GitHub에서 불러오지 못했습니다.")  
