@@ -1217,32 +1217,32 @@ def extract_text_from_audio_to_whisper(file_content, file_type):
         return None
     file_content.seek(0)  # 다시 파일 포인터를 처음으로 이동
 
-    try:
-        # Whisper API 요청
-        openai.api_key = st.session_state["openai_api_key"]
+    #try:
+    # Whisper API 요청
+    openai.api_key = st.session_state["openai_api_key"]
 
-        # 임시 파일 생성 (영문 및 숫자로 된 파일명 사용)
-        with tempfile.NamedTemporaryFile(suffix=f".{file_type}", delete=False) as temp_file:
-            temp_file.write(file_content.read())  # Bytes 형태의 파일 데이터를 임시 파일로 작성
-            temp_file.flush()  # 디스크에 저장
-            temp_file_name = temp_file.name  # 임시 파일 경로 저장
+    # 임시 파일 생성 (영문 및 숫자로 된 파일명 사용)
+    with tempfile.NamedTemporaryFile(suffix=f".{file_type}", delete=False) as temp_file:
+        temp_file.write(file_content.read())  # Bytes 형태의 파일 데이터를 임시 파일로 작성
+        temp_file.flush()  # 디스크에 저장
+        temp_file_name = temp_file.name  # 임시 파일 경로 저장
 
-        # 로그로 파일 정보를 출력해 파일 처리 상황을 확인
-        st.write(f"임시 파일 생성 완료: {temp_file_name}, 크기: {os.path.getsize(temp_file_name)} bytes")
+    # 로그로 파일 정보를 출력해 파일 처리 상황을 확인
+    st.write(f"임시 파일 생성 완료: {temp_file_name}, 크기: {os.path.getsize(temp_file_name)} bytes")
 
-        # Whisper API로 임시 파일 경로를 전달하여 음성 파일의 텍스트 추출
-        with open(temp_file_name, 'rb') as audio_file:
-            response = openai.Audio.transcribe("whisper-1", audio_file)
+    # Whisper API로 임시 파일 경로를 전달하여 음성 파일의 텍스트 추출
+    with open(temp_file_name, 'rb') as audio_file:
+        response = openai.Audio.transcribe("whisper-1", audio_file)
 
-        # 임시 파일 삭제
-        os.remove(temp_file_name)
+    # 임시 파일 삭제
+    os.remove(temp_file_name)
 
-        # 추출된 텍스트 반환
-        return response['text']
+    # 추출된 텍스트 반환
+    return response['text']
 
-    except Exception as e:
-        st.error(f"Whisper API를 통해 음성 파일에서 텍스트를 추출하는 중 오류가 발생했습니다: {str(e)}")
-        return None
+    #except Exception as e:
+        #st.error(f"Whisper API를 통해 음성 파일에서 텍스트를 추출하는 중 오류가 발생했습니다: {str(e)}")
+        #return None
 
     
 
