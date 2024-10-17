@@ -1304,15 +1304,29 @@ def convert_m4a_to_wav_from_install(file_content):
 # m4a 파일을 wav로 변환하는 함수 (ffmpeg 사용)
 def convert_m4a_to_wav(file_path):
     try:
+        # 임시 m4a 파일 생성
+        with tempfile.NamedTemporaryFile(suffix=".m4a", delete=False) as temp_m4a_file:
+            temp_m4a_file.write(file_content.read())  # BytesIO 객체의 내용을 임시 파일로 저장
+            temp_m4a_file.flush()
+            m4a_path = temp_m4a_file.name
+
         # 변환된 wav 파일 경로
-        wav_path = tempfile.mktemp(suffix=".wav")
+        temp_wav_file = tempfile.NamedTemporaryFile(suffix=".wav", delete=False)
+        wav_path = temp_wav_file.name
 
         # ffmpeg을 사용하여 m4a -> wav 변환
-        command = ['ffmpeg', '-i', file_path, wav_path]
+        command = ['ffmpeg', '-i', m4a_path, wav_path]
         subprocess.run(command, check=True)
-        st.success("m4a 파일을 wav로 변환 완료")
-        # 변환된 wav 파일 경로 반환
-        return wav_path
+
+        # 변환된 wav 파일 열기
+        with open(wav_path, 'rb') as wav_file:
+            wav_content = wav_file.read()
+
+        # 임시 파일 삭제
+        os.remove(m4a_path)
+        os.remove(wav_path)
+
+        return BytesIO(wav_content)  # 변환된 wav 파일을 다시 BytesIO 객체로 반환
 
     except Exception as e:
         st.error(f"m4a 파일을 wav로 변환하는 중 오류가 발생했습니다: {str(e)}")
