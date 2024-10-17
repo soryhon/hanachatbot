@@ -1265,7 +1265,7 @@ def install_ffmpeg():
     ffmpeg_path = os.path.join(os.getcwd(), ffmpeg_dir, "ffmpeg")
     st.write(f"{ffmpeg_path}")    
     
-    os.chmod(ffmpeg_path, 0o755)  # 실행 권한 부여
+   # os.chmod(ffmpeg_path, 0o755)  # 실행 권한 부여
     os.environ["PATH"] += os.pathsep + ffmpeg_path
     st.write(f"ffmpeg 설치 완료! 경로: {ffmpeg_path}")
     return ffmpeg_path
