@@ -1289,7 +1289,7 @@ def convert_m4a_to_wav_from_install(file_content):
         wav_path = temp_wav_file.name
         
         # ffmpeg을 사용하여 m4a -> wav 변환
-        command = [ffmpeg_path, '-i', m4a_path, wav_path]
+        command = ['ffmpeg', '-i', m4a_path, wav_path]
         subprocess.run(command, check=True)
 
         # 변환된 wav 파일 열기
@@ -1307,7 +1307,7 @@ def convert_m4a_to_wav_from_install(file_content):
         return None
 
 # m4a 파일을 wav로 변환하는 함수 (ffmpeg 사용)
-def convert_m4a_to_wav(file_content, file_path):
+def convert_m4a_to_wav(file_content):
     try:
         # 임시 m4a 파일 생성
         with tempfile.NamedTemporaryFile(suffix=".m4a", delete=False) as temp_m4a_file:
@@ -1340,7 +1340,7 @@ def convert_m4a_to_wav(file_content, file_path):
         return None
 
 # m4a 파일을 wav로 변환하는 함수 (ffmpeg 사용)
-def convert_m4a_to_mp3(file_content, file_path):
+def convert_m4a_to_mp3(file_content):
     try:
         # 임시 m4a 파일 생성
         with tempfile.NamedTemporaryFile(suffix=".m4a", delete=False) as temp_m4a_file:
@@ -1351,7 +1351,7 @@ def convert_m4a_to_mp3(file_content, file_path):
         # 변환된 wav 파일 경로
         temp_wav_file = tempfile.NamedTemporaryFile(suffix=".mp3", delete=False)
         mp3_path = temp_wav_file.name
-        st.write(f"file_path : {file_path}")
+  
         st.write(f"m4a_path : {m4a_path}")
         st.write(f"wav_path : {mp3_path}")
         
@@ -1374,7 +1374,7 @@ def convert_m4a_to_mp3(file_content, file_path):
         return None
         
 # Whisper API를 통해 음성 파일에서 텍스트를 추출하는 함수
-def extract_text_from_audio(file_content, file_type, file_path):
+def extract_text_from_audio(file_content, file_type):
     # Whisper API에서 지원하는 확장자
     supported_audio_types = ['flac', 'm4a', 'mp3', 'mp4', 'mpeg', 'mpga', 'oga', 'ogg', 'wav', 'webm']
 
@@ -1392,9 +1392,9 @@ def extract_text_from_audio(file_content, file_type, file_path):
 
     if file_type == 'm4a':
         st.write("m4a 파일을 변환 중입니다...")
-        #file_content = convert_m4a_to_wav(file_content, file_path)
-        file_content = convert_m4a_to_mp3(file_content, file_path)
-        #file_content = convert_m4a_to_wav_from_install(file_content)
+        #file_content = convert_m4a_to_wav(file_content)
+        #file_content = convert_m4a_to_mp3(file_content)
+        file_content = convert_m4a_to_wav_from_install(file_content)
         if file_content is None:
             st.write("m4a 파일을 None")
             return None
