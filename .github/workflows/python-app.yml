@@ -39,5 +39,7 @@ jobs:
         pytest
     - name: Install ffmpeg
       run: sudo apt-get install ffmpeg
+    - name: Verify ffmpeg installation
+      run: ffmpeg -version
     - name: Run Python script
       run: python test53.py
