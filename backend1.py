@@ -1305,17 +1305,17 @@ def convert_m4a_to_wav_from_install(file_content):
 def convert_m4a_to_wav(file_path):
     try:
         # 변환된 wav 파일 경로
-        wav_path = tempfile.mktemp(suffix=".wav")
+        wav_path = tempfile.mktemp(suffix=".mp3")
 
         # ffmpeg을 사용하여 m4a -> wav 변환
         command = ['ffmpeg', '-i', file_path, wav_path]
         subprocess.run(command, check=True)
-
+        st.success("m4a 파일을 wav로 변환 완료")
         # 변환된 wav 파일 경로 반환
         return wav_path
 
     except Exception as e:
-        print(f"m4a 파일을 wav로 변환하는 중 오류가 발생했습니다: {str(e)}")
+        st.error(f"m4a 파일을 wav로 변환하는 중 오류가 발생했습니다: {str(e)}")
         return None
         
 # Whisper API를 통해 음성 파일에서 텍스트를 추출하는 함수
