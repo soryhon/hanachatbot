@@ -1199,13 +1199,23 @@ def extract_text_from_audio_to_whisper(file_content, file_type):
         st.error(f"{file_type} 형식은 Whisper API에서 지원되지 않습니다.")
         return None
 
-     # 파일 크기 확인 (Whisper API 최대 파일 크기: 25MB)
+# 파일 크기 확인 (Whisper API 최대 파일 크기: 25MB)
     MAX_FILE_SIZE_BYTES = 26214400
     file_size = len(file_content.read())
 
     if file_size > MAX_FILE_SIZE_BYTES:
         st.error(f"파일 크기가 너무 큽니다. Whisper API의 최대 파일 크기 제한은 25MB입니다. 현재 파일 크기: {file_size / (1024 * 1024):.2f}MB")
         return None
+
+# 파일 크기 확인 (Whisper API 최대 파일 크기: 25MB)
+    MAX_FILE_SIZE_BYTES = 26214400
+    file_content.seek(0, os.SEEK_END)  # 파일 크기 확인 전, 파일 포인터를 끝으로 이동
+    file_size = file_content.tell()
+
+    if file_size > MAX_FILE_SIZE_BYTES:
+        st.error(f"파일 크기가 너무 큽니다. Whisper API의 최대 파일 크기 제한은 25MB입니다. 현재 파일 크기: {file_size / (1024 * 1024):.2f}MB")
+        return None
+    file_content.seek(0)  # 다시 파일 포인터를 처음으로 이동
 
     try:
         # Whisper API 요청
@@ -1216,6 +1226,9 @@ def extract_text_from_audio_to_whisper(file_content, file_type):
             temp_file.write(file_content.read())  # Bytes 형태의 파일 데이터를 임시 파일로 작성
             temp_file.flush()  # 디스크에 저장
             temp_file_name = temp_file.name  # 임시 파일 경로 저장
+
+        # 로그로 파일 정보를 출력해 파일 처리 상황을 확인
+        st.write(f"임시 파일 생성 완료: {temp_file_name}, 크기: {os.path.getsize(temp_file_name)} bytes")
 
         # Whisper API로 임시 파일 경로를 전달하여 음성 파일의 텍스트 추출
         with open(temp_file_name, 'rb') as audio_file:
