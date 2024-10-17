@@ -1302,7 +1302,7 @@ def convert_m4a_to_wav_from_install(file_content):
         return None
 
 # m4a 파일을 wav로 변환하는 함수 (ffmpeg 사용)
-def convert_m4a_to_wav(file_path):
+def convert_m4a_to_wav(file_content):
     try:
         # 임시 m4a 파일 생성
         with tempfile.NamedTemporaryFile(suffix=".m4a", delete=False) as temp_m4a_file:
