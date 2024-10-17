@@ -1269,7 +1269,7 @@ def install_ffmpeg():
 #ffmpeg_path = install_ffmpeg()
 
 # m4a 파일을 wav로 변환하는 함수 (ffmpeg 사용)
-def convert_m4a_to_wav(file_content):
+def convert_m4a_to_wav_form_install(file_content):
     try:
         # ffmpeg 설치
         ffmpeg_path = install_ffmpeg()
@@ -1301,6 +1301,23 @@ def convert_m4a_to_wav(file_content):
         st.error(f"m4a 파일을 wav로 변환하는 중 오류가 발생했습니다: {str(e)}")
         return None
 
+# m4a 파일을 wav로 변환하는 함수 (ffmpeg 사용)
+def convert_m4a_to_wav(file_path):
+    try:
+        # 변환된 wav 파일 경로
+        wav_path = tempfile.mktemp(suffix=".wav")
+
+        # ffmpeg을 사용하여 m4a -> wav 변환
+        command = ['ffmpeg', '-i', file_path, wav_path]
+        subprocess.run(command, check=True)
+
+        # 변환된 wav 파일 경로 반환
+        return wav_path
+
+    except Exception as e:
+        print(f"m4a 파일을 wav로 변환하는 중 오류가 발생했습니다: {str(e)}")
+        return None
+        
 # Whisper API를 통해 음성 파일에서 텍스트를 추출하는 함수
 def extract_text_from_audio(file_content, file_type):
     # Whisper API에서 지원하는 확장자
