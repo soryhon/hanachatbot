@@ -1336,8 +1336,8 @@ def extract_text_from_audio(file_content, file_type):
     # m4a 파일은 wav로 변환
     if file_type == 'm4a':
         st.write("m4a 파일을 변환 중입니다...")
-        file_content = convert_m4a_to_wav(file_content)
-        #file_content = convert_m4a_to_wav_from_install(file_content)
+        #file_content = convert_m4a_to_wav(file_content)
+        file_content = convert_m4a_to_wav_from_install(file_content)
         if file_content is None:
             st.write("m4a 파일을 None")
             return None
