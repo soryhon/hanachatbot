@@ -1196,18 +1196,10 @@ def extract_text_from_audio_to_whisper(file_content, file_type):
     supported_audio_types = ['flac', 'm4a', 'mp3', 'mp4', 'mpeg', 'mpga', 'oga', 'ogg', 'wav', 'webm']
 
     if file_type not in supported_audio_types:
-        st.error(f"{file_type} 형식은 Whisper API에서 지원되지 않습니다.")
+        st.error(f"Whisper API는 '{file_type}' 형식을 지원하지 않습니다. 지원되는 형식: {supported_audio_types}")
         return None
 
-# 파일 크기 확인 (Whisper API 최대 파일 크기: 25MB)
-    MAX_FILE_SIZE_BYTES = 26214400
-    file_size = len(file_content.read())
-
-    if file_size > MAX_FILE_SIZE_BYTES:
-        st.error(f"파일 크기가 너무 큽니다. Whisper API의 최대 파일 크기 제한은 25MB입니다. 현재 파일 크기: {file_size / (1024 * 1024):.2f}MB")
-        return None
-
-# 파일 크기 확인 (Whisper API 최대 파일 크기: 25MB)
+    # 파일 크기 확인 (Whisper API 최대 파일 크기: 25MB)
     MAX_FILE_SIZE_BYTES = 26214400
     file_content.seek(0, os.SEEK_END)  # 파일 크기 확인 전, 파일 포인터를 끝으로 이동
     file_size = file_content.tell()
@@ -1217,32 +1209,36 @@ def extract_text_from_audio_to_whisper(file_content, file_type):
         return None
     file_content.seek(0)  # 다시 파일 포인터를 처음으로 이동
 
-    #try:
-    # Whisper API 요청
-    openai.api_key = st.session_state["openai_api_key"]
+    try:
+        # Whisper API 요청
+        openai.api_key = st.session_state["openai_api_key"]
 
-    # 임시 파일 생성 (영문 및 숫자로 된 파일명 사용)
-    with tempfile.NamedTemporaryFile(suffix=f".{file_type}", delete=False) as temp_file:
-        temp_file.write(file_content.read())  # Bytes 형태의 파일 데이터를 임시 파일로 작성
-        temp_file.flush()  # 디스크에 저장
-        temp_file_name = temp_file.name  # 임시 파일 경로 저장
+        # 임시 파일 생성 (영문 및 숫자로 된 파일명 사용)
+        with tempfile.NamedTemporaryFile(suffix=f".{file_type}", delete=False) as temp_file:
+            temp_file.write(file_content.read())  # Bytes 형태의 파일 데이터를 임시 파일로 작성
+            temp_file.flush()  # 디스크에 저장
+            temp_file_name = temp_file.name  # 임시 파일 경로 저장
 
-    # 로그로 파일 정보를 출력해 파일 처리 상황을 확인
-    st.write(f"임시 파일 생성 완료: {temp_file_name}, 크기: {os.path.getsize(temp_file_name)} bytes")
+        # 로그로 파일 정보를 출력해 파일 처리 상황을 확인
+        st.write(f"임시 파일 생성 완료: {temp_file_name}, 크기: {os.path.getsize(temp_file_name)} bytes")
 
-    # Whisper API로 임시 파일 경로를 전달하여 음성 파일의 텍스트 추출
-    with open(temp_file_name, 'rb') as audio_file:
-        response = openai.Audio.transcribe("whisper-1", audio_file)
+        # Whisper API로 임시 파일 경로를 전달하여 음성 파일의 텍스트 추출
+        with open(temp_file_name, 'rb') as audio_file:
+            response = openai.Audio.transcribe("whisper-1", audio_file)
 
-    # 임시 파일 삭제
-    os.remove(temp_file_name)
+        # 임시 파일 삭제
+        os.remove(temp_file_name)
 
-    # 추출된 텍스트 반환
-    return response['text']
+        # 추출된 텍스트 반환
+        return response['text']
 
-    #except Exception as e:
-        #st.error(f"Whisper API를 통해 음성 파일에서 텍스트를 추출하는 중 오류가 발생했습니다: {str(e)}")
-        #return None
+    except openai.error.InvalidRequestError as e:
+        st.error(f"Whisper API 요청이 유효하지 않습니다. 오류 메시지: {str(e)}")
+        return None
+
+    except Exception as e:
+        st.error(f"Whisper API를 통해 음성 파일에서 텍스트를 추출하는 중 오류가 발생했습니다: {str(e)}")
+        return None
 
     
 
