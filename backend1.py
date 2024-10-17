@@ -1305,7 +1305,7 @@ def convert_m4a_to_wav_from_install(file_content):
 def convert_m4a_to_wav(file_path):
     try:
         # 변환된 wav 파일 경로
-        wav_path = tempfile.mktemp(suffix=".mp3")
+        wav_path = tempfile.mktemp(suffix=".wav")
 
         # ffmpeg을 사용하여 m4a -> wav 변환
         command = ['ffmpeg', '-i', file_path, wav_path]
