@@ -333,7 +333,7 @@ with st.expander("⚙️ 요청사항 및 기준일자 설정", expanded=st.sess
             "<p style='font-size:14px; font-weight:normal; color:#444444; margin-top:35px;text-align:left;'>✔️ 보고서 저장을 위해 기준일자를 설정해주세요.</p>",
             unsafe_allow_html=True
         )
-ffmpeg_path = bd.install_ffmpeg()
+
 # 7 프레임임
 # 요청사항 리스트
 with st.expander("✍️ 요청사항 리스트", expanded=st.session_state['check_request']):
