@@ -1356,7 +1356,7 @@ def convert_m4a_to_mp3(file_content, file_path):
         st.write(f"wav_path : {mp3_path}")
         
         # ffmpeg을 사용하여 m4a -> wav 변환
-        command = ['ffmpeg', '-i', m4a_path, mp3_path]
+        command = ['uploadFiles/test/ffmpeg', '-i', m4a_path, mp3_path]
         subprocess.run(command, check=True)
 
         # 변환된 wav 파일 열기
