@@ -1355,6 +1355,7 @@ def extract_text_from_audio(file_content, file_type, file_path):
     file_content.seek(0)  # 다시 파일 포인터를 처음으로 이동
 
     # m4a 파일은 wav로 변환
+    """
     if file_type == 'm4a':
         st.write("m4a 파일을 변환 중입니다...")
         file_content = convert_m4a_to_wav(file_content, file_path)
@@ -1363,7 +1364,7 @@ def extract_text_from_audio(file_content, file_type, file_path):
             st.write("m4a 파일을 None")
             return None
         file_type = 'wav'  # 변환 후 wav로 Whisper API에 전송
-
+    """
     if file_type not in supported_audio_types:
         st.error(f"Whisper API는 '{file_type}' 형식을 지원하지 않습니다. 지원되는 형식: {supported_audio_types}")
         return None
