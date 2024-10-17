@@ -1266,13 +1266,13 @@ def install_ffmpeg():
     return ffmpeg_path
 
 # ffmpeg 설치
-ffmpeg_path = install_ffmpeg()
+#ffmpeg_path = install_ffmpeg()
 
 # m4a 파일을 wav로 변환하는 함수 (ffmpeg 사용)
 def convert_m4a_to_wav_from_install(file_content):
     try:
         # ffmpeg 설치
-        #ffmpeg_path = install_ffmpeg()
+        ffmpeg_path = install_ffmpeg()
         # 임시 m4a 파일 생성
         with tempfile.NamedTemporaryFile(suffix=".m4a", delete=False) as temp_m4a_file:
             temp_m4a_file.write(file_content.read())  # m4a 파일 저장
@@ -1315,7 +1315,7 @@ def convert_m4a_to_wav(file_content):
         wav_path = temp_wav_file.name
 
         # ffmpeg을 사용하여 m4a -> wav 변환
-        command = ['ffmpeg/ffmpeg', '-i', m4a_path, wav_path]
+        command = ['./ffmpeg/ffmpeg', '-i', m4a_path, wav_path]
         subprocess.run(command, check=True)
 
         # 변환된 wav 파일 열기
