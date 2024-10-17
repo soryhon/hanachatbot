@@ -1258,10 +1258,10 @@ def install_ffmpeg():
         st.write("ffmpeg 압축을 해제 중입니다...")
         os.system(f"mkdir {ffmpeg_dir}")
         os.system(f"tar -xJf {ffmpeg_tar} -C {ffmpeg_dir} --strip-components 1")
-        
+    st.write(f"{ffmpeg_path}")    
     # ffmpeg 실행 파일에 실행 권한 부여
-    ffmpeg_path = os.path.join(os.getcwd(), ffmpeg_dir, "ffmpeg")
-    os.chmod(ffmpeg_path, 0o755)  # 실행 권한 부여
+    #ffmpeg_path = os.path.join(os.getcwd(), ffmpeg_dir, "ffmpeg")
+    #os.chmod(ffmpeg_path, 0o755)  # 실행 권한 부여
     
     # ffmpeg 경로 설정
     ffmpeg_path = os.path.join(os.getcwd(), ffmpeg_dir, "ffmpeg")
@@ -1286,7 +1286,7 @@ def convert_m4a_to_wav_from_install(file_content):
         # 변환된 wav 파일 경로
         temp_wav_file = tempfile.NamedTemporaryFile(suffix=".wav", delete=False)
         wav_path = temp_wav_file.name
-        st.write(f"{ffmpeg_path}")
+        
         # ffmpeg을 사용하여 m4a -> wav 변환
         command = [ffmpeg_path, '-i', m4a_path, wav_path]
         subprocess.run(command, check=True)
