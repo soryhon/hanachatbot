@@ -1202,8 +1202,14 @@ def extract_text_from_audio_to_whisper(file_content, file_type):
     try:
         # Whisper API 요청
         openai.api_key = st.session_state["openai_api_key"]
-        audio_data = file_content.read()  # Bytes 형태의 파일 데이터를 Whisper API로 전달
-        response = openai.Audio.transcribe("whisper-1", audio_data)
+        # 파일을 BytesIO로 읽어오고 Whisper API에 전달 (파일 이름 포함)
+        with tempfile.NamedTemporaryFile(suffix=f".{file_type}") as temp_file:
+            temp_file.write(file_content.read())  # Bytes 형태의 파일 데이터를 임시 파일로 작성
+            temp_file.flush()  # 디스크에 저장
+            
+            # Whisper API로 임시 파일 경로를 전달하여 음성 파일의 텍스트 추출
+            with open(temp_file.name, 'rb') as audio_file:
+                response = openai.Audio.transcribe("whisper-1", audio_file)
 
         # 추출된 텍스트 반환
         return response['text']
