@@ -1271,6 +1271,8 @@ def install_ffmpeg():
 # m4a 파일을 wav로 변환하는 함수 (ffmpeg 사용)
 def convert_m4a_to_wav(file_content):
     try:
+        # ffmpeg 설치
+        ffmpeg_path = install_ffmpeg()
         # 임시 m4a 파일 생성
         with tempfile.NamedTemporaryFile(suffix=".m4a", delete=False) as temp_m4a_file:
             temp_m4a_file.write(file_content.read())  # m4a 파일 저장
