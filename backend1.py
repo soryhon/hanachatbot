@@ -1199,14 +1199,23 @@ def extract_text_from_audio_to_whisper(file_content, file_type):
         st.error(f"{file_type} 형식은 Whisper API에서 지원되지 않습니다.")
         return None
 
+     # 파일 크기 확인 (Whisper API 최대 파일 크기: 25MB)
+    MAX_FILE_SIZE_BYTES = 26214400
+    file_size = len(file_content.read())
+
+    if file_size > MAX_FILE_SIZE_BYTES:
+        st.error(f"파일 크기가 너무 큽니다. Whisper API의 최대 파일 크기 제한은 25MB입니다. 현재 파일 크기: {file_size / (1024 * 1024):.2f}MB")
+        return None
+
     try:
         # Whisper API 요청
         openai.api_key = st.session_state["openai_api_key"]
+
         # 파일을 BytesIO로 읽어오고 Whisper API에 전달 (파일 이름 포함)
         with tempfile.NamedTemporaryFile(suffix=f".{file_type}") as temp_file:
             temp_file.write(file_content.read())  # Bytes 형태의 파일 데이터를 임시 파일로 작성
             temp_file.flush()  # 디스크에 저장
-            
+
             # Whisper API로 임시 파일 경로를 전달하여 음성 파일의 텍스트 추출
             with open(temp_file.name, 'rb') as audio_file:
                 response = openai.Audio.transcribe("whisper-1", audio_file)
