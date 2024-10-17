@@ -1220,10 +1220,14 @@ def extract_text_from_audio_to_whisper(file_content, file_type):
 
             # Whisper API로 임시 파일 경로를 전달하여 음성 파일의 텍스트 추출
             with open(temp_file.name, 'rb') as audio_file:
-                response = openai.Audio.transcribe("whisper-1", audio_file)
+                response = openai.Completion.create(
+                    model="gpt-4",
+                    prompt="요약해",
+                    max_tokens=100
+                )  
 
         # 추출된 텍스트 반환
-        return response['text']
+        return response.choices[0].text.strip()
 
     except openai.error.InvalidRequestError as e:
         st.error(f"Whisper API 요청이 유효하지 않습니다. 오류 메시지: {str(e)}")
