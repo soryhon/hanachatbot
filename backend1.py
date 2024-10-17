@@ -32,6 +32,7 @@ from langchain.chains import LLMChain
 import yt_dlp
 from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled, NoTranscriptFound
 from pytube import YouTube
+import subprocess
 
 # Backend 기능 구현 시작 ---
 
@@ -1240,6 +1241,116 @@ def extract_text_from_audio_to_whisper(file_content, file_type):
         st.error(f"Whisper API를 통해 음성 파일에서 텍스트를 추출하는 중 오류가 발생했습니다: {str(e)}")
         return None
 
-    
+# ffmpeg 바이너리를 설치하는 함수
+def install_ffmpeg():
+    # ffmpeg 바이너리 다운로드 (Linux용, 다른 OS는 필요 시 바이너리 경로 변경)
+    ffmpeg_url = "https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-i686-static.tar.xz"
+    ffmpeg_tar = "ffmpeg.tar.xz"
+    ffmpeg_dir = "ffmpeg"
+
+    # ffmpeg 다운로드
+    if not os.path.exists(ffmpeg_tar):
+        st.write("ffmpeg를 다운로드 중입니다...")
+        os.system(f"wget {ffmpeg_url} -O {ffmpeg_tar}")
+
+    # 압축 해제
+    if not os.path.exists(ffmpeg_dir):
+        st.write("ffmpeg 압축을 해제 중입니다...")
+        os.system(f"mkdir {ffmpeg_dir}")
+        os.system(f"tar -xJf {ffmpeg_tar} -C {ffmpeg_dir} --strip-components 1")
+
+    # ffmpeg 경로 설정
+    ffmpeg_path = os.path.join(os.getcwd(), ffmpeg_dir, "ffmpeg")
+    os.environ["PATH"] += os.pathsep + ffmpeg_path
+    st.write(f"ffmpeg 설치 완료! 경로: {ffmpeg_path}")
+    return ffmpeg_path
+
+# ffmpeg 설치
+#ffmpeg_path = install_ffmpeg()
+
+# m4a 파일을 wav로 변환하는 함수 (ffmpeg 사용)
+def convert_m4a_to_wav(file_content):
+    try:
+        # 임시 m4a 파일 생성
+        with tempfile.NamedTemporaryFile(suffix=".m4a", delete=False) as temp_m4a_file:
+            temp_m4a_file.write(file_content.read())  # m4a 파일 저장
+            temp_m4a_file.flush()
+            m4a_path = temp_m4a_file.name
+
+        # 변환된 wav 파일 경로
+        temp_wav_file = tempfile.NamedTemporaryFile(suffix=".wav", delete=False)
+        wav_path = temp_wav_file.name
+
+        # ffmpeg을 사용하여 m4a -> wav 변환
+        command = [ffmpeg_path, '-i', m4a_path, wav_path]
+        subprocess.run(command, check=True)
+
+        # 변환된 wav 파일 열기
+        with open(wav_path, 'rb') as wav_file:
+            wav_content = wav_file.read()
+
+        # 임시 파일 삭제
+        os.remove(m4a_path)
+        os.remove(wav_path)
+
+        return wav_content
+
+    except Exception as e:
+        st.error(f"m4a 파일을 wav로 변환하는 중 오류가 발생했습니다: {str(e)}")
+        return None
+
+# Whisper API를 통해 음성 파일에서 텍스트를 추출하는 함수
+def extract_text_from_audio(file_content, file_type):
+    # Whisper API에서 지원하는 확장자
+    supported_audio_types = ['flac', 'm4a', 'mp3', 'mp4', 'mpeg', 'mpga', 'oga', 'ogg', 'wav', 'webm']
+
+    # 25MB 파일 크기 제한
+    MAX_FILE_SIZE_BYTES = 26214400  # 25MB
+    file_content.seek(0, os.SEEK_END)  # 파일 크기 확인 전 파일 포인터를 끝으로 이동
+    file_size = file_content.tell()
+
+    if file_size > MAX_FILE_SIZE_BYTES:
+        st.error(f"파일 크기가 너무 큽니다. Whisper API의 최대 파일 크기 제한은 25MB입니다. 현재 파일 크기: {file_size / (1024 * 1024):.2f}MB")
+        return None
+    file_content.seek(0)  # 다시 파일 포인터를 처음으로 이동
+
+    # m4a 파일은 wav로 변환
+    if file_type == 'm4a':
+        st.write("m4a 파일을 변환 중입니다...")
+        file_content = convert_m4a_to_wav(file_content)
+        if file_content is None:
+            return None
+        file_type = 'wav'  # 변환 후 wav로 Whisper API에 전송
+
+    if file_type not in supported_audio_types:
+        st.error(f"Whisper API는 '{file_type}' 형식을 지원하지 않습니다. 지원되는 형식: {supported_audio_types}")
+        return None
+
+    # Whisper API 요청
+    try:
+        openai.api_key = st.session_state["openai_api_key"]
+
+        # 파일을 Whisper API로 전송
+        with tempfile.NamedTemporaryFile(suffix=f".{file_type}", delete=False) as temp_file:
+            temp_file.write(file_content.read())
+            temp_file.flush()
+            temp_file_name = temp_file.name
+
+        with open(temp_file_name, 'rb') as audio_file:
+            response = openai.Audio.transcribe("whisper-1", audio_file)
+
+        # 임시 파일 삭제
+        os.remove(temp_file_name)
+
+        # 추출된 텍스트 반환
+        return response['text']
+
+    except openai.error.InvalidRequestError as e:
+        st.error(f"Whisper API 요청이 유효하지 않습니다. 오류 메시지: {str(e)}")
+        return None
+
+    except Exception as e:
+        st.error(f"Whisper API를 통해 음성 파일에서 텍스트를 추출하는 중 오류가 발생했습니다: {str(e)}")
+        return None    
 
 # Backend 기능 구현 끝 ---
