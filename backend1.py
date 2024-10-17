@@ -1258,7 +1258,11 @@ def install_ffmpeg():
         st.write("ffmpeg 압축을 해제 중입니다...")
         os.system(f"mkdir {ffmpeg_dir}")
         os.system(f"tar -xJf {ffmpeg_tar} -C {ffmpeg_dir} --strip-components 1")
-
+        
+    # ffmpeg 실행 파일에 실행 권한 부여
+    ffmpeg_path = os.path.join(os.getcwd(), ffmpeg_dir, "ffmpeg")
+    os.chmod(ffmpeg_path, 0o755)  # 실행 권한 부여
+    
     # ffmpeg 경로 설정
     ffmpeg_path = os.path.join(os.getcwd(), ffmpeg_dir, "ffmpeg")
     os.environ["PATH"] += os.pathsep + ffmpeg_path
@@ -1266,7 +1270,7 @@ def install_ffmpeg():
     return ffmpeg_path
 
 # ffmpeg 설치
-#ffmpeg_path = install_ffmpeg()
+ffmpeg_path = install_ffmpeg()
 
 # m4a 파일을 wav로 변환하는 함수 (ffmpeg 사용)
 def convert_m4a_to_wav_from_install(file_content):
@@ -1350,8 +1354,8 @@ def extract_text_from_audio(file_content, file_type):
     # m4a 파일은 wav로 변환
     if file_type == 'm4a':
         st.write("m4a 파일을 변환 중입니다...")
-        file_content = convert_m4a_to_wav(file_content)
-        #file_content = convert_m4a_to_wav_from_install(file_content)
+        #file_content = convert_m4a_to_wav(file_content)
+        file_content = convert_m4a_to_wav_from_install(file_content)
         if file_content is None:
             st.write("m4a 파일을 None")
             return None
