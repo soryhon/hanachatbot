@@ -1285,7 +1285,7 @@ def convert_m4a_to_wav_from_install(file_content):
             m4a_path = temp_m4a_file.name
 
         # 변환된 wav 파일 경로
-        temp_wav_file = tempfile.NamedTemporaryFile(suffix=".wav", delete=False)
+        temp_wav_file = tempfile.NamedTemporaryFile(suffix=".mp3", delete=False)
         wav_path = temp_wav_file.name
         
         # ffmpeg을 사용하여 m4a -> wav 변환
