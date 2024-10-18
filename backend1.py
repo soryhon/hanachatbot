@@ -1433,7 +1433,7 @@ def extract_text_from_audio(file_content, file_type):
         return None    
 
 # ffmpeg 경로 설정 (필요한 경우)
-AudioSegment.converter = "/usr/bin/ffmpeg"
+#AudioSegment.converter = "/usr/bin/ffmpeg"
 
 # 파일 처리 함수
 def process_audio_file(file_content, selected_file):
@@ -1488,6 +1488,7 @@ def convert_m4a_to_mp3_3(file_content):
         
         # mp3 파일로 변환
         mp3_path = m4a_path.replace(".m4a", ".mp3")
+        AudioSegment.converter = "ffmpeg"
         audio = AudioSegment.from_file(m4a_path, format="m4a")
         audio.export(mp3_path, format="mp3")
 
