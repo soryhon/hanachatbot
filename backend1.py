@@ -1365,7 +1365,7 @@ def transcribe_audio(audio_path):
         return None
 
 # LLM을 통해 프롬프트와 파일을 전달하고 응답을 받는 함수
-def run_llm_with_audio_and_prompt(api_key, titles, requests, video_data_str):
+def run_llm_with_audio_and_prompt(api_key, titles, requests, audio_data_str):
     global global_generated_prompt
     openai.api_key = api_key
 
@@ -1401,10 +1401,10 @@ def run_llm_with_audio_and_prompt(api_key, titles, requests, video_data_str):
         ]
         -항목 데이터
         [
-            {video_data_str}
+            {audio_data_str}
         ]
         """
-        
+        st.write(f"{audio_data_str}")
         # 텍스트 길이 제한 확인 (예: 1000000자로 제한)
         if len(generated_prompt) > 1000000:
             st.error("프롬프트 글자 수 초과로 LLM 연동에 실패했습니다.")
