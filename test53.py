@@ -382,12 +382,12 @@ with st.expander("✍️ 요청사항 리스트", expanded=st.session_state['che
                     if file_type not in supported_file_types:
                         st.error(f"지원하지 않는 파일입니다: {file_path}")
                         row['데이터'] = ""
-                    else:      
+                    #else:      
                         #bd.handle_file_selection(file_path, file_content, file_type, idx)
                         #row['데이터'] = bd.extract_text_from_audio_to_whisper(file_content, file_type)
                         #row['데이터'] = bd.extract_text_from_audio(file_content, file_type)
-                        row['데이터'] = bd.process_audio_file(file_content, selected_file) 
-                        st.write(f"{row['데이터']}")
+                        #row['데이터'] = bd.process_audio_file(file_content, selected_file) 
+                        #st.write(f"{row['데이터']}")
                 else:
                     st.error(f"{selected_file} 파일을 GitHub에서 불러오지 못했습니다.")  
             st.text_input(f"{idx+1}.요청사항 선택한 파일", row['파일'], disabled=True, key=f"file_{idx}")
@@ -421,21 +421,8 @@ with col2:
                     file_type = file_path.split('.')[-1].lower()
                     report_html = ""
                     if file_content:
-                        if file_type == 'xlsx':
-                            selected_sheets = bd.parse_sheet_selection(row['파일정보'], len(openpyxl.load_workbook(file_content).sheetnames))
-                            file_data_dict = bd.extract_sheets_from_excel(file_content, selected_sheets)
-                            if file_data_dict is not None:
-                                # 제목 입력 값 가져오기
-                                report_html +=  f"<h3>{idx + 1}. {row['제목']}</h3>\n"
-                                for sheet_name, df in file_data_dict.items():
-                                    wb = openpyxl.load_workbook(file_content)
-                                    ws = wb[sheet_name]
-                                    html_data = bd.convert_df_to_html_with_styles_and_merging(ws, df)
-                                    report_html += f"<div style='text-indent: 20px;'>{html_data}</div>\n"
-    
-                        else:
-                            file_data = bd.extract_data_from_file(file_content, file_type)
-                            report_html += f"<h3>{idx + 1}. {row['제목']}</h3>\n<p>{file_data}</p>"
+                         file_data = bd.process_audio_file(file_content, selected_file)
+                         report_html += f"<h3>{idx + 1}. {row['제목']}</h3>\n<p>{file_data}</p>"
                         if idx > 0 :
                             report_html += "<p/>"
                         html_viewer_data += report_html    
@@ -448,7 +435,7 @@ with col2:
                 titles = [row['제목'] for row in st.session_state['rows']]
                 requests = [row['요청'] for row in st.session_state['rows']]
         
-                responses = bd.run_llm_with_file_and_prompt(
+                responses = bd.run_llm_with_audio_and_prompt(
                     st.session_state["openai_api_key"], 
                     titles, 
                     requests, 
