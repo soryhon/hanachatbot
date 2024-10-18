@@ -1478,7 +1478,7 @@ def process_audio_file(file_content, selected_file):
             st.error(f"{file_extension} 형식은 지원되지 않습니다.")
 
 # m4a 파일을 mp3로 변환하는 함수
-def convert_m4a_to_mp3_3(m4a_bytes):
+def convert_m4a_to_mp3_3(file_content):
     m4a_path = None
     try:
         # 임시 파일에 m4a 파일 저장
