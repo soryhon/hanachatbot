@@ -1457,7 +1457,7 @@ def process_audio_file(file_content, selected_file):
     else:
         # .m4a 파일은 mp3로 변환 후 Whisper API로 전달
         if file_extension == "m4a":
-            mp3_path = convert_m4a_to_mp3_3(file_content)
+            mp3_path = convert_m4a_to_mp3(file_content)
             if mp3_path:
                 text = transcribe_audio(mp3_path)
                 if text:
