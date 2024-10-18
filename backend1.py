@@ -1466,7 +1466,7 @@ def process_audio_file(file_content, selected_file):
         # 다른 형식의 파일은 바로 Whisper API로 전달
         elif file_extension in ["mp3", "wav", "ogg", "flac"]:
             with tempfile.NamedTemporaryFile(delete=False, suffix=f".{file_extension}") as audio_temp_file:
-                audio_temp_file.write(file_content)
+                audio_temp_file.write(file_content.read())
                 audio_path = audio_temp_file.name
 
             text = transcribe_audio(audio_path)
