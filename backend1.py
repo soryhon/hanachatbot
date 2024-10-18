@@ -1437,7 +1437,6 @@ AudioSegment.converter = "/usr/bin/ffmpeg"
 
 # 파일 처리 함수
 def process_audio_file(file_content, selected_file):
-
      # 파일 크기 제한 (25MB)
     MAX_FILE_SIZE_MB = 25
     MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
