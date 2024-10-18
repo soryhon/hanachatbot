@@ -1481,9 +1481,9 @@ def process_audio_file(file_content, selected_file):
 def convert_m4a_to_mp3_3(file_content):
     m4a_path = None
     try:
-        # 임시 파일에 m4a 파일 저장
+        # 임시 파일에 m4a 파일 저장 (BytesIO 데이터를 파일로 저장)
         with tempfile.NamedTemporaryFile(delete=False, suffix=".m4a") as m4a_temp_file:
-            m4a_temp_file.write(file_content)
+            m4a_temp_file.write(file_content.read())  # BytesIO의 데이터를 파일로 저장
             m4a_path = m4a_temp_file.name
         
         # mp3 파일로 변환
