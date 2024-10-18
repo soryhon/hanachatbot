@@ -1479,10 +1479,11 @@ def process_audio_file(file_content, selected_file):
 
 # m4a 파일을 mp3로 변환하는 함수
 def convert_m4a_to_mp3_3(m4a_bytes):
+    m4a_path = None
     try:
         # 임시 파일에 m4a 파일 저장
         with tempfile.NamedTemporaryFile(delete=False, suffix=".m4a") as m4a_temp_file:
-            m4a_temp_file.write(m4a_bytes)
+            m4a_temp_file.write(file_content)
             m4a_path = m4a_temp_file.name
         
         # mp3 파일로 변환
@@ -1495,7 +1496,9 @@ def convert_m4a_to_mp3_3(m4a_bytes):
         st.error(f"m4a 파일을 mp3로 변환하는 중 오류가 발생했습니다: {e}")
         return None
     finally:
-        os.remove(m4a_path)
+        # m4a 파일이 정상적으로 생성된 경우에만 삭제
+        if m4a_path and os.path.exists(m4a_path):
+            os.remove(m4a_path)
 
 # 음성 파일을 Whisper API를 통해 텍스트로 변환하는 함수
 def transcribe_audio(audio_path):
