@@ -1465,7 +1465,7 @@ def process_audio_file(file_content, selected_file):
                 os.remove(mp3_path)
 
         # 다른 형식의 파일은 바로 Whisper API로 전달
-        elif file_extension in ["mp3", "wav", "ogg", "flac"]:
+        elif file_extension in ["mp3", "wav", "ogg", "flac","m4a"]:
             with tempfile.NamedTemporaryFile(delete=False, suffix=f".{file_extension}") as audio_temp_file:
                 audio_temp_file.write(file_content.read())
                 audio_path = audio_temp_file.name
