@@ -1405,7 +1405,7 @@ def run_llm_with_audio_and_prompt(api_key, titles, requests, audio_data_str):
             {audio_data_str}
         ]
         """
-        st.write(f"{audio_data_str}")
+        
         # 텍스트 길이 제한 확인 (예: 1000000자로 제한)
         if len(generated_prompt) > 1000000:
             st.error("프롬프트 글자 수 초과로 LLM 연동에 실패했습니다.")
