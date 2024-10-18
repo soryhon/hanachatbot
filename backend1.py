@@ -1488,7 +1488,9 @@ def convert_m4a_to_mp3_3(file_content):
         
         # mp3 파일로 변환
         mp3_path = m4a_path.replace(".m4a", ".mp3")
-        AudioSegment.converter = "ffmpeg"
+        # ffmpeg와 ffprobe 경로 설정
+        AudioSegment.converter = which("ffmpeg")  # ffmpeg 경로 설정
+        AudioSegment.ffprobe = which("ffprobe")  # ffprobe 경로 설정
         audio = AudioSegment.from_file(m4a_path, format="m4a")
         audio.export(mp3_path, format="mp3")
 
