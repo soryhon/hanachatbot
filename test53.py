@@ -421,8 +421,8 @@ with col2:
                     file_type = file_path.split('.')[-1].lower()
                     report_html = ""
                     if file_content:
-                         file_data = bd.process_audio_file(file_content, selected_file)
-                         report_html += f"<h3>{idx + 1}. {row['제목']}</h3>\n<p>{file_data}</p>"
+                        file_data = bd.process_audio_file(file_content, selected_file)
+                        report_html += f"<h3>{idx + 1}. {row['제목']}</h3>\n<p>{file_data}</p>"
                         if idx > 0 :
                             report_html += "<p/>"
                         html_viewer_data += report_html    
