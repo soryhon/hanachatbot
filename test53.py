@@ -199,11 +199,11 @@ st.markdown(
 # 5 프레임
 # 파일 업로드
 # 지원되는 음성 파일 형식 리스트
-supported_audio_file_types = ['mp3', 'wav', 'm4a', 'mp4', 'mpeg', 'webm', 'ogg', 'aac', 'flac']
+supported_file_types = ['mp3', 'wav', 'm4a', 'mp4', 'mpeg', 'webm', 'ogg', 'aac', 'flac']
 
 if github_info_loaded:
     with st.expander("⬆️ 음성 파일 업로드", expanded=st.session_state['check_upload']):
-        uploaded_files = st.file_uploader("음성 파일을 여러 개 드래그 앤 드롭하여 업로드하세요. (최대 100MB)", accept_multiple_files=True, type=supported_audio_file_types)
+        uploaded_files = st.file_uploader("음성 파일을 여러 개 드래그 앤 드롭하여 업로드하세요. (최대 100MB)", accept_multiple_files=True, type=supported_file_types)
 
         if uploaded_files:
             for uploaded_file in uploaded_files:
