@@ -34,6 +34,7 @@ from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled, No
 from pytube import YouTube
 import subprocess
 from pydub import AudioSegment
+from pydub.utils import which
 
 # Backend 기능 구현 시작 ---
 
