@@ -1248,8 +1248,8 @@ def install_ffmpeg():
     # ffmpeg 바이너리 다운로드 (Linux용, 다른 OS는 필요 시 바이너리 경로 변경)
     ffmpeg_url = "https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-i686-static.tar.xz"
     ffmpeg_tar = "ffmpeg.tar.xz"
-    #ffmpeg_dir = "ffmpeg"
-    ffmpeg_dir = ""
+    ffmpeg_dir = "ffmpeg"
+    #ffmpeg_dir = ""
 
     # ffmpeg 다운로드
     if not os.path.exists(ffmpeg_tar):
@@ -1260,6 +1260,12 @@ def install_ffmpeg():
     if not os.path.exists(ffmpeg_dir):
         st.write("ffmpeg 압축을 해제 중입니다...")
         os.system(f"mkdir {ffmpeg_dir}")
+        # 폴더가 만들어졌는지 확인
+        if os.path.exists(ffmpeg_dir):
+            st.write(f"'{ffmpeg_dir}' 폴더가 성공적으로 생성되었습니다.")
+        else:
+            st.error(f"'{ffmpeg_dir}' 폴더 생성에 실패했습니다.")
+            return None  # 폴더 생성에 실패한 경우 None 반환하여 중단
         os.system(f"tar -xJf {ffmpeg_tar} -C {ffmpeg_dir} --strip-components 1")
     
   
