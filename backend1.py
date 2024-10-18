@@ -41,6 +41,9 @@ from pydub.utils import which
 # 전역변수로 프롬프트 및 파일 데이터 저장
 global_generated_prompt = []
 
+# ffmpeg 경로 설정 (필요한 경우)
+#AudioSegment.converter = "/usr/bin/ffmpeg"
+
 # GitHub 정보 및 OpenAI API 키 자동 설정 또는 입력창을 통해 설정
 def load_env_info():
     json_data = '''
@@ -1280,169 +1283,7 @@ def install_ffmpeg():
     st.write(f"ffmpeg 설치 완료! 경로: {ffmpeg_path}")
     return ffmpeg_path
 
-# ffmpeg 설치
-ffmpeg_path = install_ffmpeg()
 
-# m4a 파일을 wav로 변환하는 함수 (ffmpeg 사용)
-def convert_m4a_to_wav_from_install(file_content):
-    try:
-        # ffmpeg 설치
-        ffmpeg_path = install_ffmpeg()
-        # 임시 m4a 파일 생성
-        with tempfile.NamedTemporaryFile(suffix=".m4a", delete=False) as temp_m4a_file:
-            temp_m4a_file.write(file_content.read())  # m4a 파일 저장
-            temp_m4a_file.flush()
-            m4a_path = temp_m4a_file.name
-
-        # 변환된 wav 파일 경로
-        temp_wav_file = tempfile.NamedTemporaryFile(suffix=".mp3", delete=False)
-        wav_path = temp_wav_file.name
-        
-        # ffmpeg을 사용하여 m4a -> wav 변환
-        command = [ffmpeg_path, '-i', m4a_path, wav_path]
-        subprocess.run(command, check=True)
-
-        # 변환된 wav 파일 열기
-        with open(wav_path, 'rb') as wav_file:
-            wav_content = wav_file.read()
-
-        # 임시 파일 삭제
-        os.remove(m4a_path)
-        os.remove(wav_path)
-
-        return wav_content
-
-    except Exception as e:
-        st.error(f"m4a 파일을 wav로 변환하는 중 오류가 발생했습니다: {str(e)}")
-        return None
-
-# m4a 파일을 wav로 변환하는 함수 (ffmpeg 사용)
-def convert_m4a_to_wav(file_content):
-    try:
-        # 임시 m4a 파일 생성
-        with tempfile.NamedTemporaryFile(suffix=".m4a", delete=False) as temp_m4a_file:
-            temp_m4a_file.write(file_content.read())  # BytesIO 객체의 내용을 임시 파일로 저장
-            temp_m4a_file.flush()
-            m4a_path = temp_m4a_file.name
-
-        # 변환된 wav 파일 경로
-        temp_wav_file = tempfile.NamedTemporaryFile(suffix=".wav", delete=False)
-        wav_path = temp_wav_file.name
-        st.write(f"m4a_path : {m4a_path}")
-        st.write(f"wav_path : {wav_path}")
-        
-        # ffmpeg을 사용하여 m4a -> wav 변환
-        command = ['ffmpeg', '-i', m4a_path, wav_path]
-        subprocess.run(command, check=True)
-
-        # 변환된 wav 파일 열기
-        with open(wav_path, 'rb') as wav_file:
-            wav_content = wav_file.read()
-
-        # 임시 파일 삭제
-        os.remove(m4a_path)
-        os.remove(wav_path)
-
-        return BytesIO(wav_content)  # 변환된 wav 파일을 다시 BytesIO 객체로 반환
-
-    except Exception as e:
-        st.error(f"m4a 파일을 wav로 변환하는 중 오류가 발생했습니다: {str(e)}")
-        return None
-
-# m4a 파일을 wav로 변환하는 함수 (ffmpeg 사용)
-def convert_m4a_to_mp3(file_content):
-    try:
-        # 임시 m4a 파일 생성
-        with tempfile.NamedTemporaryFile(suffix=".m4a", delete=False) as temp_m4a_file:
-            temp_m4a_file.write(file_content.read())  # BytesIO 객체의 내용을 임시 파일로 저장
-            temp_m4a_file.flush()
-            m4a_path = temp_m4a_file.name
-
-        # 변환된 wav 파일 경로
-        temp_wav_file = tempfile.NamedTemporaryFile(suffix=".mp3", delete=False)
-        mp3_path = temp_wav_file.name
-  
-        st.write(f"m4a_path : {m4a_path}")
-        st.write(f"wav_path : {mp3_path}")
-        
-        # ffmpeg을 사용하여 m4a -> wav 변환
-        command = ['ffmpeg', '-i', m4a_path, mp3_path]
-        subprocess.run(command, check=True)
-
-        # 변환된 wav 파일 열기
-        with open(mp3_path, 'rb') as wav_file:
-            mp3_content = wav_file.read()
-
-        # 임시 파일 삭제
-        os.remove(m4a_path)
-        os.remove(mp3_path)
-
-        return BytesIO(mp3_content)  # 변환된 wav 파일을 다시 BytesIO 객체로 반환
-
-    except Exception as e:
-        st.error(f"m4a 파일을 mp3로 변환하는 중 오류가 발생했습니다: {str(e)}")
-        return None
-        
-# Whisper API를 통해 음성 파일에서 텍스트를 추출하는 함수
-def extract_text_from_audio(file_content, file_type):
-    # Whisper API에서 지원하는 확장자
-    supported_audio_types = ['flac', 'm4a', 'mp3', 'mp4', 'mpeg', 'mpga', 'oga', 'ogg', 'wav', 'webm']
-
-    # 25MB 파일 크기 제한
-    MAX_FILE_SIZE_BYTES = 26214400  # 25MB
-    file_content.seek(0, os.SEEK_END)  # 파일 크기 확인 전 파일 포인터를 끝으로 이동
-    file_size = file_content.tell()
-
-    if file_size > MAX_FILE_SIZE_BYTES:
-        st.error(f"파일 크기가 너무 큽니다. Whisper API의 최대 파일 크기 제한은 25MB입니다. 현재 파일 크기: {file_size / (1024 * 1024):.2f}MB")
-        return None
-    file_content.seek(0)  # 다시 파일 포인터를 처음으로 이동
-
-    # m4a 파일은 wav로 변환
-
-    if file_type == 'm4a':
-        st.write("m4a 파일을 변환 중입니다...")
-        #file_content = convert_m4a_to_wav(file_content)
-        #file_content = convert_m4a_to_mp3(file_content)
-        file_content = convert_m4a_to_wav_from_install(file_content)
-        if file_content is None:
-            st.write("m4a 파일을 None")
-            return None
-        file_type = 'wav'  # 변환 후 wav로 Whisper API에 전송
-
-    if file_type not in supported_audio_types:
-        st.error(f"Whisper API는 '{file_type}' 형식을 지원하지 않습니다. 지원되는 형식: {supported_audio_types}")
-        return None
-
-    # Whisper API 요청
-    try:
-        openai.api_key = st.session_state["openai_api_key"]
-
-        # 파일을 Whisper API로 전송
-        with tempfile.NamedTemporaryFile(suffix=f".{file_type}", delete=False) as temp_file:
-            temp_file.write(file_content.read())
-            temp_file.flush()
-            temp_file_name = temp_file.name
-
-        with open(temp_file_name, 'rb') as audio_file:
-            response = openai.Audio.transcribe("whisper-1", audio_file)
-
-        # 임시 파일 삭제
-        os.remove(temp_file_name)
-
-        # 추출된 텍스트 반환
-        return response['text']
-
-    except openai.error.InvalidRequestError as e:
-        st.error(f"Whisper API 요청이 유효하지 않습니다. 오류 메시지: {str(e)}")
-        return None
-
-    except Exception as e:
-        st.error(f"Whisper API를 통해 음성 파일에서 텍스트를 추출하는 중 오류가 발생했습니다: {str(e)}")
-        return None    
-
-# ffmpeg 경로 설정 (필요한 경우)
-#AudioSegment.converter = "/usr/bin/ffmpeg"
 
 # 파일 처리 함수
 def process_audio_file(file_content, selected_file):
@@ -1465,7 +1306,7 @@ def process_audio_file(file_content, selected_file):
     else:
         # .m4a 파일은 mp3로 변환 후 Whisper API로 전달
         if file_extension == "m4a":
-            mp3_path = convert_m4a_to_mp3_3(file_content)
+            mp3_path = convert_m4a_to_mp3(file_content)
             if mp3_path:
                 text = transcribe_audio(mp3_path)
                 if text:
@@ -1487,7 +1328,7 @@ def process_audio_file(file_content, selected_file):
             st.error(f"{file_extension} 형식은 지원되지 않습니다.")
 
 # m4a 파일을 mp3로 변환하는 함수
-def convert_m4a_to_mp3_3(file_content):
+def convert_m4a_to_mp3(file_content):
     m4a_path = None
     try:
         # 임시 파일에 m4a 파일 저장 (BytesIO 데이터를 파일로 저장)
