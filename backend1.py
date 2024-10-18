@@ -1248,7 +1248,8 @@ def install_ffmpeg():
     # ffmpeg 바이너리 다운로드 (Linux용, 다른 OS는 필요 시 바이너리 경로 변경)
     ffmpeg_url = "https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-i686-static.tar.xz"
     ffmpeg_tar = "ffmpeg.tar.xz"
-    ffmpeg_dir = "ffmpeg"
+    #ffmpeg_dir = "ffmpeg"
+    ffmpeg_dir = ""
 
     # ffmpeg 다운로드
     if not os.path.exists(ffmpeg_tar):
