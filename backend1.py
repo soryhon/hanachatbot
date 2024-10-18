@@ -1440,12 +1440,15 @@ def process_audio_file(file_content, selected_file):
      # 파일 크기 제한 (25MB)
     MAX_FILE_SIZE_MB = 25
     MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
+
+     # 파일 크기 확인 (BytesIO 객체의 크기 확인)
+    file_size = len(file_content.getbuffer().nbytes) if isinstance(file_content, BytesIO) else len(file_content)
     
     # 파일 확장자 확인
     file_extension = selected_file.split('.')[-1].lower()
-
+    
     # 파일 크기 확인
-    if len(file_content) > MAX_FILE_SIZE_BYTES:
+    if file_size > MAX_FILE_SIZE_BYTES:
         st.error(f"파일 크기가 {MAX_FILE_SIZE_MB}MB를 초과했습니다. 크기: {len(file_content) / (1024 * 1024):.2f} MB")
     else:
         # .m4a 파일은 mp3로 변환 후 Whisper API로 전달
