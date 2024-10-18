@@ -1266,6 +1266,7 @@ def install_ffmpeg():
         else:
             st.error(f"'{ffmpeg_dir}' 폴더 생성에 실패했습니다.")
             return None  # 폴더 생성에 실패한 경우 None 반환하여 중단
+            
         os.system(f"tar -xJf {ffmpeg_tar} -C {ffmpeg_dir} --strip-components 1")
     
   
