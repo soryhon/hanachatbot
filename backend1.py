@@ -1499,6 +1499,7 @@ def convert_m4a_to_mp3_3(file_content):
         # m4a 파일이 정상적으로 생성된 경우에만 삭제
         if m4a_path and os.path.exists(m4a_path):
             os.remove(m4a_path)
+            
 
 # 음성 파일을 Whisper API를 통해 텍스트로 변환하는 함수
 def transcribe_audio(audio_path):
