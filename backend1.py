@@ -1309,10 +1309,10 @@ def process_audio_file(file_content, selected_file):
             mp3_path = convert_m4a_to_mp3(file_content)
             if mp3_path:
                 text = transcribe_audio(mp3_path)
-                if text:
-                    st.text_area("추출된 텍스트:", text, height=300)
+                #if text:
+                    #st.text_area("추출된 텍스트:", text, height=300)
                 os.remove(mp3_path)
-
+                return text
         # 다른 형식의 파일은 바로 Whisper API로 전달
         elif file_extension in ["mp3", "wav", "ogg", "flac","m4a"]:
             with tempfile.NamedTemporaryFile(delete=False, suffix=f".{file_extension}") as audio_temp_file:
@@ -1320,12 +1320,13 @@ def process_audio_file(file_content, selected_file):
                 audio_path = audio_temp_file.name
 
             text = transcribe_audio(audio_path)
-            if text:
-                st.text_area("추출된 텍스트:", text, height=300)
-
+            #if text:
+                #st.text_area("추출된 텍스트:", text, height=300)
+            return text
             os.remove(audio_path)
         else:
             st.error(f"{file_extension} 형식은 지원되지 않습니다.")
+            return None
 
 # m4a 파일을 mp3로 변환하는 함수
 def convert_m4a_to_mp3(file_content):
