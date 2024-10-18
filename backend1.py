@@ -33,6 +33,7 @@ import yt_dlp
 from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled, NoTranscriptFound
 from pytube import YouTube
 import subprocess
+from pydub import AudioSegment
 
 # Backend 기능 구현 시작 ---
 
@@ -1431,4 +1432,73 @@ def extract_text_from_audio(file_content, file_type):
         st.error(f"Whisper API를 통해 음성 파일에서 텍스트를 추출하는 중 오류가 발생했습니다: {str(e)}")
         return None    
 
+# ffmpeg 경로 설정 (필요한 경우)
+AudioSegment.converter = "/usr/bin/ffmpeg"
+
+# 파일 처리 함수
+def process_audio_file(file_content, selected_file):
+
+     # 파일 크기 제한 (25MB)
+    MAX_FILE_SIZE_MB = 25
+    MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
+    
+    # 파일 확장자 확인
+    file_extension = selected_file.split('.')[-1].lower()
+
+    # 파일 크기 확인
+    if len(file_content) > MAX_FILE_SIZE_BYTES:
+        st.error(f"파일 크기가 {MAX_FILE_SIZE_MB}MB를 초과했습니다. 크기: {len(file_content) / (1024 * 1024):.2f} MB")
+    else:
+        # .m4a 파일은 mp3로 변환 후 Whisper API로 전달
+        if file_extension == "m4a":
+            mp3_path = convert_m4a_to_mp3(file_content)
+            if mp3_path:
+                text = transcribe_audio(mp3_path)
+                if text:
+                    st.text_area("추출된 텍스트:", text, height=300)
+                os.remove(mp3_path)
+
+        # 다른 형식의 파일은 바로 Whisper API로 전달
+        elif file_extension in ["mp3", "wav", "ogg", "flac"]:
+            with tempfile.NamedTemporaryFile(delete=False, suffix=f".{file_extension}") as audio_temp_file:
+                audio_temp_file.write(file_content)
+                audio_path = audio_temp_file.name
+
+            text = transcribe_audio(audio_path)
+            if text:
+                st.text_area("추출된 텍스트:", text, height=300)
+
+            os.remove(audio_path)
+        else:
+            st.error(f"{file_extension} 형식은 지원되지 않습니다.")
+
+# m4a 파일을 mp3로 변환하는 함수
+def convert_m4a_to_mp3(m4a_bytes):
+    try:
+        # 임시 파일에 m4a 파일 저장
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".m4a") as m4a_temp_file:
+            m4a_temp_file.write(m4a_bytes)
+            m4a_path = m4a_temp_file.name
+        
+        # mp3 파일로 변환
+        mp3_path = m4a_path.replace(".m4a", ".mp3")
+        audio = AudioSegment.from_file(m4a_path, format="m4a")
+        audio.export(mp3_path, format="mp3")
+
+        return mp3_path
+    except Exception as e:
+        st.error(f"m4a 파일을 mp3로 변환하는 중 오류가 발생했습니다: {e}")
+        return None
+    finally:
+        os.remove(m4a_path)
+
+# 음성 파일을 Whisper API를 통해 텍스트로 변환하는 함수
+def transcribe_audio(audio_path):
+    try:
+        with open(audio_path, "rb") as audio_file:
+            response = openai.Audio.transcribe("whisper-1", audio_file)
+            return response['text']
+    except Exception as e:
+        st.error(f"Whisper API를 통해 음성 파일에서 텍스트를 추출하는 중 오류가 발생했습니다: {e}")
+        return None
 # Backend 기능 구현 끝 ---
