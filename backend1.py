@@ -1441,9 +1441,12 @@ def process_audio_file(file_content, selected_file):
     MAX_FILE_SIZE_MB = 25
     MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
 
-     # 파일 크기 확인 (BytesIO 객체의 크기 확인)
-    file_size = len(file_content.getbuffer().nbytes) if isinstance(file_content, BytesIO) else len(file_content)
-    
+    # 파일 크기 확인 (BytesIO 객체의 크기 확인)
+    if isinstance(file_content, BytesIO):
+        file_size = file_content.getbuffer().nbytes
+    else:
+        file_size = len(file_content) 
+        
     # 파일 확장자 확인
     file_extension = selected_file.split('.')[-1].lower()
     
