@@ -1456,8 +1456,8 @@ def process_audio_file(file_content, selected_file):
         st.error(f"파일 크기가 {MAX_FILE_SIZE_MB}MB를 초과했습니다. 크기: {file_size / (1024 * 1024):.2f} MB")
     else:
         # .m4a 파일은 mp3로 변환 후 Whisper API로 전달
-        if file_extension == "m4a":
-            mp3_path = convert_m4a_to_mp3(file_content)
+        if file_extension == "m4a2":
+            mp3_path = convert_m4a_to_mp3_3(file_content)
             if mp3_path:
                 text = transcribe_audio(mp3_path)
                 if text:
