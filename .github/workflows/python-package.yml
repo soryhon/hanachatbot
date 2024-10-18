@@ -38,5 +38,7 @@ jobs:
     - name: Test with pytest
       run: |
     # 4. ffmpeg 설치
-    - name: Install ffmpeg
+    - name: Install FFmpeg
       run: sudo apt-get install -y ffmpeg
+    - name: Verify FFmpeg installation
+      run: ffmpeg -version
