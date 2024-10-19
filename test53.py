@@ -124,7 +124,7 @@ if github_info_loaded:
                         
                         template_data = bd.load_template_from_github(repo, branch, token, selected_template)
                         if template_data:
-                            bd.apply_template_to_session_state(f"templateFiles/{selected_template}")
+                            bd.apply_template_to_session_state(f"audioTemplateFiles/{selected_template}")
                             #st.success(f"{selected_template} 양식을 성공적으로 불러왔습니다.")
 
         with tab3:
