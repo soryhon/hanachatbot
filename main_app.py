@@ -57,19 +57,19 @@ with st.sidebar.form("보고서 자동 완성"):
         # 선택한 Python 파일 내용 읽기
         selected_file = "test50.py"
         exec_page(selected_file)
-    if st.form_submit_button("결과 보고서 현황", use_container_width=True):        
+    if st.form_submit_button("보고서 비교분석 자동 완성", use_container_width=True):        
         selected_menu(0)
         # 선택한 Python 파일 내용 읽기
         selected_file = "test51.py"
         exec_page(selected_file)
-    if st.form_submit_button("챌린지5팀 소개", use_container_width=True):        
+    if st.form_submit_button("음성 파일 보고서 완성", use_container_width=True):        
         selected_menu(0)
         # 선택한 Python 파일 내용 읽기
         selected_file = "test53.py"
         exec_page(selected_file)
-    if st.form_submit_button("'만족도 평가", use_container_width=True):        
+    if st.form_submit_button("'Quickly 키워드 검색 보고서", use_container_width=True):        
         selected_menu(0)
-        st.sidebar.write("평가도")
+        st.write("Quickly 키워드 검색 보고서")
         # 선택한 Python 파일 내용 읽기
         #selected_file = "test50.py"
         #exec_page(selected_file)
