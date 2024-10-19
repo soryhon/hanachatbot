@@ -37,13 +37,43 @@ def selected_menu(idx):
         st.session_state['menu03'] = False
         st.session_state['menu04'] = False
 
+def exec_page(file_name):
+    if file_name:
+        with open(file_name, 'r') as file:
+                file_content = file.read()
+            
+        # 파일 내용을 화면에 출력
+        #st.code(file_content, language='python')
+        try:
+            exec(file_content)  # exec()을 사용하여 추출된 Python 코드를 실행
+        except Exception as e:
+            st.error(f"코드를 실행하는 중 오류가 발생했습니다: {str(e)}")    
+        
 selected_menu(0)
 
-col1, col2 = st.columns([0.2,0.8])
-with col1:
-    st.sidebar.write("1")
-with col2:
-    st.sidebar.write("2")
+form_menu01 = st.sidebar.form("보고서 자동 완성"):
+    if st.sidebar.button("업무 보고서 자동 완성", use_container_width=True):        
+        selected_menu(0)
+        # 선택한 Python 파일 내용 읽기
+        selected_file = "test50.py"
+        exec_page(selected_file)
+    if st.sidebar.button("결과 보고서 현황", use_container_width=True):        
+        selected_menu(0)
+        # 선택한 Python 파일 내용 읽기
+        selected_file = "test51.py"
+        exec_page(selected_file)
+    if st.sidebar.button("챌린지5팀 소개", use_container_width=True):        
+        selected_menu(0)
+        # 선택한 Python 파일 내용 읽기
+        selected_file = "test53.py"
+        exec_page(selected_file)
+    if st.sidebar.button("'만족도 평가", use_container_width=True):        
+        selected_menu(0)
+        st.sidebar.write("평가도")
+        # 선택한 Python 파일 내용 읽기
+        #selected_file = "test50.py"
+        #exec_page(selected_file)
+
 selected_menu = st.sidebar.radio("", ['보고서 자동 완성', '결과 보고서 현황', '챌린지5팀 소개', '만족도 평가'])
 if selected_menu == '보고서 자동 완성':
     #selected_menu(0)
