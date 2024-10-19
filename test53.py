@@ -201,7 +201,7 @@ st.markdown(
 
 # 6 프레임
 # 요청사항 갯수 및 기준일자 설정 
-with st.expander("⚙️ 요청사항 및 기준일자 설정", expanded=st.session_state['check_setting']):
+with st.expander("⚙️ 요청사항 설정 및 ⬆️ 음성 파일 업로드", expanded=st.session_state['check_setting']):
     tab1, tab2 = st.tabs(["• 요청사항 및 기준일자 설정", "• 음성파일 업로드"]) 
     with tab1:
         col1, col2, col3 = st.columns([0.5, 0.25, 0.25])
