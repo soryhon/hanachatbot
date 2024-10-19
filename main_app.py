@@ -40,7 +40,18 @@ def selected_menu(idx):
 selected_menu(0)
 selected_menu = st.sidebar.radio("", ['보고서 자동 완성', '결과 보고서 현황', '챌린지5팀 소개', '만족도 평가'])
 if selected_menu == '보고서 자동 완성':
-    selected_menu(0)
+    #selected_menu(0)
+    # 선택한 Python 파일 내용 읽기
+    selected_file = "test50.py"
+    with open(selected_file, 'r') as file:
+        file_content = file.read()
+    
+    # 파일 내용을 화면에 출력
+    #st.code(file_content, language='python')
+    try:
+        exec(file_content)  # exec()을 사용하여 추출된 Python 코드를 실행
+    except Exception as e:
+        st.error(f"코드를 실행하는 중 오류가 발생했습니다: {str(e)}")
 elif selected_menu == '결과 보고서 현황':
     selected_menu(0)
 elif selected_menu == '챌린지5팀 소개':
