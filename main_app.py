@@ -40,7 +40,7 @@ def selected_menu(idx):
 selected_menu(0)
 with st.sidebar.expander("보고서 자동 완성", expanded=st.session_state['menu01']):
     if st.sidebar.button("업무 보고서 자동 완성", use_container_width=True):
-        selected_menu(idx)
+        selected_menu(0)
         
 # 버튼 클릭 시 radio_visible 값 변경
 if st.sidebar.button("보고서 자동 완성", use_container_width=True):
