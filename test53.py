@@ -294,47 +294,47 @@ with st.expander("⚙️ 요청사항 및 기준일자 설정", expanded=st.sess
         supported_file_types = ['mp3', 'wav', 'm4a', 'mp4', 'mpeg', 'webm', 'ogg', 'aac', 'flac']
 
         if github_info_loaded:
-            with st.expander("⬆️ 음성 파일 업로드", expanded=st.session_state['check_upload']):
-                uploaded_files = st.file_uploader("음성 파일을 여러 개 드래그 앤 드롭하여 업로드하세요. (최대 100MB)", accept_multiple_files=True, type=supported_file_types)
-        
-                if uploaded_files:
-                    for uploaded_file in uploaded_files:
-                        file_type = uploaded_file.name.split('.')[-1].lower()
-        
-                        if file_type not in supported_file_types:
-                            st.error(f"지원하지 않는 파일입니다: {uploaded_file.name}")
-                            continue
-        
-                        if uploaded_file.size > MAX_FILE_SIZE_BYTES:
-                            st.warning(f"'{uploaded_file.name}' 파일은 {MAX_FILE_SIZE_MB}MB 제한을 초과했습니다. 파일 크기를 줄이거나 GitHub에 직접 푸시하세요.")
+            #with st.expander("⬆️ 음성 파일 업로드", expanded=st.session_state['check_upload']):
+            uploaded_files = st.file_uploader("음성 파일을 여러 개 드래그 앤 드롭하여 업로드하세요. (최대 100MB)", accept_multiple_files=True, type=supported_file_types)
+    
+            if uploaded_files:
+                for uploaded_file in uploaded_files:
+                    file_type = uploaded_file.name.split('.')[-1].lower()
+    
+                    if file_type not in supported_file_types:
+                        st.error(f"지원하지 않는 파일입니다: {uploaded_file.name}")
+                        continue
+    
+                    if uploaded_file.size > MAX_FILE_SIZE_BYTES:
+                        st.warning(f"'{uploaded_file.name}' 파일은 {MAX_FILE_SIZE_MB}MB 제한을 초과했습니다. 파일 크기를 줄이거나 GitHub에 직접 푸시하세요.")
+                    else:
+                        file_content = uploaded_file.read()
+                        file_name = uploaded_file.name
+                        #folder_name = 'uploadFiles'
+                        folder_name = st.session_state.get('upload_folder', 'uploadFiles')
+    
+                        sha = bd.get_file_sha(st.session_state['github_repo'], f"{folder_name}/{file_name}", st.session_state['github_token'], branch=st.session_state['github_branch'])
+    
+                        if sha:
+                            st.warning(f"'{file_name}' 파일이 이미 존재합니다. 덮어쓰시겠습니까?")
+                            col1, col2 = st.columns(2)
+    
+                            with col1:
+                                if st.button(f"'{file_name}' 덮어쓰기", key=f"overwrite_{file_name}"):
+                                    bd.upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
+                                    st.success(f"'{file_name}' 파일이 성공적으로 덮어쓰기 되었습니다.")
+                                    uploaded_files = None
+                                    break
+    
+                            with col2:
+                                if st.button("취소", key=f"cancel_{file_name}"):
+                                    st.info("덮어쓰기가 취소되었습니다.")
+                                    uploaded_files = None
+                                    break
                         else:
-                            file_content = uploaded_file.read()
-                            file_name = uploaded_file.name
-                            #folder_name = 'uploadFiles'
-                            folder_name = st.session_state.get('upload_folder', 'uploadFiles')
-        
-                            sha = bd.get_file_sha(st.session_state['github_repo'], f"{folder_name}/{file_name}", st.session_state['github_token'], branch=st.session_state['github_branch'])
-        
-                            if sha:
-                                st.warning(f"'{file_name}' 파일이 이미 존재합니다. 덮어쓰시겠습니까?")
-                                col1, col2 = st.columns(2)
-        
-                                with col1:
-                                    if st.button(f"'{file_name}' 덮어쓰기", key=f"overwrite_{file_name}"):
-                                        bd.upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
-                                        st.success(f"'{file_name}' 파일이 성공적으로 덮어쓰기 되었습니다.")
-                                        uploaded_files = None
-                                        break
-        
-                                with col2:
-                                    if st.button("취소", key=f"cancel_{file_name}"):
-                                        st.info("덮어쓰기가 취소되었습니다.")
-                                        uploaded_files = None
-                                        break
-                            else:
-                                bd.upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'])
-                                st.success(f"'{file_name}' 파일이 성공적으로 업로드되었습니다.")
-                                uploaded_files = None
+                            bd.upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'])
+                            st.success(f"'{file_name}' 파일이 성공적으로 업로드되었습니다.")
+                            uploaded_files = None
         else:
             st.warning("GitHub 정보가 저장되기 전에는 파일 업로드를 할 수 없습니다. 먼저 GitHub 정보를 입력해 주세요.")
 
