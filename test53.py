@@ -122,7 +122,7 @@ if github_info_loaded:
                     st.session_state['selected_template_name'] = selected_template
                     if selected_template != templatelist_init_value:
                         
-                        template_data = bd.load_template_from_github(repo, branch, token, selected_template)
+                        template_data = bd.load_audio_template_from_github(repo, branch, token, selected_template)
                         if template_data:
                             bd.apply_template_to_session_state(f"audioTemplateFiles/{selected_template}")
                             #st.success(f"{selected_template} 양식을 성공적으로 불러왔습니다.")
