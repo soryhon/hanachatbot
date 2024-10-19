@@ -49,3 +49,18 @@ elif page == '음성 파일 보고서 완성':
         exec(file_content)  # exec()을 사용하여 추출된 Python 코드를 실행
     except Exception as e:
         st.error(f"코드를 실행하는 중 오류가 발생했습니다: {str(e)}")
+
+# 세션 상태에 radio_visible 변수가 없다면 False로 초기화
+if 'radio_visible' not in st.session_state:
+    st.session_state['radio_visible'] = False
+
+# 버튼 클릭 시 radio_visible 값 변경
+if st.sidebar.button("옵션 선택하기"):
+    st.session_state['radio_visible'] = True
+
+# 버튼이 클릭되었을 때만 radio 버튼 표시
+if st.session_state['radio_visible']:
+    selected_option = st.sidebar.radio("옵션을 선택하세요", ["옵션 1", "옵션 2", "옵션 3"])
+    
+    # 선택한 옵션을 화면에 표시
+    st.write(f"선택한 옵션: {selected_option}")
