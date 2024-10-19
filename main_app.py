@@ -52,22 +52,22 @@ def exec_page(file_name):
 selected_menu(0)
 
 form_menu01 = st.sidebar.form("보고서 자동 완성"):
-    if st.sidebar.button("업무 보고서 자동 완성", use_container_width=True):        
+    if st.button("업무 보고서 자동 완성", use_container_width=True):        
         selected_menu(0)
         # 선택한 Python 파일 내용 읽기
         selected_file = "test50.py"
         exec_page(selected_file)
-    if st.sidebar.button("결과 보고서 현황", use_container_width=True):        
+    if st.button("결과 보고서 현황", use_container_width=True):        
         selected_menu(0)
         # 선택한 Python 파일 내용 읽기
         selected_file = "test51.py"
         exec_page(selected_file)
-    if st.sidebar.button("챌린지5팀 소개", use_container_width=True):        
+    if st.button("챌린지5팀 소개", use_container_width=True):        
         selected_menu(0)
         # 선택한 Python 파일 내용 읽기
         selected_file = "test53.py"
         exec_page(selected_file)
-    if st.sidebar.button("'만족도 평가", use_container_width=True):        
+    if st.button("'만족도 평가", use_container_width=True):        
         selected_menu(0)
         st.sidebar.write("평가도")
         # 선택한 Python 파일 내용 읽기
