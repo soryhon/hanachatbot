@@ -542,7 +542,7 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
         if "html_report" in st.session_state:
             #st.write("파일 데이터 추출 보기")
             html_report_value = f"<div style='border: 0px solid #cccccc; padding: 2px;'>{st.session_state['html_report']}</div>"
-            st.components.v1.html(html_report_value, height=10240, scrolling=True)
+            st.components.v1.html(html_report_value, height=800, scrolling=True)
 # 11 프레임
 # 결과 보고서 HTML 보기
 #if "html_report" in st.session_state:
