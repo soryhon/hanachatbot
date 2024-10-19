@@ -19,7 +19,7 @@ elif page == 'Page 1':
         file_content = file.read()
     
     # 파일 내용을 화면에 출력
-    st.write(f"### {selected_file} 파일 내용")
+    #st.write(f"### {selected_file} 파일 내용")
     st.code(file_content, language='python')
 
 # Page 2 선택 시 'cheokcheok1_02.py' 실행
