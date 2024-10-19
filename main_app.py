@@ -109,7 +109,7 @@ if st.session_state['menu04']:
     st.write("만족도 평가")
     
 # 사이드바에 메뉴 추가
-page = st.sidebar.radio('Choose a page', ['Home', '업무 보고서 자동 완성', '보고서 비교분석 자동 완성', '음성 파일 보고서 완성'])
+page = st.sidebar.radio('Choose a page', [ '업무 보고서 자동 완성', '보고서 비교분석 자동 완성', '음성 파일 보고서 완성'])
 
 # 홈 페이지 설정
 if page == 'Home':
