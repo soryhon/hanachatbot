@@ -38,6 +38,17 @@ def selected_menu(idx):
         st.session_state['menu04'] = False
 
 selected_menu(0)
+selected_menu = st.sidebar.radio("", ['보고서 자동 완성', '결과 보고서 현황', '챌린지5팀 소개', '만족도 평가'], use_container_width=True)
+if selected_menu == '보고서 자동 완성':
+    selected_menu(0)
+elif selected_menu == '결과 보고서 현황':
+    selected_menu(0)
+elif selected_menu == '챌린지5팀 소개':
+    selected_menu(0)
+elif selected_menu == '만족도 평가':
+    selected_menu(0)
+
+    
 with st.sidebar.expander("보고서 자동 완성", expanded=st.session_state['menu01']):
     if st.sidebar.button("업무 보고서 자동 완성", use_container_width=True):
         selected_menu(0)
