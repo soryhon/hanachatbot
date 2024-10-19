@@ -58,7 +58,7 @@ if st.sidebar.button("보고서 자동 완성", key="button_menu01",use_containe
         st.session_state['menu01']=True
         
 if st.session_state['menu01']:
-    with st.sidebar.form("보고서 자동 완성", , clear_on_submit=False):
+    with st.sidebar.form("보고서 자동 완성", clear_on_submit=False):
         if st.form_submit_button("업무 보고서 자동 완성", use_container_width=True):        
             selected_menu(0)
             # 선택한 Python 파일 내용 읽기
