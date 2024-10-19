@@ -100,7 +100,7 @@ if github_info_loaded:
                 branch = st.session_state["github_branch"]
                 token = st.session_state["github_token"]
                  # templateFiles 폴더 내 JSON 파일 리스트 가져오기
-                template_files = bd.get_template_files_list(repo, branch, token)
+                template_files = bd.get_audio_template_files_list(repo, branch, token)
                 
                 if template_files:
                     # 'selected_template'가 template_files에 있을 때만 index 설정
