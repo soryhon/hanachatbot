@@ -1,5 +1,6 @@
 import streamlit as st
 import importlib
+import os
 
 # 사이드바에 메뉴 추가
 page = st.sidebar.selectbox('Choose a page', ['Home', 'Page 1', 'Page 2'])
@@ -12,8 +13,13 @@ if page == 'Home':
 # Page 1 선택 시 'cheokcheok1_01.py' 실행
 elif page == 'Page 1':
     st.title("Page 1")
-    cheokcheok1_01 = importlib.import_module('test50')
-    #cheokcheok1_01.show()
+    # 선택한 Python 파일 내용 읽기
+    with open('test50.py', 'r') as file:
+        file_content = file.read()
+    
+    # 파일 내용을 화면에 출력
+    st.write(f"### {selected_file} 파일 내용")
+    st.code(file_content, language='python')
 
 # Page 2 선택 시 'cheokcheok1_02.py' 실행
 elif page == 'Page 2':
