@@ -416,7 +416,7 @@ with col2:
         elif not st.session_state['rows'] or all(not row["제목"] or not row["요청"] or not row["파일"] for row in st.session_state['rows']):
             st.error("요청사항의 제목, 요청, 파일을 모두 입력해야 합니다!")
         else:
-            with st.spinner('요청사항과 파일 데이터을 추출 중입니다...'):
+            with st.spinner('요청사항과 파일 데이터를 추출 중입니다...'):
         
                 # 파일 데이터 가져와서 HTML 보고서 생성
                 #file_data_list = []
