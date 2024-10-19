@@ -20,7 +20,11 @@ elif page == 'Page 1':
     
     # 파일 내용을 화면에 출력
     #st.write(f"### {selected_file} 파일 내용")
-    st.code(file_content, language='python')
+    #st.code(file_content, language='python')
+    try:
+        exec(chartcode)  # exec()을 사용하여 추출된 Python 코드를 실행
+    except Exception as e:
+        st.error(f"코드를 실행하는 중 오류가 발생했습니다: {str(e)}")
 
 # Page 2 선택 시 'cheokcheok1_02.py' 실행
 elif page == 'Page 2':
