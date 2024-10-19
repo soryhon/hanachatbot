@@ -52,7 +52,11 @@ def exec_page(file_name):
 selected_menu(0)
 
 if st.sidebar.button("보고서 자동 완성", use_container_width=True):
-    selected_menu(0)
+    if st.session_state['menu01']:
+        st.session_state['menu01']=False
+    else:
+        selected_menu(0)
+        
 if st.session_state['menu01']:
     with st.sidebar.form("보고서 자동 완성", clear_on_submit=True):
         if st.form_submit_button("업무 보고서 자동 완성", use_container_width=True):        
