@@ -537,7 +537,7 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
                    st.session_state['check_upload'] = False
                    st.session_state['check_setting'] = False
                    st.session_state['check_request'] = False
-                   bd.save_template_to_json()
+                   bd.save_audio_template_to_json()
     with tab2:  
         if "html_report" in st.session_state:
             #st.write("파일 데이터 추출 보기")
