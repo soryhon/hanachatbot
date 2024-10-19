@@ -38,6 +38,12 @@ def selected_menu(idx):
         st.session_state['menu04'] = False
 
 selected_menu(0)
+
+col1, col2 = st.sidebar.columns([0.2,0.8])
+with col1:
+    st.sidebar.write("1")
+with col2:
+    st.sidebar.write("2")
 selected_menu = st.sidebar.radio("", ['보고서 자동 완성', '결과 보고서 현황', '챌린지5팀 소개', '만족도 평가'])
 if selected_menu == '보고서 자동 완성':
     #selected_menu(0)
