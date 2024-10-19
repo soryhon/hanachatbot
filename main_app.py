@@ -13,10 +13,10 @@ if page == 'Home':
 elif page == 'Page 1':
     st.title("Page 1")
     cheokcheok1_01 = importlib.import_module('test50')
-    cheokcheok1_01.show()
+    #cheokcheok1_01.show()
 
 # Page 2 선택 시 'cheokcheok1_02.py' 실행
 elif page == 'Page 2':
     st.title("Page 2")
     cheokcheok1_02 = importlib.import_module('test51')
-    cheokcheok1_02.show()
+    #cheokcheok1_02.show()
