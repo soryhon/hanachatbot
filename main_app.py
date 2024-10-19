@@ -7,7 +7,7 @@ if 'menu01' not in st.session_state:
     st.session_state['menu01'] = True
 if 'menu02' not in st.session_state:
     st.session_state['menu02'] = False
- if 'menu03' not in st.session_state:
+if 'menu03' not in st.session_state:
     st.session_state['menu03'] = False
 if 'menu05' not in st.session_state:
     st.session_state['menu04'] = False   
