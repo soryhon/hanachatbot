@@ -55,7 +55,7 @@ if st.sidebar.button("보고서 자동 완성", key="button_menu01",use_containe
     if st.session_state['menu01'] == True:
         st.session_state['menu01']=False
     else:
-        selected_menu(0)
+        st.session_state['menu01']=True
         
 if st.session_state['menu01']:
     with st.sidebar.form("보고서 자동 완성", clear_on_submit=True):
