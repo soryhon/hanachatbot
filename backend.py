@@ -1504,5 +1504,20 @@ def get_audio_template_files_list(repo, branch, token):
     else:
         st.error("templateFiles 폴더의 파일 목록을 가져오지 못했습니다.")
         return []
+
+# JSON 파일의 내용을 불러오는 함수
+def load_audio_template_from_github(repo, branch, token, file_name):
+    template_folder = "audioTemplateFiles"
+    json_file_path = f"{template_folder}/{file_name}"
+    url = f"https://api.github.com/repos/{repo}/contents/{json_file_path}?ref={branch}"
+    headers = {"Authorization": f"token {token}"}
+    response = requests.get(url, headers=headers)
+
+    if response.status_code == 200:
+        file_content = base64.b64decode(response.json()['content'])
+        return json.loads(file_content)
+    else:
+        st.error(f"{file_name} 파일을 가져오지 못했습니다.")
+        return None
         
 # Backend 기능 구현 끝 ---
