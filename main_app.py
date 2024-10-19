@@ -51,7 +51,7 @@ def exec_page(file_name):
         
 selected_menu(0)
 
-form_menu01 = st.sidebar.form("보고서 자동 완성"):
+with st.sidebar.form("보고서 자동 완성"):
     if st.button("업무 보고서 자동 완성", use_container_width=True):        
         selected_menu(0)
         # 선택한 Python 파일 내용 읽기
