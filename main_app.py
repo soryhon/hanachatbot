@@ -58,7 +58,7 @@ if st.sidebar.button("보고서 자동 완성", key="button_menu01",use_containe
         st.session_state['menu01']=True
         
 st.sidebar.markdown(
-    "<p style='font-size:18px; font-weight:bold; color:#007BFF;text-align:center;width:100%;border:1px solid #000000;'>보고서 자동 완성</p>",
+    "<p style='font-size:18px; font-weight:bold; color:#007BFF;text-align:center;width:100%;border:0px solid #000000;'>보고서 자동 완성</p>",
     unsafe_allow_html=True
 )
 with st.sidebar.form("보고서 자동 완성", clear_on_submit=False):
