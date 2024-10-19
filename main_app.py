@@ -51,28 +51,30 @@ def exec_page(file_name):
         
 selected_menu(0)
 
-with st.sidebar.form("보고서 자동 완성"):
-    if st.form_submit_button("업무 보고서 자동 완성", use_container_width=True):        
-        selected_menu(0)
-        # 선택한 Python 파일 내용 읽기
-        selected_file = "test50.py"
-        exec_page(selected_file)
-    if st.form_submit_button("보고서 비교분석 자동 완성", use_container_width=True):        
-        selected_menu(0)
-        # 선택한 Python 파일 내용 읽기
-        selected_file = "test51.py"
-        exec_page(selected_file)
-    if st.form_submit_button("음성 파일 보고서 완성", use_container_width=True):        
-        selected_menu(0)
-        # 선택한 Python 파일 내용 읽기
-        selected_file = "test53.py"
-        exec_page(selected_file)
-    if st.form_submit_button("'Quickly 키워드 검색 보고서", use_container_width=True):        
-        selected_menu(0)
-        st.write("Quickly 키워드 검색 보고서")
-        # 선택한 Python 파일 내용 읽기
-        #selected_file = "test50.py"
-        #exec_page(selected_file)
+if st.sidebar.button("보고서 자동 완성", use_container_width=True):
+    selected_menu(0)
+    with st.sidebar.form("보고서 자동 완성", clear_on_submit=True):
+        if st.form_submit_button("업무 보고서 자동 완성", use_container_width=True):        
+            selected_menu(0)
+            # 선택한 Python 파일 내용 읽기
+            selected_file = "test50.py"
+            exec_page(selected_file)
+        if st.form_submit_button("보고서 비교분석 자동 완성", use_container_width=True):        
+            selected_menu(0)
+            # 선택한 Python 파일 내용 읽기
+            selected_file = "test51.py"
+            exec_page(selected_file)
+        if st.form_submit_button("음성 파일 보고서 완성", use_container_width=True):        
+            selected_menu(0)
+            # 선택한 Python 파일 내용 읽기
+            selected_file = "test53.py"
+            exec_page(selected_file)
+        if st.form_submit_button("'Quickly 키워드 검색 보고서", use_container_width=True):        
+            selected_menu(0)
+            st.write("Quickly 키워드 검색 보고서")
+            # 선택한 Python 파일 내용 읽기
+            #selected_file = "test50.py"
+            #exec_page(selected_file)
 
 selected_menu = st.sidebar.radio("", ['보고서 자동 완성', '결과 보고서 현황', '챌린지5팀 소개', '만족도 평가'])
 if selected_menu == '보고서 자동 완성':
