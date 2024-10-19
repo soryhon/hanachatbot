@@ -3,21 +3,51 @@ import importlib
 import os
 
 # 세션 상태에 radio_visible 변수가 없다면 False로 초기화
-if 'menu01' not in st.session_state:
-    st.session_state['menu01'] = True
-if 'menu02' not in st.session_state:
-    st.session_state['menu02'] = False
-if 'menu03' not in st.session_state:
-    st.session_state['menu03'] = False
-if 'menu05' not in st.session_state:
-    st.session_state['menu04'] = False   
+def selected_menu(idx):
+    if not idx:
+        idx = 0
+    
+    if 'menu01' not in st.session_state:
+        st.session_state['menu01'] = True
+    if 'menu02' not in st.session_state:
+        st.session_state['menu02'] = False
+    if 'menu03' not in st.session_state:
+        st.session_state['menu03'] = False
+    if 'menu05' not in st.session_state:
+        st.session_state['menu04'] = False   
 
+    if idx == 1:
+        st.session_state['menu01'] = False
+        st.session_state['menu02'] = True
+        st.session_state['menu03'] = False
+        st.session_state['menu04'] = False
+    elif idx == 2:
+        st.session_state['menu01'] = False
+        st.session_state['menu02'] = False
+        st.session_state['menu03'] = True
+        st.session_state['menu04'] = False
+    elif idx == 3:
+        st.session_state['menu01'] = False
+        st.session_state['menu02'] = False
+        st.session_state['menu03'] = False
+        st.session_state['menu04'] = True
+    else:
+        st.session_state['menu01'] = True
+        st.session_state['menu02'] = False
+        st.session_state['menu03'] = False
+        st.session_state['menu04'] = False
+
+with st.sidebar.expander("보고서 자동 완성", expanded=st.session_state['menu01'])
+    if st.sidebar.button("업무 보고서 자동 완성", use_container_width=True):
+        selected_menu(idx)
+        
 # 버튼 클릭 시 radio_visible 값 변경
 if st.sidebar.button("보고서 자동 완성", use_container_width=True):
     st.session_state['menu01'] = True
     st.session_state['menu02'] = False
     st.session_state['menu03'] = False
     st.session_state['menu04'] = False
+
 
 if st.session_state['menu01']:
     selected_menu01_option = st.sidebar.radio("", ['업무 보고서 자동 완성', '보고서 비교분석 자동 완성', '음성 파일 보고서 완성'])
