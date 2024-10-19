@@ -468,25 +468,26 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
     with tab1:   
         if "response" in st.session_state:
             st.markdown(
-                "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
-                unsafe_allow_html=True
+            "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
+            unsafe_allow_html=True
             )  
             st.session_state['check_result'] = True
             for idx, response in enumerate(st.session_state["response"]):
                 #st.text_area(f"응답 {idx+1}:", value=response, height=300)
-    
+                
                 html_response_value = f"<div style='border: 0px solid #cccccc; padding: 1px;'>{response}</div>"
                 html_result_value += html_response_value
                 st.components.v1.html(html_response_value, height=1024, scrolling=True)
-         html_result_value += "</div>"
-         st.markdown(
+                
+        html_result_value += "</div>"
+        st.markdown(
               "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
             unsafe_allow_html=True
-         )
+        )
         
     # 결과 저장 버튼
-         col1, col2 = st.columns([0.5, 0.5])
-         with col1:   
+        col1, col2 = st.columns([0.5, 0.5])
+        with col1:   
             if st.button("💾 결과 내용 저장", key="save_result", use_container_width=True):
                 st.session_state['check_result'] = True
                 st.session_state['check_report'] = False
@@ -527,7 +528,7 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
     
                 else:
                     st.warning("결과 보고서를 먼저 실행하세요.")
-         with col2:
+        with col2:
               if st.button("🗃️ 보고서 양식 저장", key="save_template", use_container_width=True):
                    st.session_state['check_result'] = True
                    st.session_state['check_report'] = False
