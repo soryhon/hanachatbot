@@ -10,7 +10,7 @@ import openpyxl
 # GitHub 정보가 있는지 확인하고 파일 업로드 객체를 출력
 github_info_loaded = bd.load_env_info()
 
-# 업로드 가능한 파일 크기 제한 (100MB)
+# 업로드 가능한 파일 크기 제한 (25MB)
 MAX_FILE_SIZE_MB = 25
 MAX_FILE_SIZE_BYTES = 25 * 1024 * 1024
 
@@ -295,7 +295,7 @@ with st.expander("⚙️ 요청사항 설정 / 파일 업로드", expanded=st.se
 
         if github_info_loaded:
             #with st.expander("⬆️ 음성 파일 업로드", expanded=st.session_state['check_upload']):
-            uploaded_files = st.file_uploader("음성 파일을 여러 개 드래그 앤 드롭하여 업로드하세요. (최대 100MB)", accept_multiple_files=True, type=supported_file_types)
+            uploaded_files = st.file_uploader("음성 파일을 여러 개 드래그 앤 드롭하여 업로드하세요. (최대 25MB)", accept_multiple_files=True, type=supported_file_types)
     
             if uploaded_files:
                 for uploaded_file in uploaded_files:
