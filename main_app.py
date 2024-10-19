@@ -2,6 +2,53 @@ import streamlit as st
 import importlib
 import os
 
+# 세션 상태에 radio_visible 변수가 없다면 False로 초기화
+if 'menu01' not in st.session_state:
+    st.session_state['menu01'] = True
+if 'menu02' not in st.session_state:
+    st.session_state['menu02'] = False
+ if 'menu03' not in st.session_state:
+    st.session_state['menu03'] = False
+if 'menu05' not in st.session_state:
+    st.session_state['menu04'] = False   
+
+# 버튼 클릭 시 radio_visible 값 변경
+if st.sidebar.button("보고서 자동 완성"):
+    st.session_state['menu01'] = True
+    st.session_state['menu02'] = False
+    st.session_state['menu03'] = False
+    st.session_state['menu04'] = False
+
+if st.sidebar.button("결과 보고서 확인"):
+    st.session_state['menu01'] = False
+    st.session_state['menu02'] = True
+    st.session_state['menu03'] = False
+    st.session_state['menu04'] = False
+
+if st.sidebar.button("챌린지5팀 소개"):
+    st.session_state['menu01'] = False
+    st.session_state['menu02'] = False
+    st.session_state['menu03'] = True
+    st.session_state['menu04'] = False
+
+if st.sidebar.button("만족도 평가"):
+    st.session_state['menu01'] = False
+    st.session_state['menu02'] = False
+    st.session_state['menu03'] = False
+    st.session_state['menu04'] = True
+
+if st.session_state['menu01']:
+    selected_menu01_option = st.sidebar.radio("", '업무 보고서 자동 완성', '보고서 비교분석 자동 완성', '음성 파일 보고서 완성'])
+
+if st.session_state['menu02']:
+    selected_menu02_button = st.sidebar.button("결과 보고서 현황")
+
+if st.session_state['menu03']:
+    st.write("챌린지5팀 소개")
+
+if st.session_state['menu04']:
+    st.write("만족도 평가")
+    
 # 사이드바에 메뉴 추가
 page = st.sidebar.radio('Choose a page', ['Home', '업무 보고서 자동 완성', '보고서 비교분석 자동 완성', '음성 파일 보고서 완성'])
 
