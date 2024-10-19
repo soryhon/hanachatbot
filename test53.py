@@ -27,7 +27,7 @@ bd.refresh_page()
 col1, col2 = st.columns([0.55,0.45])
 with col1:
     st.markdown(
-        "<p style='font-size:25px; font-weight:bold; color:#000000;'>음성파일 보고서 완성 📚</p>",
+        "<p style='font-size:25px; font-weight:bold; color:#000000;'>음성파일 보고서 완성 🎧</p>",
         unsafe_allow_html=True
     )
 with col2:
