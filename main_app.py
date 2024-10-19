@@ -51,7 +51,7 @@ def exec_page(file_name):
         
 selected_menu(0)
 
-if st.sidebar.button("보고서 자동 완성", use_container_width=True):
+if st.sidebar.button("보고서 자동 완성", key="btn_menu01",use_container_width=True):
     if st.session_state['menu01']:
         st.session_state['menu01']=False
     else:
