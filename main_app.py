@@ -13,38 +13,44 @@ if 'menu05' not in st.session_state:
     st.session_state['menu04'] = False   
 
 # 버튼 클릭 시 radio_visible 값 변경
-if st.sidebar.button("보고서 자동 완성"):
+if st.sidebar.button("보고서 자동 완성", use_container_width=True):
     st.session_state['menu01'] = True
     st.session_state['menu02'] = False
     st.session_state['menu03'] = False
     st.session_state['menu04'] = False
 
-if st.sidebar.button("결과 보고서 확인"):
+if st.session_state['menu01']:
+    selected_menu01_option = st.sidebar.radio("", ['업무 보고서 자동 완성', '보고서 비교분석 자동 완성', '음성 파일 보고서 완성'])
+
+if st.sidebar.button("결과 보고서 확인", use_container_width=True):
     st.session_state['menu01'] = False
     st.session_state['menu02'] = True
     st.session_state['menu03'] = False
     st.session_state['menu04'] = False
 
-if st.sidebar.button("챌린지5팀 소개"):
+if st.session_state['menu02']:
+    selected_menu02_button = st.sidebar.button("결과 보고서 현황")
+
+if st.sidebar.button("챌린지5팀 소개", use_container_width=True):
     st.session_state['menu01'] = False
     st.session_state['menu02'] = False
     st.session_state['menu03'] = True
     st.session_state['menu04'] = False
 
-if st.sidebar.button("만족도 평가"):
+if st.session_state['menu03']:
+    st.sidebar.write("챌린지5팀 소개")
+
+if st.sidebar.button("만족도 평가", use_container_width=True):
     st.session_state['menu01'] = False
     st.session_state['menu02'] = False
     st.session_state['menu03'] = False
     st.session_state['menu04'] = True
 
-if st.session_state['menu01']:
-    selected_menu01_option = st.sidebar.radio("", ['업무 보고서 자동 완성', '보고서 비교분석 자동 완성', '음성 파일 보고서 완성'])
 
-if st.session_state['menu02']:
-    selected_menu02_button = st.sidebar.button("결과 보고서 현황")
 
-if st.session_state['menu03']:
-    st.write("챌린지5팀 소개")
+
+
+
 
 if st.session_state['menu04']:
     st.write("만족도 평가")
