@@ -11,8 +11,8 @@ import openpyxl
 github_info_loaded = bd.load_env_info()
 
 # 업로드 가능한 파일 크기 제한 (100MB)
-MAX_FILE_SIZE_MB = 100
-MAX_FILE_SIZE_BYTES = 100 * 1024 * 1024
+MAX_FILE_SIZE_MB = 25
+MAX_FILE_SIZE_BYTES = 25 * 1024 * 1024
 
 #Session_state 변수 초기화
 folderlist_init_value = "보고서명을 선택하세요."
