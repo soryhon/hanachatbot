@@ -14,7 +14,8 @@ if page == 'Home':
 elif page == 'Page 1':
     st.title("Page 1")
     # 선택한 Python 파일 내용 읽기
-    with open('test50.py', 'r') as file:
+    selected_file = "test50.py"
+    with open(selected_file, 'r') as file:
         file_content = file.read()
     
     # 파일 내용을 화면에 출력
