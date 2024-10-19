@@ -14,6 +14,9 @@ github_info_loaded = bd.load_env_info()
 MAX_FILE_SIZE_MB = 25
 MAX_FILE_SIZE_BYTES = 25 * 1024 * 1024
 
+# 지원되는 음성 파일 형식 리스트
+supported_file_types = ['mp3', 'wav', 'm4a', 'mp4', 'mpeg', 'webm', 'ogg', 'aac', 'flac']
+
 #Session_state 변수 초기화
 folderlist_init_value = "보고서명을 선택하세요."
 templatelist_init_value = "불러올 보고서 양식을 선택하세요."
@@ -290,9 +293,6 @@ with st.expander("⚙️ 요청사항 설정 / 파일 업로드", expanded=st.se
             )
     with tab2:
 # 파일 업로드
-        # 지원되는 음성 파일 형식 리스트
-        supported_file_types = ['mp3', 'wav', 'm4a', 'mp4', 'mpeg', 'webm', 'ogg', 'aac', 'flac']
-
         if github_info_loaded:
             #with st.expander("⬆️ 음성 파일 업로드", expanded=st.session_state['check_upload']):
             uploaded_files = st.file_uploader("음성 파일을 여러 개 드래그 앤 드롭하여 업로드하세요. (최대 25MB)", accept_multiple_files=True, type=supported_file_types)
@@ -364,8 +364,9 @@ with st.expander("✍️ 요청사항 리스트", expanded=st.session_state['che
      
             file_list = ['파일을 선택하세요.']
             if st.session_state.get('github_token') and st.session_state.get('github_repo'):
-                file_list += bd.get_github_files(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
-
+                all_files = bd.get_github_files(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
+                audio_files = [file for file in all_files if file.split('.')[-1].lower() in supported_audio_file_types]
+                file_list += audio_files
             selected_file = st.selectbox(f"파일 선택 : '{idx+1}.요청사항'의 파일을 선택해주세요.", options=file_list, key=f"file_select_{idx}")
 
             if selected_file != '파일을 선택하세요.':
