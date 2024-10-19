@@ -22,7 +22,7 @@ elif page == 'Page 1':
     #st.write(f"### {selected_file} 파일 내용")
     #st.code(file_content, language='python')
     try:
-        exec(chartcode)  # exec()을 사용하여 추출된 Python 코드를 실행
+        exec(file_content)  # exec()을 사용하여 추출된 Python 코드를 실행
     except Exception as e:
         st.error(f"코드를 실행하는 중 오류가 발생했습니다: {str(e)}")
 
