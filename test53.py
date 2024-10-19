@@ -365,7 +365,7 @@ with st.expander("✍️ 요청사항 리스트", expanded=st.session_state['che
             file_list = ['파일을 선택하세요.']
             if st.session_state.get('github_token') and st.session_state.get('github_repo'):
                 all_files = bd.get_github_files(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
-                audio_files = [file for file in all_files if file.split('.')[-1].lower() in supported_audio_file_types]
+                audio_files = [file for file in all_files if file.split('.')[-1].lower() in supported_file_types]
                 file_list += audio_files
                 
             selected_file = st.selectbox(f"파일 선택 : '{idx+1}.요청사항'의 파일을 선택해주세요.", options=file_list, key=f"file_select_{idx}")
