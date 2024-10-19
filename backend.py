@@ -1491,5 +1491,18 @@ def save_audio_template_to_json():
         st.success(f"{json_file_name} 파일이 {template_folder} 폴더에 저장되었습니다.")
     else:
         st.error(f"파일 저장 실패: {response.json()}")
+
+def get_audio_template_files_list(repo, branch, token):
+    template_folder = "audioTemplateFiles"
+    url = f"https://api.github.com/repos/{repo}/contents/{template_folder}?ref={branch}"
+    headers = {"Authorization": f"token {token}"}
+    response = requests.get(url, headers=headers)
+
+    if response.status_code == 200:
+        # JSON 파일만 필터링하여 리스트로 반환
+        return [item['name'] for item in response.json() if item['name'].endswith('.json')]
+    else:
+        st.error("templateFiles 폴더의 파일 목록을 가져오지 못했습니다.")
+        return []
         
 # Backend 기능 구현 끝 ---
