@@ -38,7 +38,7 @@ if st.sidebar.button("만족도 평가"):
     st.session_state['menu04'] = True
 
 if st.session_state['menu01']:
-    selected_menu01_option = st.sidebar.radio("", '업무 보고서 자동 완성', '보고서 비교분석 자동 완성', '음성 파일 보고서 완성'])
+    selected_menu01_option = st.sidebar.radio("", ['업무 보고서 자동 완성', '보고서 비교분석 자동 완성', '음성 파일 보고서 완성'])
 
 if st.session_state['menu02']:
     selected_menu02_button = st.sidebar.button("결과 보고서 현황")
