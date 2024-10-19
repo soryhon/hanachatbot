@@ -39,7 +39,7 @@ def selected_menu(idx):
 
 selected_menu(0)
 
-col1, col2 = st.sidebar.columns([0.2,0.8])
+col1, col2 = st.columns([0.2,0.8])
 with col1:
     st.sidebar.write("1")
 with col2:
