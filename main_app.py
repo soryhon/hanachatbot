@@ -72,7 +72,7 @@ st.sidebar.markdown(
 )
 
 with st.sidebar.form("menu01_form", clear_on_submit=False):
-    selected_menu2 = st.select_slider("selectbox", ['보고서 자동 완성', '결과 보고서 현황', '챌린지5팀 소개', '만족도 평가'])
+    selected_menu2 = st.selectbox("selectbox", ['보고서 자동 완성', '결과 보고서 현황', '챌린지5팀 소개', '만족도 평가'])
     if st.form_submit_button("업무 보고서 자동 완성", use_container_width=True):        
         selected_menu(0)
         
