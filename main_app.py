@@ -76,6 +76,6 @@ else:
 st.sidebar.markdown(
     """
     <div style='font-size:12px; font-weight:normal; color:#999999;text-align:center;width:90%;border-top:0px dotted #cccccc;margin-left:5%;margin-right:5%'>ⓒ LepoLab. Challenger_5 Team</div>
-    """
-    unsafe_allow_html=True Team
+    """,
+    unsafe_allow_html=True
 )
