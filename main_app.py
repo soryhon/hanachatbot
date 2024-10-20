@@ -63,11 +63,11 @@ st.sidebar.markdown(
 )
 
 with st.sidebar.form("보고서 자동 완성1", clear_on_submit=False):
-    selected_menu = st.sidebar.radio("radio", ['보고서 자동 완성', '결과 보고서 현황', '챌린지5팀 소개', '만족도 평가'])
+    selected_menu = st.radio("radio", ['보고서 자동 완성', '결과 보고서 현황', '챌린지5팀 소개', '만족도 평가'])
     if st.form_submit_button("업무 보고서 자동 완성", use_container_width=True):        
         selected_menu(0)
 with st.sidebar.form("보고서 자동 완성2", clear_on_submit=False):
-    selected_menu2 = st.sidebar.selectbox("selectbox", ['보고서 자동 완성', '결과 보고서 현황', '챌린지5팀 소개', '만족도 평가'])
+    selected_menu2 = st.selectbox("selectbox", ['보고서 자동 완성', '결과 보고서 현황', '챌린지5팀 소개', '만족도 평가'])
     if st.form_submit_button("업무 보고서 자동 완성", use_container_width=True):        
         selected_menu(0)
 with st.sidebar.form("보고서 자동 완성", clear_on_submit=False):
