@@ -1531,5 +1531,71 @@ def exec_page(file_name):
             exec(file_content)  # exec()을 사용하여 추출된 Python 코드를 실행
         except Exception as e:
             st.error(f"코드를 실행하는 중 오류가 발생했습니다: {str(e)}")  
+
+# LLM을 통해 프롬프트와 파일을 전달하고 응답을 받는 함수
+def run_llm_with_keyword_and_prompt(api_key, title, request):
+    global global_generated_prompt
+    openai.api_key = api_key
+
+    responses = []
+    global_generated_prompt = []  # 프롬프트들을 담을 리스트 초기화
+
+    try:
+
+        # 프롬프트 텍스트 정의
+        generated_prompt = f"""
+        '{title}'에 대해 웹 검색 기반으로 검색 조회하고 분석하여 간결하고 깔끔한 보고서를 작성해야 한다..
+        다음과 같은 조건에 모두 만족해야 한다.
+        가. '{title}'에 대해 웹 검색 기반으로 검색 조회하여 데이터를 수집해야 한다.
+        나. 답변할 때 첫번째 행에는 h3 태그를 활용해서 '{title}' 문구가 반드시 시작되어야 한다.
+        다. 아래의 요청사항에 만족하게 최적화된 내용으로 답변해야 한다.
+        라. 표 형식의로 table태그로 답변 할 때는 th과 td 태그는 border는 사이즈 1이고 색상은 검정색으로 구성한다. table 태그 가로길이는 전체를 차지해야 한다.
+        마. 이외 table 태그가 포함 안된 설명은 너가 생각한 가장 좋은 보고서 양식에 맞춰 간결하고 깔끔하게 요약하고 html 형식으로 변환해야 한다.
+        바. 답변할 때는 반드시 모든 항목 데이터의 수정한 데이터 내용과 HTML 형삭에 맞춰 답변한다. 문단마다 줄바꿈을 적용하여 br태그 활용하고 가시성 높게 특수기호와 이모지를 활용하여 보고서 양식에 준하게 요약한 내용을 설명한다.
+        사. 답변할 때 두번째 행에는 h3 태그를 활용해서 '✨AI 비교 분석 결과' 타이틀 추가하고 색상을 달리 구성한다. 너의 답변이라는 것을 표현하는 특수문자로 강조해.
+               전달받은 보고서 전반적인 내용에 대해 너가 선정한 가장 좋은 방법으로 요약과 설명하고 그 내용을 HTML 형식으로 변환하여 답변해야 한다.
+        아. '````', '````HTML' 이 문구들이 답변에 포함되지 않아야 한다.
+        -요청사항
+        [
+            {request}
+        ]
+        """
         
+        # 텍스트 길이 제한 확인 (예: 1000000자로 제한)
+        if len(generated_prompt) > 1000000:
+            st.error("프롬프트 글자 수 초과로 LLM 연동에 실패했습니다.")
+        else:
+            global_generated_prompt.append(generated_prompt)
+            prompt_template = PromptTemplate(
+                template=generated_prompt,
+                input_variables=[]
+            )
+
+            # LLM 모델 생성
+            llm = ChatOpenAI(model_name="gpt-4o")
+            chain = LLMChain(llm=llm, prompt=prompt_template)
+
+            success = False
+            retry_count = 0
+            max_retries = 5  # 최대 재시도 횟수
+
+            # 응답을 받을 때까지 재시도
+            while not success and retry_count < max_retries:
+                try:
+                    response = chain.run({})
+                    response = response.replace('/n', '<br/>')
+                    response = response.replace('```html', '')
+                    response = response.replace('```', '')
+                    responses.append(response)
+                    success = True
+                except RateLimitError:
+                    retry_count += 1
+                    st.warning(f"API 요청 한도를 초과했습니다. 10초 후 다시 시도합니다. 재시도 횟수: {retry_count}/{max_retries}")
+                    time.sleep(10)
+
+                time.sleep(10)
+    except Exception as e:
+        st.error(f"LLM 실행 중 오류가 발생했습니다: {str(e)}")
+
+    return responses
 # Backend 기능 구현 끝 ---
