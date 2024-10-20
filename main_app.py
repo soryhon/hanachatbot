@@ -61,7 +61,8 @@ st.sidebar.markdown(
 selected_menu = st.sidebar.selectbox("보고서 유형 선택하세요.", ["사용할 유형 선택하세요."]+sub_menu_list)
 if selected_menu != "사용할 유형 선택하세요.":
     init_menu(0)
-    if st.session.state['menu01'] == True:
+    check_menu01 = st.session.state['menu01']
+    if check_menu01 == True:
         idx  = sub_menu_list.index(selected_menu)
         selected_file = file_list[idx]
         bd.exec_page(selected_file)
