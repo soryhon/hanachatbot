@@ -76,7 +76,7 @@ if selected_menu:
 st.sidebar.markdown(
     """
     <div style='width:10%'> </div>
-    <p style='font-size:12px; font-weight:bold; color:#007BFF;text-align:center;width:100%;border-top:1px solid #cccccc;'></p>
+    <div style='font-size:12px; font-weight:bold; color:#007BFF;text-align:center;width:80%;border-top:1px solid #cccccc;'></div>
     <div style='width:10%'> </div>
     """,
     unsafe_allow_html=True
