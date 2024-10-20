@@ -1439,59 +1439,8 @@ def run_llm_with_audio_and_prompt(api_key, titles, requests, audio_data_str):
     except Exception as e:
         st.error(f"LLM 실행 중 오류가 발생했습니다: {str(e)}")
 
-    return responses
-
-# JSON 파일 저장 함수
-def save_audio_template_to_json():
-    repo = st.session_state["github_repo"]
-    branch = st.session_state["github_branch"]
-    token = st.session_state["github_token"]
-
-    # GitHub 토큰과 레포지토리 설정 확인
-    if not token or not repo:
-        st.error("GitHub 토큰이나 저장소 정보가 설정되지 않았습니다.")
-        return
-        
-    # JSON 데이터 구조 생성
-    template_data = {
-        "selected_folder_name": st.session_state['selected_folder_name'],
-        "num_requests": st.session_state['num_requests'],
-        "rows": st.session_state['rows'],
-        "rows_length": len(st.session_state['rows']),
-        "timestamp": datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-    }
-
-    # 파일명 생성
-    folder_name = st.session_state['selected_folder_name']
-    timestamp = template_data["timestamp"]
-    json_file_name = f"{folder_name}_Template_{timestamp}.json"
-
-    # GitHub 저장소 내 templateFiles 폴더 생성 및 파일 저장
-    template_folder = "audioTemplateFiles"
-    check_and_create_github_folder(template_folder, repo, branch, token)
-   
-    # 저장할 파일 경로
-    json_file_path = f"{template_folder}/{json_file_name}"
-
-    # JSON 파일을 Base64로 인코딩
-    json_content = json.dumps(template_data, ensure_ascii=False, indent=4)
-    json_base64 = base64.b64encode(json_content.encode('utf-8')).decode('utf-8')
-
-    # GitHub에 파일 업로드
-    url = f"https://api.github.com/repos/{repo}/contents/{json_file_path}"
-    headers = {"Authorization": f"token {token}"}
-    data = {
-        "message": f"Add {json_file_name}",
-        "content": json_base64,
-        "branch": branch
-    }
-
-    response = requests.put(url, headers=headers, json=data)
-    if response.status_code == 201:
-        st.success(f"{json_file_name} 파일이 {template_folder} 폴더에 저장되었습니다.")
-    else:
-        st.error(f"파일 저장 실패: {response.json()}")
-
+    return respons기
+    
 def get_audio_template_files_list(repo, branch, token):
     template_folder = "audioTemplateFiles"
     url = f"https://api.github.com/repos/{repo}/contents/{template_folder}?ref={branch}"
@@ -1599,4 +1548,27 @@ def run_llm_with_keyword_and_prompt(api_key, title, request):
         st.error(f"LLM 실행 중 오류가 발생했습니다: {str(e)}")
 
     return responses
+
+# 보고서명 리스트를 가져오고, reportFiles 폴더 존재 여부를 확인하고 없으면 생성하는 함수
+def get_reportType_folder_list_from_github(repo, branch, token, folder_name):
+    
+    if folder_name:
+        folder_check = check_and_create_github_folder_if_not_exists(repo, folder_name, token, branch)
+    
+        if folder_check:
+            url = f"https://api.github.com/repos/{repo}/contents/{folder_name?ref={branch}"
+            headers = {"Authorization": f"token {token}"}
+            response = requests.get(url, headers=headers)
+    
+            if response.status_code == 200:
+                folder_list = [item['name'] for item in response.json() if item['type'] == 'dir']
+                return folder_list
+            else:
+                st.error(f"폴더 리스트를 가져오지 못했습니다: {response.status_code}")
+                return []
+        else:
+            st.error("reportFiles 폴더가 존재하지 않아 생성할 수 없습니다.")
+            return []
+    else:
+        return []
 # Backend 기능 구현 끝 ---
