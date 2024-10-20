@@ -33,9 +33,7 @@ if selected_menu:
 else:
     st.session_state['selected_menu01_index'] = 0
     
-
-
-
+# 사이드바 하단 문구
 st.sidebar.markdown(
     """
     <div style='font-size:12px; font-weight:normal; color:#999999;text-align:center;width:90%;border-top:0px dotted #cccccc;margin-left:5%;margin-right:5%'>ⓒ LepoLab. Challenger_5 Team</div>
