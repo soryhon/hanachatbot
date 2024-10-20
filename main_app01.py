@@ -17,26 +17,26 @@ def init_menu(idx):
         st.session_state['menu03'] = False
     if 'menu05' not in st.session_state:
         st.session_state['menu04'] = False   
-    if 'selected_menu01_index' not in st.session_state:
-        st.session_state['selected_menu01_index'] =0
+    if 'selected_menu_index' not in st.session_state:
+        st.session_state['selected_menu_index'] =0
     if idx == 1:
         st.session_state['menu01'] = False
         st.session_state['menu02'] = True
         st.session_state['menu03'] = False
         st.session_state['menu04'] = False
-        st.session_state['selected_menu01_index'] =0
+        st.session_state['selected_menu_index'] =0
     elif idx == 2:
         st.session_state['menu01'] = False
         st.session_state['menu02'] = False
         st.session_state['menu03'] = True
         st.session_state['menu04'] = False
-        st.session_state['selected_menu01_index'] = 0
+        st.session_state['selected_menu_index'] = 0
     elif idx == 3:
         st.session_state['menu01'] = False
         st.session_state['menu02'] = False
         st.session_state['menu03'] = False
         st.session_state['menu04'] = True
-        st.session_state['selected_menu01_index'] = 0
+        st.session_state['selected_menu_index'] = 0
     else:
         st.session_state['menu01'] = True
         st.session_state['menu02'] = False
@@ -59,52 +59,22 @@ st.sidebar.markdown(
     unsafe_allow_html=True
 )
 
-st.sidebar.markdown(
-    "<p style='background-color:#E7EAF1;border-radius: 5px;font-size:15px; font-weight:bold; color:#090909;text-align:center;width:100%;padding:8px;border:0px solid #cccccc;margin-top:15px;'>보고서 유형 선택</p>",
-    unsafe_allow_html=True
-)
-
-selected_menu = st.sidebar.selectbox("보고서 유형 선택하세요.", ["사용할 유형 선택하세요."]+sub_menu_list, index=st.session_state['selected_menu01_index'])
-if selected_menu != "사용할 유형 선택하세요.":
-    init_menu(0)
+selected_menu = st.sidebar.selectbox("메뉴를 선택하세요.", sub_menu_list, index=st.session_state['selected_menu_index'])
+if selected_menu:
+    #init_menu(0)
     idx  = sub_menu_list.index(selected_menu)
-    st.session_state['selected_menu01_index'] = idx+1
+    st.session_state['selected_menu_index'] = idx+1
     selected_file = file_list[idx]
     bd.exec_page(selected_file)
 else:
-    st.session_state['selected_menu01_index'] = 0
+    st.session_state['selected_menu_index'] = 0
     
 
 
 
 st.sidebar.markdown(
     """
-    <div style='font-size:12px; font-weight:bold; color:#007BFF;text-align:center;width:90%;border-top:1px dotted #cccccc;margin-left:5%;margin-right:5%'></div>
+    <div style='font-size:12px; font-weight:bold; color:#007BFF;text-align:center;width:90%;border-top:0px dotted #cccccc;margin-left:5%;margin-right:5%'>by Challenger 5 Team</div>
     """,
     unsafe_allow_html=True
 )
-if st.sidebar.button("결과 보고서 현황", key="button_menu02",use_container_width=True):
-    if st.session_state['menu01'] == True:
-        st.session_state['menu01']=False
-    else:
-        st.session_state['menu01']=True
-        
-if st.sidebar.button("챌린지5팀 소개", key="button_menu03",use_container_width=True):
-    st.session_state['selected_menu01_index']=6
-    #init_menu(2)
-    #st.rerun()
-    #if st.session_state['menu03'] == True:
-        #selected_file = 'team_info.py'
-        #bd.exec_page(selected_file)
-        
-        #st.markdown('<meta http-equiv="refresh" content="0">', unsafe_allow_html=True)
-        
-if st.sidebar.button("만족도 평가", key="button_menu04",use_container_width=True):
-    if st.session_state['menu01'] == True:
-        st.session_state['menu01']=False
-    else:
-        st.session_state['menu01']=True
-        
-
-
-
