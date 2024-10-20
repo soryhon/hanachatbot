@@ -62,8 +62,12 @@ st.sidebar.markdown(
     unsafe_allow_html=True
 )
 
+st.sidebar.markdown(
+    "<p style='font-size:18px; font-weight:bold; color:#007BFF;text-align:left;width:100%;border:0px solid #000000;'>보고서 자동 완성</p>",
+    unsafe_allow_html=True
+)
 
-selected_menu = st.sidebar.selectbox("보고서 유형", sub_menu_list)
+selected_menu = st.sidebar.selectbox("보고서 유형 선택하세요.", sub_menu_list)
 if selected_menu:
     idx  = sub_menu_list.index(selected_menu)
     selected_file = file_list[idx]
@@ -87,40 +91,6 @@ if st.sidebar.button("만족도 평가", key="button_menu04",use_container_width
     else:
         st.session_state['menu01']=True
         
-st.sidebar.markdown(
-    "<p style='font-size:18px; font-weight:bold; color:#007BFF;text-align:center;width:100%;border:0px solid #000000;'>보고서 자동 완성</p>",
-    unsafe_allow_html=True
-)
 
-
-        
-
-selected_menu = st.radio("radio", ['보고서 자동 완성', '결과 보고서 현황', '챌린지5팀 소개', '만족도 평가'])
-if st.form_submit_button("업무 보고서 자동 완성", use_container_width=True):        
-    selected_menu(0)
-
-with st.sidebar.form("보고서 자동 완성", clear_on_submit=False):
-
-    if st.form_submit_button("업무 보고서 자동 완성", use_container_width=True):        
-        selected_menu(0)
-        # 선택한 Python 파일 내용 읽기
-        selected_file = "test50.py"
-        exec_page(selected_file)
-    if st.form_submit_button("보고서 비교분석 자동 완성", use_container_width=True):        
-        selected_menu(0)
-        # 선택한 Python 파일 내용 읽기
-        selected_file = "test51.py"
-        exec_page(selected_file)
-    if st.form_submit_button("음성 파일 보고서 완성", use_container_width=True):        
-        selected_menu(0)
-        # 선택한 Python 파일 내용 읽기
-        selected_file = "test53.py"
-        exec_page(selected_file)
-    if st.form_submit_button("'Quickly 키워드 검색 보고서", use_container_width=True):        
-        selected_menu(0)
-        st.write("Quickly 키워드 검색 보고서")
-        # 선택한 Python 파일 내용 읽기
-        #selected_file = "test50.py"
-        #exec_page(selected_file)
 
 
