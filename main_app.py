@@ -51,6 +51,14 @@ def exec_page(file_name):
         
 selected_menu(0)
 
+# 사이드바에 메뉴 추가
+st.sidebar.markdown(
+    """
+    <h1 style='text-align: center; color:#000000;'>📝 CheokCeock1 </h1>
+    """,
+    unsafe_allow_html=True
+)
+
 if st.sidebar.button("보고서 자동 완성", key="button_menu01",use_container_width=True):
     if st.session_state['menu01'] == True:
         st.session_state['menu01']=False
