@@ -63,7 +63,7 @@ st.sidebar.markdown(
 )
 
 
-selected_menu = st.selectbox("보고서 유형", sub_menu_list)
+selected_menu = st.sidarbar.selectbox("보고서 유형", sub_menu_list)
 if selected_menu:
     idx  = sub_menu_list.index(selected_menu)
     selected_file = file_list[idx]
