@@ -59,10 +59,6 @@ st.sidebar.markdown(
     unsafe_allow_html=True
 )
 
-st.sidebar.markdown(
-    "<p style='background-color:#E7EAF1;border-radius: 5px;font-size:15px; font-weight:bold; color:#090909;text-align:center;width:100%;padding:8px;border:0px solid #cccccc;margin-top:15px;'>보고서 유형 선택</p>",
-    unsafe_allow_html=True
-)
 
 selected_menu = st.sidebar.selectbox("보고서 유형 선택하세요.", ["사용할 유형 선택하세요."]+sub_menu_list, index=st.session_state['selected_menu01_index'])
 if selected_menu != "사용할 유형 선택하세요.":
@@ -79,7 +75,7 @@ else:
 
 st.sidebar.markdown(
     """
-    <div style='font-size:12px; font-weight:bold; color:#007BFF;text-align:center;width:90%;border-top:0px dotted #cccccc;margin-left:5%;margin-right:5%'>by Challenger 5 Team</div>
+    <div style='font-size:12px; font-weight:normal; color:#999999;text-align:center;width:90%;border-top:0px dotted #cccccc;margin-left:5%;margin-right:5%'>by Challenger 5 Team</div>
     """,
     unsafe_allow_html=True
 )
