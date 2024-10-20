@@ -158,14 +158,14 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
             st.session_state['check_request'] = False
             if "response" in st.session_state:                
                 
-                folder_name = st.session_state['selected_folder_name']
-                report_date_str = st.session_state.get('report_date_str', datetime.datetime.now().strftime('%Y%m%d'))
+                folder_name = st.session_state['request_title']
+                report_date_str = st.session_state.get('report_date_str', datetime.datetime.now().strftime('%Y%m%d%H%M%S'))
                 
                 # save_html_response 함수를 사용하여 HTML 파일 저장
                 file_name, temp_file_path = bd.save_html_response(html_result_value, folder_name, report_date_str)
 
                 # 파일 저장 경로 (reportFiles/{폴더명}/{일자})
-                github_folder = f"reportFiles/{folder_name}/{report_date_str}"
+                github_folder = f"keywordReportFiles/{folder_name}/{report_date_str}"
 
                 # 폴더 존재 확인 및 생성
                 bd.check_and_create_github_folder(github_folder, st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
