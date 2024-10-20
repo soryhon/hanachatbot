@@ -63,7 +63,7 @@ st.sidebar.markdown(
 )
 
 st.sidebar.markdown(
-    "<p style='font-size:18px; font-weight:bold; color:#007BFF;text-align:left;width:100%;border:0px solid #000000;'>보고서 자동 완성</p>",
+    "<p style='font-size:18px; font-weight:bold; color:#007BFF;text-align:center;width:100%;border-top:1px solid #000000;'>보고서 자동 완성</p>",
     unsafe_allow_html=True
 )
 
@@ -73,6 +73,10 @@ if selected_menu:
     selected_file = file_list[idx]
     exec_page(selected_file)
 
+st.sidebar.markdown(
+    "<p style='font-size:18px; font-weight:bold; color:#007BFF;text-align:center;width:100%;border-top:1px solid #000000;'></p>",
+    unsafe_allow_html=True
+)
 if st.sidebar.button("결과 보고서 현황", key="button_menu02",use_container_width=True):
     if st.session_state['menu01'] == True:
         st.session_state['menu01']=False
