@@ -48,7 +48,7 @@ def init_menu(idx):
         
 init_menu(0)
 sub_menu_list=['업무 보고서 자동 완성', '보고서 비교분석 자동 완성', '음성 파일 보고서 완성', 'Quickly 키워드 검색 보고서','결과 보고서 현황', '챌린지5팀 소개', '만족도 평가']
-file_list=["test50.py","test51.py","test53.py","","","tea_info.py",""]
+file_list=["test50.py","test51.py","test53.py","","","team_info.py",""]
 menu_list=['보고서 자동 완성', '결과 보고서 현황', '챌린지5팀 소개', '만족도 평가']
 
 # 사이드바에 메뉴 추가
