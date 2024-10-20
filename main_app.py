@@ -75,11 +75,11 @@ if selected_menu:
 
 st.sidebar.markdown(
     """
-    <table style='width:100%;border:0px solid #cccccc;'>
+    <table style='width:100%;'>
     <tr>
-    <td style='width:10%'></td>
+    <td style='width:10%;border:0px solid #cccccc;'></td>
     <td style='font-size:12px; font-weight:bold; color:#007BFF;text-align:center;width:80%;border-top:1px solid #cccccc;'></td>
-    <td style='width:10%'></td>
+    <td style='width:10%;border:0px solid #cccccc;'></td>
     </tr>
     </table>
     """,
