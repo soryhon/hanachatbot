@@ -17,25 +17,25 @@ def init_menu(idx):
     if 'menu05' not in st.session_state:
         st.session_state['menu04'] = False   
     if 'selected_menu01_option' not in st.session_state:
-        st.session_state['selected_menu01_option'] = ""
+        st.session_state['selected_menu01_option'] =0
     if idx == 1:
         st.session_state['menu01'] = False
         st.session_state['menu02'] = True
         st.session_state['menu03'] = False
         st.session_state['menu04'] = False
-        st.session_state['selected_menu01_option'] = ""
+        st.session_state['selected_menu01_option'] =0
     elif idx == 2:
         st.session_state['menu01'] = False
         st.session_state['menu02'] = False
         st.session_state['menu03'] = True
         st.session_state['menu04'] = False
-        st.session_state['selected_menu01_option'] = ""
+        st.session_state['selected_menu01_option'] = 0
     elif idx == 3:
         st.session_state['menu01'] = False
         st.session_state['menu02'] = False
         st.session_state['menu03'] = False
         st.session_state['menu04'] = True
-        st.session_state['selected_menu01_option'] = ""
+        st.session_state['selected_menu01_option'] = 0
     else:
         st.session_state['menu01'] = True
         st.session_state['menu02'] = False
@@ -62,17 +62,18 @@ st.sidebar.markdown(
     unsafe_allow_html=True
 )
 
-selected_menu = st.sidebar.selectbox("보고서 유형 선택하세요.", ["사용할 유형 선택하세요."]+sub_menu_list)
+selected_menu = st.sidebar.selectbox("보고서 유형 선택하세요.", ["사용할 유형 선택하세요."]+sub_menu_list, index=st.session_state['selected_menu01_option'])
 if selected_menu != "사용할 유형 선택하세요.":
     init_menu(0)
     st.session_state['selected_menu01_option'] = selected_menu
-else:
-    st.session_state['selected_menu01_option'] = ""
-    
-if st.session_state['menu01'] == True and st.session_state['selected_menu01_option'] != "":
     idx  = sub_menu_list.index(st.session_state['selected_menu01_option'])
     selected_file = file_list[idx]
     bd.exec_page(selected_file)
+else:
+    st.session_state['selected_menu01_option'] = 0
+    
+
+
 
 st.sidebar.markdown(
     """
