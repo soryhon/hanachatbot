@@ -711,9 +711,9 @@ def init_session_state(check_value):
 # HTML 파일을 저장하고 파일 경로를 반환하는 함수 (날짜 포함)
 def save_html_response(html_content, folder_name, report_date_str):
     # 현재 시간을 'YYYYMMDDHHMMSS' 형식으로 가져오기
-    #current_time = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+    current_time = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
     # HTML 파일명을 보고서명과 날짜로 설정
-    file_name = f"{folder_name}_result_{report_date_str}.html"
+    file_name = f"{folder_name}_report_{current_time}.html"
     
     # HTML 파일 임시 경로에 저장
     temp_file_path = f"/tmp/{file_name}"
