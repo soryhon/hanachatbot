@@ -69,13 +69,13 @@ if selected_menu:
     selected_file = file_list[idx]
     exec_page(selected_file)
  
-if st.sidebar.button("챌린지5팀 소개", key="button_menu01",use_container_width=True):
+if st.sidebar.button("챌린지5팀 소개", key="button_menu02",use_container_width=True):
     if st.session_state['menu01'] == True:
         st.session_state['menu01']=False
     else:
         st.session_state['menu01']=True
 
-if st.sidebar.button("만족도 평가", key="button_menu01",use_container_width=True):
+if st.sidebar.button("만족도 평가", key="button_menu03",use_container_width=True):
     if st.session_state['menu01'] == True:
         st.session_state['menu01']=False
     else:
