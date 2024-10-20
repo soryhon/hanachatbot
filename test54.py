@@ -94,27 +94,19 @@ with col2:
             
         if not st.session_state.get("openai_api_key"):
             st.error("먼저 OpenAI API 키를 입력하고 저장하세요!")
-        elif not st.session_state['selected_folder_name'] or not st.session_state['request_title'] or not st.session_state['request_text'] or not st.session_state['start_date_value'] or not st.session_state['end_date_value']:
+        elif not st.session_state['request_title'] or not st.session_state['request_text']:
             st.error("보고서명, 요청사항, 기준일자을 모두 입력해야 합니다!")
         else:
-            with st.spinner('요청사항과 보고서 파일 데이터를 추출 중입니다...'):
-                 
-                # 파일 데이터 가져와서 HTML 보고서 생성
-                html_request = bd.fetch_report_data_between_dates(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'], selected_folder, start_date, end_date)
-                st.session_state['html_report'] = html_request
-                
-                time.sleep(1)  # 예를 들어, 5초 동안 로딩 상태 유지
 
             with st.spinner('결과 보고서 작성 중입니다...'):
                 # LLM 함수 호출
                 title = st.session_state['request_title']
                 request = st.session_state['request_text']
         
-                responses = bd.run_llm_with_analysisfile_and_prompt(
+                responses = bd.run_llm_with_keyword_and_prompt(
                     st.session_state["openai_api_key"], 
                     title, 
-                    request, 
-                    st.session_state['html_report']
+                    request
                 )
                 st.session_state["response"] = responses
                 st.session_state['check_result'] = True
@@ -144,27 +136,8 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
 
 
         for idx, response in enumerate(st.session_state["response"]):
-            #st.text_area(f"응답 {idx+1}:", value=response, height=300)
-            response_text, chartcode = bd.extract_text_within_brackets(response)
             
-            fm, plt = bd.download_and_apply_font_from_github(st.session_state['github_repo'], st.session_state['github_branch'], fm, plt)
-            st.code(chartcode, language='python')  # 추출한 Python 코드를 화면에 출력
-            st.markdown(
-                  "<p style='font-size:22px;font-weight:bold;color:#CC66FF;padding:5px;'>📈 AI 추천 차트</p>",
-                  unsafe_allow_html=True
-            )
-            # eval()을 사용하여 Python 코드를 실행하고 차트를 출력
-            try:
-                exec(chartcode)  # exec()을 사용하여 추출된 Python 코드를 실행
-            except Exception as e:
-                st.error(f"코드를 실행하는 중 오류가 발생했습니다: {str(e)}")
-            
-            # 추출된 코드를 화면에 출력
-            st.markdown(
-                "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
-                unsafe_allow_html=True
-            )   
-            html_response_value = f"<div style='border: 0px solid #cccccc; padding: 1px;'>{response_text}</div>"
+            html_response_value = f"<div style='border: 0px solid #cccccc; padding: 1px;'>{response}</div>"
             html_result_value += html_response_value
             st.components.v1.html(html_response_value, height=1024, scrolling=True)
 
