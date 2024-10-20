@@ -45,29 +45,12 @@ with col2:
 
 
 # 3 프레임
-# 보고서 타이틀 보기
-col1, col2, col3 = st.columns([0.2, 0.6, 0.2])
-with col1:
-    st.write("")
-with col2:   
-    report_title = "작성할 보고서를 선택하세요."
-    title_style="font-size:15px; font-weight:normal; color:#cccccc;border: 1px solid #dddddd;letter-spacing: 1px;"
-    if 'selected_folder_name' in st.session_state:
-        if st.session_state['selected_folder_name'] != folderlist_init_value:
-            report_title = " [" + st.session_state['selected_folder_name'] + "] 보고서"
-            title_style="font-size:20px; font-weight:bold; color:#000000;border: 0px solid #dddddd;letter-spacing: 4px;"
-    st.markdown(
-        f"<div style='text-align:center;{title_style};border-radius: 10px;width:100%;padding: 10px;margin-top:10px;margin-bottom:10px;'>{report_title}</div>",
-        unsafe_allow_html=True
-    )
-   
-with col3:
-    st.write("")
+
 
 # 4 프레임
 # 작성 보고서 요청사항 세부타이틀
 st.markdown(
-    "<p style='font-size:18px; font-weight:bold; color:#007BFF;'>작성 보고서 요청사항</p>",
+    "<p style='font-size:18px; font-weight:bold; color:#007BFF;'>작성할 보고서 요청사항</p>",
     unsafe_allow_html=True
 )
 
@@ -76,7 +59,7 @@ st.markdown(
 
 # 6 프레임
 # 요청사항 갯수 및 기준일자 설정 
-with st.expander("⚙️ 요청사항 및 기준일자 설정", expanded=st.session_state['check_setting']):
+with st.expander("⚙️ 키워드 및 요청사항", expanded=st.session_state['check_setting']):
     if 'request_title' not in st.session_state:
         st.session_state['request_title'] = ""
     request_title = st.text_input("키워드 : '키워드를 입력해주세요.", key="request_title_input")
