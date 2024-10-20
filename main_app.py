@@ -60,9 +60,11 @@ st.sidebar.markdown(
 
 selected_menu = st.sidebar.selectbox("보고서 유형 선택하세요.", ["사용할 유형 선택하세요."]+sub_menu_list)
 if selected_menu != "사용할 유형 선택하세요.":
-    idx  = sub_menu_list.index(selected_menu)
-    selected_file = file_list[idx]
-    bd.exec_page(selected_file)
+    selected_menu(0)
+    if st.session.state["meno01"] == True:
+        idx  = sub_menu_list.index(selected_menu)
+        selected_file = file_list[idx]
+        bd.exec_page(selected_file)
 
 st.sidebar.markdown(
     """
@@ -77,8 +79,10 @@ if st.sidebar.button("결과 보고서 현황", key="button_menu02",use_containe
         st.session_state['menu01']=True
         
 if st.sidebar.button("챌린지5팀 소개", key="button_menu03",use_container_width=True):
-    selected_file = 'team_info.py'
-    bd.exec_page(selected_file)
+    selected_menu(2)
+    if st.session.state["meno03"] == True:
+        selected_file = 'team_info.py'
+        bd.exec_page(selected_file)
 
 if st.sidebar.button("만족도 평가", key="button_menu04",use_container_width=True):
     if st.session_state['menu01'] == True:
