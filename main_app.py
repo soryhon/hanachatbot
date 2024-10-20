@@ -74,7 +74,11 @@ if selected_menu:
     exec_page(selected_file)
 
 st.sidebar.markdown(
-    "<div style='width:10%'></div><p style='font-size:12px; font-weight:bold; color:#007BFF;text-align:center;width:80%;border-top:1px solid #cccccc;'></p><div style='width:10%'></div>",
+    """
+    <div style='width:10%'> </div>
+    <p style='font-size:12px; font-weight:bold; color:#007BFF;text-align:center;width:80%;border-top:1px solid #cccccc;'></p>
+    <div style='width:10%'> </div>
+    """,
     unsafe_allow_html=True
 )
 if st.sidebar.button("결과 보고서 현황", key="button_menu02",use_container_width=True):
