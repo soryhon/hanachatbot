@@ -2,6 +2,7 @@ import streamlit as st
 import importlib
 import os
 import backend as bd
+import time
 
 # 세션 상태에 radio_visible 변수가 없다면 False로 초기화
 def init_menu(idx):
