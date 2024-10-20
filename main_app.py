@@ -79,32 +79,7 @@ else:
 
 st.sidebar.markdown(
     """
-    <div style='font-size:12px; font-weight:bold; color:#007BFF;text-align:center;width:90%;border-top:1px dotted #cccccc;margin-left:5%;margin-right:5%'></div>
+    <div style='font-size:12px; font-weight:bold; color:#007BFF;text-align:center;width:90%;border-top:0px dotted #cccccc;margin-left:5%;margin-right:5%'>by Challenger 5 Team</div>
     """,
     unsafe_allow_html=True
 )
-if st.sidebar.button("결과 보고서 현황", key="button_menu02",use_container_width=True):
-    if st.session_state['menu01'] == True:
-        st.session_state['menu01']=False
-    else:
-        st.session_state['menu01']=True
-        
-if st.sidebar.button("챌린지5팀 소개", key="button_menu03",use_container_width=True):
-    st.session_state['selected_menu01_index']=6
-    #init_menu(2)
-    #st.rerun()
-    #if st.session_state['menu03'] == True:
-        #selected_file = 'team_info.py'
-        #bd.exec_page(selected_file)
-        
-        #st.markdown('<meta http-equiv="refresh" content="0">', unsafe_allow_html=True)
-        
-if st.sidebar.button("만족도 평가", key="button_menu04",use_container_width=True):
-    if st.session_state['menu01'] == True:
-        st.session_state['menu01']=False
-    else:
-        st.session_state['menu01']=True
-        
-
-
-
