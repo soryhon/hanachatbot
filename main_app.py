@@ -50,8 +50,10 @@ def exec_page(file_name):
             st.error(f"코드를 실행하는 중 오류가 발생했습니다: {str(e)}")    
         
 selected_menu(0)
-
+sub_menu_list=['업무 보고서 자동 완성', '보고서 비교분석 자동 완성', '음성 파일 보고서 완성', 'Quickly 키워드 검색 보고서']
 file_list=["test50.py","test51.py","test53.py",""]
+menu_list=['보고서 자동 완성', '결과 보고서 현황', '챌린지5팀 소개', '만족도 평가']
+
 # 사이드바에 메뉴 추가
 st.sidebar.markdown(
     """
@@ -60,6 +62,14 @@ st.sidebar.markdown(
     unsafe_allow_html=True
 )
 
+with st.sidebar.form("menu01_form", clear_on_submit=False):
+    selected_menu = st.selectbox("보고서 유형", sub_menu_list)
+    if selected_menu:
+        idx  = options.index(selected_option)
+        selected_file = file_list[idx]
+        exec_page(selected_file)
+
+        
 if st.sidebar.button("보고서 자동 완성", key="button_menu01",use_container_width=True):
     if st.session_state['menu01'] == True:
         st.session_state['menu01']=False
@@ -71,10 +81,7 @@ st.sidebar.markdown(
     unsafe_allow_html=True
 )
 
-with st.sidebar.form("menu01_form", clear_on_submit=False):
-    selected_menu2 = st.multiselect("selectbox", ['보고서 자동 완성', '결과 보고서 현황', '챌린지5팀 소개', '만족도 평가'])
-    if st.form_submit_button("업무 보고서 자동 완성", use_container_width=True):        
-        selected_menu(0)
+
         
 with st.sidebar.form("보고서 자동 완성1", clear_on_submit=False):
     selected_menu = st.radio("radio", ['보고서 자동 완성', '결과 보고서 현황', '챌린지5팀 소개', '만족도 평가'])
