@@ -65,7 +65,7 @@ st.sidebar.markdown(
 with st.sidebar.form("menu01_form", clear_on_submit=False):
     selected_menu = st.selectbox("보고서 유형", sub_menu_list)
     if selected_menu:
-        idx  = options.index(selected_option)
+        idx  = sub_menu_list.index(selected_menu)
         selected_file = file_list[idx]
         exec_page(selected_file)
 
