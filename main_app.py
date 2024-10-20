@@ -42,7 +42,7 @@ def init_menu(idx):
         st.session_state['menu02'] = False
         st.session_state['menu03'] = False
         st.session_state['menu04'] = False
-    st.rerun()
+    
 
   
         
@@ -90,8 +90,9 @@ if st.sidebar.button("결과 보고서 현황", key="button_menu02",use_containe
         st.session_state['menu01']=True
         
 if st.sidebar.button("챌린지5팀 소개", key="button_menu03",use_container_width=True):
+    
     init_menu(2)
-
+    st.rerun()
     if st.session_state['menu03'] == True:
         selected_file = 'team_info.py'
         bd.exec_page(selected_file)
