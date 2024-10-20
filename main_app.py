@@ -61,9 +61,14 @@ st.sidebar.markdown(
     "<p style='font-size:18px; font-weight:bold; color:#007BFF;text-align:center;width:100%;border:0px solid #000000;'>보고서 자동 완성</p>",
     unsafe_allow_html=True
 )
-with st.sidebar.form("보고서 자동 완성", clear_on_submit=False):
+
+with st.sidebar.form("보고서 자동 완성1", clear_on_submit=False):
     selected_menu = st.sidebar.radio("radio", ['보고서 자동 완성', '결과 보고서 현황', '챌린지5팀 소개', '만족도 평가'])
+with st.sidebar.form("보고서 자동 완성2", clear_on_submit=False):
     selected_menu2 = st.sidebar.selectbox("selectbox", ['보고서 자동 완성', '결과 보고서 현황', '챌린지5팀 소개', '만족도 평가'])
+
+with st.sidebar.form("보고서 자동 완성", clear_on_submit=False):
+
     if st.form_submit_button("업무 보고서 자동 완성", use_container_width=True):        
         selected_menu(0)
         # 선택한 Python 파일 내용 읽기
