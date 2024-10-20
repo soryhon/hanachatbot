@@ -67,7 +67,7 @@ if selected_menu != "사용할 유형 선택하세요.":
     init_menu(0)
     st.session_state['selected_menu01_option'] = selected_menu
 else:
-    st.session_state['selected_menu01_option'] = selected_menu
+    st.session_state['selected_menu01_option'] = ""
     
 if st.session_state['menu01'] == True and st.session_state['selected_menu01_option'] != "":
     idx  = sub_menu_list.index(st.session_state['selected_menu01_option'])
