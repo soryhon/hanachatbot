@@ -1556,7 +1556,7 @@ def get_reportType_folder_list_from_github(repo, branch, token, folder_name):
         folder_check = check_and_create_github_folder_if_not_exists(repo, folder_name, token, branch)
     
         if folder_check:
-            url = f"https://api.github.com/repos/{repo}/contents/{folder_name?ref={branch}"
+            url = f"https://api.github.com/repos/{repo}/contents/{folder_name}?ref={branch}"
             headers = {"Authorization": f"token {token}"}
             response = requests.get(url, headers=headers)
     
