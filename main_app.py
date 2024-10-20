@@ -89,9 +89,11 @@ if st.sidebar.button("결과 보고서 현황", key="button_menu02",use_containe
         
 if st.sidebar.button("챌린지5팀 소개", key="button_menu03",use_container_width=True):
     init_menu(2)
-    if st.session_state['menu03'] == True:
-        selected_file = 'team_info.py'
-        bd.exec_page(selected_file)
+    with st.spinner('요청사항과 파일 데이터를 추출 중입니다...'):
+        if st.session_state['menu03'] == True:
+            selected_file = 'team_info.py'
+            bd.exec_page(selected_file)
+        time.sleep(1)  # 예를 들어, 5초 동안 로딩 상태 유지
 
 if st.sidebar.button("만족도 평가", key="button_menu04",use_container_width=True):
     if st.session_state['menu01'] == True:
