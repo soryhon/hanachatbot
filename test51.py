@@ -298,7 +298,7 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
                 file_name, temp_file_path = bd.save_html_response(html_result_value, folder_name, report_date_str)
 
                 # 파일 저장 경로 (analysisReportFiles/{폴더명}/{일자})
-                github_folder = f"reportFiles/{folder_name}/{report_date_str}"
+                github_folder = f"analysisReportFiles/{folder_name}/{report_date_str}"
 
                 # 폴더 존재 확인 및 생성
                 bd.check_and_create_github_folder(github_folder, st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
