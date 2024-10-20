@@ -57,7 +57,7 @@ menu_list=['보고서 자동 완성', '결과 보고서 현황', '챌린지5팀 
 # 사이드바에 메뉴 추가
 st.sidebar.markdown(
     """
-    <h1 style='text-align: center; color:#000000;'>📝 CheokCeock1 </h1>
+    <div style='text-align:right;width:100%;'><p style='font-size:18px; font-weight:normal; color:#aaaaaa; margin-top:10px;'>by <b style='font-size:16px;color:#0099FF'>CheokCeock</b><b style='font-size:24px;color:#009999'>1</b></p></div>",
     """,
     unsafe_allow_html=True
 )
