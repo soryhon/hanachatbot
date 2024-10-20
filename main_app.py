@@ -62,12 +62,12 @@ st.sidebar.markdown(
     unsafe_allow_html=True
 )
 
-with st.sidebar.form("menu01_form", clear_on_submit=False):
-    selected_menu = st.selectbox("보고서 유형", sub_menu_list)
-    if selected_menu:
-        idx  = sub_menu_list.index(selected_menu)
-        selected_file = file_list[idx]
-        exec_page(selected_file)
+
+selected_menu = st.selectbox("보고서 유형", sub_menu_list)
+if selected_menu:
+    idx  = sub_menu_list.index(selected_menu)
+    selected_file = file_list[idx]
+    exec_page(selected_file)
 
         
 if st.sidebar.button("보고서 자동 완성", key="button_menu01",use_container_width=True):
