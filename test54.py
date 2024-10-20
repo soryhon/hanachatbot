@@ -159,7 +159,7 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
             if "response" in st.session_state:                
                 
                 folder_name = st.session_state['request_title']
-                report_date_str = st.session_state.get('report_date_str', datetime.datetime.now().strftime('%Y%m%d%H%M%S'))
+                report_date_str = st.session_state.get('report_date_str', datetime.datetime.now().strftime('%Y%m%d'))
                 
                 # save_html_response 함수를 사용하여 HTML 파일 저장
                 file_name, temp_file_path = bd.save_html_response(html_result_value, folder_name, report_date_str)
