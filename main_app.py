@@ -47,8 +47,8 @@ def init_menu(idx):
   
         
 init_menu(0)
-sub_menu_list=['업무 보고서 자동 완성', '보고서 비교분석 자동 완성', '음성 파일 보고서 완성', 'Quickly 키워드 검색 보고서']
-file_list=["test50.py","test51.py","test53.py",""]
+sub_menu_list=['업무 보고서 자동 완성', '보고서 비교분석 자동 완성', '음성 파일 보고서 완성', 'Quickly 키워드 검색 보고서','결과 보고서 현황', '챌린지5팀 소개', '만족도 평가']
+file_list=["test50.py","test51.py","test53.py","","","tea_info.py",""]
 menu_list=['보고서 자동 완성', '결과 보고서 현황', '챌린지5팀 소개', '만족도 평가']
 
 # 사이드바에 메뉴 추가
@@ -92,7 +92,7 @@ if st.sidebar.button("결과 보고서 현황", key="button_menu02",use_containe
 if st.sidebar.button("챌린지5팀 소개", key="button_menu03",use_container_width=True):
     
     init_menu(2)
-    st.rerun()
+    #st.rerun()
     if st.session_state['menu03'] == True:
         selected_file = 'team_info.py'
         bd.exec_page(selected_file)
