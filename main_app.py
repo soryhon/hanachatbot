@@ -5,6 +5,9 @@ import backend as bd
 # 메뉴명 리스트
 sub_menu_list=['📚업무 보고서 자동 완성', '📈보고서 비교분석 자동 완성', '🎧음성 파일 보고서 완성', '⚡Quickly 키워드 검색 보고서','📋결과 보고서 현황', '👥프로젝트 및 팀 소개', '🏆만족도 평가']
 
+ if 'selected_menu01_index' not in st.session_state:
+        st.session_state['selected_menu01_index'] =0
+     
 # 파일명 리스트
 file_list=["test50.py","test51.py","test53.py","test54.py","","team_info.py",""]
 
