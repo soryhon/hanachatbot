@@ -55,8 +55,7 @@ menu_list=['보고서 자동 완성', '결과 보고서 현황', '챌린지5팀 
 st.sidebar.markdown(
     """
     <div style='background-color:#E7EAF1;text-align:center;width:100%;padding-bottom:6px;border-radius:8px;'>
-    <b style='font-size:22px;color:#0099FF;font-style:italic;'>CheokCeock</b>
-    <b style='font-size:30px;color:#009999;font-style:italic'>☝️</b>
+    <b style='font-size:22px;color:#0099FF;font-style:italic;'>CheokCeock</b><b style='font-size:30px;color:#009999;'>☝️</b>
     </div>
     """,
     unsafe_allow_html=True
