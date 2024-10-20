@@ -63,7 +63,7 @@ st.sidebar.markdown(
 )
 
 st.sidebar.markdown(
-    "<p style='background-color:#DAE9F8;border-radius: 5px;font-size:18px; font-weight:bold; color:#090909;text-align:center;width:100%;padding:8px;border:0px solid #cccccc;'>보고서 자동 완성</p>",
+    "<br/><p style='background-color:#DAE9F8;border-radius: 5px;font-size:18px; font-weight:bold; color:#090909;text-align:center;width:100%;padding:8px;border:0px solid #cccccc;'>보고서 자동 완성</p>",
     unsafe_allow_html=True
 )
 
