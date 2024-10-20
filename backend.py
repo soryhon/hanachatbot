@@ -1519,5 +1519,17 @@ def load_audio_template_from_github(repo, branch, token, file_name):
     else:
         st.error(f"{file_name} 파일을 가져오지 못했습니다.")
         return None
+
+def exec_page(file_name):
+    if file_name:
+        with open(file_name, 'r') as file:
+                file_content = file.read()
+            
+        # 파일 내용을 화면에 출력
+        #st.code(file_content, language='python')
+        try:
+            exec(file_content)  # exec()을 사용하여 추출된 Python 코드를 실행
+        except Exception as e:
+            st.error(f"코드를 실행하는 중 오류가 발생했습니다: {str(e)}")  
         
 # Backend 기능 구현 끝 ---
