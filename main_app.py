@@ -63,7 +63,7 @@ st.sidebar.markdown(
 )
 
 st.sidebar.markdown(
-    "<p style='background-color:#E7EAF1;border-radius: 5px;font-size:14px; font-weight:bold; color:#090909;text-align:center;width:100%;padding:8px;border:0px solid #cccccc;margin-top:15px;'>보고서 유형 선택</p>",
+    "<p style='background-color:#E7EAF1;border-radius: 5px;font-size:15px; font-weight:bold; color:#090909;text-align:center;width:100%;padding:8px;border:0px solid #cccccc;margin-top:15px;'>보고서 유형 선택</p>",
     unsafe_allow_html=True
 )
 
