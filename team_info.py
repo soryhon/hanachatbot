@@ -1,7 +1,7 @@
 import streamlit as st
 import importlib
 import os
-import backend bd as bd
+import backend as bd
 
 # 1 프레임
 # 보고서 타이틀
