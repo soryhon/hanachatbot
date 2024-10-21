@@ -26,7 +26,7 @@ bd.init_session_state(False)
 bd.refresh_page()
 
 if 'selected_report_folder_index' not in st.session_state:
-    st.session_state['selected_repoert_folder_index'] = 0
+    st.session_state['selected_report_folder_index'] = 0
 if 'selected_analysis_folder_index' not in st.session_state:
     st.session_state['selected_analysis_folder_index'] = 0
 if 'selected_audio_folder_index' not in st.session_state:
