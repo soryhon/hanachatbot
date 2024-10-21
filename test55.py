@@ -9,6 +9,7 @@ import matplotlib.font_manager as fm
 import altair as alt
 import numpy as np
 import io
+import os
 
 # Frontend 기능 구현 시작 ---
 
@@ -237,6 +238,7 @@ st.markdown(
 # 10 프레임
 # 결과 보고서 LLM 응답 보기/ 결과 보고서 저장/ 보고서 양식 저장
 file_content = None
+result_path = None
 
 with st.expander("📊 결과 보고서 보기", expanded=st.session_state['check_result']):
     if "selected_report_file_name" in st.session_state and st.session_state['selected_report_file_name']:
@@ -275,15 +277,14 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
 # 결과 저장 버튼
     col1, col2 = st.columns([0.5, 0.5])
     with col1:   
-        if file_content:
-            result_folder = st.session_state['selected_report_folder_name']
-            result_file = st.session_state['selected_report_file_name']
-            result_path = f"{result_folder}/{result_file}"
+        if file_content and result_path:
+            # 폴더명을 제외한 순수 파일명만 추출
+            pure_file_name = os.path.basename(result_path)
             if st.download_button(
                 label="📥 다운로드",
                 use_container_width=True,
                 data=file_content.getvalue(),
-                file_name=result_path,
+                file_name=pure_file_name,
                 mime="text/html"
             ):
                 st.session_state['check_result'] = True
