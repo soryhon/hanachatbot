@@ -64,57 +64,11 @@ st.title("사용자 만족도 평가")
 # 닉네임/이름 입력
 nickname = st.text_input("닉네임/이름을 입력하세요:")
 
-# 별점 선택 (이미지 사용)
-st.markdown(
-    """
-        <style>
-        .star-rating {
-        display: flex;
-        direction: row-reverse;
-        justify-content: center;
-        font-size: 2em;
-        }
-        
-        .star-rating input {
-        display: none;
-        }
-        
-        .star-rating label {
-        width: 40px;
-        height: 40px;
-        background-image: url('image/star01.png');
-        background-size: contain;
-        background-repeat: no-repeat;
-        cursor: pointer;
-        }
-        
-        .star-rating input:checked ~ label {
-        opacity: 1;
-        }
-        
-        .star-rating label:hover,
-        .star-rating label:hover ~ label {
-        opacity: 0.7;
-        }
-        </style>
-        
-        <div class="star-rating">
-        <input type="radio" id="5-stars" name="rating" value="5" />
-        <label for="5-stars"></label>
-        <input type="radio" id="4-stars" name="rating" value="4" />
-        <label for="4-stars"></label>
-        <input type="radio" id="3-stars" name="rating" value="3" />
-        <label for="3-stars"></label>
-        <input type="radio" id="2-stars" name="rating" value="2" />
-        <label for="2-stars"></label>
-        <input type="radio" id="1-star" name="rating" value="1" />
-        <label for="1-star"></label>
-        </div>
-    """, unsafe_allow_html=True)
+
 
 col1,col2,col3,col4,col5 = st.columns([0.2,0.2,0.2,0.2,0.2])
 with col1:
-    st.write("☆☆☆☆☆")
+    st.image("image/star01.png", width=20%)
 with col2:
     st.write("☆☆☆☆☆")
 with col3:
