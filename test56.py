@@ -79,12 +79,10 @@ if github_info_loaded:
             file_lists.append(file_list)
 
         # 업무 보고서 자동 완성 리스트
-        type_list = ["• 업무 보고서", "• 보고서 비교분석","• 음성 파일 보고서","• Quickly 키워드 보고서"]
+        type_list = ["• 업무 보고서<br/>", "• 보고서 비교분석<br/>","• 음성 파일 보고서<br/>","• Quickly 키워드 보고서"]
        
-        with st.container():
-            st.markdown("<div style='flex-direction: row;border:1px solid #cccccc;'>", unsafe_allow_html=True)
-            selected_type = st.radio("보고서 유형",type_list, key="radio-type")
-            st.markdown('</div>', unsafe_allow_html=True)
+        selected_type = st.radio("",type_list, key="radio-type")
+    
 
                 
         if selected_type == type_list[0]: 
