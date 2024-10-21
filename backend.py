@@ -1567,7 +1567,7 @@ def get_reportType_file_list_from_github(repo, branch, token, folder_name):
                     item['path'].replace(f"{folder_name}/", "") 
                     for item in response.json().get('tree', []) 
                     if item['type'] == 'blob' and item['path'].startswith(folder_name) and item['path'].endswith('.html')
-                ]f
+                ]
                 return files
             else:
                 st.error("GitHub 파일 목록을 가져오지 못했습니다. 저장소 정보나 토큰을 확인하세요.")
