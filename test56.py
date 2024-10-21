@@ -83,14 +83,17 @@ if github_info_loaded:
         # CSS 스타일을 사용하여 radio 버튼을 가로로 표시
         st.markdown("""
             <style>
-            div[data-testid="stRadio"][aria-describedby="radio-type"] > label > div {
+            .horizontal-radio > div {
                 flex-direction: row;
             }
             </style>
             """, unsafe_allow_html=True
         )
-
-        selected_type = st.radio("보고서 유형",type_list, key="radio-type")
+        with st.container():
+            st.markdown('<div class="horizontal-radio">', unsafe_allow_html=True)
+            selected_type = st.radio("보고서 유형",type_list, key="radio-type")
+            st.markdown('</div>', unsafe_allow_html=True)
+            
         if selected_type == type_list[0]: 
             st.session_state['sub_title']="업무 보고서<br/>리스트 선택"
             st.session_state['report_folder_option'] = [folderlist_init_value] + file_lists[0]
