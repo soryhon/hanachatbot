@@ -249,8 +249,8 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
         
         if file_content:
             # HTML 파일 내용을 화면에 출력
-            #st.markdown(file_content, unsafe_allow_html=True)
-            st.components.v1.html(file_content, height=1024, scrolling=True)
+            st.markdown(file_content, unsafe_allow_html=True)
+            #st.components.v1.html(file_content, height=1024, scrolling=True)
         else:
             st.error(f"{selected_file} 파일 데이터를 가져오는 데 실패했습니다.")
 
