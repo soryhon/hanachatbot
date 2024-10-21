@@ -127,6 +127,7 @@ if github_info_loaded:
         col1, col2 = st.columns([0.21, 0.79])
         with col1:
             st.write("")
+            st.write("")
             st.markdown(
                 "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>닉네임 또는 이름</p>",
                 unsafe_allow_html=True
