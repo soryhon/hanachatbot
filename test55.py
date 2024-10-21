@@ -33,8 +33,11 @@ if 'selected_audio_folder_index' not in st.session_state:
     st.session_state['selected_audio_folder_index'] = 0
 if 'selected_keyword_folder_index' not in st.session_state:
     st.session_state['selected_keyword_folder_index'] = 0
+if 'selected_report_file_name' not in st.session_state:
+    st.session_state['selected_report_file_name']=""
 if 'selected_report_folder_name' not in st.session_state:
     st.session_state['selected_report_folder_name']=""
+    
 # 1 프레임
 # 보고서 타이틀
 col1, col2 = st.columns([0.55,0.45])
@@ -55,11 +58,23 @@ with col2:
 if github_info_loaded:
     with st.expander("📝 보고서 선택", expanded=st.session_state['check_report']):
         tab1, tab2, tab3, tab4 = st.tabs(["• 업무 보고서", "• 보고서 비교분석","• 음성 파일 보고서","• Quickly 키워드 보고서"])
+        folder_list =["reportFiles","analysisReportFiles","audioReportFiles", "keywordReportFiles"]
 
-        file_list = bd.get_reportType_file_list_from_github(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'],"reportFiles")
-        file_list1 = bd.get_reportType_file_list_from_github(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'],"analysisReportFiles")
-        file_list2 = bd.get_reportType_file_list_from_github(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'],"audioReportFiles")
-        file_list3 = bd.get_reportType_file_list_from_github(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'],"keywordReportFiles")
+        # 2차원 배열에 각 폴더별 파일 리스트 저장
+        file_lists = []
+        
+        # 각 폴더에 대해 파일 리스트 가져오기
+        for folder_name in folder_list:
+            # 각 폴더에서 파일 리스트를 가져와서 2차원 배열에 저장
+            file_list = bd.get_reportType_file_list_from_github(
+                st.session_state['github_repo'], 
+                st.session_state['github_branch'], 
+                st.session_state['github_token'], 
+                folder_name
+            )
+            
+            # 결과를 2차 배열에 추가
+            file_lists.append(file_list)
 
         # 업무 보고서 자동 완성 리스트
         with tab1:            
@@ -72,26 +87,28 @@ if github_info_loaded:
                 )
             with col2:
                 # 폴더 존재 확인 및 생성
-                # 'selected_folder'가 file_list에 있을 때만 index 설정
+                # 'selected_file_name'가 file_list에 있을 때만 index 설정
                 #selected_index = st.session_state['selected_report_folder_index']
-                report_file_list = [folderlist_init_value] + file_list
+                report_file_list = [folderlist_init_value] + file_lists[0]
                 # 폴더 선택 selectbox 생성 (새 폴더 추가 후, 선택값으로 설정)
-                selected_folder = st.selectbox(
+                selected_file_name = st.selectbox(
                     "등록된 보고서명 리스트",
                     options=report_file_list,  # 옵션 리스트에 새 폴더 반영
                     index=st.session_state['selected_report_folder_index'],  # 새로 선택된 폴더를 기본값으로 선택
                     key="selected_report_folder"
                 )
                 # 파일 업로드와 요청사항 리스트의 기본 폴더 설정
-                if selected_folder != folderlist_init_value:
-                    st.session_state['selected_report_folder_name'] = f"{selected_folder}"
+                if selected_file_name != folderlist_init_value:
+                    st.session_state['selected_report_file_name'] = f"{selected_file_name}"
+                    st.session_state['selected_report_folder_name'] = f"{folder_list[0]}"
+                    st.session_state['selected_report_folder_index'] = file_list.index(selected_file_name) + 1
                     st.session_state['selected_analysis_folder_index'] = 0
                     st.session_state['selected_audio_folder_index'] = 0
                     st.session_state['selected_keyword_folder_index'] = 0
                     st.session_state['check_report']=False
-                    st.session_state['selected_report_folder_index'] = file_list.index(selected_folder) + 1
+
                     #bd.refresh_page()
-                    st.success(f"[{selected_folder}] 보고서명이 선택되었습니다.")  
+                    st.success(f"[{selected_file_name}] 보고서명이 선택되었습니다.")  
 
 
         # 보고서 비교분석 완성 리스트
@@ -105,26 +122,28 @@ if github_info_loaded:
                 )
             with col2:
                 # 폴더 존재 확인 및 생성
-                # 'selected_folder'가 file_list에 있을 때만 index 설정
+                # 'selected_file_name'가 file_list에 있을 때만 index 설정
                 #selected_index = st.session_state['selected_analysis_folder_index']
-                report_file_list = [folderlist_init_value] + file_list1
+                report_file_list = [folderlist_init_value] + file_lists[1]
                 # 폴더 선택 selectbox 생성 (새 폴더 추가 후, 선택값으로 설정)
-                selected_folder = st.selectbox(
+                selected_file_name = st.selectbox(
                     "등록된 보고서명 리스트",
                     options=report_file_list,  # 옵션 리스트에 새 폴더 반영
                     index=st.session_state['selected_analysis_folder_index'],  # 새로 선택된 폴더를 기본값으로 선택
                     key="selected_analysis_folder"
                 )
                 # 파일 업로드와 요청사항 리스트의 기본 폴더 설정
-                if selected_folder != folderlist_init_value:
-                    st.session_state['selected_report_folder_name'] = f"{selected_folder}"
+                if selected_file_name != folderlist_init_value:
+                    st.session_state['selected_report_file_name'] = f"{selected_file_name}"
+                    st.session_state['selected_report_folder_name'] = f"{folder_list[1]}"
+                    st.session_state['selected_analysis_folder_index'] = file_list1.index(selected_file_name) + 1
                     st.session_state['selected_report_folder_index'] = 0
                     st.session_state['selected_audio_folder_index'] = 0
                     st.session_state['selected_keyword_folder_index'] = 0
                     st.session_state['check_report']=False
-                    st.session_state['selected_analysis_folder_index'] = file_list1.index(selected_folder) + 1
+                    
                     #bd.refresh_page()
-                    st.success(f"[{selected_folder}] 보고서명이 선택되었습니다.")  
+                    st.success(f"[{selected_file_name}] 보고서명이 선택되었습니다.")  
 
         # 음성파일 보고서 완성 리스트
         with tab3:            
@@ -137,26 +156,28 @@ if github_info_loaded:
                 )
             with col2:
                 # 폴더 존재 확인 및 생성
-                # 'selected_folder'가 file_list에 있을 때만 index 설정
+                # 'selected_file_name'가 file_list에 있을 때만 index 설정
                 #selected_index = st.session_state['selected_audio_folder_index']
-                report_file_list = [folderlist_init_value] + file_list2
+                report_file_list = [folderlist_init_value] + file_lists[2]
                 # 폴더 선택 selectbox 생성 (새 폴더 추가 후, 선택값으로 설정)
-                selected_folder = st.selectbox(
+                selected_file_name = st.selectbox(
                     "등록된 보고서명 리스트",
                     options=report_file_list,  # 옵션 리스트에 새 폴더 반영
                     index=st.session_state['selected_audio_folder_index'],  # 새로 선택된 폴더를 기본값으로 선택
                     key="selected_audio_folder"
                 )
                 # 파일 업로드와 요청사항 리스트의 기본 폴더 설정
-                if selected_folder != folderlist_init_value:
-                    st.session_state['selected_report_folder_name'] = f"{selected_folder}"
+                if selected_file_name != folderlist_init_value:
+                    st.session_state['selected_report_file_name'] = f"{selected_file_name}"
+                    st.session_state['selected_report_folder_name'] = f"{folder_list[2]}"
+                    st.session_state['selected_audio_folder_index'] = file_list2.index(selected_file_name) + 1
                     st.session_state['selected_analysis_folder_index'] = 0
                     st.session_state['selected_report_folder_index'] = 0
                     st.session_state['selected_keyword_folder_index'] = 0
                     st.session_state['check_report']=False
-                    st.session_state['selected_audio_folder_index'] = file_list2.index(selected_folder) + 1
+                    
                     #bd.refresh_page()
-                    st.success(f"[{selected_folder}] 보고서명이 선택되었습니다.")  
+                    st.success(f"[{selected_file_name}] 보고서명이 선택되었습니다.")  
 
 
         # Quickly 키워드 보고서 리스트
@@ -170,26 +191,28 @@ if github_info_loaded:
                 )
             with col2:
                 # 폴더 존재 확인 및 생성
-                # 'selected_folder'가 file_list에 있을 때만 index 설정
+                # 'selected_file_name'가 file_list에 있을 때만 index 설정
                 #selected_index = st.session_state['selected_keyword_folder_index']
-                report_file_list = [folderlist_init_value] + file_list3
+                report_file_list = [folderlist_init_value] + file_lists[3]
                 # 폴더 선택 selectbox 생성 (새 폴더 추가 후, 선택값으로 설정)
-                selected_folder = st.selectbox(
+                selected_file_name = st.selectbox(
                     "등록된 보고서명 리스트",
                     options=report_file_list,  # 옵션 리스트에 새 폴더 반영
                     index=st.session_state['selected_keyword_folder_index'],  # 새로 선택된 폴더를 기본값으로 선택
                     key="selected_keyword_folder"
                 )
                 # 파일 업로드와 요청사항 리스트의 기본 폴더 설정
-                if selected_folder != folderlist_init_value:
-                    st.session_state['selected_report_folder_name'] = f"{selected_folder}"
+                if selected_file_name != folderlist_init_value:
+                    st.session_state['selected_report_file_name'] = f"{selected_file_name}"
+                    st.session_state['selected_report_folder_name'] = f"{folder_list[3]}"
+                    st.session_state['selected_keyword_folder_index'] = file_list3.index(selected_file_name) + 1
                     st.session_state['selected_report_folder_index'] = 0
                     st.session_state['selected_audio_folder_index'] = 0
                     st.session_state['selected_analysis_folder_index'] = 0
                     st.session_state['check_report']=False
-                    st.session_state['selected_keyword_folder_index'] = file_list3.index(selected_folder) + 1
+                    
                     #bd.refresh_page()
-                    st.success(f"[{selected_folder}] 보고서명이 선택되었습니다.")  
+                    st.success(f"[{selected_file_name}] 보고서명이 선택되었습니다.")  
       
 else:
     st.warning("GitHub 정보가 설정되지 않았습니다. 먼저 GitHub Token을 입력해 주세요.")
@@ -207,38 +230,31 @@ st.markdown(
 # 결과 보고서 LLM 응답 보기/ 결과 보고서 저장/ 보고서 양식 저장
 html_result_value = "<div id='html_result_value'>"
 with st.expander("📊 결과 보고서 보기", expanded=st.session_state['check_result']):
-    if "response" in st.session_state:
+    if "selected_report_file_name" in st.session_state and st.session_state['selected_report_file_name']:
         st.markdown(
             "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
             unsafe_allow_html=True
         )  
         st.session_state['check_result'] = True
 
+        result_path = f"{selected_report_folder_name']}/{st.session_state['selected_report_file_name']}"
+        # GitHub에서 HTML 파일 데이터 가져오기
+        file_content = bd.get_file_from_github(
+            st.session_state['github_repo'], 
+            st.session_state['github_branch'], 
+            f"{result_path}",  # 폴더 경로와 파일 이름을 합침
+            st.session_state['github_token']
+        )
+        
+        if file_content:
+            # HTML 파일 내용을 화면에 출력
+            #st.markdown(file_content, unsafe_allow_html=True)
+            st.components.v1.html(file_content, height=1024, scrolling=True)
+        else:
+            st.error(f"{selected_file} 파일 데이터를 가져오는 데 실패했습니다.")
 
-        for idx, response in enumerate(st.session_state["response"]):
-            #st.text_area(f"응답 {idx+1}:", value=response, height=300)
-            response_text, chartcode = bd.extract_text_within_brackets(response)
+
             
-            fm, plt = bd.download_and_apply_font_from_github(st.session_state['github_repo'], st.session_state['github_branch'], fm, plt)
-            st.code(chartcode, language='python')  # 추출한 Python 코드를 화면에 출력
-            st.markdown(
-                  "<p style='font-size:22px;font-weight:bold;color:#CC66FF;padding:5px;'>📈 AI 추천 차트</p>",
-                  unsafe_allow_html=True
-            )
-            # eval()을 사용하여 Python 코드를 실행하고 차트를 출력
-            try:
-                exec(chartcode)  # exec()을 사용하여 추출된 Python 코드를 실행
-            except Exception as e:
-                st.error(f"코드를 실행하는 중 오류가 발생했습니다: {str(e)}")
-            
-            # 추출된 코드를 화면에 출력
-            st.markdown(
-                "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
-                unsafe_allow_html=True
-            )   
-            html_response_value = f"<div style='border: 0px solid #cccccc; padding: 1px;'>{response_text}</div>"
-            html_result_value += html_response_value
-            st.components.v1.html(html_response_value, height=1024, scrolling=True)
 
     html_result_value += "</div>"
     st.markdown(
