@@ -68,7 +68,7 @@ nickname = st.text_input("닉네임/이름을 입력하세요:")
 
 col1,col2,col3,col4,col5 = st.columns([0.2,0.2,0.2,0.2,0.2])
 with col1:
-    st.image("image/star01.png", width='100')
+    st.image("image/star01.png", width=100)
 with col2:
     st.write("☆☆☆☆☆")
 with col3:
