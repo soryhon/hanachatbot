@@ -102,7 +102,7 @@ if github_info_loaded:
         # 각 열에 대해 옵션을 출력
         for idx, type_list in enumerate(options):
             if columns[idx].radio("옵션 선택", [option], key=f"radio_{idx}"):
-                selected_option = option  
+                selected_option = type_list 
                 
         if selected_type == type_list[0]: 
             st.session_state['sub_title']="업무 보고서<br/>리스트 선택"
