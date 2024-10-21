@@ -9,14 +9,14 @@ if 'selected_menu01_index' not in st.session_state:
     st.session_state['selected_menu01_index'] =0
      
 # 파일명 리스트
-file_list=["test50.py","test51.py","test53.py","test54.py","test56.py","team_info.py",""]
+file_list=["cheockcheock1_01.py","cheockcheock1_02.py","cheockcheock1_03.py","cheockcheock1_04.py","cheockcheock1_05.py","teacheockcheock1_team.py","cheockcheock1_06.py"]
 
 
 # 사이드바에 타이트 추가 : 척척하나
 st.sidebar.markdown(
     """
     <div style='background-color:#E7EAF1;text-align:center;width:100%;padding-bottom:6px;border-radius:8px;'>
-    <b style='font-size:22px;color:#0099FF;font-style:italic;'>CheokCeock</b><b style='font-size:30px;color:#009999;'>☝️</b>
+    <b style='font-size:22px;color:#0099FF;font-style:italic;'>CheockCheock</b><b style='font-size:30px;color:#009999;'>☝️</b>
     </div>
     """,
     unsafe_allow_html=True
