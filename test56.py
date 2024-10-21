@@ -93,7 +93,17 @@ if github_info_loaded:
             st.markdown("<div style='flex-direction: row;'>", unsafe_allow_html=True)
             selected_type = st.radio("보고서 유형",type_list, key="radio-type")
             st.markdown('</div>', unsafe_allow_html=True)
-            
+         # 선택된 값을 저장할 변수 초기화
+        selected_option = None
+        
+        # st.columns()을 사용해 가로로 항목 배치
+        columns = st.columns(len(type_list))
+        
+        # 각 열에 대해 옵션을 출력
+        for idx, type_list in enumerate(options):
+            if columns[idx].radio("옵션 선택", [option], key=f"radio_{idx}"):
+                selected_option = option  
+                
         if selected_type == type_list[0]: 
             st.session_state['sub_title']="업무 보고서<br/>리스트 선택"
             st.session_state['report_folder_option'] = [folderlist_init_value] + file_lists[0]
@@ -114,6 +124,7 @@ if github_info_loaded:
                 f"<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>{st.session_state['sub_title']}</p>",
                 unsafe_allow_html=True
             )
+            
         with col2:
             # 폴더 존재 확인 및 생성
             # 'selected_file_name'가 file_list에 있을 때만 index 설정
