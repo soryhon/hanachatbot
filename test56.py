@@ -105,7 +105,7 @@ if github_info_loaded:
             # 폴더 존재 확인 및 생성
             # 'selected_file_name'가 file_list에 있을 때만 index 설정
             #selected_index = st.session_state['selected_report_folder_index']
-            st.session_state['report_folder_option'] = [folderlist_init_value] + file_lists[0]
+            #st.session_state['report_folder_option'] = [folderlist_init_value] + file_lists[0]
             # 폴더 선택 selectbox 생성 (새 폴더 추가 후, 선택값으로 설정)
             selected_file_name = st.selectbox(
                 "등록된 보고서명 리스트",
