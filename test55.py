@@ -55,7 +55,7 @@ subfolder_list=[]
 date_list=[]
 if github_info_loaded:
     with st.expander("📝 보고서 선택", expanded=st.session_state['check_report']):
-        tab1, tab2, tab3, tab4 = st.tabs(["• 업무 보고서", "• 비교분석","• 음성 파일","• 키워드"])
+        tab1, tab2, tab3, tab4 = st.tabs(["• 업무 보고서", "• 보고서 비교분석","• 음성 파일 보고서","• Quickly 키워드 보고서"])
 
         folder_list = bd.get_reportType_folder_list_from_github(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'],"reportFiles")
         folder_list1 = bd.get_reportType_folder_list_from_github(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'],"analysisReportFiles")
