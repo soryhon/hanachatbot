@@ -88,7 +88,7 @@ if github_info_loaded:
             st.session_state['sub_title']="업무 보고서<br/>리스트 선택"
             st.session_state['report_folder_option'] = [folderlist_init_value] + file_lists[0]
             st.session_state['selected_report_folder_name'] = folder_list[0]
-            if st.session_state['report_type_index'] != 0
+            if st.session_state['report_type_index'] != 0:
                 st.session_state['report_type_index'] = 0
                 st.session_state['selected_report_folder_index'] = 0
       
@@ -96,21 +96,21 @@ if github_info_loaded:
             st.session_state['sub_title']="보고서 비교분석<br/>리스트 선택"
             st.session_state['report_folder_option'] = [folderlist_init_value] + file_lists[1]
             st.session_state['selected_report_folder_name'] = folder_list[1]
-            if st.session_state['report_type_index'] != 1
+            if st.session_state['report_type_index'] != 1:
                 st.session_state['report_type_index'] = 1
                 st.session_state['selected_report_folder_index'] = 0
         elif selected_type == type_list[2]: 
             st.session_state['sub_title']="음성파일 보고서<br/>리스트 선택"
             st.session_state['report_folder_option'] = [folderlist_init_value] + file_lists[2]
             st.session_state['selected_report_folder_name'] = folder_list[2]
-            if st.session_state['report_type_index'] != 2
+            if st.session_state['report_type_index'] != 2:
                 st.session_state['report_type_index'] = 2
                 st.session_state['selected_report_folder_index'] = 0
         elif selected_type == type_list[3]:
             st.session_state['sub_title']="키워드 보고서<br/>리스트 선택"
             st.session_state['report_folder_option'] = [folderlist_init_value] + file_lists[3]
             st.session_state['selected_report_folder_name'] = folder_list[3]
-            if st.session_state['report_type_index'] != 3
+            if st.session_state['report_type_index'] != 3:
                 st.session_state['report_type_index'] = 3
                 st.session_state['selected_report_folder_index'] = 0
             
