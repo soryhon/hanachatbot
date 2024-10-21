@@ -66,15 +66,35 @@ nickname = st.text_input("닉네임/이름을 입력하세요:")
 
 
 
-col1,col2,col3,col4,col5 = st.columns([0.2,0.2,0.2,0.2,0.2])
+col1,col2,col3,col4,col5,col6,col7,col8,col9 = st.columns([0.19,0.01,0.19,0.01,0.19,0.01,0.19,0.01,0.19])
 with col1:
     st.image("image/star01.png", width=100)
 with col2:
-    st.image("image/star01.png", width=100)
+    st.markdown(
+        "<p style='font-size:9px;color#cccccc;'>1</p>",
+        unsafe_allow_html=True
+    )
 with col3:
     st.image("image/star01.png", width=100)
 with col4:
+    st.markdown(
+        "<p style='font-size:9px;color#cccccc;'>1</p>",
+        unsafe_allow_html=True
+    )
+with col5:
     st.image("image/star01.png", width=100)
+with col6:
+    st.markdown(
+        "<p style='font-size:9px;color#cccccc;'>1</p>",
+        unsafe_allow_html=True
+    )
+with col7:
+    st.image("image/star01.png", width=100)
+with col8:
+    st.markdown(
+        "<p style='font-size:9px;color#cccccc;'>1</p>",
+        unsafe_allow_html=True
+    )
 with col5:
     st.image("image/star01.png", width=100)
 # 별점 선택 (슬라이더 사용)
