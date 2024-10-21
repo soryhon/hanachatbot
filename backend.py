@@ -1454,7 +1454,7 @@ def get_audio_template_files_list(repo, branch, token):
         # JSON 파일만 필터링하여 리스트로 반환
         return [item['name'] for item in response.json() if item['name'].endswith('.json')]
     else:
-        st.error("templateFiles 폴더의 파일 목록을 가져오지 못했습니다.")
+        st.error("audioTemplateFiles 폴더의 파일 목록을 가져오지 못했습니다.")
         return []
 
 # JSON 파일의 내용을 불러오는 함수
