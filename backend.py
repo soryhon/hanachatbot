@@ -1631,7 +1631,7 @@ def create_file_in_github(token, repo, branch, filepath):
         return False
 
 # CSV 파일에 데이터를 추가하는 함수
-def add_to_csv(nickname, score, token, repo, branch, file_path):
+def add_to_csv(nickname, score, token, repo, branch, filepath):
     # 파일이 GitHub에 존재하는지 확인하고, 없으면 생성
     file_exists = check_csv_file_from_github(token, repo, branch, filepath)
     
