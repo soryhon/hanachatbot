@@ -1738,5 +1738,56 @@ def get_star_images(score):
     
 
     return star_images
+
+# JSON 파일 저장 함수
+def save_audio_template_to_json():
+    repo = st.session_state["github_repo"]
+    branch = st.session_state["github_branch"]
+    token = st.session_state["github_token"]
+
+    # GitHub 토큰과 레포지토리 설정 확인
+    if not token or not repo:
+        st.error("GitHub 토큰이나 저장소 정보가 설정되지 않았습니다.")
+        return
+        
+    # JSON 데이터 구조 생성
+    template_data = {
+        "selected_folder_name": st.session_state['selected_folder_name'],
+        "num_requests": st.session_state['num_requests'],
+        "rows": st.session_state['rows'],
+        "rows_length": len(st.session_state['rows']),
+        "timestamp": datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+    }
+
+    # 파일명 생성
+    folder_name = st.session_state['selected_folder_name']
+    timestamp = template_data["timestamp"]
+    json_file_name = f"{folder_name}_Template_{timestamp}.json"
+
+    # GitHub 저장소 내 templateFiles 폴더 생성 및 파일 저장
+    template_folder = "audioTemplateFiles"
+    check_and_create_github_folder(template_folder, repo, branch, token)
+   
+    # 저장할 파일 경로
+    json_file_path = f"{template_folder}/{json_file_name}"
+
+    # JSON 파일을 Base64로 인코딩
+    json_content = json.dumps(template_data, ensure_ascii=False, indent=4)
+    json_base64 = base64.b64encode(json_content.encode('utf-8')).decode('utf-8')
+
+    # GitHub에 파일 업로드
+    url = f"https://api.github.com/repos/{repo}/contents/{json_file_path}"
+    headers = {"Authorization": f"token {token}"}
+    data = {
+        "message": f"Add {json_file_name}",
+        "content": json_base64,
+        "branch": branch
+    }
+
+    response = requests.put(url, headers=headers, json=data)
+    if response.status_code == 201:
+        st.success(f"{json_file_name} 파일이 {template_folder} 폴더에 저장되었습니다.")
+    else:
+        st.error(f"파일 저장 실패: {response.json()}")
     
 # Backend 기능 구현 끝 ---
