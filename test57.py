@@ -54,7 +54,7 @@ def get_star_images(score):
     star_images = ["image/star01.png"] * 5  # 기본적으로 모든 별을 흰색 별로 설정 (star01.png)
     
     if score >= 0.50:
-        star_images[0] = "image/star02.png"  # score 1점에 반 노란색 별 (star02.png)1
+        star_images[0] = "image/star03.png"  # score 1점에 반 노란색 별 (star02.png)1
     if score == 1.00:
         star_images[0] = "image/star03.png"  # score 1점에 노란색 별 (star03.png)
     if score > 1.00:
