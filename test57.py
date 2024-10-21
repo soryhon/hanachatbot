@@ -122,39 +122,54 @@ with col2:
         unsafe_allow_html=True
     )
 
+if github_info_loaded:
+    with st.expander("📝 보고서 선택", expanded=st.session_state['check_report']):
+        col1, col2 = st.columns([0.21, 0.79])
+        with col1:
+            st.write("")
+            st.markdown(
+                "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>닉네임 또는 이름<br/>입력 </p>",
+                unsafe_allow_html=True
+            )
+        with col2:
+            nickname = st.text_input("닉네임 또는 이름을 입력하세요:")
+        # 별점 선택 (슬라이더 사용)
+        score = st.slider("별점 선택 (1~5, 0.5 단위):", 0.5, 5.0, 1.0)
+        # score에 따라 이미지 설정
+        star_images = get_star_images(score)
+        
+        # 별 이미지를 표시할 5개의 열 생성
+        col1, col2, col3, col4, col5 = st.columns([0.2, 0.2, 0.2, 0.2, 0.2])
+        
+        # 각 열에 맞는 별 이미지 출력
+        with col1:  # score 1점 별
+            st.image(star_images[0], width=100)
+        with col2:  # score 2점 별
+            st.image(star_images[1], width=100)
+        with col3:  # score 3점 별
+            st.image(star_images[2], width=100)
+        with col4:  # score 4점 별
+            st.image(star_images[3], width=100)
+        with col5:  # score 5점 별
+            st.image(star_images[4], width=100)
+
+        # 평가 버튼
+        if st.button("평가"):
+            if nickname and score:
+                check_or_create_csv()
+                add_to_csv(nickname, score)
+                st.success(f"{nickname}님의 평가가 성공적으로 등록되었습니다!")
+            else:
+                st.error("닉네임/이름과 별 개수 선택은 필수입니다.")
+else:
+    st.warning("GitHub 정보가 설정되지 않았습니다. 먼저 GitHub Token을 입력해 주세요.")
 
 
-# 닉네임/이름 입력
-nickname = st.text_input("닉네임/이름을 입력하세요:")
 
 
 
-# 별점 선택 (슬라이더 사용)
-score = st.slider("별점 선택 (1~5, 0.5 단위):", 0.5, 5.0, 1.0)
 
-# score에 따라 이미지 설정
-star_images = get_star_images(score)
 
-# 별 이미지를 표시할 5개의 열 생성
-col1, col2, col3, col4, col5 = st.columns([0.2, 0.2, 0.2, 0.2, 0.2])
 
-# 각 열에 맞는 별 이미지 출력
-with col1:  # score 1점 별
-    st.image(star_images[0], width=100)
-with col2:  # score 2점 별
-    st.image(star_images[1], width=100)
-with col3:  # score 3점 별
-    st.image(star_images[2], width=100)
-with col4:  # score 4점 별
-    st.image(star_images[3], width=100)
-with col5:  # score 5점 별
-    st.image(star_images[4], width=100)
     
-# 평가 버튼
-if st.button("평가"):
-    if nickname and score:
-        check_or_create_csv()
-        add_to_csv(nickname, score)
-        st.success(f"{nickname}님의 평가가 성공적으로 등록되었습니다!")
-    else:
-        st.error("닉네임/이름과 별 개수 선택은 필수입니다.")
+
