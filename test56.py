@@ -79,9 +79,9 @@ if github_info_loaded:
             file_lists.append(file_list)
 
         # 업무 보고서 자동 완성 리스트
-        type_list = ["• 업무 보고서", "• 보고서 비교분석","• 음성 파일 보고서","• Quickly 키워드 보고서"]
+        type_list = ["• 업무 보고서 자동 완성", "• 보고서 비교분석 완성","• 음성 파일 보고서 완성","• Quickly 키워드 보고서 완성"]
        
-        selected_type = st.radio("",type_list, key="radio-type")     
+        selected_type = st.radio("보고서 유형",type_list, key="radio-type")     
         if selected_type == type_list[0]: 
             st.session_state['sub_title']="업무 보고서<br/>리스트 선택"
             st.session_state['report_folder_option'] = [folderlist_init_value] + file_lists[0]
