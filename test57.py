@@ -157,25 +157,22 @@ if github_info_loaded:
             st.image(star_images[3], width=100)
         with col5:  # score 5점 별
             st.image(star_images[4], width=100)
-        st.markdown(
-            "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
-            unsafe_allow_html=True
-        )    
+   
 
-        col1, col2, col3 = st.columns([0.2, 0.6, 0.2])
-        with col1:
-            st.write("")
-        with col2:
-            # 평가 버튼
-            if st.button("🎯 평가하기", key="appraisal", use_container_width=True):
-                if nickname and score:
-                    check_or_create_csv()
-                    add_to_csv(nickname, score)
-                    st.success(f"{nickname}님의 평가가 성공적으로 등록되었습니다!")
-                else:
-                    st.error("닉네임/이름과 별 개수 선택은 필수입니다.")
-        with col3:
-            st.write("")
+    col1, col2, col3 = st.columns([0.2, 0.6, 0.2])
+    with col1:
+        st.write("")
+    with col2:
+        # 평가 버튼
+        if st.button("🎯 평가하기", key="appraisal", use_container_width=True):
+            if nickname and score:
+                check_or_create_csv()
+                add_to_csv(nickname, score)
+                st.success(f"{nickname}님의 평가가 성공적으로 등록되었습니다!")
+            else:
+                st.error("닉네임/이름과 별 개수 선택은 필수입니다.")
+    with col3:
+        st.write("")
             
 else:
     st.warning("GitHub 정보가 설정되지 않았습니다. 먼저 GitHub Token을 입력해 주세요.")
