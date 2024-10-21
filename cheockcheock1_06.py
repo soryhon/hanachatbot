@@ -45,7 +45,7 @@ if github_info_loaded:
             "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
             unsafe_allow_html=True
         ) 
-        col1, col2, col3 = st.columns([0.1, 0.8, 0.1])
+        col1, col2, col3 = st.columns([0.08, 0.81, 0.11])
         with col1:
             st.write("")
         with col2:
