@@ -59,6 +59,8 @@ def get_star_images(score):
         star_images[0] = "image/star04.png"    
     if score > 0.75 and score <= 1.00:
         star_images[0] = "image/star05.png" 
+    if score > 1.00
+        star_images[0] = "image/star05.png" 
     if score > 1.00 and score <= 1.25:
         star_images[1] = "image/star02.png"
     if score > 1.25 and score <= 1.50:
@@ -66,6 +68,8 @@ def get_star_images(score):
     if score > 1.50 and score <= 1.75:
         star_images[1] = "image/star04.png"    
     if score > 1.75 and score <= 2.00:
+        star_images[1] = "image/star05.png" 
+    if score > 2.00
         star_images[1] = "image/star05.png" 
     if score > 2.00 and score <= 2.25:
         star_images[2] = "image/star02.png"
@@ -75,6 +79,8 @@ def get_star_images(score):
         star_images[2] = "image/star04.png"    
     if score > 2.75 and score <= 3.00:
         star_images[2] = "image/star05.png" 
+    if score > 3.00
+        star_images[2] = "image/star05.png" 
     if score > 3.00 and score <= 3.25:
         star_images[3] = "image/star02.png"
     if score > 3.25 and score <= 3.50:
@@ -82,6 +88,8 @@ def get_star_images(score):
     if score > 3.50 and score <= 3.75:
         star_images[3] = "image/star04.png"    
     if score > 3.75 and score <= 4.00:
+        star_images[3] = "image/star05.png" 
+    if score > 4.00
         star_images[3] = "image/star05.png" 
     if score > 4.00 and score <= 4.25:
         star_images[4] = "image/star02.png"
