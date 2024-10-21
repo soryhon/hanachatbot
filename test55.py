@@ -237,7 +237,7 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
         )  
         st.session_state['check_result'] = True
 
-        result_path = f"{selected_report_folder_name']}/{st.session_state['selected_report_file_name']}"
+        result_path = f"{st.session_state[selected_report_folder_name']}/{st.session_state['selected_report_file_name']}"
         # GitHub에서 HTML 파일 데이터 가져오기
         file_content = bd.get_file_from_github(
             st.session_state['github_repo'], 
