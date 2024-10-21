@@ -58,24 +58,28 @@ def get_star_images(score):
     if score == 1.0:
         star_images[0] = "image/star03.png"  # score 1점에 노란색 별 (star03.png)
     if score > 1.0:
+        star_images[0] = "image/star03.png"  # score 1점에 노란색 별 (star03.png)
         star_images[1] = "image/star02.png"  # score 2점에 반 노란색 별 (star02.png)
     if score > 1.5:
         star_images[1] = "image/star03.png"  # score 2점에 반 노란색 별 (star02.png)
     if score == 2.0:
         star_images[1] = "image/star03.png"  # score 2점에 노란색 별 (star03.png)
     if score > 2.0:
+        star_images[1] = "image/star03.png"  # score 1점에 노란색 별 (star03.png)
         star_images[2] = "image/star02.png"  # score 2점에 노란색 별 (star03.png)
     if score > 2.5:
         star_images[2] = "image/star03.png"  # score 3점에 반 노란색 별 (star02.png)
     if score == 3.0:
         star_images[2] = "image/star03.png"  # score 3점에 반 노란색 별 (star02.png)
     if score > 3.0:
+        star_images[2] = "image/star03.png"  # score 1점에 노란색 별 (star03.png)
         star_images[3] = "image/star02.png"  # score 3점에 노란색 별 (star03.png)
     if score > 3.5:
         star_images[3] = "image/star03.png"  # score 4점에 반 노란색 별 (star02.png)
     if score == 4.0:
         star_images[3] = "image/star03.png"  # score 4점에 반 노란색 별 (star02.png)
     if score > 4.0:
+        star_images[3] = "image/star03.png"  # score 1점에 노란색 별 (star03.png)
         star_images[4] = "image/star02.png"  # score 4점에 노란색 별 (star03.png)
     if score > 4.5:
         star_images[4] = "image/star03.png"  # score 5점에 반 노란색 별 (star02.png)
