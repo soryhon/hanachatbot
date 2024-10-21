@@ -134,6 +134,10 @@ if github_info_loaded:
             )
         with col2:
             nickname = st.text_input("닉네임 또는 이름을 입력하세요:")
+        st.markdown(
+            "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
+            unsafe_allow_html=True
+        )    
         # 별점 선택 (슬라이더 사용)
         score = st.slider("별점 선택 (1~5, 0.5 단위):", 0.5, 5.0, 1.0)
         # score에 따라 이미지 설정
