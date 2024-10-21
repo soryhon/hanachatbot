@@ -1550,21 +1550,22 @@ def run_llm_with_keyword_and_prompt(api_key, title, request):
     return responses
 
 # 보고서명 리스트를 가져오고, reportFiles 폴더 존재 여부를 확인하고 없으면 생성하는 함수
-def get_reportType_folder_list_from_github(repo, branch, token, folder_name):
+def get_reportType_file_list_from_github(repo, branch, token, folder_name):
     
     if folder_name:
         folder_check = check_and_create_github_folder_if_not_exists(repo, folder_name, token, branch)
     
         if folder_check:
-            url = f"https://api.github.com/repos/{repo}/contents/{folder_name}?ref={branch}"
+            # 폴더 내의 파일을 가져옴
+            url = f"https://api.github.com/repos/{repo}/git/trees/{branch}?recursive=1"
             headers = {"Authorization": f"token {token}"}
             response = requests.get(url, headers=headers)
-    
+            
             if response.status_code == 200:
-                folder_list = [item['name'] for item in response.json() if item['type'] == 'dir']
-                return folder_list
+                files = [item['path'] for item in response.json().get('tree', []) if item['type'] == 'blob' and item['path'].startswith(folder_name)]
+                return files
             else:
-                st.error(f"폴더 리스트를 가져오지 못했습니다: {response.status_code}")
+                st.error("GitHub 파일 목록을 가져오지 못했습니다. 저장소 정보나 토큰을 확인하세요.")
                 return []
         else:
             st.error("reportFiles 폴더가 존재하지 않아 생성할 수 없습니다.")
