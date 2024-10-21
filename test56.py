@@ -124,7 +124,7 @@ if github_info_loaded:
             #st.session_state['report_folder_option'] = [folderlist_init_value] + file_lists[0]
             # 폴더 선택 selectbox 생성 (새 폴더 추가 후, 선택값으로 설정)
             selected_file_name = st.selectbox(
-                "등록된 보고서명 리스트",
+                "등록된 결과 보고서를 선택하세요.",
                 options= st.session_state['report_folder_option'],  # 옵션 리스트에 새 폴더 반영
                 index=st.session_state['selected_report_folder_index'],  # 새로 선택된 폴더를 기본값으로 선택
                 key="selected_report_folder"
