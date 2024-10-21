@@ -80,6 +80,16 @@ if github_info_loaded:
 
         # 업무 보고서 자동 완성 리스트
         type_list = ["• 업무 보고서", "• 보고서 비교분석","• 음성 파일 보고서","• Quickly 키워드 보고서"]
+        # CSS 스타일을 사용하여 radio 버튼을 가로로 표시
+        st.markdown("""
+            <style>
+            div[data-testid="stRadio"] > label > div {
+                flex-direction: row;
+            }
+            </style>
+            """, unsafe_allow_html=True
+        )
+
         selected_type = st.radio("",type_list )
         if selected_type == type_list[0]: 
             st.session_state['sub_title']="업무 보고서<br/>리스트 선택"
