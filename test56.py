@@ -40,7 +40,7 @@ if 'check_report' not in st.session_state:
 if 'sub_title' not in st.session_state:
     st.session_state['sub_title'] = ""
 if 'report_type_index' not in st.session_state:
-    report_type_index = 0
+    st.session_state['report_type_index'] = 0
     
 # 1 프레임
 # 보고서 타이틀
