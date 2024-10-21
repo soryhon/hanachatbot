@@ -89,20 +89,18 @@ if github_info_loaded:
             </style>
             """, unsafe_allow_html=True
         )
+        st.markdown("""
+            <style>
+            div[data-testid="stRadio"] > label > div {
+                flex-direction: row;
+            }
+            </style>
+            """, unsafe_allow_html=True)
         with st.container():
             st.markdown("<div style='flex-direction: row;'>", unsafe_allow_html=True)
             selected_type = st.radio("보고서 유형",type_list, key="radio-type")
             st.markdown('</div>', unsafe_allow_html=True)
-         # 선택된 값을 저장할 변수 초기화
-        selected_option = None
-        
-        # st.columns()을 사용해 가로로 항목 배치
-        columns = st.columns(len(type_list))
-        
-        # 각 열에 대해 옵션을 출력
-        for idx, option in enumerate(type_list):
-            if columns[idx].radio("옵션 선택", [option], key=f"radio_{idx}"):
-                selected_option = option
+
                 
         if selected_type == type_list[0]: 
             st.session_state['sub_title']="업무 보고서<br/>리스트 선택"
