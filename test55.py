@@ -26,9 +26,9 @@ if 'selected_report_file_name' not in st.session_state:
 if 'selected_report_folder_name' not in st.session_state:
     st.session_state['selected_report_folder_name']=""
 if 'check_result' not in st.session_state:  
-        st.session_state['check_result'] = False
+    st.session_state['check_result'] = False
 if 'check_report' not in st.session_state:
-        st.session_state['check_report'] = True
+    st.session_state['check_report'] = True
     
 # 1 프레임
 # 보고서 타이틀
@@ -215,25 +215,27 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
         )  
         st.session_state['check_result'] = True
         st.session_state['check_report'] = False
-        result_folder = st.session_state['selected_report_folder_name']
-        result_file = st.session_state['selected_report_file_name']
-        result_path = f"{result_folder}/{result_file}"
-        # GitHub에서 HTML 파일 데이터 가져오기
-        file_content = bd.get_file_from_github(
-            st.session_state['github_repo'], 
-            st.session_state['github_branch'], 
-            f"{result_path}",  # 폴더 경로와 파일 이름을 합침
-            st.session_state['github_token']
-        )
-        
-        if file_content:
-            # HTML 파일 내용을 화면에 출력
-            #st.markdown(file_content, unsafe_allow_html=True)
-            html_content = file_content.getvalue().decode('utf-8')
-
-            st.components.v1.html(html_content, height=1024, scrolling=True)
-        else:
-            st.error(f"{selected_file} 파일 데이터를 가져오는 데 실패했습니다.")
+        with st.spinner('선택한 결과 보고서를 불러오는 중입니다...'):
+            result_folder = st.session_state['selected_report_folder_name']
+            result_file = st.session_state['selected_report_file_name']
+            result_path = f"{result_folder}/{result_file}"
+            # GitHub에서 HTML 파일 데이터 가져오기
+            file_content = bd.get_file_from_github(
+                st.session_state['github_repo'], 
+                st.session_state['github_branch'], 
+                f"{result_path}",  # 폴더 경로와 파일 이름을 합침
+                st.session_state['github_token']
+            )
+            
+            if file_content:
+                # HTML 파일 내용을 화면에 출력
+                #st.markdown(file_content, unsafe_allow_html=True)
+                html_content = file_content.getvalue().decode('utf-8')
+    
+                st.components.v1.html(html_content, height=1024, scrolling=True)
+            else:
+                st.error(f"{selected_file} 파일 데이터를 가져오는 데 실패했습니다.")
+            time.sleep(1)  # 예를 들어, 5초 동안 로딩 상태 유지
 
 
     st.markdown(
