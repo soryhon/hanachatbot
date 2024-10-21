@@ -101,7 +101,7 @@ if github_info_loaded:
                 if selected_file_name != folderlist_init_value:
                     st.session_state['selected_report_file_name'] = f"{selected_file_name}"
                     st.session_state['selected_report_folder_name'] = f"{folder_list[0]}"
-                    st.session_state['selected_report_folder_index'] = file_list[0].index(selected_file_name) + 1
+                    st.session_state['selected_report_folder_index'] = file_lists[0].index(selected_file_name) + 1
                     st.session_state['selected_analysis_folder_index'] = 0
                     st.session_state['selected_audio_folder_index'] = 0
                     st.session_state['selected_keyword_folder_index'] = 0
@@ -136,7 +136,7 @@ if github_info_loaded:
                 if selected_file_name != folderlist_init_value:
                     st.session_state['selected_report_file_name'] = f"{selected_file_name}"
                     st.session_state['selected_report_folder_name'] = f"{folder_list[1]}"
-                    st.session_state['selected_analysis_folder_index'] = file_list[1].index(selected_file_name) + 1
+                    st.session_state['selected_analysis_folder_index'] = file_lists[1].index(selected_file_name) + 1
                     st.session_state['selected_report_folder_index'] = 0
                     st.session_state['selected_audio_folder_index'] = 0
                     st.session_state['selected_keyword_folder_index'] = 0
@@ -170,7 +170,7 @@ if github_info_loaded:
                 if selected_file_name != folderlist_init_value:
                     st.session_state['selected_report_file_name'] = f"{selected_file_name}"
                     st.session_state['selected_report_folder_name'] = f"{folder_list[2]}"
-                    st.session_state['selected_audio_folder_index'] = file_list[2].index(selected_file_name) + 1
+                    st.session_state['selected_audio_folder_index'] = file_lists[2].index(selected_file_name) + 1
                     st.session_state['selected_analysis_folder_index'] = 0
                     st.session_state['selected_report_folder_index'] = 0
                     st.session_state['selected_keyword_folder_index'] = 0
@@ -205,7 +205,7 @@ if github_info_loaded:
                 if selected_file_name != folderlist_init_value:
                     st.session_state['selected_report_file_name'] = f"{selected_file_name}"
                     st.session_state['selected_report_folder_name'] = f"{folder_list[3]}"
-                    st.session_state['selected_keyword_folder_index'] = file_list[3].index(selected_file_name) + 1
+                    st.session_state['selected_keyword_folder_index'] = file_lists[3].index(selected_file_name) + 1
                     st.session_state['selected_report_folder_index'] = 0
                     st.session_state['selected_audio_folder_index'] = 0
                     st.session_state['selected_analysis_folder_index'] = 0
