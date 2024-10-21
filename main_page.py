@@ -3,7 +3,7 @@ import importlib
 import os
 import backend as bd
 # 메뉴명 리스트
-sub_menu_list=['📚업무 보고서 자동 완성', '📈보고서 비교분석 자동 완성', '🎧음성 파일 보고서 완성', '⚡Quickly 키워드 보고서 완성','📋결과 보고서 현황', '👥프로젝트 및 팀 소개', '🏆만족도 평가']
+sub_menu_list=['📚업무 보고서 자동 완성', '📈보고서 비교분석 자동 완성', '🎧음성 파일 보고서 완성', '⚡Quickly 키워드 보고서 완성','📋결과 보고서 현황', '👥프로젝트 및 팀 소개', '🏆사용자 만족도 평가']
 
 if 'selected_menu01_index' not in st.session_state:
     st.session_state['selected_menu01_index'] =0
