@@ -80,24 +80,9 @@ if github_info_loaded:
 
         # 업무 보고서 자동 완성 리스트
         type_list = ["• 업무 보고서", "• 보고서 비교분석","• 음성 파일 보고서","• Quickly 키워드 보고서"]
-        # CSS 스타일을 사용하여 radio 버튼을 가로로 표시
-        st.markdown("""
-            <style>
-            .horizontal-radio > div {
-                flex-direction: row;
-            }
-            </style>
-            """, unsafe_allow_html=True
-        )
-        st.markdown("""
-            <style>
-            div[data-testid="stRadio"] > label > div {
-                flex-direction: row;
-            }
-            </style>
-            """, unsafe_allow_html=True)
+       
         with st.container():
-            st.markdown("<div style='flex-direction: row;'>", unsafe_allow_html=True)
+            st.markdown("<div style='flex-direction: row;border:1px solid #cccccc;'>", unsafe_allow_html=True)
             selected_type = st.radio("보고서 유형",type_list, key="radio-type")
             st.markdown('</div>', unsafe_allow_html=True)
 
