@@ -184,9 +184,23 @@ if github_info_loaded:
                 #selected_index = st.session_state['selected_keyword_folder_index']
                 report_file_list = [folderlist_init_value] + file_lists[3]
                 # 폴더 선택 selectbox 생성 (새 폴더 추가 후, 선택값으로 설정)
-                selected_file_name = st.s기</p>",
-    unsafe_allow_html=True
-)
+                selected_file_name = st.selectbox(
+                    "등록된 보고서명 리스트",
+                    options=report_file_list,  # 옵션 리스트에 새 폴더 반영
+                    index=st.session_state['selected_keyword_folder_index'],  # 새로 선택된 폴더를 기본값으로 선택
+                    key="selected_keyword_folder"
+                )
+                # 파일 업로드와 요청사항 리스트의 기본 폴더 설정
+                if selected_file_name != folderlist_init_value:
+                    st.session_state['selected_report_file_name'] = f"{selected_file_name}"
+                    st.session_state['selected_report_folder_name'] = f"{folder_list[3]}"
+                    st.session_state['selected_keyword_folder_index'] = file_lists[3].index(selected_file_name) + 1
+                    st.session_state['selected_analysis_folder_index'] = 0
+                    st.session_state['selected_report_folder_index'] = 0
+                    st.session_state['selected_audio_folder_index'] = 0
+                    st.session_state['check_report'] = False
+                    st.session_state['check_result'] = True                    
+                    #st.success(f"[{selected_file_name}] 보고서명이 선택되었습니다.")  
 
 # 3 프레임
 # 결과 보고서 보기/ 결과 보고서 저장
