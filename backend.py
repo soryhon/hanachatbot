@@ -1662,7 +1662,8 @@ def add_to_csv(nickname, score, token, repo, branch, file_path):
         'DATE': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     }
     
-    df = df.append(new_data, ignore_index=True)
+    # pd.concat()을 사용하여 데이터 추가
+    df = pd.concat([df, new_data], ignore_index=True)
 
     # CSV 데이터를 base64로 인코딩
     csv_content = df.to_csv(index=False)
