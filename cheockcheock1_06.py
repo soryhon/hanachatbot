@@ -1,14 +1,8 @@
 import streamlit as st
 import pandas as pd
 import os
-
 from datetime import datetime
-
 import backend as bd
-
-
-
-
 
 # Frontend 기능 구현 시작 ---
 
@@ -50,7 +44,7 @@ if github_info_loaded:
             st.write("")
         with col2:
             # 별점 선택 (슬라이더 사용)
-            score = st.slider("별점 선택 (1~5, 0.5 단위):", 1.0, 5.0, 1.0)
+            score = st.slider("만족도 별점을 아래의 슬라이드바를 움직여서 선택해주세요. (1~5점 까지):", 1.0, 5.0, 1.0)
         with col3:
             st.write("")   
         # score에 따라 이미지 설정
