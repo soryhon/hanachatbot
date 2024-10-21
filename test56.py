@@ -90,7 +90,7 @@ if github_info_loaded:
             """, unsafe_allow_html=True
         )
         with st.container():
-            st.markdown('<div class="horizontal-radio">', unsafe_allow_html=True)
+            st.markdown("<div style='horizontal-radio'>", unsafe_allow_html=True)
             selected_type = st.radio("보고서 유형",type_list, key="radio-type")
             st.markdown('</div>', unsafe_allow_html=True)
             
