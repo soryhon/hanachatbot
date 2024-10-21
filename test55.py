@@ -68,7 +68,7 @@ if github_info_loaded:
             with col1:
                 st.write("")
                 st.markdown(
-                    "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>업무 보고서 자동 완성(br/>리스트 선택 </p>",
+                    "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>업무 보고서 자동 완성<br/>리스트 선택 </p>",
                     unsafe_allow_html=True
                 )
             with col2:
@@ -101,7 +101,7 @@ if github_info_loaded:
             with col1:
                 st.write("")
                 st.markdown(
-                    "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>보고서 비교분석 완성(br/>리스트 선택 </p>",
+                    "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>보고서 비교분석 완성<br/>리스트 선택 </p>",
                     unsafe_allow_html=True
                 )
             with col2:
@@ -114,7 +114,7 @@ if github_info_loaded:
                     "등록된 보고서명 리스트",
                     options=report_folder_list,  # 옵션 리스트에 새 폴더 반영
                     index=st.session_state['selected_analysis_folder_index'],  # 새로 선택된 폴더를 기본값으로 선택
-                    key="selected_report_folder"
+                    key="selected_analysis_folder"
                 )
                 # 파일 업로드와 요청사항 리스트의 기본 폴더 설정
                 if selected_folder != folderlist_init_value:
@@ -133,7 +133,7 @@ if github_info_loaded:
             with col1:
                 st.write("")
                 st.markdown(
-                    "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>음성파일 보고서(br/>리스트 선택 </p>",
+                    "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>음성파일 보고서<br/>리스트 선택 </p>",
                     unsafe_allow_html=True
                 )
             with col2:
@@ -146,7 +146,7 @@ if github_info_loaded:
                     "등록된 보고서명 리스트",
                     options=report_folder_list,  # 옵션 리스트에 새 폴더 반영
                     index=st.session_state['selected_audio_folder_index'],  # 새로 선택된 폴더를 기본값으로 선택
-                    key="selected_report_folder"
+                    key="selected_audio_folder"
                 )
                 # 파일 업로드와 요청사항 리스트의 기본 폴더 설정
                 if selected_folder != folderlist_init_value:
@@ -166,7 +166,7 @@ if github_info_loaded:
             with col1:
                 st.write("")
                 st.markdown(
-                    "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>Quickly 키워드 보고서(br/>리스트 선택 </p>",
+                    "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>Quickly 키워드 보고서<br/>리스트 선택 </p>",
                     unsafe_allow_html=True
                 )
             with col2:
@@ -179,7 +179,7 @@ if github_info_loaded:
                     "등록된 보고서명 리스트",
                     options=report_folder_list,  # 옵션 리스트에 새 폴더 반영
                     index=st.session_state['selected_keyword_folder_index'],  # 새로 선택된 폴더를 기본값으로 선택
-                    key="selected_report_folder"
+                    key="selected_keyword_folder"
                 )
                 # 파일 업로드와 요청사항 리스트의 기본 폴더 설정
                 if selected_folder != folderlist_init_value:
