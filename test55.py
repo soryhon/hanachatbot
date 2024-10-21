@@ -74,7 +74,7 @@ if github_info_loaded:
             with col2:
                 # 폴더 존재 확인 및 생성
                 # 'selected_folder'가 folder_list에 있을 때만 index 설정
-                selected_index = st.session_state['selected_report_folder_index']
+                #selected_index = st.session_state['selected_report_folder_index']
                 report_folder_list = [folderlist_init_value] + folder_list
                 # 폴더 선택 selectbox 생성 (새 폴더 추가 후, 선택값으로 설정)
                 selected_folder = st.selectbox(
@@ -90,7 +90,7 @@ if github_info_loaded:
                     st.session_state['selected_audio_folder_index'] = 0
                     st.session_state['selected_keyword_folder_index'] = 0
                     st.session_state['check_report']=False
-
+                    st.session_state['selected_report_folder_index'] = folder_list.index(selected_folder) + 1
                     #bd.refresh_page()
                     st.success(f"[{selected_folder}] 보고서명이 선택되었습니다.")  
 
@@ -107,7 +107,7 @@ if github_info_loaded:
             with col2:
                 # 폴더 존재 확인 및 생성
                 # 'selected_folder'가 folder_list에 있을 때만 index 설정
-                selected_index = st.session_state['selected_analysis_folder_index']
+                #selected_index = st.session_state['selected_analysis_folder_index']
                 report_folder_list = [folderlist_init_value] + folder_list1
                 # 폴더 선택 selectbox 생성 (새 폴더 추가 후, 선택값으로 설정)
                 selected_folder = st.selectbox(
@@ -123,7 +123,7 @@ if github_info_loaded:
                     st.session_state['selected_audio_folder_index'] = 0
                     st.session_state['selected_keyword_folder_index'] = 0
                     st.session_state['check_report']=False
-
+                    st.session_state['selected_analysis_folder_index'] = folder_list1.index(selected_folder) + 1
                     #bd.refresh_page()
                     st.success(f"[{selected_folder}] 보고서명이 선택되었습니다.")  
 
@@ -139,7 +139,7 @@ if github_info_loaded:
             with col2:
                 # 폴더 존재 확인 및 생성
                 # 'selected_folder'가 folder_list에 있을 때만 index 설정
-                selected_index = st.session_state['selected_audio_folder_index']
+                #selected_index = st.session_state['selected_audio_folder_index']
                 report_folder_list = [folderlist_init_value] + folder_list2
                 # 폴더 선택 selectbox 생성 (새 폴더 추가 후, 선택값으로 설정)
                 selected_folder = st.selectbox(
@@ -155,7 +155,7 @@ if github_info_loaded:
                     st.session_state['selected_report_folder_index'] = 0
                     st.session_state['selected_keyword_folder_index'] = 0
                     st.session_state['check_report']=False
-
+                    st.session_state['selected_audio_folder_index'] = folder_list2.index(selected_folder) + 1
                     #bd.refresh_page()
                     st.success(f"[{selected_folder}] 보고서명이 선택되었습니다.")  
 
@@ -172,7 +172,7 @@ if github_info_loaded:
             with col2:
                 # 폴더 존재 확인 및 생성
                 # 'selected_folder'가 folder_list에 있을 때만 index 설정
-                selected_index = st.session_state['selected_keyword_folder_index']
+                #selected_index = st.session_state['selected_keyword_folder_index']
                 report_folder_list = [folderlist_init_value] + folder_list3
                 # 폴더 선택 selectbox 생성 (새 폴더 추가 후, 선택값으로 설정)
                 selected_folder = st.selectbox(
@@ -188,9 +188,9 @@ if github_info_loaded:
                     st.session_state['selected_audio_folder_index'] = 0
                     st.session_state['selected_analysis_folder_index'] = 0
                     st.session_state['check_report']=False
-
+                    st.session_state['selected_keyword_folder_index'] = folder_list3.index(selected_folder) + 1
                     #bd.refresh_page()
-                    st.success(f"[{selected_folder}] 보고서명이이 선택되었습니다.")  
+                    st.success(f"[{selected_folder}] 보고서명이 선택되었습니다.")  
       
 else:
     st.warning("GitHub 정보가 설정되지 않았습니다. 먼저 GitHub Token을 입력해 주세요.")
