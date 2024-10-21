@@ -78,7 +78,7 @@ with col4:
 with col5:
     st.image("image/star01.png", width=100)
 # 별점 선택 (슬라이더 사용)
-score = st.slider("별점 선택 (1~5, 0.5 단위):", 1.0, 5.0, 0)
+score = st.slider("별점 선택 (1~5, 0.5 단위):", 1.0, 5.0, 1)
 
 # 평가 버튼
 if st.button("평가"):
