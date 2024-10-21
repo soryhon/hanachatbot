@@ -68,7 +68,7 @@ if github_info_loaded:
             with col1:
                 st.write("")
                 st.markdown(
-                    "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>업무 보고서 자동 완성<br/>리스트 선택 </p>",
+                    "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>업무 보고서<br/>리스트 선택 </p>",
                     unsafe_allow_html=True
                 )
             with col2:
@@ -101,7 +101,7 @@ if github_info_loaded:
             with col1:
                 st.write("")
                 st.markdown(
-                    "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>보고서 비교분석 완성<br/>리스트 선택 </p>",
+                    "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>보고서 비교분석<br/>리스트 선택 </p>",
                     unsafe_allow_html=True
                 )
             with col2:
@@ -166,7 +166,7 @@ if github_info_loaded:
             with col1:
                 st.write("")
                 st.markdown(
-                    "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>Quickly 키워드 보고서<br/>리스트 선택 </p>",
+                    "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>키워드 보고서<br/>리스트 선택 </p>",
                     unsafe_allow_html=True
                 )
             with col2:
