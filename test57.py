@@ -157,7 +157,10 @@ if github_info_loaded:
             st.image(star_images[3], width=100)
         with col5:  # score 5점 별
             st.image(star_images[4], width=100)
-
+        st.markdown(
+            "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
+            unsafe_allow_html=True
+        )    
         # 평가 버튼
         if st.button("평가"):
             if nickname and score:
