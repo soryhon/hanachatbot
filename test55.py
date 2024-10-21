@@ -236,7 +236,7 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
             unsafe_allow_html=True
         )  
         st.session_state['check_result'] = True
-        result_folder = st.session_state[selected_report_folder_name']
+        result_folder = st.session_state['selected_report_folder_name']
         result_file = st.session_state['selected_report_file_name']
         result_path = f"{result_folder}/{result_file}"
         # GitHub에서 HTML 파일 데이터 가져오기
