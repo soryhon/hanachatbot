@@ -44,9 +44,15 @@ if github_info_loaded:
         st.markdown(
             "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
             unsafe_allow_html=True
-        )    
-        # 별점 선택 (슬라이더 사용)
-        score = st.slider("별점 선택 (1~5, 0.5 단위):", 0.5, 5.0, 1.0)
+        ) 
+        col1, col2, col3 = st.columns([0.1, 0.8, 0.1])
+        with col1:
+            st.write("")
+        with col2:
+            # 별점 선택 (슬라이더 사용)
+            score = st.slider("별점 선택 (1~5, 0.5 단위):", 0.5, 5.0, 1.0)
+         with col1:
+            st.write("")   
         # score에 따라 이미지 설정
         star_images = bd.get_star_images(score)
         
