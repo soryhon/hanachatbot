@@ -55,15 +55,15 @@ if github_info_loaded:
         
         # 각 열에 맞는 별 이미지 출력
         with col1:  # score 1점 별
-            st.image(star_images[0], width=80)
+            st.image(star_images[0], width=90)
         with col2:  # score 2점 별
-            st.image(star_images[1], width=80)
+            st.image(star_images[1], width=90)
         with col3:  # score 3점 별
-            st.image(star_images[2], width=80)
+            st.image(star_images[2], width=90)
         with col4:  # score 4점 별
-            st.image(star_images[3], width=80)
+            st.image(star_images[3], width=90)
         with col5:  # score 5점 별
-            st.image(star_images[4], width=80)
+            st.image(star_images[4], width=90)
    
 
     col1, col2, col3 = st.columns([0.2, 0.6, 0.2])
