@@ -1659,7 +1659,7 @@ def add_to_csv(nickname, score, token, repo, branch, file_path):
         'Score': score,
         'IP': ip,
         'Hostname': hostname,
-        'DATE': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        'DATE': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     }
     
     df = df.append(new_data, ignore_index=True)
