@@ -123,12 +123,12 @@ with col2:
     )
 
 if github_info_loaded:
-    with st.expander("📝 보고서 선택", expanded=True):
+    with st.expander("✏️ 만족도 평가하기", expanded=True):
         col1, col2 = st.columns([0.21, 0.79])
         with col1:
             st.write("")
             st.markdown(
-                "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>닉네임 또는 이름<br/>입력 </p>",
+                "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>닉네임 또는 이름</p>",
                 unsafe_allow_html=True
             )
         with col2:
