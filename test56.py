@@ -15,20 +15,8 @@ folderlist_init_value = "보고서를 선택하세요."
 # 세션 상태에 각 변수 없다면 초기화
 if 'report_folder_option' not in st.session_state:
     st.session_state['report_folder_option'] = []
-if 'analysis_folder_option' not in st.session_state:
-    st.session_state['analysis_folder_option'] = []
-if 'audio_folder_option' not in st.session_state:
-    st.session_state['audio_folder_option'] = []
-if 'keyword_folder_option' not in st.session_state:
-    st.session_state['keyword_folder_option'] = []
 if 'selected_report_folder_index' not in st.session_state:
     st.session_state['selected_report_folder_index'] = 0
-if 'selected_analysis_folder_index' not in st.session_state:
-    st.session_state['selected_analysis_folder_index'] = 0
-if 'selected_audio_folder_index' not in st.session_state:
-    st.session_state['selected_audio_folder_index'] = 0
-if 'selected_keyword_folder_index' not in st.session_state:
-    st.session_state['selected_keyword_folder_index'] = 0
 if 'selected_report_file_name' not in st.session_state:
     st.session_state['selected_report_file_name']=""
 if 'selected_report_folder_name' not in st.session_state:
@@ -83,7 +71,7 @@ if github_info_loaded:
         # 업무 보고서 자동 완성 리스트
         type_list = ["• 업무 보고서 자동 완성", "• 보고서 비교분석 완성","• 음성 파일 보고서 완성","• Quickly 키워드 보고서 완성"]
        
-        selected_type = st.radio("보고서 유형",type_list, key="radio-type")     
+        selected_type = st.radio("보고서 유형 선택하세요.",type_list, key="radio-type")     
         if selected_type == type_list[0]: 
             st.session_state['sub_title']="업무 보고서<br/>리스트 선택"
             st.session_state['report_folder_option'] = [folderlist_init_value] + file_lists[0]
@@ -148,8 +136,6 @@ if github_info_loaded:
                 st.session_state['check_report'] = False
                 st.session_state['check_result'] = True
                 #st.success(f"[{selected_file_name}] 보고서명이 선택되었습니다.")  
-
-
 
 
 # 3 프레임
