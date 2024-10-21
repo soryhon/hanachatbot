@@ -108,7 +108,12 @@ if github_info_loaded:
                 st.session_state['selected_report_folder_index'] = 0
                 st.session_state['selected_report_file_name']=""
                 st.session_state['check_result'] = False
-                
+
+        st.markdown(
+            "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
+            unsafe_allow_html=True
+        )
+    
         col1, col2 = st.columns([0.21, 0.79])
         with col1:
             st.write("")
