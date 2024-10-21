@@ -1,13 +1,6 @@
 import streamlit as st
-import pandas as pd
 import backend as bd
-import datetime
 import time
-import openpyxl
-import matplotlib.pyplot as plt
-import matplotlib.font_manager as fm
-import altair as alt
-import numpy as np
 import io
 import os
 
@@ -16,17 +9,10 @@ import os
 # GitHub 정보가 있는지 확인하고 파일 업로드 객체를 출력
 github_info_loaded = bd.load_env_info()
 
-# 업로드 가능한 파일 크기 제한 (100MB)
-MAX_FILE_SIZE_MB = 100
-MAX_FILE_SIZE_BYTES = 100 * 1024 * 1024
-
 #Session_state 변수 초기화
 folderlist_init_value = "보고서를 선택하세요."
-templatelist_init_value = "불러올 보고서 양식을 선택하세요."
-# 세션 상태에 각 변수 없다면 초기화
-#bd.init_session_state(False)
-#bd.refresh_page()
 
+# 세션 상태에 각 변수 없다면 초기화
 if 'selected_report_folder_index' not in st.session_state:
     st.session_state['selected_report_folder_index'] = 0
 if 'selected_analysis_folder_index' not in st.session_state:
@@ -113,8 +99,7 @@ if github_info_loaded:
                     st.session_state['selected_keyword_folder_index'] = 0
                     st.session_state['check_report'] = False
                     st.session_state['check_result'] = True
-                    #bd.refresh_page()
-                    st.success(f"[{selected_file_name}] 보고서명이 선택되었습니다.")  
+                    #st.success(f"[{selected_file_name}] 보고서명이 선택되었습니다.")  
 
 
         # 보고서 비교분석 완성 리스트
@@ -148,9 +133,7 @@ if github_info_loaded:
                     st.session_state['selected_keyword_folder_index'] = 0
                     st.session_state['check_report'] = False
                     st.session_state['check_result'] = True
-                    
-                    #bd.refresh_page()
-                    st.success(f"[{selected_file_name}] 보고서명이 선택되었습니다.")  
+                    #st.success(f"[{selected_file_name}] 보고서명이 선택되었습니다.")  
 
         # 음성파일 보고서 완성 리스트
         with tab3:            
@@ -182,10 +165,8 @@ if github_info_loaded:
                     st.session_state['selected_report_folder_index'] = 0
                     st.session_state['selected_keyword_folder_index'] = 0
                     st.session_state['check_report'] = False
-                    st.session_state['check_result'] = True
-                    
-                    #bd.refresh_page()
-                    st.success(f"[{selected_file_name}] 보고서명이 선택되었습니다.")  
+                    st.session_state['check_result'] = True                    
+                    #st.success(f"[{selected_file_name}] 보고서명이 선택되었습니다.")  
 
 
         # Quickly 키워드 보고서 리스트
@@ -203,40 +184,12 @@ if github_info_loaded:
                 #selected_index = st.session_state['selected_keyword_folder_index']
                 report_file_list = [folderlist_init_value] + file_lists[3]
                 # 폴더 선택 selectbox 생성 (새 폴더 추가 후, 선택값으로 설정)
-                selected_file_name = st.selectbox(
-                    "등록된 보고서명 리스트",
-                    options=report_file_list,  # 옵션 리스트에 새 폴더 반영
-                    index=st.session_state['selected_keyword_folder_index'],  # 새로 선택된 폴더를 기본값으로 선택
-                    key="selected_keyword_folder"
-                )
-                # 파일 업로드와 요청사항 리스트의 기본 폴더 설정
-                if selected_file_name != folderlist_init_value:
-                    st.session_state['selected_report_file_name'] = f"{selected_file_name}"
-                    st.session_state['selected_report_folder_name'] = f"{folder_list[3]}"
-                    st.session_state['selected_keyword_folder_index'] = file_lists[3].index(selected_file_name) + 1
-                    st.session_state['selected_report_folder_index'] = 0
-                    st.session_state['selected_audio_folder_index'] = 0
-                    st.session_state['selected_analysis_folder_index'] = 0
-                    st.session_state['check_report'] = False
-                    st.session_state['check_result'] = True
-                    
-                    #bd.refresh_page()
-                    st.success(f"[{selected_file_name}] 보고서명이 선택되었습니다.")  
-      
-else:
-    st.warning("GitHub 정보가 설정되지 않았습니다. 먼저 GitHub Token을 입력해 주세요.")
-
-
-          
-# 9 프레임
-# 결과 보고서 세부 타이틀
-st.markdown(
-    "<p style='font-size:18px; font-weight:bold; color:#007BFF;'>결과 보고서</p>",
+                selected_file_name = st.s기</p>",
     unsafe_allow_html=True
 )
 
-# 10 프레임
-# 결과 보고서 LLM 응답 보기/ 결과 보고서 저장/ 보고서 양식 저장
+# 3 프레임
+# 결과 보고서 보기/ 결과 보고서 저장
 file_content = None
 result_path = None
 
@@ -291,20 +244,9 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
                 st.session_state['check_report'] = False
 
         else:
-            st.warning("결과 보고서를 먼저 실행하세요.")
+            st.warning("결과 보고서를 먼저 선택하세요.")
     with col2:
         st.write("")
 
-
-# 11 프레임
-# 결과 보고서 HTML 보기
-#if "html_report" in st.session_state:
-    #st.write("파일 데이터 추출 보기")
-    #html_report_value = f"<div style='border: 2px solid #cccccc; padding: 2px;'>{st.session_state['html_report']}</div>"
-    #st.components.v1.html(html_report_value, height=10240, scrolling=True)
-
-# 12 프레임
-# 전달된 프롬프트
-#st.text_area("전달된 프롬프트:", value="\n\n".join(global_generated_prompt), height=150)
     
 # Frontend 기능 구현 끝 ---
