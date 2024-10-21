@@ -92,6 +92,7 @@ if github_info_loaded:
                 st.session_state['report_type_index'] = 0
                 st.session_state['selected_report_folder_index'] = 0
                 st.session_state['selected_report_file_name']=""
+                st.session_state['check_result'] = False
         elif selected_type == type_list[1]:
             st.session_state['sub_title']="보고서 비교분석<br/>리스트 선택"
             st.session_state['report_folder_option'] = [folderlist_init_value] + file_lists[1]
@@ -100,6 +101,7 @@ if github_info_loaded:
                 st.session_state['report_type_index'] = 1
                 st.session_state['selected_report_folder_index'] = 0
                 st.session_state['selected_report_file_name']=""
+                st.session_state['check_result'] = False
         elif selected_type == type_list[2]: 
             st.session_state['sub_title']="음성파일 보고서<br/>리스트 선택"
             st.session_state['report_folder_option'] = [folderlist_init_value] + file_lists[2]
@@ -108,6 +110,7 @@ if github_info_loaded:
                 st.session_state['report_type_index'] = 2
                 st.session_state['selected_report_folder_index'] = 0
                 st.session_state['selected_report_file_name']=""
+                st.session_state['check_result'] = False
         elif selected_type == type_list[3]:
             st.session_state['sub_title']="키워드 보고서<br/>리스트 선택"
             st.session_state['report_folder_option'] = [folderlist_init_value] + file_lists[3]
@@ -116,6 +119,8 @@ if github_info_loaded:
                 st.session_state['report_type_index'] = 3
                 st.session_state['selected_report_folder_index'] = 0
                 st.session_state['selected_report_file_name']=""
+                st.session_state['check_result'] = False
+                
         col1, col2 = st.columns([0.21, 0.79])
         with col1:
             st.write("")
