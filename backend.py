@@ -35,6 +35,8 @@ from pytube import YouTube
 import subprocess
 from pydub import AudioSegment
 from pydub.utils import which
+import socket
+import csv
 
 # Backend 기능 구현 시작 ---
 
@@ -1577,4 +1579,161 @@ def get_reportType_file_list_from_github(repo, branch, token, folder_name):
             return []
     else:
         return []
+
+# 사용자 IP 주소 및 컴퓨터명 가져오기
+def get_user_ip_and_hostname():
+    hostname = socket.gethostname()  # 컴퓨터명 추출
+    ip_address = socket.gethostbyname(hostname)  # IP 주소 추출
+    return ip_address, hostname
+    
+# 파일을 GitHub에서 가져오고, 없으면 생성하고 있으면 True 반환
+def check_csv_file_from_github(token, repo, branch, filepath):
+    encoded_filepath = urllib.parse.quote(filepath)
+    url = f"https://api.github.com/repos/{repo}/contents/{encoded_filepath}?ref={branch}"
+    headers = {"Authorization": f"token {token}"}
+    
+    # 파일 존재 여부 확인
+    response = requests.get(url, headers=headers)
+    
+    if response.status_code == 200:
+        # 파일이 존재하면 True 반환
+        return True
+    elif response.status_code == 404:
+        # 파일이 없으면 파일을 생성
+        return create_file_in_github(token, repo, branch, filepath )
+    else:
+        st.error(f"{filepath} 파일을 가져오지 못했습니다. 상태 코드: {response.status_code}")
+        return None
+
+# 파일을 GitHub에 생성하는 함수
+def create_file_in_github(token, repo, branch, filepath):
+    url = f"https://api.github.com/repos/{repo}/contents/{filepath}"
+    headers = {"Authorization": f"token {token}"}
+    message = "Create new file"
+    
+    # CSV 파일의 기본 내용 (헤더)
+    content = base64.b64encode(b"ID,Score,IP,Hostname,DATE").decode('utf-8')
+    
+    data = {
+        "message": message,
+        "content": content,
+        "branch": branch
+    }
+    
+    # 파일 생성 요청
+    response = requests.put(url, headers=headers, data=json.dumps(data))
+    
+    if response.status_code == 201:
+        #st.success(f"{filepath} 파일을 성공적으로 생성했습니다.")
+        return True
+    else:
+        #st.error(f"파일 생성 중 오류가 발생했습니다. 상태 코드: {response.status_code}")
+        return False
+
+# CSV 파일에 데이터를 추가하는 함수
+def add_to_csv(nickname, score, token, repo, branch, file_path):
+    # 파일이 GitHub에 존재하는지 확인하고, 없으면 생성
+    file_exists = check_csv_file_from_github(token, repo, branch, filepath)
+    
+    # GitHub API로 파일 가져오기
+    encoded_filepath = urllib.parse.quote(file_path)
+    url = f"https://api.github.com/repos/{repo}/contents/{encoded_filepath}?ref={branch}"
+    headers = {"Authorization": f"token {token}"}
+    
+    if file_exists:  # 파일이 존재하면 데이터 추가
+        response = requests.get(url, headers=headers)
+        if response.status_code == 200:
+            file_content = base64.b64decode(response.json()['content']).decode('utf-8')
+            df = pd.read_csv(StringIO(file_content))
+        else:
+            st.error(f"{file_path} 파일을 가져오지 못했습니다. 상태 코드: {response.status_code}")
+            return
+    else:  # 파일이 없으면 새로운 데이터프레임 생성
+        df = pd.DataFrame(columns=['ID', 'Score', 'IP', 'Hostname', 'DATE'])
+
+    ip, hostname = get_user_ip_and_hostname()
+    # 새 데이터 추가
+    new_data = {
+        'ID': nickname,
+        'Score': score,
+        'IP': ip,
+        'Hostname': hostname,
+        'DATE': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    }
+    
+    df = df.append(new_data, ignore_index=True)
+
+    # CSV 데이터를 base64로 인코딩
+    csv_content = df.to_csv(index=False)
+    encoded_content = base64.b64encode(csv_content.encode('utf-8')).decode('utf-8')
+
+    # 파일 업데이트 (GitHub API 요청)
+    update_data = {
+        "message": "Update CSV with new data",
+        "content": encoded_content,
+        "branch": branch,
+        "sha": requests.get(url, headers=headers).json()['sha']  # 파일의 SHA 값 가져오기
+    }
+
+    response = requests.put(url, headers=headers, data=json.dumps(update_data))
+
+    if response.status_code == 200:
+        st.success(f"{nickname}님의 평가가 성공적으로 등록되었습니다.")
+    else:
+        st.error(f"파일 업데이트 중 오류가 발생했습니다. 상태 코드: {response.status_code}")
+
+# 별 이미지를 설정하는 함수
+def get_star_images(score):
+    star_images = ["image/star01.png"] * 5  # 기본적으로 모든 별을 흰색 별로 설정 (star01.png)
+
+    if score > 0 and score <= 0.50:
+        star_images[0] = "image/star03.png" 
+    if score > 0.50 and score <= 0.75:
+        star_images[0] = "image/star04.png"    
+    if score > 0.75 and score <= 1.00:
+        star_images[0] = "image/star05.png" 
+    if score > 1.00:
+        star_images[0] = "image/star05.png" 
+    if score > 1.00 and score <= 1.25:
+        star_images[1] = "image/star02.png"
+    if score > 1.25 and score <= 1.50:
+        star_images[1] = "image/star03.png" 
+    if score > 1.50 and score <= 1.75:
+        star_images[1] = "image/star04.png"    
+    if score > 1.75 and score <= 2.00:
+        star_images[1] = "image/star05.png" 
+    if score > 2.00:
+        star_images[1] = "image/star05.png" 
+    if score > 2.00 and score <= 2.25:
+        star_images[2] = "image/star02.png"
+    if score > 2.25 and score <= 2.50:
+        star_images[2] = "image/star03.png" 
+    if score > 2.50 and score <= 2.75:
+        star_images[2] = "image/star04.png"    
+    if score > 2.75 and score <= 3.00:
+        star_images[2] = "image/star05.png" 
+    if score > 3.00:
+        star_images[2] = "image/star05.png" 
+    if score > 3.00 and score <= 3.25:
+        star_images[3] = "image/star02.png"
+    if score > 3.25 and score <= 3.50:
+        star_images[3] = "image/star03.png" 
+    if score > 3.50 and score <= 3.75:
+        star_images[3] = "image/star04.png"    
+    if score > 3.75 and score <= 4.00:
+        star_images[3] = "image/star05.png" 
+    if score > 4.00:
+        star_images[3] = "image/star05.png" 
+    if score > 4.00 and score <= 4.25:
+        star_images[4] = "image/star02.png"
+    if score > 4.25 and score <= 4.50:
+        star_images[4] = "image/star03.png" 
+    if score > 4.50 and score <= 4.75:
+        star_images[4] = "image/star04.png"    
+    if score > 4.75 and score <= 5.00:
+        star_images[4] = "image/star05.png" 
+    
+
+    return star_images
+    
 # Backend 기능 구현 끝 ---
