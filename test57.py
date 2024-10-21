@@ -64,16 +64,16 @@ st.title("사용자 만족도 평가")
 # 닉네임/이름 입력
 nickname = st.text_input("닉네임/이름을 입력하세요:")
 
-col,col2,col3,col4,col5 = st.columns([0.2,0.2,0.2,0.2,0.2])
-with co1:
+col1,col2,col3,col4,col5 = st.columns([0.2,0.2,0.2,0.2,0.2])
+with col1:
     st.write("☆☆☆☆☆")
-with co2:
+with col2:
     st.write("☆☆☆☆☆")
-with co3:
+with col3:
     st.write("☆☆☆☆☆")
-with co4:
+with col4:
     st.write("☆☆☆☆☆")
-with co5:
+with col5:
     st.write("☆☆☆☆☆")
 # 별점 선택 (슬라이더 사용)
 score = st.slider("별점 선택 (1~5, 0.5 단위):", 1.0, 5.0, 0.5)
