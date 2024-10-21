@@ -1653,14 +1653,15 @@ def add_to_csv(nickname, score, token, repo, branch, file_path):
         df = pd.DataFrame(columns=['ID', 'Score', 'IP', 'Hostname', 'DATE'])
 
     ip, hostname = get_user_ip_and_hostname()
-    # 새 데이터 추가
-    new_data = {
+
+    # 새 데이터 추가 (DataFrame으로 변환)
+    new_data = pd.DataFrame([{
         'ID': nickname,
         'Score': score,
         'IP': ip,
         'Hostname': hostname,
         'DATE': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    }
+    }])
     
     # pd.concat()을 사용하여 데이터 추가
     df = pd.concat([df, new_data], ignore_index=True)
