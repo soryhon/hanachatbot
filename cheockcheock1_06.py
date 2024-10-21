@@ -51,7 +51,7 @@ if github_info_loaded:
         with col2:
             # 별점 선택 (슬라이더 사용)
             score = st.slider("별점 선택 (1~5, 0.5 단위):", 0.5, 5.0, 1.0)
-         with col3:
+        with col3:
             st.write("")   
         # score에 따라 이미지 설정
         star_images = bd.get_star_images(score)
