@@ -37,6 +37,8 @@ if 'check_result' not in st.session_state:
     st.session_state['check_result'] = False
 if 'check_report' not in st.session_state:
     st.session_state['check_report'] = True
+if 'sub_title' not in st.session_state:
+    st.session_state['sub_title'] = ""
     
 # 1 프레임
 # 보고서 타이틀
@@ -57,7 +59,7 @@ with col2:
 
 if github_info_loaded:
     with st.expander("📝 보고서 선택", expanded=st.session_state['check_report']):
-        tab1, tab2, tab3, tab4 = st.tabs(["• 업무 보고서", "• 보고서 비교분석","• 음성 파일 보고서","• Quickly 키워드 보고서"])
+
         folder_list =["reportFiles","analysisReportFiles","audioReportFiles", "keywordReportFiles"]
 
         # 2차원 배열에 각 폴더별 파일 리스트 저장
@@ -77,150 +79,50 @@ if github_info_loaded:
             file_lists.append(file_list)
 
         # 업무 보고서 자동 완성 리스트
-        with tab1:            
-            col1, col2 = st.columns([0.21, 0.79])
-            with col1:
-                st.write("")
-                st.markdown(
-                    "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>업무 보고서<br/>리스트 선택 </p>",
-                    unsafe_allow_html=True
-                )
-            with col2:
-                # 폴더 존재 확인 및 생성
-                # 'selected_file_name'가 file_list에 있을 때만 index 설정
-                #selected_index = st.session_state['selected_report_folder_index']
-                st.session_state['report_folder_option'] = [folderlist_init_value] + file_lists[0]
-                # 폴더 선택 selectbox 생성 (새 폴더 추가 후, 선택값으로 설정)
-                selected_file_name = st.selectbox(
-                    "등록된 보고서명 리스트",
-                    options= st.session_state['report_folder_option'],  # 옵션 리스트에 새 폴더 반영
-                    index=st.session_state['selected_report_folder_index'],  # 새로 선택된 폴더를 기본값으로 선택
-                    key="selected_report_folder"
-                )
-                # 파일 업로드와 요청사항 리스트의 기본 폴더 설정
-                if selected_file_name != folderlist_init_value:
-                    st.session_state['selected_report_file_name'] = f"{selected_file_name}"
-                    st.session_state['selected_report_folder_name'] = f"{folder_list[0]}"
-                    st.session_state['selected_report_folder_index'] = file_lists[0].index(selected_file_name) + 1
-                    st.session_state['selected_analysis_folder_index'] = 0
-                    st.session_state['selected_audio_folder_index'] = 0
-                    st.session_state['selected_keyword_folder_index'] = 0
-                    st.session_state['check_report'] = False
-                    st.session_state['check_result'] = True
-                    st.session_state['audio_folder_option']=[folderlist_init_value]
-                    st.session_state['analysis_folder_option']=[folderlist_init_value]
-                    st.session_state['keyword_folder_option']=[folderlist_init_value]
-                    #st.success(f"[{selected_file_name}] 보고서명이 선택되었습니다.")  
+        tab1, tab2, tab3, tab4 = st.tabs(["• 업무 보고서", "• 보고서 비교분석","• 음성 파일 보고서","• Quickly 키워드 보고서"])
+        with tab1: 
+            st.session_state['sub_title']="업무 보고서<br/>리스트 선택"
+            st.session_state['report_folder_option'] = [folderlist_init_value] + file_lists[0]
+        with tab2:
+            st.session_state['sub_title']="보고서 비교분석<br/>리스트 선택"
+            st.session_state['report_folder_option'] = [folderlist_init_value] + file_lists[1]
+        with tab3: 
+            st.session_state['sub_title']="음성파일 보고서<br/>리스트 선택"
+            st.session_state['report_folder_option'] = [folderlist_init_value] + file_lists[2]
+        with tab4:
+            st.session_state['sub_title']="키워드 보고서<br/>리스트 선택"
+            st.session_state['report_folder_option'] = [folderlist_init_value] + file_lists[3]
+            
+        col1, col2 = st.columns([0.21, 0.79])
+        with col1:
+            st.write("")
+            st.markdown(
+                "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>st.session_state['sub_title']</p>",
+                unsafe_allow_html=True
+            )
+        with col2:
+            # 폴더 존재 확인 및 생성
+            # 'selected_file_name'가 file_list에 있을 때만 index 설정
+            #selected_index = st.session_state['selected_report_folder_index']
+            st.session_state['report_folder_option'] = [folderlist_init_value] + file_lists[0]
+            # 폴더 선택 selectbox 생성 (새 폴더 추가 후, 선택값으로 설정)
+            selected_file_name = st.selectbox(
+                "등록된 보고서명 리스트",
+                options= st.session_state['report_folder_option'],  # 옵션 리스트에 새 폴더 반영
+                index=st.session_state['selected_report_folder_index'],  # 새로 선택된 폴더를 기본값으로 선택
+                key="selected_report_folder"
+            )
+            # 파일 업로드와 요청사항 리스트의 기본 폴더 설정
+            if selected_file_name != folderlist_init_value:
+                st.session_state['selected_report_file_name'] = f"{selected_file_name}"
+                st.session_state['selected_report_folder_name'] = f"{folder_list[0]}"
+                st.session_state['selected_report_folder_index'] = st.session_state['report_folder_option'].index(selected_file_name) 
+                st.session_state['check_report'] = False
+                st.session_state['check_result'] = True
+                #st.success(f"[{selected_file_name}] 보고서명이 선택되었습니다.")  
 
 
-        # 보고서 비교분석 완성 리스트
-        with tab2:            
-            col1, col2 = st.columns([0.21, 0.79])
-            with col1:
-                st.write("")
-                st.markdown(
-                    "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>보고서 비교분석<br/>리스트 선택 </p>",
-                    unsafe_allow_html=True
-                )
-            with col2:
-                # 폴더 존재 확인 및 생성
-                # 'selected_file_name'가 file_list에 있을 때만 index 설정
-                #selected_index = st.session_state['selected_analysis_folder_index']
-                st.session_state['analysis_folder_option'] = [folderlist_init_value] + file_lists[1]
-                # 폴더 선택 selectbox 생성 (새 폴더 추가 후, 선택값으로 설정)
-                selected_file_name = st.selectbox(
-                    "등록된 보고서명 리스트",
-                    options= st.session_state['analysis_folder_option'],  # 옵션 리스트에 새 폴더 반영
-                    index=st.session_state['selected_analysis_folder_index'],  # 새로 선택된 폴더를 기본값으로 선택
-                    key="selected_analysis_folder"
-                )
-                # 파일 업로드와 요청사항 리스트의 기본 폴더 설정
-                if selected_file_name != folderlist_init_value:
-                    st.session_state['selected_report_file_name'] = f"{selected_file_name}"
-                    st.session_state['selected_report_folder_name'] = f"{folder_list[1]}"
-                    st.session_state['selected_analysis_folder_index'] = file_lists[1].index(selected_file_name) + 1
-                    st.session_state['selected_report_folder_index'] = 0
-                    st.session_state['selected_audio_folder_index'] = 0
-                    st.session_state['selected_keyword_folder_index'] = 0
-                    st.session_state['check_report'] = False
-                    st.session_state['check_result'] = True
-                    st.session_state['report_folder_option']=[folderlist_init_value]
-                    st.session_state['audio_folder_option']=[folderlist_init_value]
-                    st.session_state['keyword_folder_option']=[folderlist_init_value]
-                    #st.success(f"[{selected_file_name}] 보고서명이 선택되었습니다.")  
 
-        # 음성파일 보고서 완성 리스트
-        with tab3:            
-            col1, col2 = st.columns([0.21, 0.79])
-            with col1:
-                st.write("")
-                st.markdown(
-                    "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>음성파일 보고서<br/>리스트 선택 </p>",
-                    unsafe_allow_html=True
-                )
-            with col2:
-                # 폴더 존재 확인 및 생성
-                # 'selected_file_name'가 file_list에 있을 때만 index 설정
-                #selected_index = st.session_state['selected_audio_folder_index']
-                st.session_state['audio_folder_option'] = [folderlist_init_value] + file_lists[2]
-                # 폴더 선택 selectbox 생성 (새 폴더 추가 후, 선택값으로 설정)
-                selected_file_name = st.selectbox(
-                    "등록된 보고서명 리스트",
-                    options=st.session_state['audio_folder_option'],  # 옵션 리스트에 새 폴더 반영
-                    index=st.session_state['selected_audio_folder_index'],  # 새로 선택된 폴더를 기본값으로 선택
-                    key="selected_audio_folder"
-                )
-                # 파일 업로드와 요청사항 리스트의 기본 폴더 설정
-                if selected_file_name != folderlist_init_value:
-                    st.session_state['selected_report_file_name'] = f"{selected_file_name}"
-                    st.session_state['selected_report_folder_name'] = f"{folder_list[2]}"
-                    st.session_state['selected_audio_folder_index'] = file_lists[2].index(selected_file_name) + 1
-                    st.session_state['selected_analysis_folder_index'] = 0
-                    st.session_state['selected_report_folder_index'] = 0
-                    st.session_state['selected_keyword_folder_index'] = 0
-                    st.session_state['check_report'] = False
-                    st.session_state['check_result'] = True 
-                    st.session_state['report_folder_option']=[folderlist_init_value]
-                    st.session_state['analysis_folder_option']=[folderlist_init_value]
-                    st.session_state['keyword_folder_option']=[folderlist_init_value]
-                    #st.success(f"[{selected_file_name}] 보고서명이 선택되었습니다.")  
-
-
-        # Quickly 키워드 보고서 리스트
-        with tab4:            
-            col1, col2 = st.columns([0.21, 0.79])
-            with col1:
-                st.write("")
-                st.markdown(
-                    "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>키워드 보고서<br/>리스트 선택 </p>",
-                    unsafe_allow_html=True
-                )
-            with col2:
-                # 폴더 존재 확인 및 생성
-                # 'selected_file_name'가 file_list에 있을 때만 index 설정
-                #selected_index = st.session_state['selected_keyword_folder_index']
-                st.session_state['keyword_folder_option'] = [folderlist_init_value] + file_lists[3]
-                # 폴더 선택 selectbox 생성 (새 폴더 추가 후, 선택값으로 설정)
-                selected_file_name = st.selectbox(
-                    "등록된 보고서명 리스트",
-                    options=st.session_state['keyword_folder_option'],  # 옵션 리스트에 새 폴더 반영
-                    index=st.session_state['selected_keyword_folder_index'],  # 새로 선택된 폴더를 기본값으로 선택
-                    key="selected_keyword_folder"
-                )
-                # 파일 업로드와 요청사항 리스트의 기본 폴더 설정
-                if selected_file_name != folderlist_init_value:
-                    st.session_state['selected_report_file_name'] = f"{selected_file_name}"
-                    st.session_state['selected_report_folder_name'] = f"{folder_list[3]}"
-                    st.session_state['selected_keyword_folder_index'] = file_lists[3].index(selected_file_name) + 1
-                    st.session_state['selected_analysis_folder_index'] = 0
-                    st.session_state['selected_report_folder_index'] = 0
-                    st.session_state['selected_audio_folder_index'] = 0
-                    st.session_state['check_report'] = False
-                    st.session_state['check_result'] = True  
-                    st.session_state['report_folder_option']=[folderlist_init_value]
-                    st.session_state['analysis_folder_option']=[folderlist_init_value]
-                    st.session_state['audio_folder_option']=[folderlist_init_value]
-                    #st.success(f"[{selected_file_name}] 보고서명이 선택되었습니다.")  
 
 # 3 프레임
 # 결과 보고서 보기/ 결과 보고서 저장
