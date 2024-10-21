@@ -90,7 +90,7 @@ if github_info_loaded:
             """, unsafe_allow_html=True
         )
 
-        selected_type = st.radio("",type_list, key="radio-type")
+        selected_type = st.radio("보고서 유형",type_list, key="radio-type")
         if selected_type == type_list[0]: 
             st.session_state['sub_title']="업무 보고서<br/>리스트 선택"
             st.session_state['report_folder_option'] = [folderlist_init_value] + file_lists[0]
