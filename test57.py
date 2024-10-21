@@ -115,15 +115,15 @@ col1, col2, col3, col4, col5 = st.columns([0.2, 0.2, 0.2, 0.2, 0.2])
 
 # 각 열에 맞는 별 이미지 출력
 with col1:  # score 1점 별
-    st.image(star_images[0], width=80)
+    st.image(star_images[0], width=100)
 with col2:  # score 2점 별
-    st.image(star_images[1], width=80)
+    st.image(star_images[1], width=100)
 with col3:  # score 3점 별
-    st.image(star_images[2], width=80)
+    st.image(star_images[2], width=100)
 with col4:  # score 4점 별
-    st.image(star_images[3], width=80)
+    st.image(star_images[3], width=100)
 with col5:  # score 5점 별
-    st.image(star_images[4], width=80)
+    st.image(star_images[4], width=100)
     
 # 평가 버튼
 if st.button("평가"):
