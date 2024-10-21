@@ -83,7 +83,7 @@ def get_star_images(score):
         star_images[3] = "image/star04.png"    
     if score > 3.75 and score <= 4.00:
         star_images[3] = "image/star05.png" 
-     if score > 4.00 and score <= 4.25:
+    if score > 4.00 and score <= 4.25:
         star_images[4] = "image/star02.png"
     if score > 4.25 and score <= 4.50:
         star_images[4] = "image/star03.png" 
