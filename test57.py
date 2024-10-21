@@ -123,7 +123,7 @@ with col2:
     )
 
 if github_info_loaded:
-    with st.expander("📝 보고서 선택", expanded=st.session_state['check_report']):
+    with st.expander("📝 보고서 선택", expanded=True):
         col1, col2 = st.columns([0.21, 0.79])
         with col1:
             st.write("")
