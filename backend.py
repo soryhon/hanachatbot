@@ -37,6 +37,7 @@ from pydub import AudioSegment
 from pydub.utils import which
 import socket
 import csv
+from io import StringIO
 
 # Backend 기능 구현 시작 ---
 
