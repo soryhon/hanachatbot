@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
 import altair as alt
 import numpy as np
+import io
 
 # Frontend 기능 구현 시작 ---
 
@@ -250,7 +251,8 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
         if file_content:
             # HTML 파일 내용을 화면에 출력
             #st.markdown(file_content, unsafe_allow_html=True)
-            html_content = file_content.decode('utf-8')
+            html_content = file_content.getvalue().decode('utf-8')
+
             st.components.v1.html(html_content, height=1024, scrolling=True)
         else:
             st.error(f"{selected_file} 파일 데이터를 가져오는 데 실패했습니다.")
