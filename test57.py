@@ -49,6 +49,32 @@ def add_to_csv(nickname, score):
     csv_data = df.to_csv(index=False)
     repo.update_file(FILE_PATH, "Update appraisal.csv", csv_data, file_contents.sha, branch=BRANCH)
 
+# 별 이미지를 설정하는 함수
+def get_star_images(score):
+    star_images = ["image/star01.png"] * 5  # 기본적으로 모든 별을 흰색 별로 설정 (star01.png)
+    
+    if score >= 0.5:
+        star_images[0] = "image/star02.png"  # score 1점에 반 노란색 별 (star02.png)
+    if score >= 1.0:
+        star_images[0] = "image/star03.png"  # score 1점에 노란색 별 (star03.png)
+    if score >= 1.5:
+        star_images[1] = "image/star02.png"  # score 2점에 반 노란색 별 (star02.png)
+    if score >= 2.0:
+        star_images[1] = "image/star03.png"  # score 2점에 노란색 별 (star03.png)
+    if score >= 2.5:
+        star_images[2] = "image/star02.png"  # score 3점에 반 노란색 별 (star02.png)
+    if score >= 3.0:
+        star_images[2] = "image/star03.png"  # score 3점에 노란색 별 (star03.png)
+    if score >= 3.5:
+        star_images[3] = "image/star02.png"  # score 4점에 반 노란색 별 (star02.png)
+    if score >= 4.0:
+        star_images[3] = "image/star03.png"  # score 4점에 노란색 별 (star03.png)
+    if score >= 4.5:
+        star_images[4] = "image/star02.png"  # score 5점에 반 노란색 별 (star02.png)
+    if score == 5.0:
+        star_images[4] = "image/star03.png"  # score 5점에 노란색 별 (star03.png)
+
+    return star_images
 
 # Frontend 기능 구현 시작 ---
 
@@ -66,20 +92,27 @@ nickname = st.text_input("닉네임/이름을 입력하세요:")
 
 
 
-col1,col2,col3,col4,col5= st.columns([0.2,0.2,0.2,0.2,0.2])
-with col1:
-    st.image("image/star01.png", width=80)
-with col2:
-    st.image("image/star01.png", width=80)
-with col3:
-    st.image("image/star01.png", width=80)
-with col4:
-    st.image("image/star01.png", width=80)
-with col5:
-    st.image("image/star01.png", width=80)
 # 별점 선택 (슬라이더 사용)
-score = st.slider("별점 선택 (1~5, 0.5 단위):", 1.0, 5.0, 0.5)
+score = st.slider("별점 선택 (1~5, 0.5 단위):", 0.5, 5.0, 1.0)
 
+# score에 따라 이미지 설정
+star_images = get_star_images(score)
+
+# 별 이미지를 표시할 5개의 열 생성
+col1, col2, col3, col4, col5 = st.columns([0.2, 0.2, 0.2, 0.2, 0.2])
+
+# 각 열에 맞는 별 이미지 출력
+with col1:  # score 1점 별
+    st.image(star_images[0], width=80)
+with col2:  # score 2점 별
+    st.image(star_images[1], width=80)
+with col3:  # score 3점 별
+    st.image(star_images[2], width=80)
+with col4:  # score 4점 별
+    st.image(star_images[3], width=80)
+with col5:  # score 5점 별
+    st.image(star_images[4], width=80)
+    
 # 평가 버튼
 if st.button("평가"):
     if nickname and score:
