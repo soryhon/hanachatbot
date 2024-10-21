@@ -79,17 +79,18 @@ if github_info_loaded:
             file_lists.append(file_list)
 
         # 업무 보고서 자동 완성 리스트
-        tab1, tab2, tab3, tab4 = st.tabs(["• 업무 보고서", "• 보고서 비교분석","• 음성 파일 보고서","• Quickly 키워드 보고서"])
-        with tab1: 
+        type_list = ["• 업무 보고서", "• 보고서 비교분석","• 음성 파일 보고서","• Quickly 키워드 보고서"]
+        selected_type = st.radio("",type_list )
+        if select_type == type_list[0]: 
             st.session_state['sub_title']="업무 보고서<br/>리스트 선택"
             st.session_state['report_folder_option'] = [folderlist_init_value] + file_lists[0]
-        with tab2:
+        elif select_type == type_list[1]:
             st.session_state['sub_title']="보고서 비교분석<br/>리스트 선택"
             st.session_state['report_folder_option'] = [folderlist_init_value] + file_lists[1]
-        with tab3: 
+        elif select_type == type_list[2]: 
             st.session_state['sub_title']="음성파일 보고서<br/>리스트 선택"
             st.session_state['report_folder_option'] = [folderlist_init_value] + file_lists[2]
-        with tab4:
+        elif select_type == type_list[3]:
             st.session_state['sub_title']="키워드 보고서<br/>리스트 선택"
             st.session_state['report_folder_option'] = [folderlist_init_value] + file_lists[3]
             
