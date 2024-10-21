@@ -53,37 +53,37 @@ def add_to_csv(nickname, score):
 def get_star_images(score):
     star_images = ["image/star01.png"] * 5  # 기본적으로 모든 별을 흰색 별로 설정 (star01.png)
     
-    if score >= 0.5:
+    if score >= 0.50:
         star_images[0] = "image/star02.png"  # score 1점에 반 노란색 별 (star02.png)1
-    if score == 1.0:
+    if score == 1.00:
         star_images[0] = "image/star03.png"  # score 1점에 노란색 별 (star03.png)
-    if score > 1.0:
+    if score > 1.00:
         star_images[0] = "image/star03.png"  # score 1점에 노란색 별 (star03.png)
         star_images[1] = "image/star02.png"  # score 2점에 반 노란색 별 (star02.png)
-    if score > 1.5:
+    if score > 1.50:
         star_images[1] = "image/star03.png"  # score 2점에 반 노란색 별 (star02.png)
-    if score == 2.0:
+    if score == 2.00:
         star_images[1] = "image/star03.png"  # score 2점에 노란색 별 (star03.png)
-    if score > 2.0:
+    if score > 2.00:
         star_images[1] = "image/star03.png"  # score 1점에 노란색 별 (star03.png)
         star_images[2] = "image/star02.png"  # score 2점에 노란색 별 (star03.png)
-    if score > 2.5:
+    if score > 2.50:
         star_images[2] = "image/star03.png"  # score 3점에 반 노란색 별 (star02.png)
-    if score == 3.0:
+    if score == 3.00:
         star_images[2] = "image/star03.png"  # score 3점에 반 노란색 별 (star02.png)
-    if score > 3.0:
+    if score > 3.00:
         star_images[2] = "image/star03.png"  # score 1점에 노란색 별 (star03.png)
         star_images[3] = "image/star02.png"  # score 3점에 노란색 별 (star03.png)
-    if score > 3.5:
+    if score > 3.50:
         star_images[3] = "image/star03.png"  # score 4점에 반 노란색 별 (star02.png)
-    if score == 4.0:
+    if score == 4.00:
         star_images[3] = "image/star03.png"  # score 4점에 반 노란색 별 (star02.png)
-    if score > 4.0:
+    if score > 4.00:
         star_images[3] = "image/star03.png"  # score 1점에 노란색 별 (star03.png)
         star_images[4] = "image/star02.png"  # score 4점에 노란색 별 (star03.png)
-    if score > 4.5:
+    if score > 4.50:
         star_images[4] = "image/star03.png"  # score 5점에 반 노란색 별 (star02.png)
-    if score == 5.0:
+    if score == 5.00:
         star_images[4] = "image/star03.png"  # score 5점에 노란색 별 (star03.png)
 
     return star_images
