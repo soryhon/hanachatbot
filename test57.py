@@ -167,7 +167,7 @@ if github_info_loaded:
             st.write("")
         with col2:
             # 평가 버튼
-            if st.button("평가하기", key="appraisal", use_container_width=True):
+            if st.button("🎯 평가하기", key="appraisal", use_container_width=True):
                 if nickname and score:
                     check_or_create_csv()
                     add_to_csv(nickname, score)
