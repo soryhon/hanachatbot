@@ -9,7 +9,7 @@ if 'selected_menu01_index' not in st.session_state:
     st.session_state['selected_menu01_index'] =0
      
 # 파일명 리스트
-file_list=["test50.py","test51.py","test53.py","test54.py","test55.py","team_info.py",""]
+file_list=["test50.py","test51.py","test53.py","test54.py","test56.py","team_info.py",""]
 
 
 # 사이드바에 타이트 추가 : 척척하나
