@@ -81,16 +81,16 @@ if github_info_loaded:
         # 업무 보고서 자동 완성 리스트
         type_list = ["• 업무 보고서", "• 보고서 비교분석","• 음성 파일 보고서","• Quickly 키워드 보고서"]
         selected_type = st.radio("",type_list )
-        if select_type == type_list[0]: 
+        if selected_type == type_list[0]: 
             st.session_state['sub_title']="업무 보고서<br/>리스트 선택"
             st.session_state['report_folder_option'] = [folderlist_init_value] + file_lists[0]
-        elif select_type == type_list[1]:
+        elif selected_type == type_list[1]:
             st.session_state['sub_title']="보고서 비교분석<br/>리스트 선택"
             st.session_state['report_folder_option'] = [folderlist_init_value] + file_lists[1]
-        elif select_type == type_list[2]: 
+        elif selected_type == type_list[2]: 
             st.session_state['sub_title']="음성파일 보고서<br/>리스트 선택"
             st.session_state['report_folder_option'] = [folderlist_init_value] + file_lists[2]
-        elif select_type == type_list[3]:
+        elif selected_type == type_list[3]:
             st.session_state['sub_title']="키워드 보고서<br/>리스트 선택"
             st.session_state['report_folder_option'] = [folderlist_init_value] + file_lists[3]
             
