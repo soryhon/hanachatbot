@@ -22,8 +22,7 @@ MAX_FILE_SIZE_BYTES = 100 * 1024 * 1024
 folderlist_init_value = "보고서명을 선택하세요."
 templatelist_init_value = "불러올 보고서 양식을 선택하세요."
 # 세션 상태에 각 변수 없다면 초기화
-#bd.init_session_state(False)
-#bd.refresh_page()
+
 if 'request_title_04' not in st.session_state:
     st.session_state['request_title_04'] = ""    
 if 'request_text_04' not in st.session_state:
