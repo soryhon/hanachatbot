@@ -38,10 +38,10 @@ for sub_menu in sub_menu_list:
         selected_file = file_list[idx]
         # 선택한 파일 코드 실행
         bd.exec_page(selected_file)
-        idx += 1
+        idx = idx + 1
 
-    else:
-        st.session_state['selected_menu01_index'] = 0
+    #else:
+        #st.session_state['selected_menu01_index'] = 0
     
 # 사이드바 하단 문구
 st.sidebar.markdown(
