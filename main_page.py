@@ -31,6 +31,14 @@ st.sidebar.markdown(
 # 메뉴 리스트
 selected_menu = st.sidebar.selectbox("메뉴 선택하세요.", sub_menu_list, index=st.session_state['selected_menu01_index'])
 
+# 사이드바 하단 문구
+st.sidebar.markdown(
+    """
+    <div style='font-size:12px; font-weight:normal; color:#999999;text-align:center;width:90%;border-top:0px dotted #cccccc;margin-left:5%;margin-right:5%'>ⓒ LepoLab. Challenger_5 Team</div>
+    """,
+    unsafe_allow_html=True
+)
+
 if selected_menu != st.session_state['selected_menu01_name']:
     # 선택한 option Index
     idx  = sub_menu_list.index(selected_menu)
@@ -41,15 +49,10 @@ if selected_menu != st.session_state['selected_menu01_name']:
     st.session_state['selected_menu01_file'] = file_list[idx]
     # 선택한 파일 코드 실행
     st.session_state['selected_menu01_name'] = selected_menu
+    bd.exec_page( st.session_state['selected_menu01_file'])
 #else:
     #st.session_state['selected_menu01_index'] = 0
     
-# 사이드바 하단 문구
-st.sidebar.markdown(
-    """
-    <div style='font-size:12px; font-weight:normal; color:#999999;text-align:center;width:90%;border-top:0px dotted #cccccc;margin-left:5%;margin-right:5%'>ⓒ LepoLab. Challenger_5 Team</div>
-    """,
-    unsafe_allow_html=True
-)
 
-bd.exec_page( st.session_state['selected_menu01_file'])
+
+
