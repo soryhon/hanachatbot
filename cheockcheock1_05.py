@@ -45,11 +45,10 @@ with col2:
     )
 
 # 2 프레임
-# 보고서명 및 폴더 선택, 새 폴더 만들기
-
+# 보고서 유형 선택
 if github_info_loaded:
     with st.expander("📝 보고서 선택", expanded=st.session_state['check_report']):
-
+        # 보고서 유형 리스트트
         folder_list =["reportFiles","analysisReportFiles","audioReportFiles", "keywordReportFiles"]
 
         # 2차원 배열에 각 폴더별 파일 리스트 저장
@@ -142,7 +141,6 @@ if github_info_loaded:
                 st.session_state['check_result'] = True
                 #st.success(f"[{selected_file_name}] 보고서명이 선택되었습니다.")  
 
-
 # 3 프레임
 # 결과 보고서 보기/ 결과 보고서 저장
 file_content = None
@@ -176,9 +174,7 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
             st.components.v1.html(html_content, height=1024, scrolling=True)
         else:
             st.error(f"{selected_file} 파일 데이터를 가져오는 데 실패했습니다.")
-            
-
-
+ 
     st.markdown(
         "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
         unsafe_allow_html=True
@@ -204,6 +200,5 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
             st.warning("결과 보고서를 먼저 선택하세요.")
     with col2:
         st.write("")
-
     
 # Frontend 기능 구현 끝 ---
