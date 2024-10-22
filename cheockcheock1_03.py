@@ -267,11 +267,11 @@ with st.expander("⚙️ 요청사항 설정 / 파일 업로드", expanded=st.se
                 st.session_state['rows_03'] = [
                     {"제목": "", "요청": "", "파일": "", "데이터": "", "파일정보": "1"}
                     for _ in range(st.session_state['num_requests_03'])
-                ]
-                st.success(f"{st.session_state['num_requests_03']}개의 요청사항이 설정되었습니다.")
+                ]                
                 st.session_state['check_request_03']=True
                 st.session_state['check_setting_03']=False
                 st.session_state['html_report_03'] = ""
+                st.success(f"{st.session_state['num_requests_03']}개의 요청사항이 설정되었습니다.")
         col1, col2 = st.columns([0.5, 0.5])
         with col1 :
             st.markdown(
