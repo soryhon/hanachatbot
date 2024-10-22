@@ -39,7 +39,8 @@ st.sidebar.markdown(
     unsafe_allow_html=True
 )
 
-if selected_menu != st.session_state['selected_menu01_name']:
+#if selected_menu != st.session_state['selected_menu01_name']:
+if selected_menu:
     # 선택한 option Index
     idx  = sub_menu_list.index(selected_menu)
     # 선택한 Index을 session에 저장
