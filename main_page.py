@@ -41,8 +41,8 @@ if selected_menu != st.session_state['selected_menu01_name']:
     st.session_state['selected_menu01_file'] = file_list[idx]
     # 선택한 파일 코드 실행
     st.session_state['selected_menu01_name'] = selected_menu
-else:
-    st.session_state['selected_menu01_index'] = 0
+#else:
+    #st.session_state['selected_menu01_index'] = 0
     
 # 사이드바 하단 문구
 st.sidebar.markdown(
