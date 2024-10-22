@@ -845,26 +845,26 @@ def apply_template_to_session_state(file_name):
         
         # 세션 상태에 값 저장
 
-        st.session_state['selected_folder_name'] = selected_folder_name
-        st.session_state['rows'] = rows
-        st.session_state['is_updating'] = False
-        st.session_state['upload_folder'] = f"uploadFiles/{selected_folder_name}"
-        st.session_state['check_report'] = False
-        st.session_state['check_upload'] = False
-        st.session_state['check_request'] = True
-        st.session_state['check_result'] = False
-        st.session_state['selected_folder_index'] = 0
+        st.session_state['selected_folder_name_03'] = selected_folder_name
+        st.session_state['rows_03'] = rows
+        #st.session_state['is_updating'] = False
+        st.session_state['upload_folder_03'] = f"uploadFiles/{selected_folder_name}"
+        st.session_state['check_report_03'] = False
+        st.session_state['check_upload_03'] = False
+        st.session_state['check_request_03'] = True
+        st.session_state['check_result_03'] = False
+        st.session_state['selected_folder_index_03'] = 0
     
         # 'num_requests'는 직접 변경할 수 없으므로 Streamlit에서 제공하는 방법으로 값을 설정
-        #if "num_requests" in st.session_state:
-            #st.session_state["num_requests"] = num_requests
+        #if "num_requests_03" in st.session_state:
+            #st.session_state["num_requests_03"] = num_requests
 
         
         # folder_list에서 selected_folder_name의 인덱스 찾기
-        folder_list = st.session_state.get('folder_list_option', [])
+        folder_list = st.session_state.get('folder_list_option_03', [])
         if selected_folder_name in folder_list:
             selected_index = folder_list.index(selected_folder_name)
-            st.session_state['selected_folder_index'] = selected_index + 1
+            st.session_state['selected_folder_index_03'] = selected_index + 1
         
         # 엑셀 파일 처리: 파일 정보에 따라 시트 선택 입력창 추가
         for idx, row in enumerate(rows):
@@ -881,7 +881,7 @@ def apply_template_to_session_state(file_name):
                 #)
                 #if file_content:
                     #handle_sheet_selection(file_content, len(openpyxl.load_workbook(file_content).sheetnames), idx)
-                st.session_state['rows'][idx]['파일정보'] = file_info        
+                st.session_state['rows_03'][idx]['파일정보'] = file_info        
         st.success(f"'{selected_folder_name}' 양식을 불러오기 성공하였습니다.")
     
     except FileNotFoundError:
@@ -1752,15 +1752,15 @@ def save_audio_template_to_json():
         
     # JSON 데이터 구조 생성
     template_data = {
-        "selected_folder_name": st.session_state['selected_folder_name'],
-        "num_requests": st.session_state['num_requests'],
-        "rows": st.session_state['rows'],
-        "rows_length": len(st.session_state['rows']),
+        "selected_folder_name": st.session_state['selected_folder_name_03'],
+        "num_requests": st.session_state['num_requests_03'],
+        "rows": st.session_state['rows_03'],
+        "rows_length": len(st.session_state['rows_03']),
         "timestamp": datetime.datetime.now().strftime("%Y%m%d%H%M%S")
     }
 
     # 파일명 생성
-    folder_name = st.session_state['selected_folder_name']
+    folder_name = st.session_state['selected_folder_name_03']
     timestamp = template_data["timestamp"]
     json_file_name = f"{folder_name}_Template_{timestamp}.json"
 
