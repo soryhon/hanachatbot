@@ -191,7 +191,7 @@ if github_info_loaded:
                             st.session_state['check_setting_03']=True
                             st.session_state['rows'] = [
                                 {"제목": "", "요청": "", "파일": "", "데이터": "","파일정보":"1" }
-                                for _ in range(st.session_state['num_requests'])
+                                for _ in range(st.session_state['num_requests_03'])
                             ]    
                             st.session_state['html_report_03'] = ""
                             st.success("새로운 보고서명 등록 성공하였습니다.")            
@@ -274,7 +274,7 @@ with st.expander("⚙️ 요청사항 설정 / 파일 업로드", expanded=st.se
                 #bd.refresh_page()
                 st.session_state['rows'] = [
                     {"제목": "", "요청": "", "파일": "", "데이터": "","파일정보":"1" }
-                    for _ in range(st.session_state['num_requests'])
+                    for _ in range(st.session_state['num_requests_03'])
                 ]    
                 st.session_state['html_report_03'] = ""
         col1, col2 = st.columns([0.5, 0.5])
@@ -294,7 +294,7 @@ with st.expander("⚙️ 요청사항 설정 / 파일 업로드", expanded=st.se
             today = datetime.date.today()
             
             # 'report_date_str' 세션 값이 있는지 확인하고, 없으면 'YYYYMMDD' 형식으로 today 값 설정
-            if 'report_date_str' not in st.session_state:
+            if 'report_date_str_03' not in st.session_state:
                 st.session_state['report_date_str_03'] = today.strftime('%Y%m%d')
             
             
