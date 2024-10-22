@@ -6,14 +6,16 @@ import time
 
 # 메뉴명 리스트
 sub_menu_list=['📚업무 보고서 자동 완성', '📈보고서 비교분석 자동 완성', '🎧음성 파일 보고서 완성', '⚡Quickly 키워드 보고서 완성','📋결과 보고서 현황', '👥프로젝트 및 팀 소개', '🏆사용자 만족도 평가']
+# 파일명 리스트
+file_list=["cheockcheock1_01.py","cheockcheock1_02.py","cheockcheock1_03.py","cheockcheock1_04.py","cheockcheock1_05.py","cheockcheock1_team.py","cheockcheock1_06.py"]
 
 if 'selected_menu01_index' not in st.session_state:
     st.session_state['selected_menu01_index'] =0
 if 'selected_menu01_name' not in st.session_state:
     st.session_state['selected_menu01_name'] =sub_menu_list[0]
-     
-# 파일명 리스트
-file_list=["cheockcheock1_01.py","cheockcheock1_02.py","cheockcheock1_03.py","cheockcheock1_04.py","cheockcheock1_05.py","cheockcheock1_team.py","cheockcheock1_06.py"]
+if 'selected_menu01_file' not in st.session_state:
+    st.session_state['selected_menu01_file'] =file_list[0]     
+
 
 
 # 사이드바에 타이트 추가 : 척척하나
@@ -26,26 +28,21 @@ st.sidebar.markdown(
     unsafe_allow_html=True
 )
 
-idx2  = sub_menu_list.index(st.session_state['selected_menu01_name'])
 # 메뉴 리스트
-selected_menu = st.sidebar.selectbox("메뉴 선택하세요.", sub_menu_list, index=idx2)
+selected_menu = st.sidebar.selectbox("메뉴 선택하세요.", sub_menu_list, index=st.session_state['selected_menu01_name'])
 
-if selected_menu:
+if selected_menu != None:
     # 선택한 option Index
     idx  = sub_menu_list.index(selected_menu)
-    if idx != st.session_state['selected_menu01_index']:
-        st.sidebar.write("이동")
     # 선택한 Index을 session에 저장
     st.session_state['selected_menu01_index'] = idx
     
     # 파일명 가져오기
-    selected_file = file_list[idx]
+    st.session_state['selected_menu01_file'] = file_list[idx]
     # 선택한 파일 코드 실행
-    bd.exec_page(selected_file)
     st.session_state['selected_menu01_name'] = selected_menu
 else:
     st.session_state['selected_menu01_index'] = 0
-st.sidebar.text_input("",f"{st.session_state['selected_menu01_name']}")
     
 # 사이드바 하단 문구
 st.sidebar.markdown(
@@ -54,3 +51,5 @@ st.sidebar.markdown(
     """,
     unsafe_allow_html=True
 )
+
+bd.exec_page( st.session_state['selected_menu01_file'])
