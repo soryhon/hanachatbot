@@ -39,8 +39,7 @@ st.sidebar.markdown(
     unsafe_allow_html=True
 )
 
-#if selected_menu != st.session_state['selected_menu01_name']:
-if selected_menu:
+if selected_menu != st.session_state['selected_menu01_name']:
     # 선택한 option Index
     idx  = sub_menu_list.index(selected_menu)
     # 선택한 Index을 session에 저장
@@ -48,12 +47,10 @@ if selected_menu:
     
     # 파일명 가져오기
     st.session_state['selected_menu01_file'] = file_list[idx]
-    bd.exec_page(file_list[idx])
     # 선택한 파일 코드 실행
     st.session_state['selected_menu01_name'] = selected_menu
-#bd.exec_page( st.session_state['selected_menu01_file'])
-#else:
-    #st.session_state['selected_menu01_index'] = 0
+bd.exec_page( st.session_state['selected_menu01_file'])
+
     
 
 
