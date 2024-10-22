@@ -20,7 +20,7 @@ with col2:
 st.markdown("<hr style='border-top:1px solid #dddddd;'>", unsafe_allow_html=True)
 st.markdown("## 프로젝트 소개")    
 with st.container():
-    st.image("cheockcheock.jpg", width=300)
+    st.image("cheockcheock1.jpg", width=300)
     st.markdown("### CheockCheock1")
     st.markdown("""
         **추진 배경**  
