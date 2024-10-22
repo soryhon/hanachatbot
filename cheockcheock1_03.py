@@ -371,7 +371,7 @@ with st.expander("⚙️ 요청사항 설정 / 파일 업로드", expanded=st.se
 
 # 7 프레임임
 # 요청사항 리스트
-with st.expander("✍️ 요청사항 리스트", expanded=st.session_state['check_request']):
+with st.expander("✍️ 요청사항 리스트", expanded=st.session_state['check_request_03']):
     if 'rows_03' not in st.session_state:
         st.session_state['rows_03'] = [{"제목": "", "요청": "", "파일": "", "데이터": "", "파일정보":"1"}]
 
