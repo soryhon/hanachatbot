@@ -31,7 +31,7 @@ if selected_menu:
     # 선택한 option Index
     idx  = sub_menu_list.index(selected_menu)
     if idx != st.session_state['selected_menu01_index']:
-        st.rerun()
+        st.sidebar.write("이동")
     # 선택한 Index을 session에 저장
     st.session_state['selected_menu01_index'] = idx
     
