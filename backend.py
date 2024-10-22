@@ -33,7 +33,7 @@ import yt_dlp
 from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled, NoTranscriptFound
 from pytube import YouTube
 import subprocess
-from pydub import AudioSegment
+from pydub import Segment
 from pydub.utils import which
 import socket
 import csv
@@ -45,7 +45,7 @@ from io import StringIO
 global_generated_prompt = []
 
 # ffmpeg 경로 설정 (필요한 경우)
-#AudioSegment.converter = "/usr/bin/ffmpeg"
+#Segment.converter = "/usr/bin/ffmpeg"
 
 # GitHub 정보 및 OpenAI API 키 자동 설정 또는 입력창을 통해 설정
 def load_env_info():
@@ -206,7 +206,7 @@ def extract_data_from_file(file_content, file_type):
     elif file_type == 'log':
         return extract_text_from_log(file_content)
     elif file_type == 'wav':  # 음성 파일 추가
-        return extract_text_from_audio(file_content, file_type)    
+        return extract_text_from_(file_content, file_type)    
     else:
         st.error(f"{file_type} 형식은 지원되지 않습니다.")
         return None
