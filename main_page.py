@@ -2,6 +2,8 @@ import streamlit as st
 import importlib
 import os
 import backend as bd
+import time
+
 # 메뉴명 리스트
 sub_menu_list=['📚업무 보고서 자동 완성', '📈보고서 비교분석 자동 완성', '🎧음성 파일 보고서 완성', '⚡Quickly 키워드 보고서 완성','📋결과 보고서 현황', '👥프로젝트 및 팀 소개', '🏆사용자 만족도 평가']
 
@@ -27,15 +29,17 @@ selected_menu = st.sidebar.selectbox("메뉴 선택하세요.", sub_menu_list, i
 idx=0
 for sub_menu in sub_menu_list:
     if selected_menu == sub_menu:
-        # 선택한 option Index
-        #idx  = sub_menu_list.index(selected_menu)
-        # 선택한 Index을 session에 저장
-        st.session_state['selected_menu01_index'] = idx
-        # 파일명 가져오기
-        selected_file = file_list[idx]
-        # 선택한 파일 코드 실행
-        bd.exec_page(selected_file)
-        idx += 1
+        with st.spinner(f"[selected_menu} 메뉴 이동 중입니다..."):
+            # 선택한 option Index
+            #idx  = sub_menu_list.index(selected_menu)
+            # 선택한 Index을 session에 저장
+            st.session_state['selected_menu01_index'] = idx
+            # 파일명 가져오기
+            selected_file = file_list[idx]
+            # 선택한 파일 코드 실행
+            bd.exec_page(selected_file)
+            idx += 1
+            time.sleep(1)
     else:
         st.session_state['selected_menu01_index'] = 0
     
