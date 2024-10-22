@@ -21,10 +21,40 @@ supported_file_types = ['mp3', 'wav', 'm4a', 'mp4', 'mpeg', 'webm', 'ogg', 'aac'
 folderlist_init_value = "보고서명을 선택하세요."
 templatelist_init_value = "불러올 보고서 양식을 선택하세요."
 # 세션 상태에 각 변수 없다면 초기화
-bd.init_session_state(False)
-bd.refresh_page()
-     
-    
+#bd.init_session_state(False)
+#bd.refresh_page()
+
+if 'selected_folder_name_03' not in st.session_state:
+    st.session_state['selected_folder_name_03'] = folderlist_init_value
+if 'folder_list_option_03' not in st.session_state:       
+    st.session_state['folder_list_option_03'] = folderlist_init_value
+if 'selected_template_name_03' not in st.session_state:
+    st.session_state['selected_template_name_03'] = templatelist_init_value
+if 'template_list_option_03' not in st.session_state:       
+    st.session_state['template_list_option_03'] = templatelist_init_value
+if 'upload_folder_03' not in st.session_state:        
+    st.session_state['upload_folder_03'] = "uploadFiles" 
+if 'selected_folder_index_03' not in st.session_state:    
+    st.session_state['selected_folder_index_03'] = 0
+if 'selected_template_index_03' not in st.session_state:
+    st.session_state['selected_template_index_03'] = 0
+if 'new_folder_text_03' not in st.session_state:    
+    st.session_state['new_folder_text_03'] = ""
+if 'check_report_03' not in st.session_state:    
+    st.session_state['check_report_03'] = True
+if 'check_upload_03' not in st.session_state:    
+    st.session_state['check_upload_03'] = False        
+if 'check_request_03' not in st.session_state:    
+    st.session_state['check_request_03'] = False
+if 'check_result_03' not in st.session_state:    
+    st.session_state['check_result_03'] = False
+if 'check_setting_03' not in st.session_state:    
+    st.session_state['check_setting_03'] = False
+if 'report_date_str_03' not in st.session_state: 
+    st.session_state['report_date_str_03'] = ""
+if 'html_report_03' not in st.session_state:
+    st.session_state['html_report_03'] = ""
+
 # 1 프레임
 # 보고서 타이틀
 col1, col2 = st.columns([0.55,0.45])
@@ -42,7 +72,7 @@ with col2:
 # 2 프레임
 # 보고서명 및 폴더 선택, 새 폴더 만들기
 if github_info_loaded:
-    with st.expander("📝 보고서 선택", expanded=st.session_state['check_report']):
+    with st.expander("📝 보고서 선택", expanded=st.session_state['check_report_03']):
         tab1, tab2, tab3 = st.tabs(["• 등록된 보고서명 선택하기", "• 저장된 보고서 양식 불러오기","• 새로운 보고서명 만들기"])
         with tab1:
             col1, col2 = st.columns([0.21, 0.79])
@@ -59,31 +89,30 @@ if github_info_loaded:
                 # st.selectbox bd.위젯 생성 (이제 session_state['selected_folder'] 사용 가능)
     
                 # 'selected_folder'가 folder_list에 있을 때만 index 설정
-                selected_index = st.session_state['selected_folder_index']
-                if st.session_state['selected_folder_name'] in folder_list:
-                    selected_index = folder_list.index(st.session_state['selected_folder_name']) + 1
+                selected_index = st.session_state['selected_folder_index_03']
+                if st.session_state['selected_folder_name_03'] in folder_list:
+                    selected_index = folder_list.index(st.session_state['selected_folder_name_03']) + 1
                 #else:
                     #selected_index = 0  # 기본값으로 '주제를 선택하세요.' 선택
-                st.session_state['selected_folder_index'] = selected_index
-                st.session_state['folder_list_option'] = [folderlist_init_value] + folder_list
+                st.session_state['selected_folder_index_03'] = selected_index
+                st.session_state['folder_list_option_03'] = [folderlist_init_value] + folder_list
                 # 폴더 선택 selectbox 생성 (새 폴더 추가 후, 선택값으로 설정)
                 selected_folder = st.selectbox(
                     "등록된 보고서명 리스트",
-                    options=st.session_state['folder_list_option'],  # 옵션 리스트에 새 폴더 반영
-                    index=st.session_state['selected_folder_index'],  # 새로 선택된 폴더를 기본값으로 선택
+                    options=st.session_state['folder_list_option_03'],  # 옵션 리스트에 새 폴더 반영
+                    index=st.session_state['selected_folder_index_03'],  # 새로 선택된 폴더를 기본값으로 선택
                     key="selected_folder"
                 )
 
-                st.session_state['selected_folder_name'] = f"{selected_folder}" 
+                st.session_state['selected_folder_name_03'] = f"{selected_folder}" 
                 # 파일 업로드와 요청사항 리스트의 기본 폴더 설정
                 if selected_folder != folderlist_init_value:
-                    st.session_state['upload_folder'] = f"uploadFiles/{selected_folder}"
+                    st.session_state['upload_folder_03'] = f"uploadFiles/{selected_folder}"
                      
-                    st.session_state['selected_template_name'] = templatelist_init_value
-                    st.session_state['check_report']=False
-                    st.session_state['check_setting']=True
-                    st.session_state['selected_template_index'] = 0
-                    bd.refresh_page()
+                    st.session_state['selected_template_name_03'] = templatelist_init_value
+                    st.session_state['check_report_03']=False
+                    st.session_state['check_setting_03']=True
+                    st.session_state['selected_template_index_03'] = 0
                     #st.success(f"[{selected_folder}] 보고서명이이 선택되었습니다.")
                 #else:   
                     #st.warning("보고서명을 선택하세요.")
@@ -105,21 +134,21 @@ if github_info_loaded:
                 if template_files:
                     # 'selected_template'가 template_files에 있을 때만 index 설정
                     #selected_temp_index = st.session_state['selected_template_index']
-                    if st.session_state['selected_template_name'] in template_files:
-                        selected_temp_index = template_files.index(st.session_state['selected_template_name']) + 1                         
+                    if st.session_state['selected_template_name_03'] in template_files:
+                        selected_temp_index = template_files.index(st.session_state['selected_template_name_03']) + 1                         
                     else:
                         selected_temp_index = 0
-                    st.session_state['selected_template_index'] = selected_temp_index  
-                    st.session_state['template_list_option'] = [templatelist_init_value] + template_files
+                    st.session_state['selected_template_index_03'] = selected_temp_index  
+                    st.session_state['template_list_option_03'] = [templatelist_init_value] + template_files
                     #보고서 양식 파일 리스트
                     selected_template = st.selectbox(
                         "불러올 보고서 양식 파일 리스트", 
-                        options=st.session_state['template_list_option'], 
-                        index=st.session_state['selected_template_index'],
+                        options=st.session_state['template_list_option_03'], 
+                        index=st.session_state['selected_template_index_03'],
                         key="selected_template"
                     )
                     # 선택한 템플릿 불러오기
-                    st.session_state['selected_template_name'] = selected_template
+                    st.session_state['selected_template_name_03'] = selected_template
                     if selected_template != templatelist_init_value:
                         
                         template_data = bd.load_audio_template_from_github(repo, branch, token, selected_template)
@@ -136,7 +165,7 @@ if github_info_loaded:
                     unsafe_allow_html=True
                 )
             with col2:
-                new_folder_name = st.text_input("새로 등록할 보고서명 입력", max_chars=20, key="new_folder_name", value=st.session_state['new_folder_text'])
+                new_folder_name = st.text_input("새로 등록할 보고서명 입력", max_chars=20, key="new_folder_name", value=st.session_state['new_folder_text_03'])
             with col3:
                 st.markdown(
                     "<p style='font-size:18px; margin-top:27px;'></p>",
@@ -154,14 +183,17 @@ if github_info_loaded:
                             folder_list.append(new_folder_name)  # 새 폴더를 리스트에 추가
                             #st.session_state['selected_folder_index'] = len(folder_list) + 1
                             #st.session_state['selected_template_index'] = 0
-                            st.session_state['folder_list_option'] = [folderlist_init_value] + folder_list
-                            st.session_state['upload_folder'] = f"uploadFiles/{new_folder_name}"
-                            st.session_state['selected_folder_name'] = f"{new_folder_name}"
-                            st.session_state['selected_template_name'] = templatelist_init_value
-                            st.session_state['check_report']=False
-                            st.session_state['check_setting']=True
-                            bd.refresh_page()
-                            bd.init_session_state(True)
+                            st.session_state['folder_list_option_03'] = [folderlist_init_value] + folder_list
+                            st.session_state['upload_folder_03'] = f"uploadFiles/{new_folder_name}"
+                            st.session_state['selected_folder_name_03'] = f"{new_folder_name}"
+                            st.session_state['selected_template_name_03'] = templatelist_init_value
+                            st.session_state['check_report_03']=False
+                            st.session_state['check_setting_03']=True
+                            st.session_state['rows'] = [
+                                {"제목": "", "요청": "", "파일": "", "데이터": "","파일정보":"1" }
+                                for _ in range(st.session_state['num_requests'])
+                            ]    
+                            st.session_state['html_report_03'] = ""
                             st.success("새로운 보고서명 등록 성공하였습니다.")            
         #st.markdown(
             #"<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
@@ -204,7 +236,7 @@ st.markdown(
 
 # 6 프레임
 # 요청사항 갯수 및 기준일자 설정 
-with st.expander("⚙️ 요청사항 설정 / 파일 업로드", expanded=st.session_state['check_setting']):
+with st.expander("⚙️ 요청사항 설정 / 파일 업로드", expanded=st.session_state['check_setting_03']):
     tab1, tab2 = st.tabs(["• 요청사항 및 기준일자 설정", "• ⬆️ 음성 파일 업로드"]) 
     with tab1:
         col1, col2, col3 = st.columns([0.5, 0.25, 0.25])
@@ -232,15 +264,19 @@ with st.expander("⚙️ 요청사항 설정 / 파일 업로드", expanded=st.se
             )
             if st.button("설정", key="set_requests", use_container_width=True):
                 # 설정 버튼 클릭 시 요청사항 리스트 초기화 및 새로운 요청사항 갯수 설정
-                st.session_state['rows'] = [
+                st.session_state['rows_03'] = [
                     {"제목": "", "요청": "", "파일": "", "데이터": "", "파일정보": "1"}
-                    for _ in range(st.session_state['num_requests'])
+                    for _ in range(st.session_state['num_requests_03'])
                 ]
-                st.success(f"{st.session_state['num_requests']}개의 요청사항이 설정되었습니다.")
-                st.session_state['check_request']=True
-                st.session_state['check_setting']=False
-                bd.refresh_page()
-                bd.init_session_state(True)
+                st.success(f"{st.session_state['num_requests_03']}개의 요청사항이 설정되었습니다.")
+                st.session_state['check_request_03']=True
+                st.session_state['check_setting_03']=False
+                #bd.refresh_page()
+                st.session_state['rows'] = [
+                    {"제목": "", "요청": "", "파일": "", "데이터": "","파일정보":"1" }
+                    for _ in range(st.session_state['num_requests'])
+                ]    
+                st.session_state['html_report_03'] = ""
         col1, col2 = st.columns([0.5, 0.5])
         with col1 :
             st.markdown(
@@ -259,13 +295,13 @@ with st.expander("⚙️ 요청사항 설정 / 파일 업로드", expanded=st.se
             
             # 'report_date_str' 세션 값이 있는지 확인하고, 없으면 'YYYYMMDD' 형식으로 today 값 설정
             if 'report_date_str' not in st.session_state:
-                st.session_state['report_date_str'] = today.strftime('%Y%m%d')
+                st.session_state['report_date_str_03'] = today.strftime('%Y%m%d')
             
             
             # 세션에 저장된 'YYYYMMDD' 형식을 date 객체로 변환
             saved_date = today
             # 날짜 문자열을 검사하여 잘못된 형식일 때 예외 처리
-            if 'report_date_str' in st.session_state and st.session_state['report_date_str']:
+            if 'report_date_str_03' in st.session_state and st.session_state['report_date_str_03']:
                 try:
                     # 저장된 날짜 문자열이 있으면 파싱
                     saved_date = datetime.datetime.strptime(st.session_state['report_date_str'], '%Y%m%d').date()
@@ -285,7 +321,7 @@ with st.expander("⚙️ 요청사항 설정 / 파일 업로드", expanded=st.se
             )
             # 날짜를 YYYYMMDD 형식으로 변환
             # 날짜 데이터 메모리에 저장
-            st.session_state['report_date_str'] = report_date.strftime("%Y%m%d")
+            st.session_state['report_date_str_03'] = report_date.strftime("%Y%m%d")
         with col2:
             st.markdown(
                 "<p style='font-size:14px; font-weight:normal; color:#444444; margin-top:35px;text-align:left;'>✔️ 보고서 저장을 위해 기준일자를 설정해주세요.</p>",
@@ -311,7 +347,7 @@ with st.expander("⚙️ 요청사항 설정 / 파일 업로드", expanded=st.se
                         file_content = uploaded_file.read()
                         file_name = uploaded_file.name
                         #folder_name = 'uploadFiles'
-                        folder_name = st.session_state.get('upload_folder', 'uploadFiles')
+                        folder_name = st.session_state.get('upload_folder_03', 'uploadFiles')
     
                         sha = bd.get_file_sha(st.session_state['github_repo'], f"{folder_name}/{file_name}", st.session_state['github_token'], branch=st.session_state['github_branch'])
     
@@ -341,10 +377,10 @@ with st.expander("⚙️ 요청사항 설정 / 파일 업로드", expanded=st.se
 # 7 프레임임
 # 요청사항 리스트
 with st.expander("✍️ 요청사항 리스트", expanded=st.session_state['check_request']):
-    if 'rows' not in st.session_state:
-        st.session_state['rows'] = [{"제목": "", "요청": "", "파일": "", "데이터": "", "파일정보":"1"}]
+    if 'rows_03' not in st.session_state:
+        st.session_state['rows_03'] = [{"제목": "", "요청": "", "파일": "", "데이터": "", "파일정보":"1"}]
 
-    rows = st.session_state['rows']
+    rows = st.session_state['rows_03']
     checked_rows = []
 
     for idx, row in enumerate(rows):
@@ -371,7 +407,7 @@ with st.expander("✍️ 요청사항 리스트", expanded=st.session_state['che
             selected_file = st.selectbox(f"파일 선택 : '{idx+1}.요청사항'의 파일을 선택해주세요.", options=file_list, key=f"file_select_{idx}")
 
             if selected_file != '파일을 선택하세요.':
-                st.session_state['rows'][idx]['파일'] = selected_file
+                st.session_state['rows_03'][idx]['파일'] = selected_file
            
                 file_path = selected_file
                 file_content = bd.get_file_from_github(
@@ -407,13 +443,13 @@ with col2:
 
 # 보고서 실행 버튼 클릭 시 함수 호출 수정
     if st.button("🚀 보고서 작성 실행", key="generate_report", use_container_width=True):
-        st.session_state['check_result']=True
-        st.session_state['check_report'] = False
-        st.session_state['check_upload'] = False
-        st.session_state['check_setting'] = False
+        st.session_state['check_result_03'] = True
+        st.session_state['check_report_03'] = False
+        st.session_state['check_upload_03'] = False
+        st.session_state['check_setting_03'] = False
         if not st.session_state.get("openai_api_key"):
             st.error("먼저 OpenAI API 키를 입력하고 저장하세요!")
-        elif not st.session_state['rows'] or all(not row["제목"] or not row["요청"] or not row["파일"] for row in st.session_state['rows']):
+        elif not st.session_state['rows_03'] or all(not row["제목"] or not row["요청"] or not row["파일"] for row in st.session_state['rows_03']):
             st.error("요청사항의 제목, 요청, 파일을 모두 입력해야 합니다!")
         else:
             with st.spinner('요청사항과 파일 데이터를 추출 중입니다...'):
@@ -421,7 +457,7 @@ with col2:
                 # 파일 데이터 가져와서 HTML 보고서 생성
                 #file_data_list = []
                 html_viewer_data = ""
-                for idx, row in enumerate(st.session_state['rows']):
+                for idx, row in enumerate(st.session_state['rows_03']):
                     file_path = st.session_state['rows'][idx]['파일']
                     file_content = bd.get_file_from_github(st.session_state["github_repo"], st.session_state["github_branch"], file_path, st.session_state["github_token"])
                     file_type = file_path.split('.')[-1].lower()
@@ -433,22 +469,22 @@ with col2:
                             report_html += "<p/>"
                         html_viewer_data += report_html    
                         #file_data_list.append(row['데이터'])
-                    st.session_state['html_report'] = html_viewer_data
+                    st.session_state['html_report_03'] = html_viewer_data
                 time.sleep(1)  # 예를 들어, 5초 동안 로딩 상태 유지
 
             with st.spinner('결과 보고서 작성 중입니다...'):
                 # LLM 함수 호출
-                titles = [row['제목'] for row in st.session_state['rows']]
-                requests = [row['요청'] for row in st.session_state['rows']]
+                titles = [row['제목'] for row in st.session_state['rows_03']]
+                requests = [row['요청'] for row in st.session_state['rows_03']]
         
                 responses = bd.run_llm_with_audio_and_prompt(
                     st.session_state["openai_api_key"], 
                     titles, 
                     requests, 
-                    st.session_state['html_report']
+                    st.session_state['html_report_03']
                 )
-                st.session_state["response"] = responses
-                st.session_state['check_result'] = True
+                st.session_state["response_03"] = responses
+                st.session_state['check_result_03'] = True
                 time.sleep(1)  # 예를 들어, 5초 동안 로딩 상태 유지
 
 
@@ -465,16 +501,16 @@ st.markdown(
 # 10 프레임
 # 결과 보고서 LLM 응답 보기/ 결과 보고서 저장/ 보고서 양식 저장
 html_result_value = "<div id='html_result_value'>"
-with st.expander("📊 결과 보고서 보기", expanded=st.session_state['check_result']):
+with st.expander("📊 결과 보고서 보기", expanded=st.session_state['check_result_03']):
     tab1, tab2 = st.tabs(["• 🧠 AI 요약 보고서 ", "• 🔎 음성파일 텍스트 보기"])
     with tab1:   
-        if "response" in st.session_state:
+        if "response_03" in st.session_state:
             st.markdown(
             "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
             unsafe_allow_html=True
             )  
-            st.session_state['check_result'] = True
-            for idx, response in enumerate(st.session_state["response"]):
+            st.session_state['check_result_03'] = True
+            for idx, response in enumerate(st.session_state["response_03"]):
                 #st.text_area(f"응답 {idx+1}:", value=response, height=300)
                 
                 html_response_value = f"<div style='border: 0px solid #cccccc; padding: 1px;'>{response}</div>"
@@ -491,15 +527,15 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
         col1, col2 = st.columns([0.5, 0.5])
         with col1:   
             if st.button("💾 결과 내용 저장", key="save_result", use_container_width=True):
-                st.session_state['check_result'] = True
-                st.session_state['check_report'] = False
-                st.session_state['check_upload'] = False
-                st.session_state['check_setting'] = False
-                st.session_state['check_request'] = False
-                if "response" in st.session_state:                
+                st.session_state['check_result_03'] = True
+                st.session_state['check_report_03'] = False
+                st.session_state['check_upload_03'] = False
+                st.session_state['check_setting_03'] = False
+                st.session_state['check_request_03'] = False
+                if "response_03" in st.session_state:                
                     
-                    folder_name = st.session_state['selected_folder_name']
-                    report_date_str = st.session_state.get('report_date_str', datetime.datetime.now().strftime('%Y%m%d'))
+                    folder_name = st.session_state['selected_folder_name_03']
+                    report_date_str = st.session_state.get('report_date_str_03', datetime.datetime.now().strftime('%Y%m%d'))
                     
                     # save_html_response 함수를 사용하여 HTML 파일 저장
                     file_name, temp_file_path = bd.save_html_response(html_result_value, folder_name, report_date_str)
@@ -513,7 +549,7 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
                     # GitHub에 HTML 파일 저장
                     sha = bd.get_file_sha(st.session_state['github_repo'], f"{github_folder}/{file_name}", st.session_state['github_token'], branch=st.session_state['github_branch'])
                     bd.upload_file_to_github(st.session_state['github_repo'], github_folder, file_name, open(temp_file_path, 'rb').read(), st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
-                    st.session_state['check_result'] = True
+                    st.session_state['check_result_03'] = True
                     st.success(f"{file_name} 파일이 생성되었습니다.")
                     if st.download_button(
                         label="📥 다운로드",
@@ -522,36 +558,27 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
                         file_name=file_name,
                         mime="text/html"
                     ):
-                        st.session_state['check_result'] = True
-                        st.session_state['check_report'] = False
-                        st.session_state['check_upload'] = False
-                        st.session_state['check_setting'] = False
-                        st.session_state['check_request'] = False
+                        st.session_state['check_result_03'] = True
+                        st.session_state['check_report_03'] = False
+                        st.session_state['check_upload_03'] = False
+                        st.session_state['check_setting_03'] = False
+                        st.session_state['check_request_03'] = False
     
                 else:
                     st.warning("결과 보고서를 먼저 실행하세요.")
         with col2:
               if st.button("🗃️ 보고서 양식 저장", key="save_template", use_container_width=True):
-                   st.session_state['check_result'] = True
-                   st.session_state['check_report'] = False
-                   st.session_state['check_upload'] = False
-                   st.session_state['check_setting'] = False
-                   st.session_state['check_request'] = False
+                   st.session_state['check_result_03'] = True
+                   st.session_state['check_report_03'] = False
+                   st.session_state['check_upload_03'] = False
+                   st.session_state['check_setting_03'] = False
+                   st.session_state['check_request_03'] = False
                    bd.save_audio_template_to_json()
     with tab2:  
-        if "html_report" in st.session_state:
+        if "html_report_03" in st.session_state:
             #st.write("파일 데이터 추출 보기")
-            html_report_value = f"<div style='border: 0px solid #cccccc; padding: 2px;'>{st.session_state['html_report']}</div>"
+            html_report_value = f"<div style='border: 0px solid #cccccc; padding: 2px;'>{st.session_state['html_report_03']}</div>"
             st.components.v1.html(html_report_value, height=1024, scrolling=True)
-# 11 프레임
-# 결과 보고서 HTML 보기
-#if "html_report" in st.session_state:
-    #st.write("파일 데이터 추출 보기")
-    #html_report_value = f"<div style='border: 2px solid #cccccc; padding: 2px;'>{st.session_state['html_report']}</div>"
-    #st.components.v1.html(html_report_value, height=10240, scrolling=True)
 
-# 12 프레임
-# 전달된 프롬프트
-#st.text_area("전달된 프롬프트:", value="\n\n".join(global_generated_prompt), height=150)
     
 # Frontend 기능 구현 끝 ---
