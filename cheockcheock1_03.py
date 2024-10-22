@@ -453,7 +453,7 @@ with col2:
                 #file_data_list = []
                 html_viewer_data = ""
                 for idx, row in enumerate(st.session_state['rows_03']):
-                    file_path = st.session_state['rows'][idx]['파일']
+                    file_path = st.session_state['rows_03'][idx]['파일']
                     file_content = bd.get_file_from_github(st.session_state["github_repo"], st.session_state["github_branch"], file_path, st.session_state["github_token"])
                     file_type = file_path.split('.')[-1].lower()
                     report_html = ""
