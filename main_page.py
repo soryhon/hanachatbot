@@ -9,6 +9,8 @@ sub_menu_list=['📚업무 보고서 자동 완성', '📈보고서 비교분석
 
 if 'selected_menu01_index' not in st.session_state:
     st.session_state['selected_menu01_index'] =0
+if 'selected_menu01_name' not in st.session_state:
+    st.session_state['selected_menu01_name'] =sub_menu_list[0]
      
 # 파일명 리스트
 file_list=["cheockcheock1_01.py","cheockcheock1_02.py","cheockcheock1_03.py","cheockcheock1_04.py","cheockcheock1_05.py","cheockcheock1_team.py","cheockcheock1_06.py"]
@@ -39,7 +41,7 @@ if selected_menu:
     selected_file = file_list[idx]
     # 선택한 파일 코드 실행
     bd.exec_page(selected_file)
-    
+    st.session_state['selected_menu01_name'] = selected_menu
 else:
     st.session_state['selected_menu01_index'] = 0
     
