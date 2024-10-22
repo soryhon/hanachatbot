@@ -44,7 +44,7 @@ if selected_menu:
     st.session_state['selected_menu01_name'] = selected_menu
 else:
     st.session_state['selected_menu01_index'] = 0
-st.sidarbar.text_input(f"{st.session_state['selected_menu01_name']}")
+st.sidebar.text_input(f"{st.session_state['selected_menu01_name']}")
     
 # 사이드바 하단 문구
 st.sidebar.markdown(
