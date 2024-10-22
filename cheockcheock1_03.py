@@ -254,7 +254,7 @@ with st.expander("⚙️ 요청사항 설정 / 파일 업로드", expanded=st.se
                 max_value=9,
                 value=1,
                 step=1,
-                key="num_requests"
+                key="num_requests_03"
             )
         
         with col3:
