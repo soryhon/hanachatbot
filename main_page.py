@@ -24,17 +24,20 @@ st.sidebar.markdown(
 
 # 메뉴 리스트
 selected_menu = st.sidebar.selectbox("메뉴 선택하세요.", sub_menu_list, index=st.session_state['selected_menu01_index'])
-if selected_menu:
-    # 선택한 option Index
-    idx  = sub_menu_list.index(selected_menu)
-    # 선택한 Index을 session에 저장
-    st.session_state['selected_menu01_index'] = idx
-    # 파일명 가져오기
-    selected_file = file_list[idx]
-    # 선택한 파일 코드 실행
-    bd.exec_page(selected_file)
-else:
-    st.session_state['selected_menu01_index'] = 0
+idx=0
+for sub_menu in sub_menu_list:
+    if selected_menu == sub_menu:
+        # 선택한 option Index
+        #idx  = sub_menu_list.index(selected_menu)
+        # 선택한 Index을 session에 저장
+        st.session_state['selected_menu01_index'] = idx
+        # 파일명 가져오기
+        selected_file = file_list[idx]
+        # 선택한 파일 코드 실행
+        bd.exec_page(selected_file)
+        idx += 1
+    else:
+        st.session_state['selected_menu01_index'] = 0
     
 # 사이드바 하단 문구
 st.sidebar.markdown(
