@@ -32,6 +32,7 @@ if selected_menu:
     idx  = sub_menu_list.index(selected_menu)
     # 선택한 Index을 session에 저장
     st.session_state['selected_menu01_index'] = idx
+    st.rerun()
     # 파일명 가져오기
     selected_file = file_list[idx]
     # 선택한 파일 코드 실행
