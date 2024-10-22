@@ -29,7 +29,7 @@ selected_menu = st.sidebar.selectbox("메뉴 선택하세요.", sub_menu_list, i
 idx=0
 for sub_menu in sub_menu_list:
     if selected_menu == sub_menu:
-        with st.spinner(f"[selected_menu} 메뉴 이동 중입니다..."):
+        with st.spinner(f"{selected_menu} 메뉴 이동 중입니다..."):
             # 선택한 option Index
             #idx  = sub_menu_list.index(selected_menu)
             # 선택한 Index을 session에 저장
