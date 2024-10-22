@@ -26,8 +26,9 @@ st.sidebar.markdown(
     unsafe_allow_html=True
 )
 
+idx2  = sub_menu_list.index(st.session_state['selected_menu01_name'])
 # 메뉴 리스트
-selected_menu = st.sidebar.selectbox("메뉴 선택하세요.", sub_menu_list, index=st.session_state['selected_menu01_index'])
+selected_menu = st.sidebar.selectbox("메뉴 선택하세요.", sub_menu_list, index=idx2)
 
 if selected_menu:
     # 선택한 option Index
