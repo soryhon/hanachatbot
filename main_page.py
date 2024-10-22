@@ -47,9 +47,10 @@ if selected_menu != st.session_state['selected_menu01_name']:
     
     # 파일명 가져오기
     st.session_state['selected_menu01_file'] = file_list[idx]
+    bd.exec_page(file_list[idx])
     # 선택한 파일 코드 실행
     st.session_state['selected_menu01_name'] = selected_menu
-bd.exec_page( st.session_state['selected_menu01_file'])
+#bd.exec_page( st.session_state['selected_menu01_file'])
 #else:
     #st.session_state['selected_menu01_index'] = 0
     
