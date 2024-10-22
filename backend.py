@@ -33,7 +33,7 @@ import yt_dlp
 from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled, NoTranscriptFound
 from pytube import YouTube
 import subprocess
-from pydub import Segment
+from pydub import AudioSegment
 from pydub.utils import which
 import socket
 import csv
@@ -45,7 +45,7 @@ from io import StringIO
 global_generated_prompt = []
 
 # ffmpeg 경로 설정 (필요한 경우)
-#Segment.converter = "/usr/bin/ffmpeg"
+#AudioSegment.converter = "/usr/bin/ffmpeg"
 
 # GitHub 정보 및 OpenAI API 키 자동 설정 또는 입력창을 통해 설정
 def load_env_info():
