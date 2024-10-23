@@ -223,8 +223,8 @@ with col2:
     )
    
 with col3:
-    #st.write("")
-    st.image("image/cheockcheock1_3.jpg",  use_column_width=True)
+    st.write("")
+    #st.image("image/cheockcheock1_3.jpg",  use_column_width=True)
 
 # 4 프레임
 # 작성 보고서 요청사항 세부타이틀
