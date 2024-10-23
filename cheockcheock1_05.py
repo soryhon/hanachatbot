@@ -70,7 +70,7 @@ if github_info_loaded:
             
             # 결과를 2차 배열에 추가
             file_lists.append(file_list)
-        col1, col2 = st.columns([0.6,0.4])
+        col1, col2 = st.columns([0.7,0.3])
         with col1:
             selected_type = st.radio("보고서 유형 선택하세요.",type_list, key="radio-type")
             idx = 0
