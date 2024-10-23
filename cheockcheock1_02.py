@@ -40,8 +40,8 @@ if 'response_02' not in st.session_state:
     st.session_state["response_02"] = [] 
 if 'selected_folder_index_02' not in st.session_state:
     st.session_state['selected_folder_index_02'] = 0 
-#if 'selected_folder_name_02' not in st.session_state:
-    #st.session_state['selected_folder_name_02'] = folderlist_init_value
+if 'selected_folder_name_02' not in st.session_state:
+    st.session_state['selected_folder_name_02'] = folderlist_init_value
 if 'folder_list_option_02' not in st.session_state:
     st.session_state['folder_list_option_02'] = [folderlist_init_value]
 if 'selected_template_index_02' not in st.session_state:
