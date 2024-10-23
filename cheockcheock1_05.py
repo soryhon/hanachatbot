@@ -21,10 +21,10 @@ if 'selected_report_file_name' not in st.session_state:
     st.session_state['selected_report_file_name']=""
 if 'selected_report_folder_name' not in st.session_state:
     st.session_state['selected_report_folder_name']=""
-if 'check_result' not in st.session_state:  
-    st.session_state['check_result'] = False
-if 'check_report' not in st.session_state:
-    st.session_state['check_report'] = True
+if 'check_result_05' not in st.session_state:  
+    st.session_state['check_result_05'] = False
+if 'check_report_05' not in st.session_state:
+    st.session_state['check_report_05'] = True
 if 'sub_title' not in st.session_state:
     st.session_state['sub_title'] = ""
 if 'report_type_index' not in st.session_state:
@@ -47,7 +47,7 @@ with col2:
 # 2 프레임
 # 보고서 유형 선택
 if github_info_loaded:
-    with st.expander("📝 보고서 선택", expanded=st.session_state['check_report']):
+    with st.expander("📝 보고서 선택", expanded=st.session_state['check_report_05']):
         # 보고서 유형 리스트트
         folder_list =["reportFiles","analysisReportFiles","audioReportFiles", "keywordReportFiles"]
 
@@ -79,7 +79,7 @@ if github_info_loaded:
                 st.session_state['report_type_index'] = 0
                 st.session_state['selected_report_folder_index'] = 0
                 st.session_state['selected_report_file_name']=""
-                st.session_state['check_result'] = False
+                st.session_state['check_result_05'] = False
         elif selected_type == type_list[1]:
             st.session_state['sub_title']="보고서 비교분석<br/>리스트 선택"
             st.session_state['report_folder_option'] = [folderlist_init_value] + file_lists[1]
@@ -88,7 +88,7 @@ if github_info_loaded:
                 st.session_state['report_type_index'] = 1
                 st.session_state['selected_report_folder_index'] = 0
                 st.session_state['selected_report_file_name']=""
-                st.session_state['check_result'] = False
+                st.session_state['check_result_05'] = False
         elif selected_type == type_list[2]: 
             st.session_state['sub_title']="음성파일 보고서<br/>리스트 선택"
             st.session_state['report_folder_option'] = [folderlist_init_value] + file_lists[2]
@@ -97,7 +97,7 @@ if github_info_loaded:
                 st.session_state['report_type_index'] = 2
                 st.session_state['selected_report_folder_index'] = 0
                 st.session_state['selected_report_file_name']=""
-                st.session_state['check_result'] = False
+                st.session_state['check_result_05'] = False
         elif selected_type == type_list[3]:
             st.session_state['sub_title']="키워드 보고서<br/>리스트 선택"
             st.session_state['report_folder_option'] = [folderlist_init_value] + file_lists[3]
@@ -106,7 +106,7 @@ if github_info_loaded:
                 st.session_state['report_type_index'] = 3
                 st.session_state['selected_report_folder_index'] = 0
                 st.session_state['selected_report_file_name']=""
-                st.session_state['check_result'] = False
+                st.session_state['check_result_05'] = False
 
         st.markdown(
             "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
@@ -137,8 +137,8 @@ if github_info_loaded:
             if selected_file_name != folderlist_init_value:
                 st.session_state['selected_report_file_name'] = f"{selected_file_name}"
                 st.session_state['selected_report_folder_index'] = st.session_state['report_folder_option'].index(selected_file_name) 
-                st.session_state['check_report'] = False
-                st.session_state['check_result'] = True
+                st.session_state['check_report_05'] = False
+                st.session_state['check_result_05'] = True
                 #st.success(f"[{selected_file_name}] 보고서명이 선택되었습니다.")  
 
 # 3 프레임
@@ -146,14 +146,14 @@ if github_info_loaded:
 file_content = None
 result_path = None
 
-with st.expander("📊 결과 보고서 보기", expanded=st.session_state['check_result']):
+with st.expander("📊 결과 보고서 보기", expanded=st.session_state['check_result_05']):
     if "selected_report_file_name" in st.session_state and st.session_state['selected_report_file_name']:
         st.markdown(
             "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
             unsafe_allow_html=True
         )  
-        st.session_state['check_result'] = True
-        st.session_state['check_report'] = False
+        st.session_state['check_result_05'] = True
+        st.session_state['check_report_05'] = False
         with st.spinner('선택한 결과 보고서를 불러오는 중입니다...'):
             result_folder = st.session_state['selected_report_folder_name']
             result_file = st.session_state['selected_report_file_name']
@@ -193,8 +193,8 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
                 file_name=pure_file_name,
                 mime="text/html"
             ):
-                st.session_state['check_result'] = True
-                st.session_state['check_report'] = False
+                st.session_state['check_result_05'] = True
+                st.session_state['check_report_05'] = False
 
         else:
             st.warning("결과 보고서를 먼저 선택하세요.")
