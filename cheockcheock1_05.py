@@ -44,12 +44,16 @@ with col2:
         unsafe_allow_html=True
     )
 
+# 보고서 유형 리스트트
+folder_list =["reportFiles","analysisReportFiles","audioReportFiles", "keywordReportFiles"]
+sub_tiltle_list = ["업무 보고서<br/>리스트 선택", "보고서 비교분석<br/>리스트 선택", "음성파일 보고서<br/>리스트 선택", "키워드 보고서<br/>리스트 선택"]
+# 업무 보고서 자동 완성 리스트
+type_list = ["• 업무 보고서 자동 완성", "• 보고서 비교분석 완성","• 음성 파일 보고서 완성","• Quickly 키워드 보고서 완성"]
+
 # 2 프레임
 # 보고서 유형 선택
 if github_info_loaded:
     with st.expander("📝 보고서 선택", expanded=st.session_state['check_report_05']):
-        # 보고서 유형 리스트트
-        folder_list =["reportFiles","analysisReportFiles","audioReportFiles", "keywordReportFiles"]
 
         # 2차원 배열에 각 폴더별 파일 리스트 저장
         file_lists = []
@@ -67,46 +71,19 @@ if github_info_loaded:
             # 결과를 2차 배열에 추가
             file_lists.append(file_list)
 
-        # 업무 보고서 자동 완성 리스트
-        type_list = ["• 업무 보고서 자동 완성", "• 보고서 비교분석 완성","• 음성 파일 보고서 완성","• Quickly 키워드 보고서 완성"]
-       
-        selected_type = st.radio("보고서 유형 선택하세요.",type_list, key="radio-type")     
-        if selected_type == type_list[0]: 
-            st.session_state['sub_title']="업무 보고서<br/>리스트 선택"
-            st.session_state['report_folder_option'] = [folderlist_init_value] + file_lists[0]
-            st.session_state['selected_report_folder_name'] = folder_list[0]
-            if st.session_state['report_type_index'] != 0:
-                st.session_state['report_type_index'] = 0
-                st.session_state['selected_report_folder_index'] = 0
-                st.session_state['selected_report_file_name']=""
-                st.session_state['check_result_05'] = False
-        elif selected_type == type_list[1]:
-            st.session_state['sub_title']="보고서 비교분석<br/>리스트 선택"
-            st.session_state['report_folder_option'] = [folderlist_init_value] + file_lists[1]
-            st.session_state['selected_report_folder_name'] = folder_list[1]
-            if st.session_state['report_type_index'] != 1:
-                st.session_state['report_type_index'] = 1
-                st.session_state['selected_report_folder_index'] = 0
-                st.session_state['selected_report_file_name']=""
-                st.session_state['check_result_05'] = False
-        elif selected_type == type_list[2]: 
-            st.session_state['sub_title']="음성파일 보고서<br/>리스트 선택"
-            st.session_state['report_folder_option'] = [folderlist_init_value] + file_lists[2]
-            st.session_state['selected_report_folder_name'] = folder_list[2]
-            if st.session_state['report_type_index'] != 2:
-                st.session_state['report_type_index'] = 2
-                st.session_state['selected_report_folder_index'] = 0
-                st.session_state['selected_report_file_name']=""
-                st.session_state['check_result_05'] = False
-        elif selected_type == type_list[3]:
-            st.session_state['sub_title']="키워드 보고서<br/>리스트 선택"
-            st.session_state['report_folder_option'] = [folderlist_init_value] + file_lists[3]
-            st.session_state['selected_report_folder_name'] = folder_list[3]
-            if st.session_state['report_type_index'] != 3:
-                st.session_state['report_type_index'] = 3
-                st.session_state['selected_report_folder_index'] = 0
-                st.session_state['selected_report_file_name']=""
-                st.session_state['check_result_05'] = False
+        selected_type = st.radio("보고서 유형 선택하세요.",type_list, key="radio-type")
+        idx = 0
+        for(type in type_list)
+            if selected_type == type: 
+                st.session_state['sub_title']=sub_title_list[idx]
+                st.session_state['report_folder_option'] = [folderlist_init_value] + file_lists[idx]
+                st.session_state['selected_report_folder_name'] = folder_list[idx]
+                if st.session_state['report_type_index'] != idx:
+                    st.session_state['report_type_index'] = idx
+                    st.session_state['selected_report_folder_index'] = 0
+                    st.session_state['selected_report_file_name']=""
+                    st.session_state['check_report_05'] = True
+                    st.session_state['check_result_05'] = False
 
         st.markdown(
             "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
