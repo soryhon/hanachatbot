@@ -208,8 +208,8 @@ else:
 # 보고서 타이틀 보기
 col1, col2, col3 = st.columns([0.2, 0.6, 0.2])
 with col1:
-    #st.write("")
-    st.image("image/cheockcheock1_3.jpg",  use_column_width=True)
+    st.write("")
+
 with col2:   
     report_title = "작성할 보고서를 선택하세요."
     title_style="font-size:15px; font-weight:normal; color:#cccccc;border: 1px solid #dddddd;letter-spacing: 1px;"
@@ -224,8 +224,7 @@ with col2:
    
 with col3:
     st.write("")
-    #st.image("image/cheockcheock1_3.jpg",  use_column_width=True)
-
+    
 # 4 프레임
 # 작성 보고서 요청사항 세부타이틀
 st.markdown(
@@ -492,6 +491,7 @@ st.markdown(
 # 결과 보고서 LLM 응답 보기/ 결과 보고서 저장/ 보고서 양식 저장
 html_result_value = "<div id='html_result_value'>"
 with st.expander("📊 결과 보고서 보기", expanded=st.session_state['check_result_03']):
+        st.image("image/cheockcheock1_3.jpg",  use_column_width=False, width=200)
     tab1, tab2 = st.tabs(["• 🧠 AI 요약 보고서 ", "• 🔎 음성파일 텍스트 보기"])
     with tab1:   
         if "response_03" in st.session_state:
