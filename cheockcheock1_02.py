@@ -46,7 +46,7 @@ subfolder_list=[]
 date_list=[]
 if github_info_loaded:
     with st.expander("📝 보고서 선택", expanded=st.session_state['check_report']):
-        col1, col2 = st.columns([0.3, 0.7])
+        col1, col2 = st.columns([0.25, 0.75])
         with col1:
             #st.write("")
             #st.markdown(
