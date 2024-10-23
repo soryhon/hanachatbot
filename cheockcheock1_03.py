@@ -281,7 +281,7 @@ with st.expander("⚙️ 요청사항 설정 / 파일 업로드", expanded=st.se
             if 'report_date_str_03' in st.session_state and st.session_state['report_date_str_03']:
                 try:
                     # 저장된 날짜 문자열이 있으면 파싱
-                    saved_date = datetime.datetime.strptime(st.session_state['report_date_str'], '%Y%m%d').date()
+                    saved_date = datetime.datetime.strptime(st.session_state['report_date_str_03'], '%Y%m%d').date()
                 except ValueError:
                     # 날짜 형식이 맞지 않으면 오늘 날짜로 설정
                     st.warning("잘못된 날짜 형식입니다. 기본값으로 오늘 날짜를 사용합니다.")
@@ -294,7 +294,7 @@ with st.expander("⚙️ 요청사항 설정 / 파일 업로드", expanded=st.se
                 value=saved_date,
                 min_value=datetime.date(2000, 1, 1),
                 max_value=today,
-                key="report_date"
+                key="report_date_03"
             )
             # 날짜를 YYYYMMDD 형식으로 변환
             # 날짜 데이터 메모리에 저장
