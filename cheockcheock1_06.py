@@ -65,9 +65,10 @@ if github_info_loaded:
             st.image(star_images[4], width=95)
    
 
-    col1, col2, col3 = st.columns([0.2, 0.6, 0.2])
+    col1, col2, col3 = st.columns([0.3, 0.5, 0.2])
     with col1:
-        st.write("")
+        #st.write("")
+        st.image("cheockcheock1_61.jpg", width=200)
     with col2:
         # 평가 버튼
         if st.button("🎯 평가하기", key="appraisal", use_container_width=True):
