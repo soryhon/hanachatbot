@@ -69,6 +69,7 @@ with st.expander("⚙️ 키워드 및 요청사항", expanded=st.session_state[
         st.session_state['request_text_04'] = request_text
     with col2:
         st.write("")
+        st.write("")
         st.image("image/cheockcheock1_4.jpg",  use_column_width=True)
        
 # 4 프레임
