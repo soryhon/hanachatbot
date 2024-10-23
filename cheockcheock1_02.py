@@ -142,6 +142,7 @@ with st.expander("⚙️ 요청사항 및 기준일자 설정", expanded=st.sess
         request_text = st.text_area("요청 : '요청할 내용을 입력해주세요.", key="request_text_area")
         st.session_state['request_text'] = request_text
     with col2:
+        st.write("")
         st.image("image/cheockcheock1_21.jpg",  use_column_width=True)
     
     if date_list:
