@@ -37,7 +37,7 @@ if 'check_report_02' not in st.session_state:
 if 'html_report_02' not in st.session_state:
     st.session_state['html_report_02'] = "" 
 if 'response_02' not in st.session_state:
-    #st.session_state["response_02"] = [] 
+    st.session_state["response_02"] = [] 
 if 'selected_folder_index_02' not in st.session_state:
     st.session_state['selected_folder_index_02']  
 if 'selected_folder_name_02' not in st.session_state:
