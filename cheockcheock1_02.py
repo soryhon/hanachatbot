@@ -143,6 +143,7 @@ with st.expander("⚙️ 요청사항 및 기준일자 설정", expanded=st.sess
         st.session_state['request_text'] = request_text
     with col2:
         st.write("")
+        st.write("")
         st.image("image/cheockcheock1_21.jpg",  use_column_width=True)
     
     if date_list:
