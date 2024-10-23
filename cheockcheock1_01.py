@@ -230,7 +230,7 @@ with st.expander("⚙️ 요청사항 설정 / 파일 업로드", expanded=st.se
                 step=1,
                 key="num_requests"
             )
-         with col2:
+        with col2:
             # 오늘 날짜 가져오기
             today = datetime.date.today()
             
