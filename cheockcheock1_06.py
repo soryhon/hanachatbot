@@ -94,11 +94,11 @@ if github_info_loaded:
     with col3:
         st.write("")
         
-    col1, col2, col3 = st.columns([0.2, 0.6, 0.2]) 
+    col1, col2, col3 = st.columns([0.22, 0.56, 0.22]) 
     with col1:
         st.write("")
     with col2:
-        st.image("image/cheockcheock1_61.jpg")
+        st.image("image/cheockcheock1_61.jpg",  use_column_width=True)
     with col3:
         st.write("")
 else:
