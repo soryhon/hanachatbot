@@ -75,7 +75,7 @@ if github_info_loaded:
         idx = 0
         for type in type_list:
             if selected_type == type: 
-                with st.spinner(f"{sub_title_list[idx]} 리스트 불러오는 중입니다..."):
+                with st.spinner(f"{folder_list[idx]} 리스트 불러오는 중입니다..."):
                     st.session_state['sub_title']=sub_title_list[idx]
                     st.session_state['report_folder_option'] = [folderlist_init_value] + file_lists[idx]
                     st.session_state['selected_report_folder_name'] = folder_list[idx]
