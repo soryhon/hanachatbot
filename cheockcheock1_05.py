@@ -131,7 +131,7 @@ with st.expander("📊 결과 보고서 보기", expanded=st.session_state['chec
             unsafe_allow_html=True
         )  
         st.session_state['check_result_05'] = True
-        st.session_state['check_report_05'] = False
+        #st.session_state['check_report_05'] = False
         with st.spinner('선택한 결과 보고서를 불러오는 중입니다...'):
             result_folder = st.session_state['selected_report_folder_name']
             result_file = st.session_state['selected_report_file_name']
