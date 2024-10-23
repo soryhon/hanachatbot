@@ -29,9 +29,9 @@ if 'request_title_02' not in st.session_state:
 if 'request_text_02' not in st.session_state:
     st.session_state['request_text_02'] = ""  
 if 'check_setting_02' not in st.session_state:    
-    st.session_state['check_setting_02'] = True
+    st.session_state['check_setting_02'] = False
 if 'check_result_02' not in st.session_state:
-    st.session_state['check_result_02']=True
+    st.session_state['check_result_02']=False
 if 'check_report_02' not in st.session_state:
     st.session_state['check_report_02']=True
 if 'html_report_02' not in st.session_state:
