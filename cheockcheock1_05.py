@@ -115,7 +115,7 @@ if github_info_loaded:
             if selected_file_name != folderlist_init_value:
                 st.session_state['selected_report_file_name'] = f"{selected_file_name}"
                 st.session_state['selected_report_folder_index'] = st.session_state['report_folder_option'].index(selected_file_name) 
-                st.session_state['check_report_05'] = False
+                #st.session_state['check_report_05'] = False
                 st.session_state['check_result_05'] = True
                 #st.success(f"[{selected_file_name}] 보고서명이 선택되었습니다.")  
 
