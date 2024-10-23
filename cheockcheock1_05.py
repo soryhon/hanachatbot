@@ -73,6 +73,7 @@ if github_info_loaded:
         col1, col2 = st.columns([0.7,0.3])
         with col1:
             st.write("")
+            st.write("")
             selected_type = st.radio("보고서 유형 선택하세요.",type_list, key="radio-type")
             idx = 0
             for type in type_list:
