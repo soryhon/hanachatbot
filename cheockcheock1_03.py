@@ -79,7 +79,7 @@ if github_info_loaded:
             with col1:
                 st.write("")
                 st.markdown(
-                    "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>등록된<br/>보고서명 선택 </p>",
+                    "<p style='font-size:14px; font-weight:bold; color:#ffffff;text-align:center;background-color:#cccccc;'>등록된<br/>보고서명 선택 </p>",
                     unsafe_allow_html=True
                 )
             with col2:
