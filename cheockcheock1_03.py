@@ -491,7 +491,7 @@ st.markdown(
 # 결과 보고서 LLM 응답 보기/ 결과 보고서 저장/ 보고서 양식 저장
 html_result_value = "<div id='html_result_value'>"
 with st.expander("📊 결과 보고서 보기", expanded=st.session_state['check_result_03']):
-    st.image("image/cheockcheock1_3.jpg",  use_column_width=False, width=150)
+    st.image("image/cheockcheock1_3.jpg",  use_column_width=False, width=130)
     tab1, tab2 = st.tabs(["• 🧠 AI 요약 보고서 ", "• 🔎 음성파일 텍스트 보기"])
     with tab1:   
         if "response_03" in st.session_state:
