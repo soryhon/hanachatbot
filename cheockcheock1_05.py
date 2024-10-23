@@ -73,7 +73,7 @@ if github_info_loaded:
 
         selected_type = st.radio("보고서 유형 선택하세요.",type_list, key="radio-type")
         idx = 0
-        for(type in type_list)
+        for type in type_list
             if selected_type == type: 
                 st.session_state['sub_title']=sub_title_list[idx]
                 st.session_state['report_folder_option'] = [folderlist_init_value] + file_lists[idx]
