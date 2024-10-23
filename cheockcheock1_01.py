@@ -197,142 +197,138 @@ st.markdown(
 )
 
 # 5 프레임
-# 파일 업로드
-# 지원되는 파일 형식 리스트
-supported_file_types = ['xlsx', 'pptx', 'docx', 'csv', 'png', 'jpg', 'jpeg', 'pdf', 'txt', 'log']
-
-if github_info_loaded:
-    with st.expander("⬆️ 데이터 파일 업로드", expanded=st.session_state['check_upload']):
-        uploaded_files = st.file_uploader("파일을 여러 개 드래그 앤 드롭하여 업로드하세요. (최대 100MB)", accept_multiple_files=True)
-
-        if uploaded_files:
-            for uploaded_file in uploaded_files:
-                file_type = uploaded_file.name.split('.')[-1].lower()
-
-                if file_type not in supported_file_types:
-                    st.error(f"지원하지 않는 파일입니다: {uploaded_file.name}")
-                    continue
-
-                if uploaded_file.size > MAX_FILE_SIZE_BYTES:
-                    st.warning(f"'{uploaded_file.name}' 파일은 {MAX_FILE_SIZE_MB}MB 제한을 초과했습니다. 파일 크기를 줄이거나 GitHub에 직접 푸시하세요.")
-                else:
-                    file_content = uploaded_file.read()
-                    file_name = uploaded_file.name
-                    #folder_name = 'uploadFiles'
-                    folder_name = st.session_state.get('upload_folder', 'uploadFiles')
-
-                    sha = bd.get_file_sha(st.session_state['github_repo'], f"{folder_name}/{file_name}", st.session_state['github_token'], branch=st.session_state['github_branch'])
-
-                    if sha:
-                        st.warning(f"'{file_name}' 파일이 이미 존재합니다. 덮어쓰시겠습니까?")
-                        col1, col2 = st.columns(2)
-
-                        with col1:
-                            if st.button(f"'{file_name}' 덮어쓰기", key=f"overwrite_{file_name}"):
-                                bd.upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
-                                st.success(f"'{file_name}' 파일이 성공적으로 덮어쓰기 되었습니다.")
-                                uploaded_files = None
-                                break
-
-                        with col2:
-                            if st.button("취소", key=f"cancel_{file_name}"):
-                                st.info("덮어쓰기가 취소되었습니다.")
-                                uploaded_files = None
-                                break
-                    else:
-                        bd.upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'])
-                        st.success(f"'{file_name}' 파일이 성공적으로 업로드되었습니다.")
-                        uploaded_files = None
-else:
-    st.warning("GitHub 정보가 저장되기 전에는 파일 업로드를 할 수 없습니다. 먼저 GitHub 정보를 입력해 주세요.")
 
 # 6 프레임
 # 요청사항 갯수 및 기준일자 설정 
-with st.expander("⚙️ 요청사항 및 기준일자 설정", expanded=st.session_state['check_setting']):
-    col1, col2, col3 = st.columns([0.5, 0.25, 0.25])
-    with col1:
+with st.expander("⚙️ 요청사항 설정 / 파일 업로드", expanded=st.session_state['check_setting']):
+    tab1, tab2 = st.tabs(["• 요청사항 및 기준일자 설정", "• ⬆️ 데이터 파일 업로드"]) 
+    with tab1:
+        col1, col2 = st.columns([0.5, 0.5])
+        with col1:
+            st.markdown(
+                "<p style='font-size:14px; font-weight:normal; color:#444444; margin-top:0px;text-align:left;'>✔️ 작성에 필요한 요청사항 갯수를 설정해주세요.</p>",
+                unsafe_allow_html=True
+            )
+            
+        with col2:
+            st.markdown(
+                "<p style='font-size:14px; font-weight:normal; color:#444444; margin-top:0px;text-align:left;'>✔️ 보고서 저장을 위해 기준일자를 설정해주세요.</p>",
+                unsafe_allow_html=True
+            )
         st.markdown(
-            "<p style='font-size:14px; font-weight:normal; color:#444444; margin-top:35px;text-align:left;'>✔️ 작성에 필요한 요청사항 갯수를 설정해주세요.</p>",
+              "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
             unsafe_allow_html=True
         )
-        
-    with col2:
-        # 요청사항 갯수 입력 (1-9)
-        num_requests = st.number_input(
-            "🔢 요청사항 갯수 입력창",
-            min_value=1,
-            max_value=9,
-            value=1,
-            step=1,
-            key="num_requests"
-        )
-    
-    with col3:
-        st.markdown(
-            "<p style='font-size:18px; margin-top:27px;'></p>",
-            unsafe_allow_html=True
-        )
-        if st.button("설정", key="set_requests", use_container_width=True):
-            # 설정 버튼 클릭 시 요청사항 리스트 초기화 및 새로운 요청사항 갯수 설정
-            st.session_state['rows'] = [
-                {"제목": "", "요청": "", "파일": "", "데이터": "", "파일정보": "1"}
-                for _ in range(st.session_state['num_requests'])
-            ]
-            st.success(f"{st.session_state['num_requests']}개의 요청사항이 설정되었습니다.")
-            st.session_state['check_request']=True
-            st.session_state['check_setting']=False
-            bd.refresh_page()
-            bd.init_session_state(True)
-    col1, col2 = st.columns([0.5, 0.5])
-    with col1 :
-        st.markdown(
-            "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
-            unsafe_allow_html=True
-        )      
-    with col2 :
-        st.markdown(
-            "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
-            unsafe_allow_html=True
-        )
-    col1, col2 = st.columns([0.5, 0.5])
-    with col1:
-        # 오늘 날짜 가져오기
-        today = datetime.date.today()
-        
-        # 'report_date_str' 세션 값이 있는지 확인하고, 없으면 'YYYYMMDD' 형식으로 today 값 설정
-        if 'report_date_str' not in st.session_state:
-            st.session_state['report_date_str'] = today.strftime('%Y%m%d')
-        
-        
-        # 세션에 저장된 'YYYYMMDD' 형식을 date 객체로 변환
-        saved_date = today
-        # 날짜 문자열을 검사하여 잘못된 형식일 때 예외 처리
-        if 'report_date_str' in st.session_state and st.session_state['report_date_str']:
-            try:
-                # 저장된 날짜 문자열이 있으면 파싱
-                saved_date = datetime.datetime.strptime(st.session_state['report_date_str'], '%Y%m%d').date()
-            except ValueError:
-                # 날짜 형식이 맞지 않으면 오늘 날짜로 설정
-                st.warning("잘못된 날짜 형식입니다. 기본값으로 오늘 날짜를 사용합니다.")
-        else:
-            # 저장된 날짜가 없거나 빈 문자열일 경우 오늘 날짜로 설정
+        col1, col2, col3 = st.columns([0.35, 0.35, 0.3])            
+        with col1:
+            # 요청사항 갯수 입력 (1-9)
+            num_requests = st.number_input(
+                "🔢 요청사항 갯수 입력창",
+                min_value=1,
+                max_value=9,
+                value=1,
+                step=1,
+                key="num_requests"
+            )
+         with col2:
+            # 오늘 날짜 가져오기
+            today = datetime.date.today()
+            
+            # 'report_date_str' 세션 값이 있는지 확인하고, 없으면 'YYYYMMDD' 형식으로 today 값 설정
+            if 'report_date_str' not in st.session_state:
+                st.session_state['report_date_str'] = today.strftime('%Y%m%d')
+            
+            
+            # 세션에 저장된 'YYYYMMDD' 형식을 date 객체로 변환
             saved_date = today
+            # 날짜 문자열을 검사하여 잘못된 형식일 때 예외 처리
+            if 'report_date_str' in st.session_state and st.session_state['report_date_str']:
+                try:
+                    # 저장된 날짜 문자열이 있으면 파싱
+                    saved_date = datetime.datetime.strptime(st.session_state['report_date_str'], '%Y%m%d').date()
+                except ValueError:
+                    # 날짜 형식이 맞지 않으면 오늘 날짜로 설정
+                    st.warning("잘못된 날짜 형식입니다. 기본값으로 오늘 날짜를 사용합니다.")
+            else:
+                # 저장된 날짜가 없거나 빈 문자열일 경우 오늘 날짜로 설정
+                saved_date = today
+        
+            report_date = st.date_input(
+                "📅 보고서 기준일자 선택",
+                value=saved_date,
+                min_value=datetime.date(2000, 1, 1),
+                max_value=today,
+                key="report_date"
+            )
+            # 날짜를 YYYYMMDD 형식으로 변환
+            # 날짜 데이터 메모리에 저장
+            st.session_state['report_date_str'] = report_date.strftime("%Y%m%d")
+        with col3:
+            st.markdown(
+                "<p style='font-size:18px; margin-top:27px;'></p>",
+                unsafe_allow_html=True
+            )
+            if st.button("설정", key="set_requests", use_container_width=True):
+                # 설정 버튼 클릭 시 요청사항 리스트 초기화 및 새로운 요청사항 갯수 설정
+                st.session_state['rows'] = [
+                    {"제목": "", "요청": "", "파일": "", "데이터": "", "파일정보": "1"}
+                    for _ in range(st.session_state['num_requests'])
+                ]
+                st.success(f"{st.session_state['num_requests']}개의 요청사항이 설정되었습니다.")
+                st.session_state['check_request']=True
+                st.session_state['check_setting']=False
+                bd.refresh_page()
+                bd.init_session_state(True)
+       
+    with tab2:
+        # 파일 업로드
+        # 지원되는 파일 형식 리스트
+        supported_file_types = ['xlsx', 'pptx', 'docx', 'csv', 'png', 'jpg', 'jpeg', 'pdf', 'txt', 'log']
+        
+        if github_info_loaded:
+            #with st.expander("⬆️ 데이터 파일 업로드", expanded=st.session_state['check_upload']):
+            uploaded_files = st.file_uploader("파일을 여러 개 드래그 앤 드롭하여 업로드하세요. (최대 100MB)", accept_multiple_files=True)
     
-        report_date = st.date_input(
-            "📅 보고서 기준일자 선택",
-            value=saved_date,
-            min_value=datetime.date(2000, 1, 1),
-            max_value=today,
-            key="report_date"
-        )
-        # 날짜를 YYYYMMDD 형식으로 변환
-        # 날짜 데이터 메모리에 저장
-        st.session_state['report_date_str'] = report_date.strftime("%Y%m%d")
-    with col2:
-        st.markdown(
-            "<p style='font-size:14px; font-weight:normal; color:#444444; margin-top:35px;text-align:left;'>✔️ 보고서 저장을 위해 기준일자를 설정해주세요.</p>",
-            unsafe_allow_html=True
-        )
+            if uploaded_files:
+                for uploaded_file in uploaded_files:
+                    file_type = uploaded_file.name.split('.')[-1].lower()
+    
+                    if file_type not in supported_file_types:
+                        st.error(f"지원하지 않는 파일입니다: {uploaded_file.name}")
+                        continue
+    
+                    if uploaded_file.size > MAX_FILE_SIZE_BYTES:
+                        st.warning(f"'{uploaded_file.name}' 파일은 {MAX_FILE_SIZE_MB}MB 제한을 초과했습니다. 파일 크기를 줄이거나 GitHub에 직접 푸시하세요.")
+                    else:
+                        file_content = uploaded_file.read()
+                        file_name = uploaded_file.name
+                        #folder_name = 'uploadFiles'
+                        folder_name = st.session_state.get('upload_folder', 'uploadFiles')
+    
+                        sha = bd.get_file_sha(st.session_state['github_repo'], f"{folder_name}/{file_name}", st.session_state['github_token'], branch=st.session_state['github_branch'])
+    
+                        if sha:
+                            st.warning(f"'{file_name}' 파일이 이미 존재합니다. 덮어쓰시겠습니까?")
+                            col1, col2 = st.columns(2)
+    
+                            with col1:
+                                if st.button(f"'{file_name}' 덮어쓰기", key=f"overwrite_{file_name}"):
+                                    bd.upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'], branch=st.session_state['github_branch'], sha=sha)
+                                    st.success(f"'{file_name}' 파일이 성공적으로 덮어쓰기 되었습니다.")
+                                    uploaded_files = None
+                                    break
+    
+                            with col2:
+                                if st.button("취소", key=f"cancel_{file_name}"):
+                                    st.info("덮어쓰기가 취소되었습니다.")
+                                    uploaded_files = None
+                                    break
+                        else:
+                            bd.upload_file_to_github(st.session_state['github_repo'], folder_name, file_name, file_content, st.session_state['github_token'])
+                            st.success(f"'{file_name}' 파일이 성공적으로 업로드되었습니다.")
+                            uploaded_files = None
+        else:
+            st.warning("GitHub 정보가 저장되기 전에는 파일 업로드를 할 수 없습니다. 먼저 GitHub 정보를 입력해 주세요.")
 
 # 7 프레임임
 # 요청사항 리스트
