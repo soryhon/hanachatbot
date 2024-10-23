@@ -239,14 +239,8 @@ st.markdown(
 with st.expander("⚙️ 요청사항 설정 / 파일 업로드", expanded=st.session_state['check_setting_03']):
     tab1, tab2 = st.tabs(["• 요청사항 및 기준일자 설정", "• ⬆️ 음성 파일 업로드"]) 
     with tab1:
-        col1, col2, col3 = st.columns([0.5, 0.25, 0.25])
+        col1, col2, col3 = st.columns([0.35, 0.35, 0.3])
         with col1:
-            st.markdown(
-                "<p style='font-size:14px; font-weight:normal; color:#444444; margin-top:35px;text-align:left;'>✔️ 작성에 필요한 요청사항 갯수를 설정해주세요.</p>",
-                unsafe_allow_html=True
-            )
-            
-        with col2:
             # 요청사항 갯수 입력 (1-9)
             num_requests = st.number_input(
                 "🔢 요청사항 갯수 입력창",
@@ -256,35 +250,7 @@ with st.expander("⚙️ 요청사항 설정 / 파일 업로드", expanded=st.se
                 step=1,
                 key="num_requests_03"
             )
-        
-        with col3:
-            st.markdown(
-                "<p style='font-size:18px; margin-top:27px;'></p>",
-                unsafe_allow_html=True
-            )
-            if st.button("설정", key="set_requests", use_container_width=True):
-                # 설정 버튼 클릭 시 요청사항 리스트 초기화 및 새로운 요청사항 갯수 설정
-                st.session_state['rows_03'] = [
-                    {"제목": "", "요청": "", "파일": "", "데이터": "", "파일정보": "1"}
-                    for _ in range(st.session_state['num_requests_03'])
-                ]                
-                st.session_state['check_request_03']=True
-                st.session_state['check_setting_03']=False
-                st.session_state['html_report_03'] = ""
-                st.success(f"{st.session_state['num_requests_03']}개의 요청사항이 설정되었습니다.")
-        col1, col2 = st.columns([0.5, 0.5])
-        with col1 :
-            st.markdown(
-                "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
-                unsafe_allow_html=True
-            )      
-        with col2 :
-            st.markdown(
-                "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
-                unsafe_allow_html=True
-            )
-        col1, col2 = st.columns([0.5, 0.5])
-        with col1:
+                with col1:
             # 오늘 날짜 가져오기
             today = datetime.date.today()
             
@@ -317,6 +283,39 @@ with st.expander("⚙️ 요청사항 설정 / 파일 업로드", expanded=st.se
             # 날짜를 YYYYMMDD 형식으로 변환
             # 날짜 데이터 메모리에 저장
             st.session_state['report_date_str_03'] = report_date.strftime("%Y%m%d")
+        with col2:
+            st.markdown(
+                "<p style='font-size:18px; margin-top:27px;'></p>",
+                unsafe_allow_html=True
+            )
+            if st.button("설정", key="set_requests", use_container_width=True):
+                # 설정 버튼 클릭 시 요청사항 리스트 초기화 및 새로운 요청사항 갯수 설정
+                st.session_state['rows_03'] = [
+                    {"제목": "", "요청": "", "파일": "", "데이터": "", "파일정보": "1"}
+                    for _ in range(st.session_state['num_requests_03'])
+                ]                
+                st.session_state['check_request_03']=True
+                st.session_state['check_setting_03']=False
+                st.session_state['html_report_03'] = ""
+                st.success(f"{st.session_state['num_requests_03']}개의 요청사항이 설정되었습니다.")
+        col1, col2 = st.columns([0.5, 0.5])
+        with col1 :
+            st.markdown(
+                "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
+                unsafe_allow_html=True
+            )      
+        with col2 :
+            st.markdown(
+                "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
+                unsafe_allow_html=True
+            )
+        col1, col2 = st.columns([0.5, 0.5])
+         with col1:
+            st.markdown(
+                "<p style='font-size:14px; font-weight:normal; color:#444444; margin-top:35px;text-align:left;'>✔️ 작성에 필요한 요청사항 갯수를 설정해주세요.</p>",
+                unsafe_allow_html=True
+            )
+            
         with col2:
             st.markdown(
                 "<p style='font-size:14px; font-weight:normal; color:#444444; margin-top:35px;text-align:left;'>✔️ 보고서 저장을 위해 기준일자를 설정해주세요.</p>",
