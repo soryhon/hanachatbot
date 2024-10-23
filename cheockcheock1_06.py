@@ -67,7 +67,7 @@ if github_info_loaded:
 
     col1, col2, col3 = st.columns([0.2, 0.6, 0.2])
     with col1:
-        #st.write("")
+        st.write("")
         #st.image("image/cheockcheock1_61.jpg", width=100)
         st.markdown(
             f"""
@@ -93,7 +93,14 @@ if github_info_loaded:
                 st.error("닉네임/이름과 별 개수 선택은 필수입니다.")
     with col3:
         st.write("")
-            
+        
+    col1, col2, col3 = st.columns([0.2, 0.6, 0.2]) 
+    with col1:
+        st.write("")
+    with col2:
+        st.image("image/cheockcheock1_61.jpg")
+    with col3:
+        st.write("")
 else:
     st.warning("GitHub 정보가 설정되지 않았습니다. 먼저 GitHub Token을 입력해 주세요.")
 
