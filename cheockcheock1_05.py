@@ -84,6 +84,7 @@ if github_info_loaded:
                     st.session_state['selected_report_file_name']=""
                     st.session_state['check_report_05'] = True
                     st.session_state['check_result_05'] = False
+            idx = idx +1
 
         st.markdown(
             "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
