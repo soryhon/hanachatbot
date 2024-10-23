@@ -20,7 +20,7 @@ with col2:
 st.markdown("<hr style='border-top:1px solid #dddddd;'>", unsafe_allow_html=True)
 st.markdown("## 프로젝트 소개")    
 with st.container():
-    col1, col2, col3 = st.columns([0.2,0.6,0.2])
+    col1, col2, col3 = st.columns([0.25,0.5,0.25])
     with col1:
         st.write()
     with col2:
