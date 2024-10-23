@@ -60,12 +60,15 @@ st.markdown(
 # 3 프레임
 # 키워드 및 요청사항 입력
 with st.expander("⚙️ 키워드 및 요청사항", expanded=st.session_state['check_setting_04']):
-
-    request_title = st.text_input("키워드 : '키워드를 입력해주세요.", key="request_title_input")
-    st.session_state['request_title_04'] = request_title
-
-    request_text = st.text_area("요청 : '요청할 내용을 입력해주세요.", key="request_text_area")
-    st.session_state['request_text_04'] = request_text
+    col1, col2 = st.colums([0.7,0.2])
+    with col1:
+        request_title = st.text_input("키워드 : '키워드를 입력해주세요.", key="request_title_input")
+        st.session_state['request_title_04'] = request_title
+    
+        request_text = st.text_area("요청 : '요청할 내용을 입력해주세요.", key="request_text_area")
+        st.session_state['request_text_04'] = request_text
+    with col2:
+        st.image("image/cheockcheock1_4.jpg",  use_column_width=True)
        
 # 4 프레임
 # 보고서 작성 실행 버튼
