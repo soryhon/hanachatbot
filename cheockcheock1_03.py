@@ -250,7 +250,7 @@ with st.expander("⚙️ 요청사항 설정 / 파일 업로드", expanded=st.se
                 step=1,
                 key="num_requests_03"
             )
-                with col1:
+        with col2:
             # 오늘 날짜 가져오기
             today = datetime.date.today()
             
@@ -283,7 +283,7 @@ with st.expander("⚙️ 요청사항 설정 / 파일 업로드", expanded=st.se
             # 날짜를 YYYYMMDD 형식으로 변환
             # 날짜 데이터 메모리에 저장
             st.session_state['report_date_str_03'] = report_date.strftime("%Y%m%d")
-        with col2:
+        with col3:
             st.markdown(
                 "<p style='font-size:18px; margin-top:27px;'></p>",
                 unsafe_allow_html=True
