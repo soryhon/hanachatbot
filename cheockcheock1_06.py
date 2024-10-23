@@ -68,7 +68,20 @@ if github_info_loaded:
     col1, col2, col3 = st.columns([0.2, 0.6, 0.2])
     with col1:
         #st.write("")
-        st.image("image/cheockcheock1_61.jpg", width=100)
+        #st.image("image/cheockcheock1_61.jpg", width=100)
+        st.markdown(
+            f"""
+            <style>
+            .stApp {{
+                background-image: url(image/cheockcheock1_61.jpg);
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+            }}
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
     with col2:
         # 평가 버튼
         if st.button("🎯 평가하기", key="appraisal", use_container_width=True):
