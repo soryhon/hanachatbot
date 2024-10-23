@@ -70,23 +70,25 @@ if github_info_loaded:
             
             # 결과를 2차 배열에 추가
             file_lists.append(file_list)
-
-        selected_type = st.radio("보고서 유형 선택하세요.",type_list, key="radio-type")
-        idx = 0
-        for type in type_list:
-            if selected_type == type: 
-               
-                st.session_state['sub_title']=sub_title_list[idx]
-                st.session_state['report_folder_option'] = [folderlist_init_value] + file_lists[idx]
-                st.session_state['selected_report_folder_name'] = folder_list[idx]
-                if st.session_state['report_type_index'] != idx:
-                    st.session_state['report_type_index'] = idx
-                    st.session_state['selected_report_folder_index'] = 0
-                    st.session_state['selected_report_file_name']=""
-                    st.session_state['check_report_05'] = True
-                    st.session_state['check_result_05'] = False
-        
-            idx = idx +1
+        col1, col2 = st.columns([0.6,0.4])
+        with col1:
+            selected_type = st.radio("보고서 유형 선택하세요.",type_list, key="radio-type")
+            idx = 0
+            for type in type_list:
+                if selected_type == type: 
+                   
+                    st.session_state['sub_title']=sub_title_list[idx]
+                    st.session_state['report_folder_option'] = [folderlist_init_value] + file_lists[idx]
+                    st.session_state['selected_report_folder_name'] = folder_list[idx]
+                    if st.session_state['report_type_index'] != idx:
+                        st.session_state['report_type_index'] = idx
+                        st.session_state['selected_report_folder_index'] = 0
+                        st.session_state['selected_report_file_name']=""
+                        st.session_state['check_report_05'] = True
+                        st.session_state['check_result_05'] = False
+                idx = idx +1
+        with col2:
+            st.image("image/cheockcheock1_5.jpg",  use_column_width=True)
 
         st.markdown(
             "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
