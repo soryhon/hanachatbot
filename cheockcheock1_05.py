@@ -46,7 +46,7 @@ with col2:
 
 # 보고서 유형 리스트트
 folder_list =["reportFiles","analysisReportFiles","audioReportFiles", "keywordReportFiles"]
-sub_tiltle_list = ["업무 보고서<br/>리스트 선택", "보고서 비교분석<br/>리스트 선택", "음성파일 보고서<br/>리스트 선택", "키워드 보고서<br/>리스트 선택"]
+sub_title_list = ["업무 보고서<br/>리스트 선택", "보고서 비교분석<br/>리스트 선택", "음성파일 보고서<br/>리스트 선택", "키워드 보고서<br/>리스트 선택"]
 # 업무 보고서 자동 완성 리스트
 type_list = ["• 업무 보고서 자동 완성", "• 보고서 비교분석 완성","• 음성 파일 보고서 완성","• Quickly 키워드 보고서 완성"]
 
