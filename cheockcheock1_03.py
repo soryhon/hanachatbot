@@ -310,7 +310,7 @@ with st.expander("⚙️ 요청사항 설정 / 파일 업로드", expanded=st.se
                 unsafe_allow_html=True
             )
         col1, col2 = st.columns([0.5, 0.5])
-         with col1:
+        with col1:
             st.markdown(
                 "<p style='font-size:14px; font-weight:normal; color:#444444; margin-top:35px;text-align:left;'>✔️ 작성에 필요한 요청사항 갯수를 설정해주세요.</p>",
                 unsafe_allow_html=True
