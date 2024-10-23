@@ -845,6 +845,65 @@ def apply_template_to_session_state(file_name):
         
         # 세션 상태에 값 저장
 
+        st.session_state['selected_folder_name'] = selected_folder_name
+        st.session_state['rows'] = rows
+        #st.session_state['is_updating'] = False
+        st.session_state['upload_folder'] = f"uploadFiles/{selected_folder_name}"
+        st.session_state['check_report'] = False
+        st.session_state['check_upload'] = False
+        st.session_state['check_request'] = True
+        st.session_state['check_result'] = False
+        st.session_state['selected_folder_index'] = 0
+    
+        # 'num_requests'는 직접 변경할 수 없으므로 Streamlit에서 제공하는 방법으로 값을 설정
+        #if "num_requests" in st.session_state:
+            #st.session_state["num_requests"] = num_requests
+
+        
+        # folder_list에서 selected_folder_name의 인덱스 찾기
+        folder_list = st.session_state.get('folder_list_option', [])
+        if selected_folder_name in folder_list:
+            selected_index = folder_list.index(selected_folder_name)
+            st.session_state['selected_folder_index'] = selected_index + 1
+        
+        # 엑셀 파일 처리: 파일 정보에 따라 시트 선택 입력창 추가
+        for idx, row in enumerate(rows):
+            selected_file_name = row.get("파일")
+            file_info = row.get("파일정보", "1")
+            
+            if selected_file_name and selected_file_name.endswith('.xlsx'):
+                # 시트 선택 로직 적용
+                #file_content = get_file_from_github(
+                    #st.session_state["github_repo"],
+                    #st.session_state["github_branch"],
+                    #selected_file_name,
+                    #st.session_state["github_token"]
+                #)
+                #if file_content:
+                    #handle_sheet_selection(file_content, len(openpyxl.load_workbook(file_content).sheetnames), idx)
+                st.session_state['rows_03'][idx]['파일정보'] = file_info        
+        st.success(f"'{selected_folder_name}' 양식을 불러오기 성공하였습니다.")
+    
+    except FileNotFoundError:
+        st.error(f"파일 '{file_name}'을 찾을 수 없습니다.")
+    except json.JSONDecodeError:
+        st.error(f"'{file_name}' 파일을 파싱하는 중 오류가 발생했습니다. JSON 형식을 확인해주세요.")
+    except Exception as e:
+        st.error(f"템플릿 불러오기 중 오류가 발생했습니다: {str(e)}")
+
+def apply_audioTemplate_to_session_state(file_name):
+    try:
+        # 템플릿 JSON 파일 로드
+        with open(file_name, 'r', encoding='utf-8') as f:
+            template_data = json.load(f)
+        
+        # JSON 데이터에서 세션 상태 적용
+        selected_folder_name = template_data.get('selected_folder_name_03', '')
+        #num_requests = template_data.get('num_requests_03', 1)
+        rows = template_data.get('rows', [])
+        
+        # 세션 상태에 값 저장
+
         st.session_state['selected_folder_name_03'] = selected_folder_name
         st.session_state['rows_03'] = rows
         #st.session_state['is_updating'] = False
