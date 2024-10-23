@@ -30,7 +30,7 @@ if github_info_loaded:
             st.write("")
             st.write("")
             st.markdown(
-                "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>닉네임 또는 이름</p>",
+                "<p le='font-size:14px; font-weight:bold; color:#000000;text-align:center;border:1px solid #E7EAF1;margin-top:10px;border-radius:5px;'>닉네임 또는 이름</p>",
                 unsafe_allow_html=True
             )
         with col2:
@@ -44,7 +44,7 @@ if github_info_loaded:
             st.write("")
         with col2:
             # 별점 선택 (슬라이더 사용)
-            score = st.slider("만족도 별점을 아래의 슬라이드바를 움직여서 선택해주세요. (1~5점 까지):", 1.0, 5.0, 1.0)
+            score = st.slider("✔️ 만족도 별점을 아래의 슬라이드바를 움직여서 선택해주세요. (1~5점 까지):", 1.0, 5.0, 1.0)
         with col3:
             st.write("")   
         # score에 따라 이미지 설정
