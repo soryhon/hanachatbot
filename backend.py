@@ -881,7 +881,7 @@ def apply_template_to_session_state(file_name):
                 #)
                 #if file_content:
                     #handle_sheet_selection(file_content, len(openpyxl.load_workbook(file_content).sheetnames), idx)
-                st.session_state['rows_03'][idx]['파일정보'] = file_info        
+                st.session_state['rows'][idx]['파일정보'] = file_info        
         st.success(f"'{selected_folder_name}' 양식을 불러오기 성공하였습니다.")
     
     except FileNotFoundError:
