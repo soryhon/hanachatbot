@@ -299,17 +299,6 @@ with st.expander("⚙️ 요청사항 설정 / 파일 업로드", expanded=st.se
                 st.session_state['html_report_03'] = ""
                 st.success(f"{st.session_state['num_requests_03']}개의 요청사항이 설정되었습니다.")
         col1, col2 = st.columns([0.5, 0.5])
-        with col1 :
-            st.markdown(
-                "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
-                unsafe_allow_html=True
-            )      
-        with col2 :
-            st.markdown(
-                "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
-                unsafe_allow_html=True
-            )
-        col1, col2 = st.columns([0.5, 0.5])
         with col1:
             st.markdown(
                 "<p style='font-size:14px; font-weight:normal; color:#444444; margin-top:35px;text-align:left;'>✔️ 작성에 필요한 요청사항 갯수를 설정해주세요.</p>",
