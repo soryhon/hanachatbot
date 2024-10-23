@@ -75,17 +75,17 @@ if github_info_loaded:
         idx = 0
         for type in type_list:
             if selected_type == type: 
-                with st.spinner(f"{type} 리스트 불러오는 중입니다..."):
-                    st.session_state['sub_title']=sub_title_list[idx]
-                    st.session_state['report_folder_option'] = [folderlist_init_value] + file_lists[idx]
-                    st.session_state['selected_report_folder_name'] = folder_list[idx]
-                    if st.session_state['report_type_index'] != idx:
-                        st.session_state['report_type_index'] = idx
-                        st.session_state['selected_report_folder_index'] = 0
-                        st.session_state['selected_report_file_name']=""
-                        st.session_state['check_report_05'] = True
-                        st.session_state['check_result_05'] = False
-                    time.sleep(1)
+               
+                st.session_state['sub_title']=sub_title_list[idx]
+                st.session_state['report_folder_option'] = [folderlist_init_value] + file_lists[idx]
+                st.session_state['selected_report_folder_name'] = folder_list[idx]
+                if st.session_state['report_type_index'] != idx:
+                    st.session_state['report_type_index'] = idx
+                    st.session_state['selected_report_folder_index'] = 0
+                    st.session_state['selected_report_file_name']=""
+                    st.session_state['check_report_05'] = True
+                    st.session_state['check_result_05'] = False
+        
             idx = idx +1
 
         st.markdown(
