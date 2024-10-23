@@ -99,7 +99,7 @@ if github_info_loaded:
         with col1:
             st.write("")
             st.markdown(
-                f"<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>{st.session_state['sub_title']}</p>",
+                f"<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;border:1px solid #E7EAF1;margin-top:10px;border-radius:5px;'>{st.session_state['sub_title']}</p>",
                 unsafe_allow_html=True
             )
             
