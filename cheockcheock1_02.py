@@ -48,12 +48,12 @@ if github_info_loaded:
     with st.expander("📝 보고서 선택", expanded=st.session_state['check_report']):
         col1, col2 = st.columns([0.25, 0.75])
         with col1:
-            #st.write("")
-            #st.markdown(
-                #"<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;border:1px solid #E7EAF1;margin-top:10px;border-radius:5px;'>비교분석 할<br/>보고서명 선택 </p>",
-                #unsafe_allow_html=True
-            #)
-            st.image("image/cheockcheock1_21.jpg",  use_column_width=True) 
+            st.write("")
+            st.markdown(
+                "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;border:1px solid #E7EAF1;margin-top:10px;border-radius:5px;'>비교분석 할<br/>보고서명 선택 </p>",
+                unsafe_allow_html=True
+            )
+             
         with col2:
             # 폴더 존재 확인 및 생성
             
@@ -130,15 +130,19 @@ st.markdown(
 # 6 프레임
 # 요청사항 갯수 및 기준일자 설정 
 with st.expander("⚙️ 요청사항 및 기준일자 설정", expanded=st.session_state['check_setting']):
-    if 'request_title' not in st.session_state:
-        st.session_state['request_title'] = ""
-    request_title = st.text_input("제목 : '제목을 입력해주세요.", key="request_title_input")
-    st.session_state['request_title'] = request_title
-
-    if 'request_text' not in st.session_state:
-        st.session_state['request_text'] = ""
-    request_text = st.text_area("요청 : '요청할 내용을 입력해주세요.", key="request_text_area")
-    st.session_state['request_text'] = request_text
+    col1, col2 = st.columns([0.7,0.3])
+    with col1:
+        if 'request_title' not in st.session_state:
+            st.session_state['request_title'] = ""
+        request_title = st.text_input("제목 : '제목을 입력해주세요.", key="request_title_input")
+        st.session_state['request_title'] = request_title
+    
+        if 'request_text' not in st.session_state:
+            st.session_state['request_text'] = ""
+        request_text = st.text_area("요청 : '요청할 내용을 입력해주세요.", key="request_text_area")
+        st.session_state['request_text'] = request_text
+    with col2:
+        st.image("image/cheockcheock1_21.jpg",  use_column_width=True)
     
     if date_list:
         st.markdown(
