@@ -68,14 +68,14 @@ subfolder_list=[]
 date_list=[]
 if github_info_loaded:
     with st.expander("📝 보고서 선택", expanded=st.session_state['check_report_02']):
-        col1, col2 = st.columns([0.25, 0.75])
+        col1, col2 = st.columns([0.28, 0.72])
         with col1:
-            st.write("")
-            st.markdown(
-                "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;border:1px solid #E7EAF1;margin-top:10px;border-radius:5px;'>비교분석 할<br/>보고서명 선택 </p>",
-                unsafe_allow_html=True
-            )
-             
+            #st.write("")
+            #st.markdown(
+                #"<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;border:1px solid #E7EAF1;margin-top:10px;border-radius:5px;'>비교분석 할<br/>보고서명 선택 </p>",
+                #unsafe_allow_html=True
+            #)
+            st.image("image/cheockcheock1_21.jpg",  use_column_width=False, width=180)
         with col2:
             # 폴더 존재 확인 및 생성
             
@@ -93,7 +93,7 @@ if github_info_loaded:
             st.session_state['folder_list_option_02'] = [folderlist_init_value] + folder_list
             # 폴더 선택 selectbox 생성 (새 폴더 추가 후, 선택값으로 설정)
             selected_folder = st.selectbox(
-                "등록된 보고서명 리스트",
+                "비교분석 할 보고서명 리스트",
                 options=st.session_state['folder_list_option_02'],  # 옵션 리스트에 새 폴더 반영
                 index=st.session_state['selected_folder_index_02'],  # 새로 선택된 폴더를 기본값으로 선택
                 key="selected_folder"
