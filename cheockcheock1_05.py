@@ -90,7 +90,7 @@ if github_info_loaded:
                         st.session_state['check_result_05'] = False
                 idx = idx +1
         with col2:
-            st.image("image/cheockcheock1_5.jpg",  use_column_width=True)
+            st.image("image/cheockcheock1_5.jpg",  use_column_width=False, width=180)
 
         st.markdown(
             "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
