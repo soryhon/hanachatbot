@@ -159,7 +159,7 @@ if github_info_loaded:
                             #st.success(f"{selected_template} 양식을 성공적으로 불러왔습니다.")
 
         with tab3:
-            col1, col2, col3 = st.columns([0.28, 0.5, 0.22])
+            col1, col2, col3 = st.columns([0.29, 0.5, 0.21])
             with col1:
                 #st.write("")
                 #st.markdown(
