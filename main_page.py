@@ -55,7 +55,7 @@ if side_selected_menu:
     hide_sidebar_style = """
     <style>
     [data-testid="stSidebar"] > div:first-child {
-        display: none;
+        display: hidden;
     }
     </style>
     """
