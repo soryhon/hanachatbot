@@ -35,7 +35,7 @@ def on_change_callback():
     st.session_state['selected_menu01_name'] = side_selected_menu
 
     # 선택한 파일 코드 실행
-    #bd.exec_page( st.session_state['selected_menu01_file'])
+    bd.exec_page( st.session_state['selected_menu01_file'])
     
 # 메뉴 리스트박스
 side_selected_menu = st.sidebar.selectbox("메뉴 선택하세요.", sub_menu_list, index=st.session_state['selected_menu01_index'],key='side_selected_menu', on_change=on_change_callback)
