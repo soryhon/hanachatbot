@@ -75,7 +75,7 @@ if github_info_loaded:
     with st.expander("📝 보고서 선택", expanded=st.session_state['check_report_03']):
         tab1, tab2, tab3 = st.tabs(["• 등록된 보고서명 선택하기", "• 저장된 보고서 양식 불러오기","• 새로운 보고서명 만들기"])
         with tab1:
-            col1, col2 = st.columns([0.25, 0.75])
+            col1, col2 = st.columns([0.28, 0.72])
             with col1:
                 #st.write("")
                 #st.markdown(
