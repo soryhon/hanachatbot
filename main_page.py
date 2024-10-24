@@ -36,7 +36,8 @@ st.sidebar.markdown(
 )
 
 # 리스트박스 선택 시
-if side_selected_menu != st.session_state['selected_menu01_name']:
+#if side_selected_menu != st.session_state['selected_menu01_name']:
+if side_selected_men:
     # 선택한 option Index
     idx  = sub_menu_list.index(side_selected_menu)
     # 선택한 Index을 session에 저장
