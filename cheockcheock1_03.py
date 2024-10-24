@@ -117,7 +117,7 @@ if github_info_loaded:
                     #st.success(f"[{selected_folder}] 보고서명이이 선택되었습니다.")
                 #else:   
                     #st.warning("보고서명을 선택하세요.")
-        with tab2:0
+        with tab2:
             col1, col2 = st.columns([0.28, 0.72])
             with col1:
                 #st.write("")
@@ -159,7 +159,7 @@ if github_info_loaded:
                             #st.success(f"{selected_template} 양식을 성공적으로 불러왔습니다.")
 
         with tab3:
-            col1, col2, col3 = st.columns([0.28, 0.5,0.22])
+            col1, col2, col3 = st.columns([0.28, 0.5, 0.22])
             with col1:
                 #st.write("")
                 #st.markdown(
