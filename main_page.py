@@ -13,7 +13,9 @@ if 'selected_menu01_name' not in st.session_state:
     st.session_state['selected_menu01_name'] =sub_menu_list[0]
 if 'selected_menu01_file' not in st.session_state:
     st.session_state['selected_menu01_file'] =file_list[0]     
-
+if 'side_selected_menu' not in st.session_state:
+    st.session_state.side_selected_menu = None
+    
 # 사이드바 상단 타이틀 : 척척하나
 st.sidebar.markdown(
     """
@@ -25,7 +27,7 @@ st.sidebar.markdown(
 )
 
 # 메뉴 리스트박스
-selected_menu = st.sidebar.selectbox("메뉴 선택하세요.", sub_menu_list, index=st.session_state['selected_menu01_index'])
+side_selected_menu = st.sidebar.selectbox("메뉴 선택하세요.", sub_menu_list, index=st.session_state['selected_menu01_index'],key="side_selected_menu")
 
 # 사이드바 하단 문구
 st.sidebar.markdown(
@@ -36,7 +38,7 @@ st.sidebar.markdown(
 )
 
 # 리스트박스 선택 시
-if selected_menu != st.session_state['selected_menu01_name']:
+if side_selected_menu != st.session_state['selected_menu01_name']:
     # 선택한 option Index
     idx  = sub_menu_list.index(selected_menu)
     # 선택한 Index을 session에 저장
