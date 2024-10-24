@@ -21,14 +21,7 @@ st.sidebar.markdown(
     <b style='font-size:22px;color:#0099FF;font-style:italic;'>CheockCheock</b><b style='font-size:30px;color:#009999;'>☝️</b>
     </div>
     """,
-    unsafe_allow_htm  # 선택한 option Index
-    idx  = sub_menu_list.index(side_selected_menu)
-    # 선택한 Index을 session에 저장
-    st.session_state['selected_menu01_index'] = idx 
-    # 파일명 가져오기
-    st.session_state['selected_menu01_file'] = file_list[idx]
-    # 선택한 파일 코드 실행
-    st.session_state['selected_menu01_name'] = side_selected_menul=True
+    unsafe_allow_html=True
 )
 
 def on_change_callback():
