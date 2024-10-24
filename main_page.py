@@ -23,7 +23,7 @@ st.sidebar.markdown(
     """,
     unsafe_allow_html=True
 )
-st.sidebar.image("image/cheockcheock1_menu3.jpg", width=200)
+st.sidebar.image("image/cheockcheock1_menu3.jpg", width=100)
 
     
 # 메뉴 리스트박스
