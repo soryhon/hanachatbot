@@ -65,7 +65,7 @@ if github_info_loaded:
             st.image(star_images[4], width=95)
    
 
-    col1, col2, col3 = st.columns([0.2.5, 0.5, 0.2.5])
+    col1, col2, col3 = st.columns([0.25, 0.5, 0.25])
     with col1:
         st.write("")
         #st.image("image/cheockcheock1_61.jpg", width=100)
