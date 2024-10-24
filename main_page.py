@@ -13,9 +13,7 @@ if 'selected_menu01_name' not in st.session_state:
     st.session_state['selected_menu01_name'] =sub_menu_list[0]
 if 'selected_menu01_file' not in st.session_state:
     st.session_state['selected_menu01_file'] =file_list[0]     
-if 'side_selected_menu' not in st.session_state:
-    st.session_state.side_selected_menu = None
-    
+
 # 사이드바 상단 타이틀 : 척척하나
 st.sidebar.markdown(
     """
