@@ -82,7 +82,7 @@ if github_info_loaded:
                     #"<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;border:1px solid #E7EAF1;margin-top:10px;border-radius:5px;'>등록된<br/>보고서명 선택 </p>",
                     #unsafe_allow_html=True
                 #)
-                st.image("image/cheockcheock1_3.jpg",  use_column_width=true)
+                st.image("image/cheockcheock1_3.jpg",  use_column_width=True)
             with col2:
                 # 폴더 존재 확인 및 생성
                 
