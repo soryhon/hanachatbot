@@ -46,7 +46,7 @@ if side_selected_menu:
     st.session_state['selected_menu01_file'] = file_list[idx]
     # 선택한 파일 코드 실행
     st.session_state['selected_menu01_name'] = side_selected_menu
-    st.rerun()
+
 # 선택한 파일 코드 실행
 bd.exec_page( st.session_state['selected_menu01_file'])
 
