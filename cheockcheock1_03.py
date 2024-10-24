@@ -117,14 +117,15 @@ if github_info_loaded:
                     #st.success(f"[{selected_folder}] 보고서명이이 선택되었습니다.")
                 #else:   
                     #st.warning("보고서명을 선택하세요.")
-        with tab2:
-            col1, col2 = st.columns([0.21, 0.79])
+        with tab2:0
+            col1, col2 = st.columns([0.28, 0.72])
             with col1:
-                st.write("")
-                st.markdown(
-                    "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;border:1px solid #E7EAF1;margin-top:10px;border-radius:5px;'>저장된 보고서<br/>양식 불러오기</p>",
-                    unsafe_allow_html=True
-                )
+                #st.write("")
+                #st.markdown(
+                    #"<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;border:1px solid #E7EAF1;margin-top:10px;border-radius:5px;'>저장된 보고서<br/>양식 불러오기</p>",
+                    #unsafe_allow_html=True
+                #)
+                st.image("image/cheockcheock1_3.jpg",  use_column_width=True)
             with col2:    
                 repo = st.session_state["github_repo"]
                 branch = st.session_state["github_branch"]
@@ -158,13 +159,14 @@ if github_info_loaded:
                             #st.success(f"{selected_template} 양식을 성공적으로 불러왔습니다.")
 
         with tab3:
-            col1, col2, col3 = st.columns([0.21, 0.5,0.29])
+            col1, col2, col3 = st.columns([0.28, 0.5,0.22])
             with col1:
-                st.write("")
-                st.markdown(
-                    "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;border:1px solid #E7EAF1;margin-top:10px;border-radius:5px;'>새로운 보고서명<br/>만들기</p>",
-                    unsafe_allow_html=True
-                )
+                #st.write("")
+                #st.markdown(
+                    #"<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;border:1px solid #E7EAF1;margin-top:10px;border-radius:5px;'>새로운 보고서명<br/>만들기</p>",
+                    #unsafe_allow_html=True
+                #)
+                st.image("image/cheockcheock1_3.jpg",  use_column_width=True)
             with col2:
                 new_folder_name = st.text_input("새로 등록할 보고서명 입력", max_chars=20, key="new_folder_name", value=st.session_state['new_folder_text_03'])
             with col3:
