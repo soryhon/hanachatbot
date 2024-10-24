@@ -60,7 +60,7 @@ st.markdown(
 # 3 프레임
 # 키워드 및 요청사항 입력
 with st.expander("⚙️ 키워드 및 요청사항", expanded=st.session_state['check_setting_04']):
-    col1, col2 = st.columns([0.65,0.25])
+    col1, col2 = st.columns([0.63,0.27])
     with col1:
         request_title = st.text_input("키워드 : '키워드를 입력해주세요.", key="request_title_input")
         st.session_state['request_title_04'] = request_title
