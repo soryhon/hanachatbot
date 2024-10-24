@@ -75,13 +75,14 @@ if github_info_loaded:
     with st.expander("📝 보고서 선택", expanded=st.session_state['check_report_03']):
         tab1, tab2, tab3 = st.tabs(["• 등록된 보고서명 선택하기", "• 저장된 보고서 양식 불러오기","• 새로운 보고서명 만들기"])
         with tab1:
-            col1, col2 = st.columns([0.21, 0.79])
+            col1, col2 = st.columns([0.2, 0.8])
             with col1:
-                st.write("")
-                st.markdown(
-                    "<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;border:1px solid #E7EAF1;margin-top:10px;border-radius:5px;'>등록된<br/>보고서명 선택 </p>",
-                    unsafe_allow_html=True
-                )
+                #st.write("")
+                #st.markdown(
+                    #"<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;border:1px solid #E7EAF1;margin-top:10px;border-radius:5px;'>등록된<br/>보고서명 선택 </p>",
+                    #unsafe_allow_html=True
+                #)
+                st.image("image/cheockcheock1_3.jpg",  use_column_width=true)
             with col2:
                 # 폴더 존재 확인 및 생성
                 
@@ -491,7 +492,7 @@ st.markdown(
 # 결과 보고서 LLM 응답 보기/ 결과 보고서 저장/ 보고서 양식 저장
 html_result_value = "<div id='html_result_value'>"
 with st.expander("📊 결과 보고서 보기", expanded=st.session_state['check_result_03']):
-    st.image("image/cheockcheock1_3.jpg",  use_column_width=False, width=130)
+    
     tab1, tab2 = st.tabs(["• 🧠 AI 요약 보고서 ", "• 🔎 음성파일 텍스트 보기"])
     with tab1:   
         if "response_03" in st.session_state:
