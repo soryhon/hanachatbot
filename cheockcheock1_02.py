@@ -78,7 +78,8 @@ if github_info_loaded:
             st.image("image/cheockcheock1_21.jpg",  use_column_width=False, width=180)
         with col2:
             # 폴더 존재 확인 및 생성
-            
+            st.write("")
+            st.write("")
             folder_list = bd.get_report_folder_list_from_github(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
         
             # st.selectbox 위젯 생성 (이제 session_state['selected_folder'] 사용 가능)
