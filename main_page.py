@@ -27,7 +27,7 @@ st.sidebar.markdown(
 )
 
 # 메뉴 리스트박스
-side_selected_menu = st.sidebar.selectbox("메뉴 선택하세요.", sub_menu_list, index=st.session_state['selected_menu01_index'],key="side_selected_menu")
+side_selected_menu = st.sidebar.selectbox("메뉴 선택하세요.", sub_menu_list, index=st.session_state['selected_menu01_index'],key='side_selected_menu')
 
 # 사이드바 하단 문구
 st.sidebar.markdown(
