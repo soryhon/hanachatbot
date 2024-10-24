@@ -49,7 +49,7 @@ if github_info_loaded:
                     #"<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>등록된<br/>보고서명 선택 </p>",
                     #unsafe_allow_html=True
                 #)
-                st.image("image/cheockcheock1_1.jpg",  use_column_width=True)
+                st.image("image/cheockcheock1_1.jpg",  use_column_width=False, width=180)
             with col2:
                 # 폴더 존재 확인 및 생성
                 
@@ -134,7 +134,7 @@ if github_info_loaded:
                     #"<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>새로운 보고서명<br/>만들기</p>",
                     #unsafe_allow_html=True
                 #)
-                st.image("image/cheockcheock1_1.jpg",  use_column_width=True)
+                st.image("image/cheockcheock1_1.jpg",  use_column_width=False, width=180)
             with col2:
                 new_folder_name = st.text_input("새로 등록할 보고서명 입력", max_chars=20, key="new_folder_name", value=st.session_state['new_folder_text'])
             with col3:
