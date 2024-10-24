@@ -54,7 +54,7 @@ if side_selected_menu:
     # 사이드바 숨기기 위한 CSS와 JavaScript 적용
     hide_sidebar_style = """
     <style>
-    [data-testid="stSidebar"] {
+    [data-testid="stSidebar"] > div:first-child {
         display: none;
     }
     </style>
