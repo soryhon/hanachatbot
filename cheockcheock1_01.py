@@ -93,7 +93,7 @@ if github_info_loaded:
                     #"<p style='font-size:14px; font-weight:bold; color:#000000;text-align:center;'>저장된 보고서<br/>양식 불러오기</p>",
                     #unsafe_allow_html=True
                 #)
-                st.image("image/cheockcheock1_1.jpg",  use_column_width=False, width=250)
+                st.image("image/cheockcheock1_1.jpg",  use_column_width=False, width=150)
             with col2:    
                 repo = st.session_state["github_repo"]
                 branch = st.session_state["github_branch"]
