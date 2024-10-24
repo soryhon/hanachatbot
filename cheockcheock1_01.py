@@ -52,7 +52,8 @@ if github_info_loaded:
                 st.image("image/cheockcheock1_1.jpg",  use_column_width=False, width=180)
             with col2:
                 # 폴더 존재 확인 및 생성
-                
+                st.write("")
+                st.write("")
                 folder_list = bd.get_folder_list_from_github(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
                 # st.selectbox bd.위젯 생성 (이제 session_state['selected_folder'] 사용 가능)
     
@@ -94,7 +95,9 @@ if github_info_loaded:
                     #unsafe_allow_html=True
                 #)
                 st.image("image/cheockcheock1_1.jpg",  use_column_width=False, width=180)
-            with col2:    
+            with col2:   
+                st.write("")
+                st.write("")
                 repo = st.session_state["github_repo"]
                 branch = st.session_state["github_branch"]
                 token = st.session_state["github_token"]
@@ -136,8 +139,12 @@ if github_info_loaded:
                 #)
                 st.image("image/cheockcheock1_1.jpg",  use_column_width=False, width=180)
             with col2:
+                st.write("")
+                st.write("")
                 new_folder_name = st.text_input("새로 등록할 보고서명 입력", max_chars=20, key="new_folder_name", value=st.session_state['new_folder_text'])
             with col3:
+                st.write("")
+                st.write("")
                 st.markdown(
                     "<p style='font-size:18px; margin-top:27px;'></p>",
                     unsafe_allow_html=True
