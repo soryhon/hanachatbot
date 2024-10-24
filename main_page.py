@@ -57,20 +57,20 @@ st.sidebar.markdown(
 
 # 리스트박스 선택 시
 #if side_selected_menu != st.session_state['selected_menu01_name']:
-"""
-if side_selected_menu:
+
+#if side_selected_menu:
     # 선택한 option Index
-    idx  = sub_menu_list.index(side_selected_menu)
+    #idx  = sub_menu_list.index(side_selected_menu)
     # 선택한 Index을 session에 저장
-    st.session_state['selected_menu01_index'] = idx 
+    #st.session_state['selected_menu01_index'] = idx 
     # 파일명 가져오기
-    st.session_state['selected_menu01_file'] = file_list[idx]
+    #st.session_state['selected_menu01_file'] = file_list[idx]
     # 선택한 파일 코드 실행
-    st.session_state['selected_menu01_name'] = side_selected_menu
+    #st.session_state['selected_menu01_name'] = side_selected_menu
 
 # 선택한 파일 코드 실행
-bd.exec_page( st.session_state['selected_menu01_file'])
-"""
+#bd.exec_page( st.session_state['selected_menu01_file'])
+
     
 
 
