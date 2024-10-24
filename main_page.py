@@ -51,6 +51,15 @@ if side_selected_menu:
     st.session_state['selected_menu01_name'] = side_selected_menu
     # 선택한 파일 코드 실행
     bd.exec_page( st.session_state['selected_menu01_file'])
+    # 사이드바 숨기기 위한 CSS와 JavaScript 적용
+    hide_sidebar_style = """
+    <style>
+    [data-testid="stSidebar"] {
+        display: none;
+    }
+    </style>
+    """
+    st.markdown(hide_sidebar_style, unsafe_allow_html=True)
 
 
 
