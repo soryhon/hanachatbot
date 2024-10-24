@@ -127,7 +127,9 @@ if github_info_loaded:
                     #unsafe_allow_html=True
                 #)
                 st.image("image/cheockcheock1_3.jpg",  use_column_width=False, width=180)
-            with col2:    
+            with col2:
+                st.write("")
+                st.write("")                
                 repo = st.session_state["github_repo"]
                 branch = st.session_state["github_branch"]
                 token = st.session_state["github_token"]
@@ -169,8 +171,12 @@ if github_info_loaded:
                 #)
                 st.image("image/cheockcheock1_3.jpg",  use_column_width=False, width=180)
             with col2:
+                st.write("")
+                st.write("")
                 new_folder_name = st.text_input("새로 등록할 보고서명 입력", max_chars=20, key="new_folder_name", value=st.session_state['new_folder_text_03'])
             with col3:
+                st.write("")
+                st.write("")
                 st.markdown(
                     "<p style='font-size:18px; margin-top:27px;'></p>",
                     unsafe_allow_html=True
