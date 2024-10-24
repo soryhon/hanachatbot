@@ -42,7 +42,9 @@ st.sidebar.markdown(
 
 if side_selected_menu:
     # 선택한 option Index
+    st.write(f"side_selected_menu")
     idx  = sub_menu_list.index(side_selected_menu)
+    st.write(f"idx")
     # 선택한 Index을 session에 저장
     st.session_state['selected_menu01_index'] = idx 
     # 파일명 가져오기
