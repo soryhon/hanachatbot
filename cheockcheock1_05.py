@@ -70,8 +70,10 @@ if github_info_loaded:
             
             # 결과를 2차 배열에 추가
             file_lists.append(file_list)
-        col1, col2 = st.columns([0.7,0.3])
+        col1, col2 = st.columns([0.28,0.72])
         with col1:
+            st.image("image/cheockcheock1_5.jpg",  use_column_width=False, width=180)
+        with col2:
             st.write("")
             st.write("")
             selected_type = st.radio("보고서 유형 선택하세요.",type_list, key="radio-type")
@@ -89,8 +91,7 @@ if github_info_loaded:
                         st.session_state['check_report_05'] = True
                         st.session_state['check_result_05'] = False
                 idx = idx +1
-        with col2:
-            st.image("image/cheockcheock1_5.jpg",  use_column_width=False, width=180)
+        
 
         st.markdown(
             "<hr style='border-top:1px solid #dddddd;border-bottom:0px solid #dddddd;width:100%;padding:0px;margin:0px'></hr>",
