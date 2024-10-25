@@ -111,7 +111,7 @@ if github_info_loaded:
                 if selected_folder != folderlist_init_value:
                     st.session_state['upload_folder_03'] = f"uploadFiles/{selected_folder}"
                      
-                    st.session_state['selected_template_name_03'] = templatelist_init_value
+                    st.session_state['selected_template_name_03'] =selected_folder
                     st.session_state['check_report_03']=False
                     st.session_state['check_setting_03']=True
                     st.session_state['selected_template_index_03'] = 0
@@ -150,7 +150,7 @@ if github_info_loaded:
                         "불러올 보고서 양식 파일 리스트", 
                         options=st.session_state['template_list_option_03'], 
                         index=st.session_state['selected_template_index_03'],
-                        key="selected_template"
+                        key="selected_template_03"
                     )
                     # 선택한 템플릿 불러오기
                     st.session_state['selected_template_name_03'] = selected_template
@@ -399,7 +399,7 @@ with st.expander("✍️ 요청사항 리스트", expanded=st.session_state['che
      
             file_list = ['파일을 선택하세요.']
             if st.session_state.get('github_token') and st.session_state.get('github_repo'):
-                all_files = bd.get_github_files(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
+                all_files = bd.get_github_audiofiles(st.session_state['github_repo'], st.session_state['github_branch'], st.session_state['github_token'])
                 audio_files = [file for file in all_files if file.split('.')[-1].lower() in supported_file_types]
                 file_list += audio_files
                 
