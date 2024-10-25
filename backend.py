@@ -1848,5 +1848,21 @@ def save_audio_template_to_json():
         st.success(f"{json_file_name} 파일이 {template_folder} 폴더에 저장되었습니다.")
     else:
         st.error(f"파일 저장 실패: {response.json()}")
+
+def get_github_audiofiles(repo, branch, token):
+    # 보고서명 리스트에서 선택한 폴더가 upload_folder에 저장됨
+    folder_name = st.session_state.get('upload_folder_03', 'uploadFiles')
     
+    # upload_folder 하위 폴더 내의 파일을 가져옴
+    create_github_folder_if_not_exists(repo, folder_name, token, branch)
+    url = f"https://api.github.com/repos/{repo}/git/trees/{branch}?recursive=1"
+    headers = {"Authorization": f"token {token}"}
+    response = requests.get(url, headers=headers)
+    
+    if response.status_code == 200:
+        files = [item['path'] for item in response.json().get('tree', []) if item['type'] == 'blob' and item['path'].startswith(folder_name)]
+        return files
+    else:
+        st.error("GitHub 파일 목록을 가져오지 못했습니다. 저장소 정보나 토큰을 확인하세요.")
+        return []    
 # Backend 기능 구현 끝 ---
