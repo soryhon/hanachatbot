@@ -88,7 +88,7 @@ if github_info_loaded:
                 with col1:
                     st.write("")
                 with col2:
-                    st.image("image/cheockcheock1_61.jpg",  use_column_width=True)
+                    st.image("image/cheockcheock1_6.jpg",  use_column_width=True)
                 with col3:
                     st.write("")
         with st.expander("✏️ 평가 내역 보기", expanded=False):
