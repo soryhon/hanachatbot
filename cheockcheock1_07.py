@@ -76,7 +76,7 @@ if github_info_loaded:
                                 )
                             with col2:
                                 st.markdown(
-                                    f"<p style='font-size:24px; font-weight:bold; color:#000000;text-align:center;'>날짜: <br/><b style='font-size:20px;>{random_entry['DATE']}</b></p>",
+                                    f"<p style='font-size:20px; font-weight:bold; color:#000000;text-align:center;'>날짜: <br/><b style='font-size:20px;>{random_entry['DATE']}</b></p>",
                                     unsafe_allow_html=True
                                 )
                         else:
