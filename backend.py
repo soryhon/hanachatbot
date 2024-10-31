@@ -1868,9 +1868,7 @@ def get_github_audiofiles(repo, branch, token):
         st.error("GitHub 파일 목록을 가져오지 못했습니다. 저장소 정보나 토큰을 확인하세요.")
         return []    
 
-import pandas as pd
-import random
-from datetime import datetime
+
 
 # CSV 파일에서 데이터를 불러오고 총 건수, 평균 점수를 계산하는 함수
 def get_appraisal_data(file_path):
