@@ -1902,7 +1902,7 @@ def get_random_appraisal_in_range(data, start_date, end_date):
         end_date = pd.to_datetime(end_date) + timedelta(days=1)  # end_date에 하루 추가
         
         data['DATE'] = pd.to_datetime(data['DATE'])
-        filtered_data = data[(data['DATE'] >= start_date) & (data['DATE'] < end_date
+        filtered_data = data[(data['DATE'] >= start_date) & (data['DATE'] < end_date)]
         
         if not filtered_data.empty:
             random_entry = filtered_data.sample(n=1).iloc[0]
