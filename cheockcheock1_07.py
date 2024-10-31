@@ -44,13 +44,13 @@ if github_info_loaded:
                 )
             with col3:
                 st.markdown(
-                    f"<p style='font-size:24px; font-weight:bold; color:#000000;text-align:center;'>만족도 점수:<br/>{satisfaction_score_100:.2f}점</p>",
+                    f"<p style='font-size:24px; font-weight:bold; color:#000000;text-align:center;'>만족도 점수:<br/><b style='color:#0F9ED5;'>{satisfaction_score_100:.2f}점</b></p>",
                     unsafe_allow_html=True
                 )
                # 시작일자와 종료일자를 설정
 
             if start_date and end_date:
-                st.write(f"평가 기간: {start_date.date()} ~ {end_date.date()}")
+                st.write(f"평가 등록 기간: {start_date.date()} ~ {end_date.date()}")
         if start_date and end_date:
             with st.expander("✏️ 추첨 하기", expanded=False):
                 col1 , col2 = st.columns([0.5,0.5])
