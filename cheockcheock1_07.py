@@ -36,7 +36,7 @@ if appraisal_data is not None:
         if st.button("🎉 추첨하기",  use_container_width=True):
             random_entry = bd.get_random_appraisal_in_range(appraisal_data, selected_start_date, selected_end_date)
             if random_entry is not None:
-                st.write(f"닉네임: {random_entry['Nickname']}")
+                st.write(f"닉네임: {random_entry['ID']}")
                 st.write(f"평가 점수: {random_entry['Score']}")
                 st.write(f"날짜: {random_entry['DATE']}")
             else:
