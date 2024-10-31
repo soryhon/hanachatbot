@@ -80,7 +80,13 @@ if github_info_loaded:
                                     unsafe_allow_html=True
                                 )
 
-                            st.image("image/cheockcheock1_6.jpg",  use_column_width=True)
+                            col1, col2, col3 = st.columns([0.1, 0.8, 0.1]) 
+                            with col1:
+                                st.write("")
+                            with col2:
+                                st.image("image/cheockcheock1_6.jpg",  use_column_width=True)
+                            with col3:
+                                st.write("")
 
                         else:
                             st.write("선택한 기간 내 데이터가 없습니다.")
