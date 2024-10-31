@@ -27,11 +27,11 @@ with col2:
 
 if github_info_loaded:
     # 데이터 로드 및 기본 정보 표시
-    total_count, average_score, appraisal_data = bd.get_appraisal_data(file_path)
+    total_count, average_score, satisfaction_score_100, appraisal_data = bd.get_appraisal_data(file_path)
     if appraisal_data is not None:
         start_date, end_date = bd.get_date_range(appraisal_data)
         with st.expander("✏️ 만족도 평가 결과", expanded=True):
-            col1 , col2 = st.columns([0.5,0.5])
+            col1 , col2, col3 = st.columns([0.3,0.3, 0.3])
             with col1:
                 st.markdown(
                     f"<p style='font-size:25px; font-weight:bold; color:#000000;'>총 평가 건수: {total_count}건</p>",
@@ -42,10 +42,15 @@ if github_info_loaded:
                     f"<p style='font-size:25px; font-weight:bold; color:#000000;'>평균 점수: {average_score:.2f}</p>",
                     unsafe_allow_html=True
                 )
+            with col3:
+                st.markdown(
+                    f"<p style='font-size:25px; font-weight:bold; color:#000000;'>만족도 점수: {satisfaction_score_100:.2f}점</p>",
+                    unsafe_allow_html=True
+                )
                # 시작일자와 종료일자를 설정
 
             if start_date and end_date:
-                st.write(f"데이터 범위: {start_date.date()} ~ {end_date.date()}")
+                st.write(f"평가 기간: {start_date.date()} ~ {end_date.date()}")
         if start_date and end_date:
             with st.expander("✏️ 추첨 하기", expanded=False):
                 col1 , col2 = st.columns([0.5,0.5])
@@ -78,6 +83,10 @@ if github_info_loaded:
                     st.image("image/cheockcheock1_61.jpg",  use_column_width=True)
                 with col3:
                     st.write("")
+        with st.expander("✏️ 평가 내역 보기", expanded=False):
+            # CSV 데이터를 HTML 테이블로 변환하여 표시
+            html_table = bd.convert_data_to_html_table(appraisal_data)
+            st.markdown(html_table, unsafe_allow_html=True)
     else:
         st.write("평가 데이터를 불러올 수 없습니다.")
 else:
