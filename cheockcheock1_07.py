@@ -79,13 +79,9 @@ if github_info_loaded:
                                     f"<p style='font-size:20px; font-weight:bold; color:#000000;text-align:center;'>날짜: <br/><b style='font-size:20px;'>{random_entry['DATE']}</b></p>",
                                     unsafe_allow_html=True
                                 )
-                            col1, col2, col3 = st.columns([0.25, 0.5, 0.25]) 
-                            with col1:
-                                st.write("")
-                            with col2:
-                                st.image("image/cheockcheock1_6.jpg",  use_column_width=True)
-                            with col3:
-                                st.write("")
+
+                            st.image("image/cheockcheock1_6.jpg",  use_column_width=True)
+
                         else:
                             st.write("선택한 기간 내 데이터가 없습니다.")
                 with col3:
