@@ -44,7 +44,7 @@ if github_info_loaded:
                 )
             with col3:
                 st.markdown(
-                    f"<p style='font-size:24px; font-weight:bold; color:#000000;text-align:center;'>만족도 점수:<br/>satisfaction_score_100:.2f}점</p>",
+                    f"<p style='font-size:24px; font-weight:bold; color:#000000;text-align:center;'>만족도 점수:<br/>{satisfaction_score_100:.2f}점</p>",
                     unsafe_allow_html=True
                 )
                # 시작일자와 종료일자를 설정
