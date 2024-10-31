@@ -9,7 +9,7 @@ file_path = "satisfaction/appraisal.csv"
 # 데이터 로드 및 기본 정보 표시
 total_count, average_score, appraisal_data = bd.get_appraisal_data(file_path)
 if appraisal_data is not None:
-    col1 , col2 = st.columns([0.5,0.5})
+    col1 , col2 = st.columns([0.5,0.5])
     with col1:
       st.title(f"총 평가 건수: {total_count}건")
     with col2:
