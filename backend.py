@@ -1874,7 +1874,7 @@ from datetime import datetime
 
 # CSV 파일에서 데이터를 불러오고 총 건수, 평균 점수를 계산하는 함수
 def get_appraisal_data(file_path):
-     try:
+    try:
         data = pd.read_csv(file_path)
         total_count = len(data)
         average_score = data['Score'].mean()
