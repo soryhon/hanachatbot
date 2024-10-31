@@ -30,7 +30,7 @@ if github_info_loaded:
     total_count, average_score, satisfaction_score_100, appraisal_data = bd.get_appraisal_data(file_path)
     if appraisal_data is not None:
         start_date, end_date = bd.get_date_range(appraisal_data)
-        with st.expander("✏️ 만족도 평가 결과", expanded=True):
+        with st.expander("⭐ 만족도 평가 결과", expanded=True):
             col1 , col2, col3 = st.columns([0.3,0.3, 0.3])
             with col1:
                 st.markdown(
@@ -52,7 +52,7 @@ if github_info_loaded:
             if start_date and end_date:
                 st.write(f"평가 등록 기간: {start_date.date()} ~ {end_date.date()}")
         if start_date and end_date:
-            with st.expander("✏️ 추첨 하기", expanded=False):
+            with st.expander("🏅 추첨 하기", expanded=False):
                 col1 , col2 = st.columns([0.5,0.5])
                 # 달력 입력창 추가
                 with col1:
@@ -91,7 +91,7 @@ if github_info_loaded:
                     st.image("image/cheockcheock1_6.jpg",  use_column_width=True)
                 with col3:
                     st.write("")
-        with st.expander("✏️ 평가 내역 보기", expanded=False):
+        with st.expander("📜 평가 내역 보기", expanded=False):
             # CSV 데이터를 HTML 테이블로 변환하여 표시
             html_table = bd.convert_data_to_html_table(appraisal_data)
             st.markdown(html_table, unsafe_allow_html=True)
