@@ -34,17 +34,17 @@ if github_info_loaded:
             col1 , col2, col3 = st.columns([0.3,0.3, 0.3])
             with col1:
                 st.markdown(
-                    f"<p style='font-size:25px; font-weight:bold; color:#000000;'>총 평가 건수: {total_count}건</p>",
+                    f"<p style='font-size:24px; font-weight:bold; color:#000000;text-align:center;'>총 평가 건수:<br/>{total_count}건</p>",
                     unsafe_allow_html=True
                 )
             with col2:
                 st.markdown(
-                    f"<p style='font-size:25px; font-weight:bold; color:#000000;'>평균 점수: {average_score:.2f}</p>",
+                    f"<p style='font-size:24px; font-weight:bold; color:#000000;text-align:center;'>평균 점수:<br/>{average_score:.2f}</p>",
                     unsafe_allow_html=True
                 )
             with col3:
                 st.markdown(
-                    f"<p style='font-size:25px; font-weight:bold; color:#000000;'>만족도 점수: {satisfaction_score_100:.2f}점</p>",
+                    f"<p style='font-size:24px; font-weight:bold; color:#000000;text-align:center;'>만족도 점수:<br/>satisfaction_score_100:.2f}점</p>",
                     unsafe_allow_html=True
                 )
                # 시작일자와 종료일자를 설정
