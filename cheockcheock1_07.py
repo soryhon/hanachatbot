@@ -68,9 +68,17 @@ if github_info_loaded:
                     if st.button("🎉 추첨하기",  use_container_width=True):
                         random_entry = bd.get_random_appraisal_in_range(appraisal_data, selected_start_date, selected_end_date)
                         if random_entry is not None:
-                            st.write(f"닉네임: {random_entry['ID']}")
-                            st.write(f"평가 점수: {random_entry['Score']}")
-                            st.write(f"날짜: {random_entry['DATE']}")
+                            col1, col2 = st.columns([0.5,0.5])
+                            with col1:
+                                st.markdown(
+                                    f"<p style='font-size:24px; font-weight:bold; color:#000000;text-align:center;'>닉네임: <br/>{random_entry['ID']}</p>",
+                                    unsafe_allow_html=True
+                                )
+                            with col2:
+                                st.markdown(
+                                    f"<p style='font-size:24px; font-weight:bold; color:#000000;text-align:center;'>날짜: <br/>{random_entry['DATE']}</p>",
+                                    unsafe_allow_html=True
+                                )
                         else:
                             st.write("선택한 기간 내 데이터가 없습니다.")
                 with col3:
