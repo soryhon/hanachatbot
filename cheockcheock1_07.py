@@ -11,10 +11,15 @@ total_count, average_score, appraisal_data = bd.get_appraisal_data(file_path)
 if appraisal_data is not None:
     col1 , col2 = st.columns([0.5,0.5])
     with col1:
-      st.subject(f"총 평가 건수: {total_count}건")
+        st.markdown(
+            f"<p style='font-size:25px; font-weight:bold; color:#000000;'>총 평가 건수: {total_count}건</p>",
+            unsafe_allow_html=True
+        )
     with col2:
-      st.subject(f"평균 점수: {average_score:.2f}")
-
+        st.markdown(
+            f"<p style='font-size:25px; font-weight:bold; color:#000000;'>평균 점수: {average_score:.2f}</p>",
+            unsafe_allow_html=True
+        )
     # 시작일자와 종료일자를 설정
     start_date, end_date = bd.get_date_range(appraisal_data)
     if start_date and end_date:
