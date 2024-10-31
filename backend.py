@@ -1937,6 +1937,7 @@ def convert_data_to_html_table(data):
             html_table += f"<td style='border: 1px solid black; padding: 5px; text-align: center;'>{value}</td>"
         html_table += "</tr>"
     
-    html_table += "</tbo
+    html_table += "</tbody></table>"
+    return html_table
 
 # Backend 기능 구현 끝 ---
