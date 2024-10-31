@@ -71,12 +71,12 @@ if github_info_loaded:
                             col1, col2 = st.columns([0.5,0.5])
                             with col1:
                                 st.markdown(
-                                    f"<p style='font-size:20px; font-weight:bold; color:#000000;text-align:center;'>닉네임: <br/><b style='font-size:25px;>{random_entry['ID']}</b></p>",
+                                    f"<p style='font-size:20px; font-weight:bold; color:#000000;text-align:center;'>닉네임: <br/><b style='font-size:25px;'>{random_entry['ID']}</b></p>",
                                     unsafe_allow_html=True
                                 )
                             with col2:
                                 st.markdown(
-                                    f"<p style='font-size:20px; font-weight:bold; color:#000000;text-align:center;'>날짜: <br/><b style='font-size:20px;>{random_entry['DATE']}</b></p>",
+                                    f"<p style='font-size:20px; font-weight:bold; color:#000000;text-align:center;'>날짜: <br/><b style='font-size:20px;'>{random_entry['DATE']}</b></p>",
                                     unsafe_allow_html=True
                                 )
                         else:
