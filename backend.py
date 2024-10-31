@@ -1904,7 +1904,7 @@ def get_random_appraisal_in_range(data, start_date, end_date):
         else:
             return None
     except Exception as e:
-       st.error(f"Error filtering data: {e}")
+        st.error(f"Error filtering data: {e}")
         return None
 
 # Backend 기능 구현 끝 ---
