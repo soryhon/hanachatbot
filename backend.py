@@ -900,8 +900,8 @@ def apply_audioTemplate_to_session_state(file_name):
             template_data = json.load(f)
         
         # JSON 데이터에서 세션 상태 적용
-        selected_folder_name = template_data.get('selected_folder_name_03', '')
-        #num_requests = template_data.get('num_requests_03', 1)
+        selected_folder_name = template_data.get('selected_folder_name', '')
+        #num_requests = template_data.get('num_requests', 1)
         rows = template_data.get('rows', [])
         
         # 세션 상태에 값 저장
@@ -1850,6 +1850,23 @@ def save_audio_template_to_json():
         st.success(f"{json_file_name} 파일이 {template_folder} 폴더에 저장되었습니다.")
     else:
         st.error(f"파일 저장 실패: {response.json()}")
+        
+def get_github_audiofiles(repo, branch, token):
+    # 보고서명 리스트에서 선택한 폴더가 upload_folder에 저장됨
+    folder_name = st.session_state.get('upload_folder_03', 'uploadFiles')
+    
+    # upload_folder 하위 폴더 내의 파일을 가져옴
+    create_github_folder_if_not_exists(repo, folder_name, token, branch)
+    url = f"https://api.github.com/repos/{repo}/git/trees/{branch}?recursive=1"
+    headers = {"Authorization": f"token {token}"}
+    response = requests.get(url, headers=headers)
+    
+    if response.status_code == 200:
+        files = [item['path'] for item in response.json().get('tree', []) if item['type'] == 'blob' and item['path'].startswith(folder_name)]
+        return files
+    else:
+        st.error("GitHub 파일 목록을 가져오지 못했습니다. 저장소 정보나 토큰을 확인하세요.")
+        return []    
 
 def get_github_audiofiles(repo, branch, token):
     # 보고서명 리스트에서 선택한 폴더가 upload_folder에 저장됨
@@ -1937,5 +1954,4 @@ def convert_data_to_html_table(data):
     
     html_table += "</tbody></table>"
     return html_table
-
 # Backend 기능 구현 끝 ---
