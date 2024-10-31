@@ -71,7 +71,7 @@ if github_info_loaded:
                             col1, col2 = st.columns([0.6,0.4])
                             with col1:
                                 st.markdown(
-                                    f"<p style='font-size:20px; font-weight:bold; color:#000000;text-align:center;'>닉네임: <br/><b style='font-size:25px;color:#006666;'>{random_entry['ID']}</b></p>",
+                                    f"<p style='font-size:20px; font-weight:bold; color:#000000;text-align:center;'>닉네임: <br/><b style='font-size:30px;color:#006666;'>{random_entry['ID']}</b></p>",
                                     unsafe_allow_html=True
                                 )
                             with col2:
