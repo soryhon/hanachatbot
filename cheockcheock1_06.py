@@ -89,7 +89,7 @@ if github_info_loaded:
         st.write("")
 
     # 버튼 이미지 URL (로컬 이미지 경로를 사용하려면 외부로 로드하는 방식이 필요합니다.)
-    button_image_url = "image/cheockcheock1_61.jpg"
+    button_image_url = "https://raw.githubusercontent.com/soryhon/hanachatbot/refs/heads/main/image/cheockcheock1_6.jpg"
     
     # HTML을 사용한 버튼 생성
     button_html = f"""
