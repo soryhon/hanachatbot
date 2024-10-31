@@ -33,7 +33,7 @@ if appraisal_data is not None:
             selected_end_date = st.date_input("종료일자 선택", value=end_date)
         
         # [추첨하기] 버튼을 클릭하면, 기간 내 랜덤으로 1건 추출
-        if st.button("🎉 추첨하기"):
+        if st.button("🎉 추첨하기",  use_container_width=True):
             random_entry = bd.get_random_appraisal_in_range(appraisal_data, selected_start_date, selected_end_date)
             if random_entry is not None:
                 st.write(f"닉네임: {random_entry['Nickname']}")
