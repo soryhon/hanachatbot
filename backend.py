@@ -1879,7 +1879,7 @@ def get_appraisal_data(file_path):
         average_score = data['Score'].mean()
         return total_count, average_score, data
     except Exception as e:
-        print(f"Error reading {file_path}: {e}")
+        st.error(f"Error reading {file_path}: {e}")
         return None, None, None
 
 # 시작일자와 종료일자를 추출하는 함수
@@ -1890,7 +1890,7 @@ def get_date_range(data):
         end_date = data['DATE'].max()
         return start_date, end_date
     except Exception as e:
-        print(f"Error processing dates: {e}")
+        st.error(f"Error processing dates: {e}")
         return None, None
 
 # 선택된 기간 내에서 랜덤으로 한 건의 평가 기록을 추출하는 함수
@@ -1904,7 +1904,7 @@ def get_random_appraisal_in_range(data, start_date, end_date):
         else:
             return None
     except Exception as e:
-        print(f"Error filtering data: {e}")
+       st.error(f"Error filtering data: {e}")
         return None
 
 # Backend 기능 구현 끝 ---
