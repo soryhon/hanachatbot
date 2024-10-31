@@ -24,10 +24,13 @@ if appraisal_data is not None:
     start_date, end_date = bd.get_date_range(appraisal_data)
     if start_date and end_date:
         st.write(f"데이터 범위: {start_date.date()} ~ {end_date.date()}")
-        
+
+        col1 , col2 = st.columns([0.5,0.5])
         # 달력 입력창 추가
-        selected_start_date = st.date_input("시작일자 선택", value=start_date)
-        selected_end_date = st.date_input("종료일자 선택", value=end_date)
+        with col1:
+            selected_start_date = st.date_input("시작일자 선택", value=start_date)
+        with col2:
+            selected_end_date = st.date_input("종료일자 선택", value=end_date)
         
         # [추첨하기] 버튼을 클릭하면, 기간 내 랜덤으로 1건 추출
         if st.button("🎉 추첨하기"):
