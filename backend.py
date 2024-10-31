@@ -1874,14 +1874,18 @@ from datetime import datetime
 
 # CSV 파일에서 데이터를 불러오고 총 건수, 평균 점수를 계산하는 함수
 def get_appraisal_data(file_path):
-    try:
+     try:
         data = pd.read_csv(file_path)
         total_count = len(data)
         average_score = data['Score'].mean()
-        return total_count, average_score, data
+        
+        # 평균 점수를 100점 만점 기준으로 환산
+        satisfaction_score_100 = (average_score / 5) * 100
+
+        return total_count, average_score, satisfaction_score_100, data
     except Exception as e:
         st.error(f"Error reading {file_path}: {e}")
-        return None, None, None
+        return None, None, None, None
 
 # 시작일자와 종료일자를 추출하는 함수
 def get_date_range(data):
@@ -1912,5 +1916,27 @@ def get_random_appraisal_in_range(data, start_date, end_date):
     except Exception as e:
         st.error(f"Error filtering data: {e}")
         return None
+
+# CSV 데이터를 HTML 테이블로 변환하는 함수
+def convert_data_to_html_table(data):
+    if data is None or data.empty:
+        return "<p>데이터가 없습니다.</p>"
+    
+    html_table = "<table style='width: 100%; border-collapse: collapse; border: 1px solid black;'>"
+    html_table += "<thead><tr>"
+    
+    # 테이블 헤더 추가
+    for column in data.columns:
+        html_table += f"<th style='border: 1px solid black; padding: 5px; background-color: #f2f2f2;'>{column}</th>"
+    html_table += "</tr></thead><tbody>"
+    
+    # 테이블 행 데이터 추가
+    for _, row in data.iterrows():
+        html_table += "<tr>"
+        for value in row:
+            html_table += f"<td style='border: 1px solid black; padding: 5px; text-align: center;'>{value}</td>"
+        html_table += "</tr>"
+    
+    html_table += "</tbo
 
 # Backend 기능 구현 끝 ---
