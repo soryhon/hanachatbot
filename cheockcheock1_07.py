@@ -34,17 +34,17 @@ if github_info_loaded:
             col1 , col2, col3 = st.columns([0.3,0.3, 0.3])
             with col1:
                 st.markdown(
-                    f"<p style='font-size:22px; font-weight:bold; color:#000000;text-align:center;'>총 평가 건수:<br/><b style='color:#0000FF;font-size:25px;'>{total_count}건</b></p>",
+                    f"<p style='font-size:22px; font-weight:bold; color:#0a0a0a;text-align:center;'>총 평가 건수:<br/><b style='color:#000000;font-size:25px;'>{total_count}건</b></p>",
                     unsafe_allow_html=True
                 )
             with col2:
                 st.markdown(
-                    f"<p style='font-size:22px; font-weight:bold; color:#000000;text-align:center;'>평균 점수:<br/><b style='color:#0000FF;font-size:25px;'>{average_score:.2f}</b></p>",
+                    f"<p style='font-size:22px; font-weight:bold; color:#0a0a0a;text-align:center;'>평균 점수:<br/><b style='color:#000000;font-size:25px;'>{average_score:.2f}</b></p>",
                     unsafe_allow_html=True
                 )
             with col3:
                 st.markdown(
-                    f"<p style='font-size:22px; font-weight:bold; color:#000000;text-align:center;'>만족도 점수:<br/><b style='color:#0000FF;font-size:25px;'>{satisfaction_score_100:.2f}점</b></p>",
+                    f"<p style='font-size:22px; font-weight:bold; color:#0a0a0a;text-align:center;'>만족도 점수:<br/><b style='color:#0000FF;font-size:25px;'>{satisfaction_score_100:.2f}점</b></p>",
                     unsafe_allow_html=True
                 )
                # 시작일자와 종료일자를 설정
@@ -71,7 +71,7 @@ if github_info_loaded:
                             col1, col2 = st.columns([0.5,0.5])
                             with col1:
                                 st.markdown(
-                                    f"<p style='font-size:20px; font-weight:bold; color:#000000;text-align:center;'>닉네임: <br/><b style='font-size:25px;'>{random_entry['ID']}</b></p>",
+                                    f"<p style='font-size:20px; font-weight:bold; color:#000000;text-align:center;'>닉네임: <br/><b style='font-size:25px;color:#006666;'>{random_entry['ID']}</b></p>",
                                     unsafe_allow_html=True
                                 )
                             with col2:
