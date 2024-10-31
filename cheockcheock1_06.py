@@ -87,6 +87,27 @@ if github_info_loaded:
         st.image("image/cheockcheock1_61.jpg",  use_column_width=True)
     with col3:
         st.write("")
+
+    # 버튼 이미지 URL (로컬 이미지 경로를 사용하려면 외부로 로드하는 방식이 필요합니다.)
+    button_image_url = "image/cheockcheock1_61.jpg"
+    
+    # HTML을 사용한 버튼 생성
+    button_html = f"""
+    <div style="display: flex; justify-content: center;">
+        <form action="" method="get">
+            <button style="background-color: transparent; border: none; cursor: pointer;">
+                <img src="{button_image_url}" alt="Button Image" style="width: 50px; height: 50px;">
+            </button>
+        </form>
+    </div>
+    """
+    
+    # HTML 버튼을 삽입
+    st.markdown(button_html, unsafe_allow_html=True)
+    
+    # 버튼 클릭 처리
+    if st.button("이미지 버튼으로 클릭"):
+        st.write("버튼이 클릭되었습니다!")
 else:
     st.warning("GitHub 정보가 설정되지 않았습니다. 먼저 GitHub Token을 입력해 주세요.")
 
