@@ -1896,8 +1896,13 @@ def get_date_range(data):
 # 선택된 기간 내에서 랜덤으로 한 건의 평가 기록을 추출하는 함수
 def get_random_appraisal_in_range(data, start_date, end_date):
     try:
+        # start_date와 end_date를 datetime 형식으로 변환
+        start_date = pd.to_datetime(start_date)
+        end_date = pd.to_datetime(end_date)
+        
         data['DATE'] = pd.to_datetime(data['DATE'])
         filtered_data = data[(data['DATE'] >= start_date) & (data['DATE'] <= end_date)]
+        
         if not filtered_data.empty:
             random_entry = filtered_data.sample(n=1).iloc[0]
             return random_entry
