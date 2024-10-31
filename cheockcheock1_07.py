@@ -80,7 +80,7 @@ if github_info_loaded:
                                     unsafe_allow_html=True
                                 )
 
-                            col1, col2, col3 = st.columns([0.1, 0.8, 0.1]) 
+                            col1, col2, col3 = st.columns([0.05, 0.9, 0.05]) 
                             with col1:
                                 st.write("")
                             with col2:
