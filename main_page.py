@@ -2,9 +2,9 @@ import streamlit as st
 import backend as bd
 
 # 메뉴명 리스트
-sub_menu_list=['📚업무 보고서 자동 완성', '📈보고서 비교분석 자동 완성', '🎧음성 파일 보고서 완성', '⚡Quickly 키워드 보고서 완성','📋결과 보고서 현황', '👥프로젝트 및 팀 소개', '🏆사용자 만족도 평가']
+sub_menu_list=['📚업무 보고서 자동 완성', '📈보고서 비교분석 자동 완성', '🎧음성 파일 보고서 완성', '⚡Quickly 키워드 보고서 완성','📋결과 보고서 현황', '👥프로젝트 및 팀 소개', '🏆사용자 만족도 평가','_ _ _ _ _ _ _ _ _ _ _ _ _ _']
 # 파일명 리스트
-file_list=["cheockcheock1_01.py","cheockcheock1_02.py","cheockcheock1_03.py","cheockcheock1_04.py","cheockcheock1_05.py","cheockcheock1_team.py","cheockcheock1_06.py"]
+file_list=["cheockcheock1_01.py","cheockcheock1_02.py","cheockcheock1_03.py","cheockcheock1_04.py","cheockcheock1_05.py","cheockcheock1_team.py","cheockcheock1_06.py","cheockcheock1_07.py"]
 
 # 세션변수 초기화 선언
 if 'selected_menu01_index' not in st.session_state:
